@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/screens/calendar_screen.dart';
 
 import 'package:voltican_fitness/widgets/button.dart';
 import 'package:voltican_fitness/widgets/simple_button.dart';
@@ -22,7 +23,8 @@ class _AddMealScreenState extends State<MealEditScreen> {
           GestureDetector(
             onTap: () {
               Navigator.of(context, rootNavigator: true).pop(context);
-              Navigator.of(context).push(MaterialPageRoute(builder: (context)=> const CalendarScreen()));
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const CalendarScreen()));
             },
             child: const SimpleButton(
                 title: "Discard",
@@ -33,7 +35,6 @@ class _AddMealScreenState extends State<MealEditScreen> {
           GestureDetector(
             onTap: () {
               Navigator.of(context).pop();
-
             },
             child: const SimpleButton(
                 title: "Save changes",

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 // import 'package:voltican_fitness/screens/role_screen.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:voltican_fitness/screens/role_screen.dart';
 
 import 'package:voltican_fitness/widgets/button.dart';
 import 'package:voltican_fitness/widgets/or_divider.dart';
@@ -32,7 +33,8 @@ class _SignupScreenState extends State<SignupScreen> {
     final isValid = _formKey.currentState!.validate();
     if (isValid) {
       _formKey.currentState!.save();
-      final url = Uri.parse('http://ec2-13-51-254-117.eu-north-1.compute.amazonaws.com/api/v1/auth/register');
+      final url = Uri.parse(
+          'http://ec2-13-51-254-117.eu-north-1.compute.amazonaws.com/api/v1/auth/register');
       final response = await http.post(url,
           headers: {'Content-Type': 'application/json'},
           body: json.encode({
@@ -41,9 +43,11 @@ class _SignupScreenState extends State<SignupScreen> {
             'password': _enteredPassword,
             'username': _enteredUsername
           }));
-          print(response);
-     if(!mount) return;
-     Navigator.of(context).push(MaterialPageRoute(builder:(context)=> const  RoleScreen());
+      print(response);
+      if (!mounted) return;
+      // ignore: use_build_context_synchronously
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => const RoleScreen()));
     }
   }
 
@@ -221,7 +225,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     const SizedBox(height: 20),
                     GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         _submit(context);
                       },
                       // onTap: () {
@@ -268,7 +272,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     },
                     child: const Text(
                       "Login",
-                      style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold),
                     ))
               ],
             )

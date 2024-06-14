@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/screens/calendar_screen.dart';
 import 'package:voltican_fitness/screens/signup_screen.dart';
 // import 'package:voltican_fitness/screens/tabs_screen.dart';
 import 'package:http/http.dart' as http;
@@ -23,14 +24,16 @@ class _SignupScreenState extends State<LoginScreen> {
     final isValid = _formKey.currentState!.validate();
     if (isValid) {
       _formKey.currentState!.save();
-       final url = Uri.parse('http://ec2-13-51-254-117.eu-north-1.compute.amazonaws.com/api/v1/auth/login')
+      final url = Uri.parse(
+          'http://ec2-13-51-254-117.eu-north-1.compute.amazonaws.com/api/v1/auth/login');
       final response = await http.post(url,
           headers: {'Content-Type': 'application/json'},
           body: json.encode(
               {'password': _enteredPassword, 'username': _enteredUsername}));
       print(response);
-       if(!mount) return;
-     Navigator.of(context).push(MaterialPageRoute(builder:(context)=> const  CalendarScreen());
+      if (!mounted) return;
+      Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const CalendarScreen()));
     }
   }
 
@@ -147,7 +150,7 @@ class _SignupScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 20),
                     InkWell(
-                      onTap: (){
+                      onTap: () {
                         _submit(context);
                       },
                       // onTap: () {

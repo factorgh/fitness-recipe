@@ -29,9 +29,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    body: SafeArea(
-      child:
-       Container(
+        body: SafeArea(
+            child: Container(
       width: double.maxFinite,
       height: double.maxFinite,
       margin: const EdgeInsets.only(left: 20, right: 20),
@@ -166,8 +165,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ],
         ),
       ),
-    );
-    ))
-   
+    )));
   }
 }
