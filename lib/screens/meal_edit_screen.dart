@@ -22,6 +22,7 @@ class _AddMealScreenState extends State<MealEditScreen> {
           GestureDetector(
             onTap: () {
               Navigator.of(context, rootNavigator: true).pop(context);
+              Navigator.of(context).push(MaterialPageRoute(builder: (context)=> const CalendarScreen()));
             },
             child: const SimpleButton(
                 title: "Discard",
@@ -32,6 +33,7 @@ class _AddMealScreenState extends State<MealEditScreen> {
           GestureDetector(
             onTap: () {
               Navigator.of(context).pop();
+
             },
             child: const SimpleButton(
                 title: "Save changes",

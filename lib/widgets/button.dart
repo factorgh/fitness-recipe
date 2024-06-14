@@ -13,7 +13,12 @@ class ButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return 
+    GestureDetector(
+      onTap:(){
+        Navigator.of(context).pop();
+      },
+    Container(
       width: double.maxFinite,
       height: MediaQuery.of(context).size.height / 16,
       decoration: BoxDecoration(
@@ -24,6 +29,6 @@ class ButtonWidget extends StatelessWidget {
           style: TextStyle(color: textColor, fontSize: 20),
         ),
       ),
-    );
+    ));
   }
 }
