@@ -168,11 +168,16 @@ class _AddMealScreenState extends State<AddMealScreen> {
               ),
             ),
           ),
+
           const SizedBox(
             height: 50,
           ),
+          GestureDetector(
+      onTap:(){
+        Navigator.of(context).pop();
+      },
           const ButtonWidget(
-              backColor: Colors.red, text: 'Next', textColor: Colors.white)
+              backColor: Colors.red, text: 'Next', textColor: Colors.white),)
         ],
       ),
     ));
