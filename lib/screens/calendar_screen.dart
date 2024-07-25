@@ -38,9 +38,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(
-              height: 90,
-            ),
+            const SizedBox(height:30),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -51,29 +49,22 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        _goToNotification(context);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black26),
-                            borderRadius: BorderRadius.circular(30)),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Icon(
-                            Icons.add_chart_sharp,
-                            size: 15,
-                          ),
-                        ),
-                      ),
-                    ),
+                     GestureDetector(
+                  onTap: () {
+                    _goToAddMeal(context);
+                  },
+                  child: const Icon(
+                    Icons.add_task_rounded,
+                    size: 30,
+                  ),
+                ),
                     const SizedBox(
                       width: 10,
                     ),
+                    
                     Container(
-                      width: 32,
-                      height: 32,
+                      width: 20,
+                      height: 20,
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black54),
                         borderRadius: BorderRadius.circular(30),
@@ -83,6 +74,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 AssetImage("assets/images/onboarding_1.png")),
                       ),
                     ),
+                     const SizedBox(
+              width: 5,
+            ),
+                    const Text('Trainer',style: TextStyle(fontSize: 13,color: Colors.black),),
                   ],
                 ),
               ],
@@ -92,30 +87,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
             Row(
               children: [
-                const Text(
-                  "April 2024",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 30,
-                      fontWeight: FontWeight.w400),
-                ),
                 const SizedBox(
                   width: 3,
                 ),
-                const Icon(
-                  Icons.arrow_drop_down,
-                  size: 50,
-                ),
+              
                 const Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    _goToAddMeal(context);
-                  },
-                  child: const Icon(
-                    Icons.add_task_rounded,
-                    size: 30,
-                  ),
-                ),
+               
               ],
             ),
             TableCalendar(
@@ -158,7 +135,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   CalendarItem(
                     titleIcon: Icons.restaurant_menu,
                     mealPlan: "Baked Salmon with strwaberries",
-                  )
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  CalendarItem(
+                    titleIcon: Icons.restaurant_menu,
+                    mealPlan: "Baked Salmon with strwaberries",
+                  ),
+                  
                 ],
               )),
             )

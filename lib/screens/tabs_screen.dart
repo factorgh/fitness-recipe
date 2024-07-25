@@ -12,45 +12,51 @@ class TabsScreen extends StatefulWidget {
 }
 
 class _TabsScreenState extends State<TabsScreen> {
-  int activePageIndex = 0;
+  int _activePageIndex = 0;
+
+  final List<Widget> _pages = const [
+    CalendarScreen(),
+    MealPlanScreen(),
+    TraineesScreen(),
+    SettingsScreen(),
+  ];
 
   void _selectPage(int index) {
     setState(() {
-      activePageIndex = index;
+      _activePageIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget activePage = const CalendarScreen();
-
-    if (activePageIndex == 1) {
-      activePage = const MealPlanScreen();
-    }
-    if (activePageIndex == 2) {
-      activePage = const TraineesScreen();
-    }
-    if (activePageIndex == 3) {
-      activePage = const SettingsScreen();
-    }
-
     return Scaffold(
-      body: activePage,
+      body: IndexedStack(
+        index: _activePageIndex,
+        children: _pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: _selectPage,
-        currentIndex: activePageIndex,
+        currentIndex: _activePageIndex,
         unselectedItemColor: Colors.black54,
-        unselectedLabelStyle: const TextStyle(color: Colors.black54),
         selectedItemColor: Colors.red,
+        backgroundColor: Colors.blueGrey[900], // Set the background color here
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month_outlined), label: 'Calendar'),
+            icon: Icon(Icons.calendar_month_outlined),
+            label: 'Calendar',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.restaurant_menu), label: 'MealPlans'),
+            icon: Icon(Icons.restaurant_menu),
+            label: 'Meal Plans',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.groups_3), label: 'Trainees'),
+            icon: Icon(Icons.groups_3),
+            label: 'Trainees',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.settings), label: 'Settings'),
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
         ],
       ),
     );

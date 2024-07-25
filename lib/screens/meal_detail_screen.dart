@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:voltican_fitness/models/meal.dart';
 import 'package:voltican_fitness/widgets/review_card.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class MealDetailScreen extends StatefulWidget {
   const MealDetailScreen({super.key, required this.meal});
@@ -16,6 +17,35 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: SpeedDial(
+        animatedIcon: AnimatedIcons.menu_close,
+        animatedIconTheme: const IconThemeData(size: 28.0),
+        backgroundColor: Colors.green[900], // Corrected syntax
+        visible: true,
+        curve: Curves.bounceInOut,
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.accessibility),
+            backgroundColor: Colors.blue,
+            label: 'Accessibility',
+            onTap: () {
+              // Define your action here
+              print('Accessibility tapped');
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.add),
+            backgroundColor: Colors.red,
+            label: 'Add',
+            onTap: () {
+              // Define your action here
+              print('Add tapped');
+            },
+          ),
+          // Add more SpeedDialChild widgets as needed
+        ],
+      ),
+
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -41,7 +71,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                     ),
                   ),
                 )),
-            backgroundColor: Colors.white,
+           
             expandedHeight: 300,
             pinned: true,
             toolbarHeight: 60,
@@ -52,12 +82,12 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
               child: Container(
                 margin: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 width: 20,
                 height: 20,
-                child: const Icon(Icons.arrow_back_ios_sharp, size: 20),
+                child: const Icon(Icons.arrow_back_outlined, size: 30,color: Colors.white),
               ),
             ),
             flexibleSpace: FlexibleSpaceBar(
@@ -71,7 +101,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
           SliverToBoxAdapter(
             child: Container(
               decoration: const BoxDecoration(color: Colors.white),
-              margin: const EdgeInsets.only(left: 20, right: 20),
+              padding: const EdgeInsets.only(left: 20, right: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -205,15 +235,9 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                   const ReviewCard(),
                   const SizedBox(
                     height: 10,
-                  ),
-                  const ReviewCard(),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const ReviewCard(),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  )
+
+                  
                 ],
               ),
             ),
