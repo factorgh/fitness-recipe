@@ -19,66 +19,68 @@ class _RoleScreenState extends State<RoleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const SizedBox(
-          height: 100,
-        ),
-        Container(
-          margin: const EdgeInsets.only(left: 20),
-          child: const Text(
-            'Select your role ',
-            style: TextStyle(
-                fontSize: 25, color: Colors.black, fontWeight: FontWeight.w500),
-          ),
-        ),
-        const SizedBox(
-          height: 5,
-        ),
-        Container(
-          margin: const EdgeInsets.only(left: 20),
-          child: const Text(
-            'Identify yourself:Trainer or trainee',
-            style: TextStyle(color: Color.fromARGB(255, 133, 132, 132)),
-          ),
-        ),
-        const SizedBox(
-          height: 5,
-        ),
-        const Divider(
-          color: Color.fromARGB(255, 249, 189, 189),
-          height: 1.5,
-        ),
-        const SizedBox(
-          height: 120,
-        ),
-        const Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            RoleItemWidget(labelText: 'Trainer'),
-            RoleItemWidget(labelText: 'Trainee')
+            const SizedBox(height: 100),
+            const Text(
+              'Select your role',
+              style: TextStyle(
+                fontSize: 25,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Identify yourself: Trainer or Trainee',
+              style: TextStyle(
+                color: Color(0xFF858484),
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Divider(
+              color: Color(0xFFF9BDBD),
+              thickness: 1.5,
+            ),
+            const SizedBox(height: 80),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                RoleItemWidget(labelText: 'Trainer'),
+                RoleItemWidget(labelText: 'Trainee'),
+              ],
+            ),
+            const Spacer(),
+            InkWell(
+              onTap: () => goToTabsScreen(context),
+              splashColor: Colors.purple,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Center(
+                  child: Text(
+                    'Proceed',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
           ],
         ),
-        const SizedBox(
-          height: 120,
-        ),
-        InkWell(
-          onTap: () {
-            goToTabsScreen(context);
-          },
-          splashColor: Colors.purple,
-          child: Container(
-            margin: const EdgeInsets.only(left: 20, right: 20),
-            child: const ButtonWidget(
-                backColor: Colors.red,
-                text: 'Proceed',
-                textColor: Colors.white),
-          ),
-        )
-      ],
-    ));
+      ),
+    );
   }
 }

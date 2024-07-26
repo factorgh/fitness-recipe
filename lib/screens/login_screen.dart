@@ -5,6 +5,7 @@ import 'package:voltican_fitness/screens/signup_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:voltican_fitness/widgets/button.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -36,8 +37,14 @@ class _LoginScreenState extends State<LoginScreen> {
               {'password': _enteredPassword, 'username': _enteredUsername}),
         );
 
+        print(response.body);
+        // Get token from response body
+        final token = json.decode(response.body)['token'];
+
+
         // Save user token to shared preferences
-        
+        final  prefs = await SharedPreferences.getInstance();
+        prefs.setString('auth_token', token);
 
         if (response.statusCode == 201) {
           if (!mounted) return;
