@@ -16,7 +16,7 @@ class DioSingleton {
   Future<void> _initializeDio() async {
     final prefs = await SharedPreferences.getInstance();
     dio = Dio(BaseOptions(
-      baseUrl: 'https://fitness.adroit360.com/api/v1', 
+      baseUrl: 'https://fitness.adroit360.com/api/v1',
     ));
     dio.interceptors.add(AuthInterceptor(prefs));
   }
@@ -28,10 +28,11 @@ class AuthInterceptor extends Interceptor {
   AuthInterceptor(this.prefs);
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  void onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
     final token = prefs.getString('auth_token');
     if (token != null) {
-      options.headers['Authorization'] = $token;
+      options.headers['Authorization'] = token;
     }
     handler.next(options);
   }

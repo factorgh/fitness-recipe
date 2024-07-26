@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class Trainee extends StatelessWidget {
   final Map<String, dynamic> trainee;
 
-  const Trainee({Key? key, required this.trainee}) : super(key: key);
+  const Trainee({super.key, required this.trainee});
 
   @override
   Widget build(BuildContext context) {
@@ -17,15 +17,15 @@ class Trainee extends StatelessWidget {
         );
       },
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        padding: EdgeInsets.all(15),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
               blurRadius: 4,
               spreadRadius: 1,
             ),
@@ -45,18 +45,18 @@ class Trainee extends StatelessWidget {
                           fit: BoxFit.cover,
                         ),
                       )
-                    : CircleAvatar(
+                    : const CircleAvatar(
                         radius: 24,
                         backgroundColor: Color(0xFFE5ECF9),
                         backgroundImage: AssetImage('assets/images/blank-profile.png'),
                       ),
-                SizedBox(width: 15),
+                const SizedBox(width: 15),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       trainee['name'] ?? '',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -72,7 +72,7 @@ class Trainee extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
             Text(
               'Active',
               textAlign: TextAlign.right,
@@ -81,7 +81,7 @@ class Trainee extends StatelessWidget {
                 color: Colors.grey[600],
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Divider(color: Colors.grey[300]),
           ],
         ),
@@ -96,13 +96,13 @@ class Trainee extends StatelessWidget {
 class TraineeDetailScreen extends StatelessWidget {
   final Map<String, dynamic> traineeDetail;
 
-  const TraineeDetailScreen({Key? key, required this.traineeDetail}) : super(key: key);
+  const TraineeDetailScreen({super.key, required this.traineeDetail});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Trainee Detail'),
+        title: const Text('Trainee Detail'),
       ),
       body: Center(
         child: Text('Details for ${traineeDetail['name']}'),

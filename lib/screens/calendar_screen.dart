@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/screens/add_meal_screen.dart';
 import 'package:voltican_fitness/widgets/calendar_item.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -36,9 +37,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Good Morning',
-                  style: TextStyle(fontSize: 22),
+                GestureDetector(
+                  onTap: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    final token = prefs.getString('auth_token') ?? '';
+                    print(token);
+                  },
+                  child: const Text(
+                    'Good Morning',
+                    style: TextStyle(fontSize: 22),
+                  ),
                 ),
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -69,8 +77,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             radius: 10,
                             backgroundColor: Colors.grey[300],
                           ),
-                          SizedBox(width: 5),
-                          Text(
+                          const SizedBox(width: 5),
+                          const Text(
                             'Trainer',
                             style: TextStyle(
                               color: Colors.white,
@@ -90,12 +98,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
             const SizedBox(
               height: 30,
             ),
-            Row(
+            const Row(
               children: [
-                const SizedBox(
+                SizedBox(
                   width: 3,
                 ),
-                const Spacer(),
+                Spacer(),
               ],
             ),
             TableCalendar(

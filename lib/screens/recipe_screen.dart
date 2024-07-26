@@ -12,6 +12,10 @@ class RecipeScreen extends StatefulWidget {
 class _RecipeScreenState extends State<RecipeScreen> {
   File? _selectedImage;
 
+  final TextEditingController _mealNameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _ingredientsController = TextEditingController();
+
   void _takePicture() async {
     final imagePicker = ImagePicker();
     final pickedImage =
@@ -24,6 +28,12 @@ class _RecipeScreenState extends State<RecipeScreen> {
     setState(() {
       _selectedImage = File(pickedImage.path);
     });
+  }
+
+  void _printValues() {
+    print('Meal Name: ${_mealNameController.text}');
+    print('Description: ${_descriptionController.text}');
+    print('Ingredients: ${_ingredientsController.text}');
   }
 
   @override
@@ -64,7 +74,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add a Meal Plan'),
+        title: const Text('Add a Meal Plan'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.close),
@@ -117,6 +127,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: TextFormField(
+                  controller: _mealNameController,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     hintText: 'Enter meal name',
@@ -144,6 +155,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: TextField(
+                  controller: _descriptionController,
                   keyboardType: TextInputType.multiline,
                   minLines: 1,
                   maxLines: 4,
@@ -174,6 +186,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: TextField(
+                  controller: _ingredientsController,
                   keyboardType: TextInputType.multiline,
                   minLines: 1,
                   maxLines: 4,
@@ -198,6 +211,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                   ),
                 ),
                 onPressed: () {
+                  _printValues(); // Print values to console
                   Navigator.of(context).pop();
                 },
                 child: const Text('Next'),

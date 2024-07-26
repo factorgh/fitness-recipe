@@ -81,12 +81,12 @@ class _CalendarScreenState extends State<CalendarTraineeScreen> {
             const SizedBox(
               height: 30,
             ),
-            Row(
+            const Row(
               children: [
-                const SizedBox(
+                SizedBox(
                   width: 3,
                 ),
-                const Spacer(),
+                Spacer(),
               ],
             ),
             TableCalendar(

@@ -17,9 +17,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(Icons.notifications),
+        leading: const Icon(Icons.notifications),
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'Settings',
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
         ),
@@ -40,7 +40,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: SafeArea(
         child: Container(
-          margin: EdgeInsets.only(top: 20),
+          margin: const EdgeInsets.only(top: 20),
           child: ListView(
             padding: const EdgeInsets.all(16.0),
             children: <Widget>[
@@ -60,14 +60,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => ProfileScreen()),
+          MaterialPageRoute(builder: (context) => const ProfileScreen()),
         );
       },
-      child: Card(
+      child: const Card(
         child: ListTile(
-          leading: const Icon(Icons.person),
-          title: const Text('Profile'),
-          subtitle: const Text('Edit your profile information'),
+          leading: Icon(Icons.person),
+          title: Text('Profile'),
+          subtitle: Text('Edit your profile information'),
         ),
       ),
     );
@@ -77,14 +77,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => AccountScreen()),
+          MaterialPageRoute(builder: (context) => const AccountScreen()),
         );
       },
-      child: Card(
+      child: const Card(
         child: ListTile(
-          leading: const Icon(Icons.security),
-          title: const Text('Account'),
-          subtitle: const Text('Change password or manage account settings'),
+          leading: Icon(Icons.security),
+          title: Text('Account'),
+          subtitle: Text('Change password or manage account settings'),
         ),
       ),
     );
@@ -97,11 +97,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           MaterialPageRoute(builder: (context) => NotificationsScreen()),
         );
       },
-      child: Card(
+      child: const Card(
         child: ListTile(
-          leading: const Icon(Icons.notifications),
-          title: const Text('Notifications'),
-          subtitle: const Text('Manage notification preferences'),
+          leading: Icon(Icons.notifications),
+          title: Text('Notifications'),
+          subtitle: Text('Manage notification preferences'),
         ),
       ),
     );
@@ -111,14 +111,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => GeneralScreen()),
+          MaterialPageRoute(builder: (context) => const GeneralScreen()),
         );
       },
-      child: Card(
+      child: const Card(
         child: ListTile(
-          leading: const Icon(Icons.settings),
-          title: const Text('General'),
-          subtitle: const Text('Manage app settings and preferences'),
+          leading: Icon(Icons.settings),
+          title: Text('General'),
+          subtitle: Text('Manage app settings and preferences'),
         ),
       ),
     );
@@ -129,14 +129,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(vertical: 15),
+          padding: const EdgeInsets.symmetric(vertical: 15),
           backgroundColor: Colors.red, // Background color
           foregroundColor: Colors.white, // Text color
         ),
         child: const Text('Logout'),
         onPressed: () {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => LoginScreen()),
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
           );
         },
       ),

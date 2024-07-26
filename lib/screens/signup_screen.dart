@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -31,7 +33,8 @@ class _SignupScreenState extends State<SignupScreen> {
         _isLoading = true;
       });
       try {
-        final url = Uri.parse('https://fitness.adroit360.com/api/v1/auth/register');
+        final url =
+            Uri.parse('https://fitness.adroit360.com/api/v1/auth/register');
         final response = await http.post(
           url,
           headers: {'Content-Type': 'application/json'},
@@ -43,12 +46,11 @@ class _SignupScreenState extends State<SignupScreen> {
           }),
         );
 
-           // Get token from response body
+        // Get token from response body
         final token = json.decode(response.body)['token'];
 
-
         // Save user token to shared preferences
-        final  prefs = await SharedPreferences.getInstance();
+        final prefs = await SharedPreferences.getInstance();
         prefs.setString('auth_token', token);
 
         if (response.statusCode == 200) {
@@ -115,25 +117,29 @@ class _SignupScreenState extends State<SignupScreen> {
                       label: 'Full Name',
                       hint: 'Enter your full name',
                       onSaved: (value) => _enteredFullName = value!,
-                      validator: (value) => value == null || value.trim().isEmpty
-                          ? "Please enter your full name"
-                          : null,
+                      validator: (value) =>
+                          value == null || value.trim().isEmpty
+                              ? "Please enter your full name"
+                              : null,
                     ),
                     const SizedBox(height: 20),
                     _buildTextField(
                       label: 'Username',
                       hint: 'Enter a username',
                       onSaved: (value) => _enteredUsername = value!,
-                      validator: (value) => value == null || value.trim().isEmpty
-                          ? "Please enter a username"
-                          : null,
+                      validator: (value) =>
+                          value == null || value.trim().isEmpty
+                              ? "Please enter a username"
+                              : null,
                     ),
                     const SizedBox(height: 20),
                     _buildTextField(
                       label: 'Email address',
                       hint: 'Enter your email address',
                       onSaved: (value) => _enteredEmail = value!,
-                      validator: (value) => value == null || value.trim().isEmpty || !value.contains('@')
+                      validator: (value) => value == null ||
+                              value.trim().isEmpty ||
+                              !value.contains('@')
                           ? "Please enter a valid email"
                           : null,
                     ),
@@ -143,16 +149,20 @@ class _SignupScreenState extends State<SignupScreen> {
                       decoration: InputDecoration(
                         hintText: 'Enter a password',
                         border: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color.fromARGB(255, 22, 19, 19)),
+                          borderSide: const BorderSide(
+                              color: Color.fromARGB(255, 22, 19, 19)),
                           borderRadius: BorderRadius.circular(15),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color(0xFFBFBFBF)),
+                          borderSide:
+                              const BorderSide(color: Color(0xFFBFBFBF)),
                           borderRadius: BorderRadius.circular(15),
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                           ),
                           onPressed: () {
                             setState(() {
@@ -161,7 +171,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           },
                         ),
                       ),
-                      validator: (value) => value == null || value.trim().isEmpty || value.length < 6
+                      validator: (value) => value == null ||
+                              value.trim().isEmpty ||
+                              value.length < 6
                           ? "Password must be more than 6 characters"
                           : null,
                       onSaved: (value) => _enteredPassword = value!,
@@ -193,7 +205,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     onPressed: () => _goToLogin(context),
                     child: const Text(
                       "Login",
-                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],

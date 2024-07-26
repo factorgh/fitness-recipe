@@ -1,9 +1,10 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:voltican_fitness/widgets/trainee.dart';
 
 class TraineesScreen extends StatefulWidget {
-  const TraineesScreen({Key? key}) : super(key: key);
+  const TraineesScreen({super.key});
 
   @override
   _TraineesScreenState createState() => _TraineesScreenState();
@@ -79,7 +80,7 @@ class _TraineesScreenState extends State<TraineesScreen> {
     return Scaffold(
       body: SafeArea(
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [Color(0xFFE5ECF9), Color(0xFFF6F7F9)],
               begin: Alignment.topCenter,
@@ -93,7 +94,7 @@ class _TraineesScreenState extends State<TraineesScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       'Trainees',
                       style: TextStyle(
                         fontFamily: 'Nunito',
@@ -115,8 +116,8 @@ class _TraineesScreenState extends State<TraineesScreen> {
                             radius: 10,
                             backgroundColor: Colors.grey[300],
                           ),
-                          SizedBox(width: 5),
-                          Text(
+                          const SizedBox(width: 5),
+                          const Text(
                             'Trainer',
                             style: TextStyle(
                               color: Colors.white,
@@ -138,7 +139,7 @@ class _TraineesScreenState extends State<TraineesScreen> {
                         onTap: () => handlePress('button1'),
                         child: Column(
                           children: [
-                            Text('My Trainees'),
+                            const Text('My Trainees'),
                             Container(
                               height: 3,
                               color: activeTab == 'button1'
@@ -154,7 +155,7 @@ class _TraineesScreenState extends State<TraineesScreen> {
                         onTap: () => handlePress('button2'),
                         child: Column(
                           children: [
-                            Text('Assigned Trainees'),
+                            const Text('Assigned Trainees'),
                             Container(
                               height: 3,
                               color: activeTab == 'button2'
@@ -175,10 +176,10 @@ class _TraineesScreenState extends State<TraineesScreen> {
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(color: Colors.grey),
                   ),
-                  child: Row(
+                  child: const Row(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
                         child: Icon(Icons.search),
                       ),
                       Expanded(
@@ -196,7 +197,7 @@ class _TraineesScreenState extends State<TraineesScreen> {
               ),
               Expanded(
                 child: loading
-                    ? Center(child: CircularProgressIndicator())
+                    ? const Center(child: CircularProgressIndicator())
                     : ListView.builder(
                         itemCount:
                             trainees.length, // Replace with your data length
@@ -217,7 +218,7 @@ class _TraineesScreenState extends State<TraineesScreen> {
 class AssignedTrainee extends StatelessWidget {
   final dynamic trainee;
 
-  const AssignedTrainee({Key? key, required this.trainee}) : super(key: key);
+  const AssignedTrainee({super.key, required this.trainee});
 
   @override
   Widget build(BuildContext context) {

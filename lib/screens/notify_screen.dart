@@ -5,31 +5,32 @@ class NotificationsScreen extends StatelessWidget {
     NotificationItem(
       title: 'New Message from John',
       description: 'Hey, are we still meeting today?',
-      timestamp: DateTime.now().subtract(Duration(minutes: 5)),
+      timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
     ),
     NotificationItem(
       title: 'App Update Available',
       description: 'Version 2.1.0 is now available.',
-      timestamp: DateTime.now().subtract(Duration(hours: 1)),
+      timestamp: DateTime.now().subtract(const Duration(hours: 1)),
     ),
     NotificationItem(
       title: 'Reminder: Meeting at 3 PM',
       description: 'Don\'t forget your meeting today.',
-      timestamp: DateTime.now().subtract(Duration(days: 1)),
+      timestamp: DateTime.now().subtract(const Duration(days: 1)),
     ),
     // Add more notifications here
   ];
+  NotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications'),
+        title: const Text('Notifications'),
         centerTitle: true,
       ),
       body: Column(
         children: [
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
@@ -71,29 +72,29 @@ class NotificationItem {
 class NotificationTile extends StatelessWidget {
   final NotificationItem notification;
 
-  NotificationTile({required this.notification});
+  const NotificationTile({super.key, required this.notification});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      leading: Icon(Icons.notifications, color: Colors.blue),
+      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      leading: const Icon(Icons.notifications, color: Colors.blue),
       title: Text(
         notification.title,
-        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
       ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(notification.description),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             _formatTimestamp(notification.timestamp),
-            style: TextStyle(color: Colors.grey, fontSize: 12),
+            style: const TextStyle(color: Colors.grey, fontSize: 12),
           ),
         ],
       ),
-      trailing: Icon(Icons.arrow_forward_ios, size: 16),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       tileColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),

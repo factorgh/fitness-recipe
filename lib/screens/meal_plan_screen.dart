@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:voltican_fitness/data/dummy_data.dart';
 import 'package:voltican_fitness/models/meal.dart';
 import 'package:voltican_fitness/screens/meal_detail_screen.dart';
+import 'package:voltican_fitness/screens/recipe_screen.dart';
 import 'package:voltican_fitness/widgets/meal_item.dart';
 import 'package:voltican_fitness/widgets/simple_button.dart';
 
@@ -39,14 +40,17 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
             Row(
               children: [
                 GestureDetector(
-                  onTap: () => print('Add Meal Plan'),
-                  child: Icon(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const RecipeScreen()));
+                  },
+                  child: const Icon(
                     Icons.add,
                     color: Colors.black,
                     size: 25,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 5,
                 ),
                 Container(
@@ -63,8 +67,8 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
                         radius: 10,
                         backgroundColor: Colors.grey[300],
                       ),
-                      SizedBox(width: 5),
-                      Text(
+                      const SizedBox(width: 5),
+                      const Text(
                         'Trainer',
                         style: TextStyle(
                           color: Colors.white,

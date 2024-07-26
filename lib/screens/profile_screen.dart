@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
+        title: const Text('Profile'),
         centerTitle: true,
       ),
       body: Padding(
@@ -13,9 +15,9 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           children: [
             _ProfileHeader(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _ProfileInfo(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _EditProfileButton(),
           ],
         ),
@@ -32,11 +34,11 @@ class _ProfileHeader extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 60,
-            backgroundImage: AssetImage(
+            backgroundImage: const AssetImage(
                 'assets/images/profile.jpg'), // Replace with your profile picture asset
             backgroundColor: Colors.grey.shade200,
           ),
-          Positioned(
+          const Positioned(
             bottom: 0,
             right: 0,
             child: CircleAvatar(
@@ -54,7 +56,7 @@ class _ProfileHeader extends StatelessWidget {
 class _ProfileInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _InfoField(label: 'Name', value: 'John Doe'),
@@ -70,7 +72,7 @@ class _InfoField extends StatelessWidget {
   final String label;
   final String value;
 
-  _InfoField({required this.label, required this.value});
+  const _InfoField({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -80,8 +82,8 @@ class _InfoField extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          Text(value, style: TextStyle(fontSize: 16)),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text(value, style: const TextStyle(fontSize: 16)),
         ],
       ),
     );
@@ -95,12 +97,12 @@ class _EditProfileButton extends StatelessWidget {
       onPressed: () {
         // Add your edit profile logic here
       },
-      child: Text('Edit Profile'),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blue,
-        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-        textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
+      child: const Text('Edit Profile'),
     );
   }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/screens/signup_screen.dart';
@@ -47,6 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (response.statusCode == 201) {
           if (!mounted) return;
+
           Navigator.of(context).pushReplacement(MaterialPageRoute(
               builder: (ctx) => const TabsScreen(userRole: 1)));
         } else {

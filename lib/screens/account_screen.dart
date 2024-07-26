@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AccountScreen extends StatefulWidget {
+  const AccountScreen({super.key});
+
   @override
   _AccountScreenState createState() => _AccountScreenState();
 }
@@ -25,7 +27,7 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Account Management'),
+        title: const Text('Account Management'),
         centerTitle: true,
       ),
       body: Padding(
@@ -38,7 +40,7 @@ class _AccountScreenState extends State<AccountScreen> {
               icon: Icons.email,
               keyboardType: TextInputType.emailAddress,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildTextField(
               controller: _passwordController,
               label: 'Current Password',
@@ -55,7 +57,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 },
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildTextField(
               controller: _newPasswordController,
               label: 'New Password',
@@ -72,7 +74,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 },
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildTextField(
               controller: _confirmPasswordController,
               label: 'Confirm New Password',
@@ -89,22 +91,22 @@ class _AccountScreenState extends State<AccountScreen> {
                 },
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
                 // Add your change password logic here
               },
-              child: Text(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              child: const Text(
                 'Change Password',
                 style: TextStyle(color: Colors.white),
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                padding: EdgeInsets.symmetric(vertical: 15),
-                textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
           ],
         ),
       ),

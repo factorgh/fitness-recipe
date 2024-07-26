@@ -1,6 +1,10 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 
 class GeneralScreen extends StatefulWidget {
+  const GeneralScreen({super.key});
+
   @override
   _GeneralScreenState createState() => _GeneralScreenState();
 }
@@ -13,7 +17,7 @@ class _GeneralScreenState extends State<GeneralScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('General Settings'),
+        title: const Text('General Settings'),
         centerTitle: true,
       ),
       body: Padding(
@@ -49,12 +53,12 @@ class _GeneralScreenState extends State<GeneralScreen> {
             _SettingItem(
               icon: Icons.volume_up,
               title: 'Notification Sound',
-              trailing: Icon(Icons.arrow_forward_ios),
+              trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
                 // Navigate to notification sound settings
               },
             ),
-            _SettingItem(
+            const _SettingItem(
               icon: Icons.info,
               title: 'App Version',
               trailing: Text('1.0.0'),
@@ -62,7 +66,7 @@ class _GeneralScreenState extends State<GeneralScreen> {
             _SettingItem(
               icon: Icons.book,
               title: 'Terms of Service',
-              trailing: Icon(Icons.arrow_forward_ios),
+              trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
                 // Navigate to terms of service
               },
@@ -70,7 +74,7 @@ class _GeneralScreenState extends State<GeneralScreen> {
             _SettingItem(
               icon: Icons.privacy_tip,
               title: 'Privacy Policy',
-              trailing: Icon(Icons.arrow_forward_ios),
+              trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
                 // Navigate to privacy policy
               },
@@ -88,7 +92,7 @@ class _SettingItem extends StatelessWidget {
   final Widget trailing;
   final VoidCallback? onTap;
 
-  _SettingItem({
+  const _SettingItem({
     required this.icon,
     required this.title,
     required this.trailing,
