@@ -47,8 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (response.statusCode == 201) {
           if (!mounted) return;
-          Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (ctx) => const TabsScreen()));
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (ctx) => const TabsScreen(userRole: 1)));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Login failed. Please try again.')),

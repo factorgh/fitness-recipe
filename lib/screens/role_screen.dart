@@ -12,8 +12,10 @@ class RoleScreen extends StatefulWidget {
 
 class _RoleScreenState extends State<RoleScreen> {
   void goToTabsScreen(BuildContext ctx) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (ctx) => const TabsScreen()));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (ctx) => const TabsScreen(
+              userRole: 0,
+            )));
   }
 
   @override

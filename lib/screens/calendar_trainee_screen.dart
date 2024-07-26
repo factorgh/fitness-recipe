@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-
 import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/screens/add_meal_screen.dart';
+
 import 'package:voltican_fitness/widgets/calendar_item.dart';
 
-class CalendarScreen extends StatefulWidget {
-  const CalendarScreen({super.key});
+class CalendarTraineeScreen extends StatefulWidget {
+  const CalendarTraineeScreen({super.key});
 
   @override
-  State<CalendarScreen> createState() => _CalendarScreenState();
+  State<CalendarTraineeScreen> createState() => _CalendarScreenState();
 }
 
-class _CalendarScreenState extends State<CalendarScreen> {
+class _CalendarScreenState extends State<CalendarTraineeScreen> {
   void _goToAddMeal(BuildContext ctx) {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (ctx) => const AddMealScreen()));
@@ -56,32 +56,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       width: 10,
                     ),
                     Container(
-                      width: 80,
-                      height: 30,
+                      width: 20,
+                      height: 20,
                       decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircleAvatar(
-                            radius: 10,
-                            backgroundColor: Colors.grey[300],
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            'Trainer',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
+                        border: Border.all(color: Colors.black54),
+                        borderRadius: BorderRadius.circular(30),
+                        image: const DecorationImage(
+                            fit: BoxFit.cover,
+                            image:
+                                AssetImage("assets/images/onboarding_1.png")),
                       ),
                     ),
                     const SizedBox(
                       width: 5,
+                    ),
+                    const Text(
+                      'Trainee',
+                      style: TextStyle(fontSize: 13, color: Colors.black),
                     ),
                   ],
                 ),

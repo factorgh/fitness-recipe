@@ -117,9 +117,7 @@ class _TraineesScreenState extends State<TraineesScreen> {
                           ),
                           SizedBox(width: 5),
                           Text(
-                            user != null && user['role'] == 0
-                                ? 'Trainee'
-                                : 'Trainer',
+                            'Trainer',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 12,

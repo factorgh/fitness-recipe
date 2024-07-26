@@ -94,25 +94,17 @@ class _AccountScreenState extends State<AccountScreen> {
               onPressed: () {
                 // Add your change password logic here
               },
-              child: Text('Change Password'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                padding: EdgeInsets.symmetric(vertical: 15),
-                textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              child: Text(
+                'Change Password',
+                style: TextStyle(color: Colors.white),
               ),
-            ),
-            SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                // Add logout logic here
-              },
-              child: Text('Logout'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 padding: EdgeInsets.symmetric(vertical: 15),
                 textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
+            SizedBox(height: 24),
           ],
         ),
       ),

@@ -27,11 +27,56 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const SizedBox(
-          height: 70,
+          height: 50,
         ),
-        const Text(
-          "Meal Plans",
-          style: TextStyle(fontSize: 25),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              "Meal Plans",
+              style: TextStyle(fontSize: 25),
+            ),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () => print('Add Meal Plan'),
+                  child: Icon(
+                    Icons.add,
+                    color: Colors.black,
+                    size: 25,
+                  ),
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                Container(
+                  width: 80,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 10,
+                        backgroundColor: Colors.grey[300],
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        'Trainer',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
         const SizedBox(
           height: 20,

@@ -129,6 +129,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.symmetric(vertical: 15),
           backgroundColor: Colors.red, // Background color
           foregroundColor: Colors.white, // Text color
         ),

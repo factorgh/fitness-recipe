@@ -3,9 +3,12 @@ import 'package:voltican_fitness/screens/calendar_screen.dart';
 import 'package:voltican_fitness/screens/meal_plan_screen.dart';
 import 'package:voltican_fitness/screens/settings_screen.dart';
 import 'package:voltican_fitness/screens/trainees_screen.dart';
+import 'package:voltican_fitness/screens/calendar_trainee_screen.dart'; // Assuming you have this screen
 
 class TabsScreen extends StatefulWidget {
-  const TabsScreen({super.key});
+  final int userRole; // Pass user role to the widget
+
+  const TabsScreen({super.key, required this.userRole});
 
   @override
   State<TabsScreen> createState() => _TabsScreenState();
@@ -14,12 +17,57 @@ class TabsScreen extends StatefulWidget {
 class _TabsScreenState extends State<TabsScreen> {
   int _activePageIndex = 0;
 
-  final List<Widget> _pages = const [
-    CalendarScreen(),
-    MealPlanScreen(),
-    TraineesScreen(),
-    SettingsScreen(),
-  ];
+  // Define pages based on user role
+  List<Widget> get _pages {
+    if (widget.userRole == 0) {
+      return const [
+        CalendarTraineeScreen(), // Extra screen for role 0
+        SettingsScreen(),
+      ];
+    } else {
+      return const [
+        CalendarScreen(),
+        MealPlanScreen(),
+        TraineesScreen(),
+        SettingsScreen(),
+      ];
+    }
+  }
+
+  // Define navigation items based on user role
+  List<BottomNavigationBarItem> get _bottomNavBarItems {
+    if (widget.userRole == 0) {
+      return const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.dashboard),
+          label: 'Calendar', // Extra tab for role 0
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.settings),
+          label: 'Settings',
+        ),
+      ];
+    } else {
+      return const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.calendar_month_outlined),
+          label: 'Calendar',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.restaurant_menu),
+          label: 'Meal Plans',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.groups_3),
+          label: 'Trainees',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.settings),
+          label: 'Settings',
+        ),
+      ];
+    }
+  }
 
   void _selectPage(int index) {
     setState(() {
@@ -39,25 +87,8 @@ class _TabsScreenState extends State<TabsScreen> {
         currentIndex: _activePageIndex,
         unselectedItemColor: Colors.black54,
         selectedItemColor: Colors.red,
-        backgroundColor: Colors.blueGrey[900], // Set the background color here
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month_outlined),
-            label: 'Calendar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant_menu),
-            label: 'Meal Plans',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.groups_3),
-            label: 'Trainees',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
+        backgroundColor: Color.fromARGB(255, 233, 242, 246),
+        items: _bottomNavBarItems,
       ),
     );
   }
