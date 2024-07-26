@@ -1,1 +1,1 @@
-export const SERVER_URL = "https://fitness.adroit360.com"
+

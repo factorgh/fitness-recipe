@@ -69,7 +69,8 @@ class _TraineesScreenState extends State<TraineesScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
       child: activeTab == 'button1'
           ? Trainee(trainee: item) // Replace with your Trainee widget
-          : AssignedTrainee(trainee: item), // Replace with your AssignedTrainee widget
+          : AssignedTrainee(
+              trainee: item), // Replace with your AssignedTrainee widget
     );
   }
 
@@ -88,7 +89,7 @@ class _TraineesScreenState extends State<TraineesScreen> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
+                padding: const EdgeInsets.fromLTRB(16, 30, 16, 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -116,7 +117,9 @@ class _TraineesScreenState extends State<TraineesScreen> {
                           ),
                           SizedBox(width: 5),
                           Text(
-                            user != null && user['role'] == 0 ? 'Trainee' : 'Trainer',
+                            user != null && user['role'] == 0
+                                ? 'Trainee'
+                                : 'Trainer',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 12,
@@ -140,7 +143,9 @@ class _TraineesScreenState extends State<TraineesScreen> {
                             Text('My Trainees'),
                             Container(
                               height: 3,
-                              color: activeTab == 'button1' ? Colors.red : Colors.red[200],
+                              color: activeTab == 'button1'
+                                  ? Colors.red
+                                  : Colors.red[200],
                             ),
                           ],
                         ),
@@ -154,7 +159,9 @@ class _TraineesScreenState extends State<TraineesScreen> {
                             Text('Assigned Trainees'),
                             Container(
                               height: 3,
-                              color: activeTab == 'button2' ? Colors.red : Colors.red[200],
+                              color: activeTab == 'button2'
+                                  ? Colors.red
+                                  : Colors.red[200],
                             ),
                           ],
                         ),
@@ -193,9 +200,11 @@ class _TraineesScreenState extends State<TraineesScreen> {
                 child: loading
                     ? Center(child: CircularProgressIndicator())
                     : ListView.builder(
-                        itemCount: trainees.length, // Replace with your data length
+                        itemCount:
+                            trainees.length, // Replace with your data length
                         itemBuilder: (context, index) {
-                          return renderTraineeItem(context, trainees[index]); // Replace with your data item
+                          return renderTraineeItem(context,
+                              trainees[index]); // Replace with your data item
                         },
                       ),
               ),
@@ -206,7 +215,6 @@ class _TraineesScreenState extends State<TraineesScreen> {
     );
   }
 }
-
 
 class AssignedTrainee extends StatelessWidget {
   final dynamic trainee;
@@ -219,5 +227,3 @@ class AssignedTrainee extends StatelessWidget {
     return Container();
   }
 }
-
-

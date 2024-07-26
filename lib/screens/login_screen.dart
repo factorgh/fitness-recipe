@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/calendar_screen.dart';
 import 'package:voltican_fitness/screens/signup_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:voltican_fitness/widgets/button.dart';
@@ -29,7 +28,8 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = true;
       });
       try {
-        final url = Uri.parse('https://fitness.adroit360.com/api/v1/auth/login');
+        final url =
+            Uri.parse('https://fitness.adroit360.com/api/v1/auth/login');
         final response = await http.post(
           url,
           headers: {'Content-Type': 'application/json'},
@@ -41,9 +41,8 @@ class _LoginScreenState extends State<LoginScreen> {
         // Get token from response body
         final token = json.decode(response.body)['token'];
 
-
         // Save user token to shared preferences
-        final  prefs = await SharedPreferences.getInstance();
+        final prefs = await SharedPreferences.getInstance();
         prefs.setString('auth_token', token);
 
         if (response.statusCode == 201) {
@@ -68,8 +67,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _goToSignup(BuildContext ctx) {
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (ctx) => const SignupScreen()));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (ctx) => const SignupScreen()));
   }
 
   @override
@@ -83,7 +82,13 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 60),
-              const Text('Welcome to Fitness Recipe',style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold,),),
+              const Text(
+                'Welcome to Fitness Recipe',
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 50),
               const Text(
                 'Sign in to your account',
@@ -108,18 +113,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 40),
                       const Text(
                         'Enter username',
-                        style: TextStyle(color: Color.fromARGB(255, 133, 132, 132)),
+                        style: TextStyle(
+                            color: Color.fromARGB(255, 133, 132, 132)),
                       ),
-                       const SizedBox(height: 3),
+                      const SizedBox(height: 3),
                       TextFormField(
                         decoration: InputDecoration(
                           hintText: 'Enter a username',
                           border: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Color(0xFFBFBFBF)),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFBFBFBF)),
                             borderRadius: BorderRadius.circular(15),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Color(0xFFBFBFBF)),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFBFBFBF)),
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
@@ -136,24 +144,29 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 20),
                       const Text(
                         'Enter a password',
-                        style: TextStyle(color: Color.fromARGB(255, 133, 132, 132)),
+                        style: TextStyle(
+                            color: Color.fromARGB(255, 133, 132, 132)),
                       ),
-                       const SizedBox(height: 3),
+                      const SizedBox(height: 3),
                       TextFormField(
                         obscureText: !_passwordVisible,
                         decoration: InputDecoration(
                           hintText: 'Enter a password',
                           border: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Color.fromARGB(255, 22, 19, 19)),
+                            borderSide: const BorderSide(
+                                color: Color.fromARGB(255, 22, 19, 19)),
                             borderRadius: BorderRadius.circular(15),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Color(0xFFBFBFBF)),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFBFBFBF)),
                             borderRadius: BorderRadius.circular(15),
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                              _passwordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                             ),
                             onPressed: () {
                               setState(() {
@@ -163,7 +176,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty || value.length < 6) {
+                          if (value == null ||
+                              value.trim().isEmpty ||
+                              value.length < 6) {
                             return "Password must be more than 6 characters";
                           }
                           return null;

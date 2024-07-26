@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
-import 'package:voltican_fitness/widgets/button.dart';
+
 import 'package:voltican_fitness/widgets/role_widget.dart';
 
 class RoleScreen extends StatefulWidget {
