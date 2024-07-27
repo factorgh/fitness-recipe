@@ -3,7 +3,8 @@ import 'package:voltican_fitness/screens/calendar_screen.dart';
 import 'package:voltican_fitness/screens/meal_plan_screen.dart';
 import 'package:voltican_fitness/screens/settings_screen.dart';
 import 'package:voltican_fitness/screens/trainees_screen.dart';
-import 'package:voltican_fitness/screens/calendar_trainee_screen.dart'; // Assuming you have this screen
+import 'package:voltican_fitness/screens/calendar_trainee_screen.dart';
+import 'package:voltican_fitness/screens/trainer_landing_screen.dart'; // Assuming you have this screen
 
 class TabsScreen extends StatefulWidget {
   final int userRole; // Pass user role to the widget
@@ -26,6 +27,7 @@ class _TabsScreenState extends State<TabsScreen> {
       ];
     } else {
       return const [
+        TrainerLandeingScreen(),
         CalendarScreen(),
         MealPlanScreen(),
         TraineesScreen(),
@@ -49,6 +51,10 @@ class _TabsScreenState extends State<TabsScreen> {
       ];
     } else {
       return const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Home',
+        ),
         BottomNavigationBarItem(
           icon: Icon(Icons.calendar_month_outlined),
           label: 'Calendar',

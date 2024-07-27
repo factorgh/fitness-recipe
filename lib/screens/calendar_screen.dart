@@ -44,7 +44,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     print(token);
                   },
                   child: const Text(
-                    'Good Morning from here',
+                    'Good Morning ',
                     style: TextStyle(fontSize: 22),
                   ),
                 ),

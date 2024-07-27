@@ -30,6 +30,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  void _signUp(BuildContext ctx) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => const SignupScreen(),
+      ),
+    );
+  }
+
   void _getStarted(BuildContext ctx) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -101,7 +109,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         textColor: Colors.white),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   InkWell(
                     onTap: () {
@@ -111,6 +119,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: const ButtonWidget(
                         backColor: Colors.white,
                         text: 'Login',
+                        textColor: Colors.brown),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  InkWell(
+                    onTap: () {
+                      _signUp(context);
+                    },
+                    splashColor: Colors.purple,
+                    child: const ButtonWidget(
+                        backColor: Colors.white,
+                        text: 'Skip',
                         textColor: Colors.brown),
                   ),
                   const SizedBox(
