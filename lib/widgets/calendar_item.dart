@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/meal_edit_screen.dart';
+// import 'package:voltican_fitness/screens/meal_edit_screen.dart';
 import 'package:voltican_fitness/widgets/simple_button.dart';
 
 class CalendarItem extends StatelessWidget {
@@ -114,26 +114,15 @@ class CalendarItem extends StatelessWidget {
               const SizedBox(
                 height: 5,
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const MealEditScreen()));
-                      },
-                      child: const SimpleButton(
-                          title: "Edit meal plan",
-                          backColor: Colors.white,
-                          size: 100,
-                          textColor: Colors.black),
-                    ),
-                    const SizedBox(
+                    SizedBox(
                       width: 5,
                     ),
-                    const SimpleButton(
+                    SimpleButton(
                         title: "delete",
                         backColor: Colors.red,
                         size: 100,

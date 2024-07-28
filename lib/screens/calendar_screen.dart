@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/screens/add_meal_screen.dart';
+import 'package:voltican_fitness/screens/recipe_grid_screen.dart';
 import 'package:voltican_fitness/widgets/calendar_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -112,6 +113,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
               lastDay: DateTime.utc(2040, 3, 20),
               selectedDayPredicate: (day) => isSameDay(day, selectedDay),
               onDaySelected: (DateTime focusDay, DateTime selectDay) {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const RecipeGridScreen()));
                 setState(
                   () {
                     focusedDay = focusDay;

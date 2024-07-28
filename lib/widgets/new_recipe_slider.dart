@@ -107,7 +107,7 @@ class NewRecipeSlider extends StatelessWidget {
               bottom: 0,
               child: Container(
                 width: 330,
-                height: 80,
+                height: 50,
                 decoration: BoxDecoration(
                     color: Colors.white54,
                     borderRadius: BorderRadius.circular(20)),
@@ -116,6 +116,7 @@ class NewRecipeSlider extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             "Burst Tomatoes and Basil",
@@ -145,24 +146,13 @@ class NewRecipeSlider extends StatelessWidget {
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500),
                               ),
-                              Text(
-                                'Easy',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                              Text(
-                                ".",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500),
+                              SizedBox(
+                                width: 10,
                               ),
                               Text(
                                 "by Arlene Wills",
                                 style: TextStyle(
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500),
                               ),
