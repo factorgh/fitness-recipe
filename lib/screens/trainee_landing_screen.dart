@@ -2,8 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:voltican_fitness/widgets/todays_pick.dart';
 import 'package:voltican_fitness/widgets/trainers_slider.dart';
 
-class TraineeLandingScreen extends StatelessWidget {
+class TraineeLandingScreen extends StatefulWidget {
   const TraineeLandingScreen({super.key});
+
+  @override
+  _TraineeLandingScreenState createState() => _TraineeLandingScreenState();
+}
+
+class _TraineeLandingScreenState extends State<TraineeLandingScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showBottomSheet(context);
+    });
+  }
+
+  void _showBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height / 2,
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const Text(
+                  'Bottom Sheet',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                ElevatedButton(
+                  child: const Text('Close'),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   void handleCategorySelected(String category) {
     // Handle category selection

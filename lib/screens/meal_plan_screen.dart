@@ -15,7 +15,7 @@ class MealPlanScreen extends StatefulWidget {
 class _MealPlanScreenState extends State<MealPlanScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  String _selectedFilter = 'Geography';
+  String _selectedFilter = 'A-Z';
 
   @override
   void initState() {
@@ -171,7 +171,7 @@ class _MealPlanScreenState extends State<MealPlanScreen>
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           border: InputBorder.none,
-          hintText: "Search for meal plans",
+          hintText: "Search by recipe name",
           hintStyle: TextStyle(color: Colors.grey[500]),
           suffixIcon: Padding(
             padding: const EdgeInsets.only(right: 10),
@@ -190,7 +190,13 @@ class _MealPlanScreenState extends State<MealPlanScreen>
       padding: const EdgeInsets.only(left: 10),
       child: DropdownButton<String>(
         value: _selectedFilter,
-        items: <String>['Geography', 'A-Z', 'Most Rated'].map((String value) {
+        items: <String>[
+          'A-Z',
+          'Z-A',
+          'Closest to user',
+          'Farthest from user',
+          'Most Rated',
+        ].map((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(value),

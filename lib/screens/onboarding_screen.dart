@@ -99,38 +99,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   const SizedBox(
                     height: 20,
                   ),
-                  SizedBox(
-                    width: double.maxFinite,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            _getStarted(context);
-                          },
-                          splashColor: Colors.purple,
-                          child: const CustomButton(
-                              width: 290,
-                              backColor: Color.fromARGB(225, 214, 28, 28),
-                              text: 'Get Started',
-                              textColor: Colors.white),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            _signUp(context);
-                          },
-                          splashColor: Colors.purple,
-                          child: const CustomButton(
-                              width: 50,
-                              backColor: Colors.white,
-                              text: 'Skip',
-                              textColor: Colors.brown),
-                        ),
-                      ],
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          _signUp(context);
+                        },
+                        splashColor: Colors.purple,
+                        child: const CustomButton(
+                            width: 50,
+                            backColor: Colors.transparent,
+                            text: 'Skip',
+                            textColor: Colors.white),
+                      ),
+                    ],
+                  ),
+                  InkWell(
+                    onTap: () {
+                      _signUp(context);
+                    },
+                    splashColor: Colors.purple,
+                    child: const ButtonWidget(
+                        backColor: Colors.red,
+                        text: 'Get Started',
+                        textColor: Colors.white),
                   ),
                   const SizedBox(
                     height: 10,

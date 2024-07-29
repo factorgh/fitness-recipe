@@ -155,7 +155,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   ),
                   const CalendarItem(
                     titleIcon: Icons.restaurant_menu,
-                    mealPlan: "Porched Eggs meal plan",
+                    mealPlan: "Poached Eggs meal plan",
                   ),
                   const SizedBox(
                     height: 20,
