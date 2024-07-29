@@ -11,6 +11,7 @@ class _TraineesScreenState extends State<TraineesScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String selectedDropdown = 'Following';
+  String selectedTrainee = 'Followers';
 
   @override
   void initState() {
@@ -28,6 +29,47 @@ class _TraineesScreenState extends State<TraineesScreen>
   }
 
   Widget buildListView(List<Map<String, String>> items, bool isTrainer) {
+    Future<void> showDeleteConfirmationDialog(BuildContext context) async {
+      return showDialog<void>(
+        context: context,
+        barrierDismissible: false, // User must tap button to dismiss
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text(
+              'Confirm Delete',
+              style: TextStyle(color: Colors.black87),
+            ),
+            content: const SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text(
+                    'Are you sure you want to peform a delete?',
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+              ),
+              TextButton(
+                child: const Text('Delete'),
+                onPressed: () {
+                  // Perform the delete action
+                  Navigator.of(context).pop(); // Close the dialog
+                  // You can call a function here to delete the item
+                  // For example: _deleteItem();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     return ListView.builder(
       itemCount: items.length,
       itemBuilder: (context, index) {
@@ -38,30 +80,17 @@ class _TraineesScreenState extends State<TraineesScreen>
           ),
           elevation: 5,
           child: ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(items[index]['image']!),
-            ),
-            title: Text(items[index]['name']!),
-            subtitle: Text(items[index]['telephone']!),
-            trailing: isTrainer
-                ? ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        if (items[index]['isFollowing'] == 'true') {
-                          items[index]['isFollowing'] = 'false';
-                        } else {
-                          items[index]['isFollowing'] = 'true';
-                        }
-                      });
-                    },
-                    child: Text(
-                      items[index]['isFollowing'] == 'true'
-                          ? 'Following'
-                          : 'Follow',
-                    ),
-                  )
-                : null,
-          ),
+              leading: CircleAvatar(
+                backgroundImage: NetworkImage(items[index]['image']!),
+              ),
+              title: Text(items[index]['name']!),
+              subtitle: Text(items[index]['telephone']!),
+              trailing: ElevatedButton(
+                onPressed: () {
+                  showDeleteConfirmationDialog(context);
+                },
+                child: const Text("Remove"),
+              )),
         );
       },
     );
@@ -87,6 +116,27 @@ class _TraineesScreenState extends State<TraineesScreen>
             ],
           ),
           if (_tabController.index ==
+              0) // Display dropdown only on Trainers tab
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                DropdownButton<String>(
+                  value: selectedTrainee,
+                  items: ['Followers', 'Assigned'].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedTrainee = newValue!;
+                    });
+                  },
+                ),
+              ],
+            ),
+          if (_tabController.index ==
               1) // Display dropdown only on Trainers tab
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -111,7 +161,7 @@ class _TraineesScreenState extends State<TraineesScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                buildListView(trainees, false), // Pass false for trainees
+                buildListView(trainees, true), // Pass false for trainees
                 buildListView(trainers, true), // Pass true for trainers
               ],
             ),

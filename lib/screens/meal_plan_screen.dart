@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/data/dummy_data.dart';
 import 'package:voltican_fitness/models/meal.dart';
+import 'package:voltican_fitness/screens/create_recipe.screen.dart';
 import 'package:voltican_fitness/screens/meal_detail_screen.dart';
-import 'package:voltican_fitness/screens/recipe_screen.dart';
 import 'package:voltican_fitness/widgets/meal_item.dart';
 
 class MealPlanScreen extends StatefulWidget {
@@ -15,7 +15,6 @@ class MealPlanScreen extends StatefulWidget {
 class _MealPlanScreenState extends State<MealPlanScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  String _selectedFilter = 'A-Z';
 
   @override
   void initState() {
@@ -70,7 +69,7 @@ class _MealPlanScreenState extends State<MealPlanScreen>
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const RecipeScreen()));
+                          builder: (context) => const CreateRecipeScreen()));
                     },
                     child: const Icon(
                       Icons.add,
@@ -124,7 +123,7 @@ class _MealPlanScreenState extends State<MealPlanScreen>
               controller: _tabController,
               children: [
                 buildTabContent(),
-                buildTabContent(showFilter: true),
+                buildTabContent(),
               ],
             ),
           ),
@@ -133,7 +132,7 @@ class _MealPlanScreenState extends State<MealPlanScreen>
     );
   }
 
-  Widget buildTabContent({bool showFilter = false}) {
+  Widget buildTabContent() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Column(
@@ -142,7 +141,7 @@ class _MealPlanScreenState extends State<MealPlanScreen>
           Row(
             children: [
               Expanded(child: buildSearchBar()),
-              if (showFilter) buildFilterDropdown(),
+              buildFilterIcon(),
             ],
           ),
           const SizedBox(height: 10),
@@ -185,29 +184,26 @@ class _MealPlanScreenState extends State<MealPlanScreen>
     );
   }
 
-  Widget buildFilterDropdown() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 10),
-      child: DropdownButton<String>(
-        value: _selectedFilter,
-        items: <String>[
+  Widget buildFilterIcon() {
+    return PopupMenuButton<String>(
+      icon: Icon(Icons.filter_list, color: Colors.grey[500]),
+      onSelected: (String value) {
+        setState(() {});
+      },
+      itemBuilder: (BuildContext context) {
+        return <String>[
           'A-Z',
           'Z-A',
           'Closest to user',
           'Farthest from user',
           'Most Rated',
-        ].map((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
+        ].map((String choice) {
+          return PopupMenuItem<String>(
+            value: choice,
+            child: Text(choice),
           );
-        }).toList(),
-        onChanged: (String? newValue) {
-          setState(() {
-            _selectedFilter = newValue!;
-          });
-        },
-      ),
+        }).toList();
+      },
     );
   }
 }
