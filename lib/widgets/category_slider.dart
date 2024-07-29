@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/screens/search_screen.dart';
 
 class CategorySlider extends StatelessWidget {
   final List<String> categories;
@@ -27,7 +28,8 @@ class CategorySlider extends StatelessWidget {
 
   Widget _buildCategoryItem(BuildContext context, String category) {
     return GestureDetector(
-      onTap: () => onCategorySelected(category),
+      onTap: () => Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => SearchScreen())),
       child: Container(
         width: 150, // Adjust width as needed
         margin: const EdgeInsets.symmetric(horizontal: 10),
