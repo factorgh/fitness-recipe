@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/models/meal.dart';
+import 'package:voltican_fitness/screens/meal_detail_screen.dart';
 import 'package:voltican_fitness/widgets/category_slider.dart';
 import 'package:voltican_fitness/widgets/new_recipe_slider.dart';
 import 'package:voltican_fitness/widgets/trainers_slider.dart';
@@ -44,6 +46,17 @@ class TrainerLandeingScreen extends StatelessWidget {
 
     void handleRecipSelected(String category) {
       // Handle category selection
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const MealDetailScreen(
+                    meal: Meal(
+                        id: 'm2',
+                        imageUrl:
+                            "https://cdn.pixabay.com/photo/2017/03/27/13/54/bread-2178874_640.jpg",
+                        ingredients: ["potatos", "fries"],
+                        title: "Sandwich and Fries"),
+                  )));
       print('Selected category: $category');
     }
 
