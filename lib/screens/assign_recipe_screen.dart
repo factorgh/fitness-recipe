@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/screens/calendar_screen.dart';
+import 'package:voltican_fitness/widgets/button.dart';
 
 class AssignRecipeScreen extends StatefulWidget {
   const AssignRecipeScreen({super.key});
@@ -96,6 +98,7 @@ class _AssignRecipeScreenState extends State<AssignRecipeScreen> {
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Time Picker
               Row(
@@ -175,6 +178,17 @@ class _AssignRecipeScreenState extends State<AssignRecipeScreen> {
                         )),
                   ],
                 ),
+              const SizedBox(height: 50),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const CalendarScreen()));
+                },
+                child: const ButtonWidget(
+                    backColor: Colors.red,
+                    text: "Complete Plan",
+                    textColor: Colors.white),
+              )
             ],
           ),
         ),

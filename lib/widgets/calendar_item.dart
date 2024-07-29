@@ -8,6 +8,48 @@ class CalendarItem extends StatelessWidget {
   const CalendarItem(
       {super.key, required this.mealPlan, required this.titleIcon});
 
+// sHOW DIALOG TO DELETE MEAL PLAN
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to dismiss
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Delete',
+            style: TextStyle(color: Colors.black87),
+          ),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  'Are you sure you want to delete this item?',
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                // Perform the delete action
+                Navigator.of(context).pop(); // Close the dialog
+                // You can call a function here to delete the item
+                // For example: _deleteItem();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -114,19 +156,24 @@ class CalendarItem extends StatelessWidget {
               const SizedBox(
                 height: 5,
               ),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 5,
                     ),
-                    SimpleButton(
-                        title: "delete",
-                        backColor: Colors.red,
-                        size: 100,
-                        textColor: Colors.white),
+                    InkWell(
+                      onTap: () {
+                        _showDeleteConfirmationDialog(context);
+                      },
+                      child: const SimpleButton(
+                          title: "delete",
+                          backColor: Colors.red,
+                          size: 100,
+                          textColor: Colors.white),
+                    ),
                   ],
                 ),
               ),

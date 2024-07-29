@@ -17,9 +17,7 @@ class SimpleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: backColor,
-          border: Border.all(color: Colors.black54),
-          borderRadius: BorderRadius.circular(40)),
+          color: backColor, borderRadius: BorderRadius.circular(40)),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Text(

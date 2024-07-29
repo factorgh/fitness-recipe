@@ -48,7 +48,7 @@ class _TabsScreenState extends State<TabsScreen> {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.dashboard),
-          label: 'Calendar', // Extra tab for role 0
+          label: 'Meal Plans', // Extra tab for role 0
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.settings),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:table_calendar/table_calendar.dart';
+import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
 
 import 'package:voltican_fitness/screens/recipe_grid_screen.dart';
 import 'package:voltican_fitness/widgets/calendar_item.dart';
@@ -119,34 +120,54 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
             const SizedBox(height: 30),
             const Divider(color: Colors.black54, height: 10),
-            const SizedBox(
+            SizedBox(
               width: double.maxFinite,
               child: SingleChildScrollView(
                   child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
-                  Text(
-                    "24 April, 2024",
-                    style: TextStyle(fontSize: 20, color: Colors.black54),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "29 July, 2024",
+                        style: TextStyle(fontSize: 20, color: Colors.black54),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) => const AllMealPlan())),
+                        child: const Text(
+                          "View all Plans",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ],
                   ),
-                  CalendarItem(
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const CalendarItem(
                     titleIcon: Icons.restaurant_menu,
                     mealPlan: "Porched Eggs meal plan",
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
-                  CalendarItem(
+                  const CalendarItem(
                     titleIcon: Icons.restaurant_menu,
                     mealPlan: "Baked Salmon with strwaberries",
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
-                  CalendarItem(
+                  const CalendarItem(
                     titleIcon: Icons.restaurant_menu,
                     mealPlan: "Baked Salmon with strwaberries",
                   ),

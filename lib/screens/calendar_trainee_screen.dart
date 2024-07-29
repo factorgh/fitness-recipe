@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:voltican_fitness/screens/add_meal_screen.dart';
 
 import 'package:voltican_fitness/widgets/calendar_item.dart';
 
@@ -12,11 +11,6 @@ class CalendarTraineeScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarTraineeScreen> {
-  void _goToAddMeal(BuildContext ctx) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (ctx) => const RecipeScreen()));
-  }
-
   DateTime focusedDay = DateTime.now();
   DateTime? selectedDay;
 
@@ -43,15 +37,6 @@ class _CalendarScreenState extends State<CalendarTraineeScreen> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        _goToAddMeal(context);
-                      },
-                      child: const Icon(
-                        Icons.add_task_rounded,
-                        size: 30,
-                      ),
-                    ),
                     const SizedBox(
                       width: 10,
                     ),
