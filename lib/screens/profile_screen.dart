@@ -35,7 +35,7 @@ class _ProfileHeader extends StatelessWidget {
           CircleAvatar(
             radius: 60,
             backgroundImage: const AssetImage(
-                'assets/images/profile.jpg'), // Replace with your profile picture asset
+                'assets/images/pf2.jpg'), // Replace with your profile picture asset
             backgroundColor: Colors.grey.shade200,
           ),
           const Positioned(
@@ -82,7 +82,8 @@ class _InfoField extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           Text(value, style: const TextStyle(fontSize: 16)),
         ],
       ),
@@ -102,7 +103,7 @@ class _EditProfileButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
-      child: const Text('Edit Profile'),
+      child: const Text('Update Profile'),
     );
   }
 }

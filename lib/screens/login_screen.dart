@@ -44,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (ctx) => const TabsScreen(userRole: 1)));
+            MaterialPageRoute(builder: (ctx) => const TabsScreen(userRole: 0)));
       } else {
         _showErrorSnackBar('Login failed. Please try again.');
       }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:voltican_fitness/screens/calendar_screen.dart';
 import 'package:voltican_fitness/screens/meal_plan_screen.dart';
 import 'package:voltican_fitness/screens/settings_screen.dart';
+import 'package:voltican_fitness/screens/trainee_landing_screen.dart';
 import 'package:voltican_fitness/screens/trainees_screen.dart';
 import 'package:voltican_fitness/screens/calendar_trainee_screen.dart';
 import 'package:voltican_fitness/screens/trainer_landing_screen.dart'; // Assuming you have this screen
@@ -22,14 +23,15 @@ class _TabsScreenState extends State<TabsScreen> {
   List<Widget> get _pages {
     if (widget.userRole == 0) {
       return const [
+        TraineeLandingScreen(),
         CalendarTraineeScreen(), // Extra screen for role 0
         SettingsScreen(),
       ];
     } else {
       return const [
         TrainerLandeingScreen(),
-        CalendarScreen(),
         MealPlanScreen(),
+        CalendarScreen(),
         TraineesScreen(),
         SettingsScreen(),
       ];
@@ -40,6 +42,10 @@ class _TabsScreenState extends State<TabsScreen> {
   List<BottomNavigationBarItem> get _bottomNavBarItems {
     if (widget.userRole == 0) {
       return const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Home',
+        ),
         BottomNavigationBarItem(
           icon: Icon(Icons.dashboard),
           label: 'Calendar', // Extra tab for role 0
@@ -56,12 +62,12 @@ class _TabsScreenState extends State<TabsScreen> {
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_month_outlined),
-          label: 'Calendar',
+          icon: Icon(Icons.restaurant_menu),
+          label: 'Recipes',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.restaurant_menu),
-          label: 'Meal Plans',
+          icon: Icon(Icons.calendar_month_outlined),
+          label: 'Calendar',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.groups_3),

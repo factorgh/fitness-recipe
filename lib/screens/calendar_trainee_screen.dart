@@ -14,7 +14,7 @@ class CalendarTraineeScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarTraineeScreen> {
   void _goToAddMeal(BuildContext ctx) {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (ctx) => const AddMealScreen()));
+        .push(MaterialPageRoute(builder: (ctx) => const RecipeScreen()));
   }
 
   DateTime focusedDay = DateTime.now();

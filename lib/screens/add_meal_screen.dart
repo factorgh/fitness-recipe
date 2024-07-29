@@ -1,19 +1,23 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 
-class AddMealScreen extends StatefulWidget {
-  const AddMealScreen({super.key});
+class RecipeScreen extends StatefulWidget {
+  const RecipeScreen({super.key});
 
   @override
-  State<AddMealScreen> createState() => _AddMealScreenState();
+  State<RecipeScreen> createState() => _RecipeScreenState();
 }
 
-class _AddMealScreenState extends State<AddMealScreen> {
+class _RecipeScreenState extends State<RecipeScreen> {
   File? _selectedImage;
+
+  final TextEditingController _mealNameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _ingredientsController = TextEditingController();
+
   void _takePicture() async {
     final imagePicker = ImagePicker();
     final pickedImage =
@@ -30,15 +34,24 @@ class _AddMealScreenState extends State<AddMealScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = const Center(
+    Widget content = Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             Icons.add_photo_alternate_outlined,
-            size: 30,
+            size: 40,
+            color: Colors.grey[600],
           ),
-          Text('upload')
+          const SizedBox(height: 8),
+          Text(
+            'Upload Image',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
@@ -50,131 +63,205 @@ class _AddMealScreenState extends State<AddMealScreen> {
           _selectedImage!,
           fit: BoxFit.cover,
           width: double.infinity,
-          height: double.infinity,
+          height: 200,
         ),
       );
     }
 
     return Scaffold(
-        body: SingleChildScrollView(
-      child: Container(
-        margin: const EdgeInsets.only(left: 20, right: 20),
+      appBar: AppBar(
+        title: const Text('Create A New Recipe',
+            style: TextStyle(fontWeight: FontWeight.w500)),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        backgroundColor: Colors.white,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(
-              height: 70,
+            Text(
+              'Add Thumbnail Image',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.blueGrey[800],
+              ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Icon(
-                    Icons.close,
-                    size: 30,
-                  ),
-                ),
-                const Text(
-                  'Add a meal plan ',
-                  style: TextStyle(fontSize: 15),
-                ),
-                const Text('1/2')
-              ],
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            const Text('Add thumbnail image'),
+            const SizedBox(height: 10),
             GestureDetector(
               onTap: _takePicture,
               child: Container(
-                  height: 100,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black38),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: content),
+                height: 200,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black38),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: content,
+              ),
             ),
-            const SizedBox(
-              height: 20,
+            const SizedBox(height: 20),
+            Text(
+              'Enter Meal Plan Name',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.blueGrey[800],
+              ),
             ),
-            const Text('Enter meal plan'),
+            const SizedBox(height: 10),
             Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                  color: Colors.black38,
-                ),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.black38),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(5.0),
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: TextFormField(
+                  controller: _mealNameController,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
-                    hintText: "Enter meal name",
+                    hintText: 'Enter meal name',
+                    contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),
               ),
             ),
-            const SizedBox(
-              height: 20,
-            ),
-            const Text('Description'),
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                  color: Colors.black38,
-                ),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(5.0),
-                child: TextField(
-                  keyboardType: TextInputType.multiline,
-                  minLines: 1,
-                  maxLines: 4,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "Enter meal description",
-                  ),
-                ),
+            const SizedBox(height: 20),
+            Text(
+              'Description',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.blueGrey[800],
               ),
             ),
-            const SizedBox(
-              height: 20,
-            ),
-            const Text('Ingredients'),
+            const SizedBox(height: 10),
             Container(
               height: 120,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                  color: Colors.black38,
-                ),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.black38),
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(5.0),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: TextField(
+                  controller: _descriptionController,
                   keyboardType: TextInputType.multiline,
                   minLines: 1,
                   maxLines: 4,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: InputBorder.none,
-                    hintText: "Which ingredients was used in this meal",
+                    hintText: 'Enter meal description',
+                    contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),
               ),
             ),
-            const SizedBox(
-              height: 50,
+            const SizedBox(height: 20),
+            Text(
+              'Ingredients',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.blueGrey[800],
+              ),
             ),
+            const SizedBox(height: 10),
+            Container(
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.black38),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: TextField(
+                  controller: _ingredientsController,
+                  keyboardType: TextInputType.multiline,
+                  minLines: 1,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Which ingredients were used in this meal?',
+                    contentPadding: EdgeInsets.symmetric(vertical: 15),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Instructions',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.blueGrey[800],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.black38),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: TextField(
+                  controller: _ingredientsController,
+                  keyboardType: TextInputType.multiline,
+                  minLines: 1,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Add the instructions involved ',
+                    contentPadding: EdgeInsets.symmetric(vertical: 15),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Nutritional Facts',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.blueGrey[800],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.black38),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: TextField(
+                  controller: _ingredientsController,
+                  keyboardType: TextInputType.multiline,
+                  minLines: 1,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Add the right nutritional facts',
+                    contentPadding: EdgeInsets.symmetric(vertical: 15),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
             GestureDetector(
                 onTap: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const AssignRecipeScreen()));
                 },
                 child: const ButtonWidget(
                     backColor: Colors.red,
@@ -183,6 +270,6 @@ class _AddMealScreenState extends State<AddMealScreen> {
           ],
         ),
       ),
-    ));
+    );
   }
 }

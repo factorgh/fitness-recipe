@@ -94,6 +94,7 @@ class _RecipeGridScreenState extends State<RecipeGridScreen> {
           ),
           TextButton(
             onPressed: () {
+              Navigator.of(context).pop();
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => const AssignRecipeScreen()));
               // Assign logic goes here
@@ -114,7 +115,7 @@ class _RecipeGridScreenState extends State<RecipeGridScreen> {
               icon: const Icon(Icons.add),
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const AddMealScreen()));
+                    builder: (context) => const RecipeScreen()));
               }),
           IconButton(icon: const Icon(Icons.filter_list), onPressed: () {})
         ],

@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
+import 'package:voltican_fitness/widgets/button.dart';
 
 class RecipeScreen extends StatefulWidget {
   const RecipeScreen({super.key});
@@ -28,12 +30,6 @@ class _RecipeScreenState extends State<RecipeScreen> {
     setState(() {
       _selectedImage = File(pickedImage.path);
     });
-  }
-
-  void _printValues() {
-    print('Meal Name: ${_mealNameController.text}');
-    print('Description: ${_descriptionController.text}');
-    print('Ingredients: ${_ingredientsController.text}');
   }
 
   @override
@@ -74,7 +70,8 @@ class _RecipeScreenState extends State<RecipeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add a Meal Plan'),
+        title: const Text('Create A New Recipe',
+            style: TextStyle(fontWeight: FontWeight.w500)),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.close),
@@ -82,7 +79,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
             Navigator.of(context).pop();
           },
         ),
-        backgroundColor: Colors.blueGrey[900],
+        backgroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
@@ -111,7 +108,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Enter Meal Plan Name',
+              'Enter Recipe Name',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -130,7 +127,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                   controller: _mealNameController,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'Enter meal name',
+                    hintText: 'Enter recipe name',
                     contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),
@@ -161,7 +158,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                   maxLines: 4,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'Enter meal description',
+                    hintText: 'Enter recipe description',
                     contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),
@@ -198,25 +195,78 @@ class _RecipeScreenState extends State<RecipeScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 30),
-            Center(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () {
-                  _printValues(); // Print values to console
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Next'),
+            const SizedBox(height: 20),
+            Text(
+              'Instructions',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.blueGrey[800],
               ),
             ),
+            const SizedBox(height: 10),
+            Container(
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.black38),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: TextField(
+                  controller: _ingredientsController,
+                  keyboardType: TextInputType.multiline,
+                  minLines: 1,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Add the instructions involved ',
+                    contentPadding: EdgeInsets.symmetric(vertical: 15),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Nutritional Facts',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.blueGrey[800],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.black38),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: TextField(
+                  controller: _ingredientsController,
+                  keyboardType: TextInputType.multiline,
+                  minLines: 1,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Add the right nutritional facts',
+                    contentPadding: EdgeInsets.symmetric(vertical: 15),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+            GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const AssignRecipeScreen()));
+                },
+                child: const ButtonWidget(
+                    backColor: Colors.red,
+                    text: 'Next',
+                    textColor: Colors.white))
           ],
         ),
       ),

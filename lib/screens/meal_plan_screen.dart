@@ -62,7 +62,7 @@ class _MealPlanScreenState extends State<MealPlanScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                "Meal Plans",
+                "Recipes",
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               Row(
@@ -114,7 +114,7 @@ class _MealPlanScreenState extends State<MealPlanScreen>
             labelColor: Colors.red,
             unselectedLabelColor: Colors.black,
             tabs: const [
-              Tab(text: 'Owners'),
+              Tab(text: 'My Recipes'),
               Tab(text: 'Others'),
             ],
           ),
