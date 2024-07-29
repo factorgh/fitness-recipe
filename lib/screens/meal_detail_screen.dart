@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:voltican_fitness/models/meal.dart';
+import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
+import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 
 class MealDetailScreen extends StatefulWidget {
@@ -15,6 +17,47 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
   double value = 3.8;
   bool isPrivate = false;
   bool isFollowing = false;
+
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to dismiss
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Delete',
+            style: TextStyle(color: Colors.black87),
+          ),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  'Are you sure you want to delete this item?',
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                // Perform the delete action
+                Navigator.of(context).pop(); // Close the dialog
+                // You can call a function here to delete the item
+                // For example: _deleteItem();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -279,7 +322,10 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                   ),
                   const SizedBox(height: 30),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const EditRecipeScreen()));
+                    },
                     splashColor: Colors.purple,
                     child: const ButtonWidget(
                         backColor: Colors.red,
@@ -288,7 +334,10 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                   ),
                   const SizedBox(height: 10),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const AssignRecipeScreen()));
+                    },
                     splashColor: Colors.purple,
                     child: const ButtonWidget(
                         backColor: Colors.red,
@@ -297,7 +346,9 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                   ),
                   const SizedBox(height: 10),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      _showDeleteConfirmationDialog(context);
+                    },
                     splashColor: Colors.purple,
                     child: const ButtonWidget(
                         backColor: Colors.red,
