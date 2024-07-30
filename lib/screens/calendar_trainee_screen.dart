@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import 'package:voltican_fitness/widgets/calendar_item.dart';
+import 'package:voltican_fitness/widgets/plan_item.dart';
 
 class CalendarTraineeScreen extends StatefulWidget {
   const CalendarTraineeScreen({super.key});
@@ -104,24 +104,11 @@ class _CalendarScreenState extends State<CalendarTraineeScreen> {
                     "24 April, 2024",
                     style: TextStyle(fontSize: 20, color: Colors.black54),
                   ),
-                  CalendarItem(
-                    titleIcon: Icons.restaurant_menu,
-                    mealPlan: "Porched Eggs meal plan",
-                  ),
+                  PlanItem(),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
-                  CalendarItem(
-                    titleIcon: Icons.restaurant_menu,
-                    mealPlan: "Baked Salmon with strwaberries",
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  CalendarItem(
-                    titleIcon: Icons.restaurant_menu,
-                    mealPlan: "Baked Salmon with strwaberries",
-                  ),
+                  PlanItem(),
                 ],
               )),
             )

@@ -24,17 +24,18 @@ class _TraineeLandingScreenState extends State<TraineeLandingScreen> {
       isScrollControlled: true,
       builder: (BuildContext context) {
         return SizedBox(
-          height: MediaQuery.of(context).size.height / 2,
+          height: MediaQuery.of(context).size.height / 3,
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 const Text(
-                  'Bottom Sheet',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  'Stay fit with recipes for a better you',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
+                const SizedBox(height: 10),
                 ElevatedButton(
-                  child: const Text('Close'),
+                  child: const Text('Continue your Adventure'),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
