@@ -16,31 +16,31 @@ class _RecipeSliderState extends State<RecipeSlider> {
 
   final List<Map<String, String>> _recipes = [
     {
-      'title': 'Recipe 1',
+      'title': 'Breakfast show',
       'description': 'This is a description of Recipe 1.',
       'imageUrl':
           'https://images.pexels.com/photos/1556688/pexels-photo-1556688.jpeg?auto=compress&cs=tinysrgb&w=800'
     },
     {
-      'title': 'Recipe 2',
+      'title': 'Atlanta breakfast',
       'description': 'This is a description of Recipe 2.',
       'imageUrl':
           'https://images.pexels.com/photos/5966431/pexels-photo-5966431.jpeg?auto=compress&cs=tinysrgb&w=800'
     },
     {
-      'title': 'Recipe 3',
+      'title': 'MXN INN',
       'description': 'This is a description of Recipe 3.',
       'imageUrl':
           'https://images.pexels.com/photos/6287493/pexels-photo-6287493.jpeg?auto=compress&cs=tinysrgb&w=800'
     },
     {
-      'title': 'Recipe 4',
+      'title': 'LUCISON BURGER KING',
       'description': 'This is a description of Recipe 3.',
       'imageUrl':
           'https://images.pexels.com/photos/6210876/pexels-photo-6210876.jpeg?auto=compress&cs=tinysrgb&w=800'
     },
     {
-      'title': 'Recipe 5',
+      'title': 'Amazon Restaurants',
       'description': 'This is a description of Recipe 3.',
       'imageUrl':
           'https://images.pexels.com/photos/5946643/pexels-photo-5946643.jpeg?auto=compress&cs=tinysrgb&w=800'
