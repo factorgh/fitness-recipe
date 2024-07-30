@@ -19,6 +19,14 @@ class ProfileScreen extends StatelessWidget {
             _ProfileInfo(),
             const SizedBox(height: 20),
             _EditProfileButton(),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                OutlinedButton(onPressed: () {}, child: const Text('Get Code')),
+                const SizedBox(width: 20),
+                const Text("#FRALBERT2024"),
+              ],
+            )
           ],
         ),
       ),
