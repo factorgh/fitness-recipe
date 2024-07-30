@@ -12,7 +12,7 @@ class AssignRecipeScreen extends StatefulWidget {
 
 class _AssignRecipeScreenState extends State<AssignRecipeScreen> {
   TimeOfDay? _selectedTime;
-  String _selectedDuration = 'Month';
+  String _selectedDuration = 'Does Not Repeat';
   final List<String> _allTrainees = [
     'John Doe',
     'Jane Smith',
@@ -154,7 +154,14 @@ class _AssignRecipeScreenState extends State<AssignRecipeScreen> {
               // Dropdown for Duration
               DropdownButton<String>(
                 value: _selectedDuration,
-                items: ['Month', '3 Months', '6 Months', 'Year']
+                items: [
+                  'Does Not Repeat',
+                  'Daily',
+                  'Weekly',
+                  'Monthly',
+                  'Yearly',
+                  'Custom'
+                ]
                     .map((duration) => DropdownMenuItem<String>(
                           value: duration,
                           child: Text(duration),

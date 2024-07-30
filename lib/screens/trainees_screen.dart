@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
 
 class TraineesScreen extends StatefulWidget {
   const TraineesScreen({super.key});
@@ -73,24 +74,30 @@ class _TraineesScreenState extends State<TraineesScreen>
     return ListView.builder(
       itemCount: items.length,
       itemBuilder: (context, index) {
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => TrainerProfileScreen()));
+          },
+          child: Card(
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 5,
+            child: ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: NetworkImage(items[index]['image']!),
+                ),
+                title: Text(items[index]['name']!),
+                subtitle: Text(items[index]['telephone']!),
+                trailing: ElevatedButton(
+                  onPressed: () {
+                    showDeleteConfirmationDialog(context);
+                  },
+                  child: const Text("Remove"),
+                )),
           ),
-          elevation: 5,
-          child: ListTile(
-              leading: CircleAvatar(
-                backgroundImage: NetworkImage(items[index]['image']!),
-              ),
-              title: Text(items[index]['name']!),
-              subtitle: Text(items[index]['telephone']!),
-              trailing: ElevatedButton(
-                onPressed: () {
-                  showDeleteConfirmationDialog(context);
-                },
-                child: const Text("Remove"),
-              )),
         );
       },
     );

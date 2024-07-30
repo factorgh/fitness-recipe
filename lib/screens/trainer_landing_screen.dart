@@ -91,7 +91,7 @@ class TrainerLandeingScreen extends StatelessWidget {
                             CircleAvatar(
                               radius: 20,
                               backgroundImage:
-                                  AssetImage('assets/images/profile.jpg'),
+                                  AssetImage('assets/images/pf2.jpg'),
                             ),
                             SizedBox(
                               width: 3,
