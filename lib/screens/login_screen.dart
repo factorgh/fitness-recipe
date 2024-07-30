@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/screens/code_screen.dart';
 import 'package:voltican_fitness/screens/signup_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:voltican_fitness/widgets/button.dart';
@@ -42,7 +43,9 @@ class _LoginScreenState extends State<LoginScreen> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
 
+// const TabsScreen(userRole: 0)
         if (!mounted) return;
+
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (ctx) => const TabsScreen(userRole: 0)));
       } else {
@@ -184,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     InkWell(
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (ctx) => const TabsScreen(userRole: 1)));
+                            builder: (ctx) => const CodeScreen()));
                       },
                       child: const ButtonWidget(
                           backColor: Colors.red,

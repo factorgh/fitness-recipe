@@ -3,6 +3,7 @@ import 'package:voltican_fitness/screens/calendar_screen.dart';
 import 'package:voltican_fitness/screens/meal_plan_screen.dart';
 import 'package:voltican_fitness/screens/settings_screen.dart';
 import 'package:voltican_fitness/screens/trainee_landing_screen.dart';
+import 'package:voltican_fitness/screens/trainee_settings_screen.dart';
 import 'package:voltican_fitness/screens/trainees_screen.dart';
 import 'package:voltican_fitness/screens/calendar_trainee_screen.dart';
 import 'package:voltican_fitness/screens/trainer_landing_screen.dart'; // Assuming you have this screen
@@ -25,7 +26,7 @@ class _TabsScreenState extends State<TabsScreen> {
       return const [
         TraineeLandingScreen(),
         CalendarTraineeScreen(), // Extra screen for role 0
-        SettingsScreen(),
+        TraineeSettingsScreen()
       ];
     } else {
       return const [
