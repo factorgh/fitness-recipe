@@ -108,6 +108,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         },
                         splashColor: Colors.purple,
                         child: const CustomButton(
+                            size: 20,
                             width: 50,
                             backColor: Colors.transparent,
                             text: 'Skip',

@@ -194,9 +194,10 @@ class _MealPlanScreenState extends State<MealPlanScreen>
         return <String>[
           'A-Z',
           'Z-A',
-          'Closest to user',
-          'Farthest from user',
+          'Most Recent',
+          'Least Recent',
           'Most Rated',
+          'Least Rated',
         ].map((String choice) {
           return PopupMenuItem<String>(
             value: choice,

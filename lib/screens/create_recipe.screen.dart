@@ -267,10 +267,12 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                         Navigator.of(context).pop();
                       },
                       child: const CustomButton(
-                          width: 150,
-                          backColor: Colors.red,
-                          text: 'Save',
-                          textColor: Colors.white)),
+                        size: 12,
+                        width: 150,
+                        backColor: Colors.red,
+                        text: 'Save and Complete',
+                        textColor: Colors.white,
+                      )),
                   const SizedBox(
                     width: 10,
                   ),
@@ -280,9 +282,10 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                             builder: (context) => const AssignRecipeScreen()));
                       },
                       child: const CustomButton(
+                          size: 12,
                           width: 150,
                           backColor: Colors.red,
-                          text: 'Next',
+                          text: 'Save and Assign',
                           textColor: Colors.white)),
                 ],
               ),

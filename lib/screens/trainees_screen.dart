@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
 
 class TraineesScreen extends StatefulWidget {
@@ -91,11 +92,34 @@ class _TraineesScreenState extends State<TraineesScreen>
                 ),
                 title: Text(items[index]['name']!),
                 subtitle: Text(items[index]['telephone']!),
-                trailing: ElevatedButton(
-                  onPressed: () {
-                    showDeleteConfirmationDialog(context);
-                  },
-                  child: const Text("Remove"),
+                trailing: Column(
+                  children: [
+                    const Text(
+                      "Following",
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    GestureDetector(
+                        onTap: () {
+                          showDeleteConfirmationDialog(context);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(20)),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 2),
+                            child: Text(
+                              "Remove",
+                              style:
+                                  TextStyle(fontSize: 10, color: Colors.white),
+                            ),
+                          ),
+                        ))
+                  ],
                 )),
           ),
         );
@@ -129,7 +153,7 @@ class _TraineesScreenState extends State<TraineesScreen>
               children: [
                 DropdownButton<String>(
                   value: selectedTrainee,
-                  items: ['Followers', 'Assigned'].map((String value) {
+                  items: ['Followers', 'All'].map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),

@@ -5,11 +5,13 @@ class CustomButton extends StatelessWidget {
   final String text;
   final Color textColor;
   final double width;
+  final double size;
   const CustomButton(
       {super.key,
       required this.backColor,
       required this.text,
       required this.width,
+      required this.size,
       required this.textColor});
 
   @override
@@ -22,7 +24,7 @@ class CustomButton extends StatelessWidget {
       child: Center(
         child: Text(
           text,
-          style: TextStyle(color: textColor, fontSize: 20),
+          style: TextStyle(color: textColor, fontSize: size),
         ),
       ),
     );

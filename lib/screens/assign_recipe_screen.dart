@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/calendar_screen.dart';
+import 'package:voltican_fitness/screens/tabs_screen.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 import 'package:intl/intl.dart';
 
@@ -128,25 +128,53 @@ class _AssignRecipeScreenState extends State<AssignRecipeScreen> {
                         ? 'Pick Time'
                         : 'Selected Time: ${_selectedTime!.format(context)}'),
                   ),
-                  GestureDetector(
-                      onTap: () => _selectDate(context),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          _selectedDate == null
-                              ? 'Select Date'
-                              : DateFormat('yyyy-MM-dd').format(_selectedDate!),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ))
+                  Column(
+                    children: [
+                      GestureDetector(
+                          onTap: () => _selectDate(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              _selectedDate == null
+                                  ? 'Start Date'
+                                  : DateFormat('yyyy-MM-dd')
+                                      .format(_selectedDate!),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                              ),
+                            ),
+                          )),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      GestureDetector(
+                          onTap: () => _selectDate(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              _selectedDate == null
+                                  ? 'End Date'
+                                  : DateFormat('yyyy-MM-dd')
+                                      .format(_selectedDate!),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ))
+                    ],
+                  )
                 ],
               ),
               const SizedBox(height: 20),
@@ -227,7 +255,7 @@ class _AssignRecipeScreenState extends State<AssignRecipeScreen> {
               GestureDetector(
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const CalendarScreen()));
+                      builder: (context) => const TabsScreen(userRole: 1)));
                 },
                 child: const ButtonWidget(
                     backColor: Colors.red,
