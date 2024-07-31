@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/widgets/trainer_code.dart';
 
 class TraineeProfileScreen extends StatelessWidget {
   const TraineeProfileScreen({super.key});
@@ -10,16 +11,20 @@ class TraineeProfileScreen extends StatelessWidget {
         title: const Text('Profile'),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _ProfileHeader(),
-            const SizedBox(height: 20),
-            _ProfileInfo(),
-            const SizedBox(height: 20),
-            _EditProfileButton(),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              _ProfileHeader(),
+              const SizedBox(height: 20),
+              _ProfileInfo(),
+              const SizedBox(height: 20),
+              _EditProfileButton(),
+              const SizedBox(height: 20),
+              const TrainerCodeWidget()
+            ],
+          ),
         ),
       ),
     );
