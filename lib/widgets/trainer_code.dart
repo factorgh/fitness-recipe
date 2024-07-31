@@ -9,9 +9,7 @@ class TrainerCodeWidget extends StatefulWidget {
 }
 
 class _TrainerCodeWidgetState extends State<TrainerCodeWidget> {
-  bool _showTextField = false;
-
-  void _showConfirmationDialog(bool newValue) {
+  void _showConfirmationDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -23,9 +21,6 @@ class _TrainerCodeWidgetState extends State<TrainerCodeWidget> {
             TextButton(
               child: const Text("Cancel"),
               onPressed: () {
-                setState(() {
-                  _showTextField = !newValue; // Revert switch state
-                });
                 Navigator.of(context).pop();
               },
             ),
@@ -48,25 +43,41 @@ class _TrainerCodeWidgetState extends State<TrainerCodeWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(8.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+          const Row(
             children: [
-              Switch(
-                value: _showTextField,
-                onChanged: (value) {
-                  _showConfirmationDialog(value);
-                },
+              Text(
+                "Trainer Name",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16),
               ),
-              const Text(
-                "Change Your Trainer",
-                style:
-                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+              Spacer(),
+              Text(
+                "Ernest Mensah",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16),
               ),
             ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          GestureDetector(
+            onTap: () {
+              _showConfirmationDialog();
+            },
+            child: const Text(
+              "Change Your Trainer",
+              style: TextStyle(
+                  color: Colors.red, fontWeight: FontWeight.bold, fontSize: 13),
+            ),
           ),
         ],
       ),

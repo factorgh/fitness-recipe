@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:voltican_fitness/models/meal.dart';
 
-import 'package:voltican_fitness/widgets/button.dart';
-
 class TraineePlanDetailScreen extends StatefulWidget {
   const TraineePlanDetailScreen({super.key, required this.meal});
   final Meal meal;
@@ -15,39 +13,79 @@ class TraineePlanDetailScreen extends StatefulWidget {
 class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
   double value = 3.8;
 
-  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+  Future<void> _showReviewConfirmationDialog(BuildContext context) async {
+    final TextEditingController reviewController = TextEditingController();
+
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // User must tap button to dismiss
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
-            'Confirm completion',
-            style: TextStyle(color: Colors.black87),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
           ),
-          content: const SingleChildScrollView(
+          title: const Text(
+            'Submit Your Review',
+            style: TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(
-                  'Are you sure you want to mark as completed',
+                const Text(
+                  'Please enter your review below:',
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: reviewController,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    hintText: 'Enter your review here',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
+          actionsPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.redAccent,
+                textStyle: const TextStyle(fontSize: 16),
+              ),
+              child: const Text('Skip'),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
             ),
-            TextButton(
-              child: const Text('Mark as Completed'),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                textStyle: const TextStyle(fontSize: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
+              child: const Text('Submit'),
               onPressed: () {
-                // Perform the delete action
+                // Handle the submit action
+                String review = reviewController.text;
+                if (review.isNotEmpty) {
+                  // Perform the submit action
+                  // For example, you can call a function to handle the review submission
+                  // _submitReview(review);
+                  print("Review submitted: $review");
+                }
                 Navigator.of(context).pop(); // Close the dialog
-                // You can call a function here to delete the item
-                // For example: _deleteItem();
               },
             ),
           ],
@@ -59,21 +97,6 @@ class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // floatingActionButton: SpeedDial(
-      //   animatedIcon: AnimatedIcons.menu_close,
-      //   animatedIconTheme: const IconThemeData(size: 28.0),
-      //   backgroundColor: Colors.green[900],
-      //   visible: true,
-      //   curve: Curves.bounceInOut,
-      //   children: [
-      //     SpeedDialChild(
-      //       child: const Icon(Icons.check),
-      //       backgroundColor: Colors.blue,
-      //       label: 'Mark as Complete',
-      //       onTap: () {},
-      //     ),
-      //   ],
-      // ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -180,6 +203,8 @@ class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
                           setState(() {
                             value = v;
                           });
+                          _showReviewConfirmationDialog(
+                              context); // Show dialog on rating change
                         },
                         starCount: 5,
                         starSpacing: 2,
@@ -194,8 +219,7 @@ class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    "psum passages, and more recently with desk publishing software like Aldus PageMaker \n"
-                    "psum passages, and more recently with desk publishing software like Aldus PageMaker  .",
+                    "Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.",
                     style: TextStyle(color: Colors.black38),
                   ),
                   const SizedBox(height: 20),
@@ -253,54 +277,52 @@ class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
                   ),
                   const SizedBox(height: 10),
                   const Text(
-                    '1. psum passages, and more recently with desk  ',
+                    '1. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
                     style: TextStyle(color: Colors.black38),
                   ),
                   const Text(
-                    '2. psum passages, and more recently with desk',
+                    '2. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
                     style: TextStyle(color: Colors.black38),
                   ),
                   const Text(
-                    '3. psum passages, and more recently with desk ',
+                    '3. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
                     style: TextStyle(color: Colors.black38),
                   ),
                   const Text(
-                    '4. psum passages, and more recently with desk ',
+                    '4. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
                     style: TextStyle(color: Colors.black38),
                   ),
                   const SizedBox(height: 30),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              labelText: 'Enter a review',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      const Icon(Icons.send, size: 30, color: Colors.red),
-                    ],
+                  const Text(
+                    'Nutritional Facts',
+                    style: TextStyle(fontSize: 20),
                   ),
-                  const SizedBox(height: 20),
-                  InkWell(
-                    onTap: () {
-                      _showDeleteConfirmationDialog(context);
-                    },
-                    splashColor: Colors.purple,
-                    child: const ButtonWidget(
-                        backColor: Colors.red,
-                        text: 'Mark as completed',
-                        textColor: Colors.white),
+                  Container(
+                    width: 150,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    '1. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
+                    style: TextStyle(color: Colors.black38),
+                  ),
+                  const Text(
+                    '2. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
+                    style: TextStyle(color: Colors.black38),
+                  ),
+                  const Text(
+                    '3. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
+                    style: TextStyle(color: Colors.black38),
+                  ),
+                  const Text(
+                    '4. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
+                    style: TextStyle(color: Colors.black38),
+                  ),
+                  const SizedBox(height: 30),
                   const SizedBox(height: 10),
                 ],
               ),

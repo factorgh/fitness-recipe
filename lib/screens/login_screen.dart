@@ -200,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   InkWell(
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (ctx) => const CodeScreen()));
+                          builder: (ctx) => const TabsScreen(userRole: 1)));
                     },
                     child: const ButtonWidget(
                         backColor: Colors.red,

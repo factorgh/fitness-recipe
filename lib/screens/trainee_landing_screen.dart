@@ -53,11 +53,6 @@ class _TraineeLandingScreenState extends State<TraineeLandingScreen> {
     print('Selected category: $category');
   }
 
-  void handleTrainerSelected(String category) {
-    // Handle category selection
-    print('Selected category: $category');
-  }
-
   @override
   Widget build(BuildContext context) {
     final meals = [
@@ -81,6 +76,18 @@ class _TraineeLandingScreenState extends State<TraineeLandingScreen> {
       "assets/images/pf4.jpg",
       "assets/images/pf5.jpg",
     ];
+    final emails = [
+      'albert.m@example.com',
+      'ernest.m@example.com.',
+      'lucy.m@example.com',
+      'mills.m@example.com',
+      'william.m@example.com',
+    ];
+
+    void handleTrainerSelected(String category) {
+      // Handle category selection
+      print('Selected category: $category');
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -259,6 +266,7 @@ class _TraineeLandingScreenState extends State<TraineeLandingScreen> {
                 recipes: trainers,
                 onTrainerSelected: handleTrainerSelected,
                 images: images,
+                emails: emails,
               ),
               const SizedBox(
                 height: 10,

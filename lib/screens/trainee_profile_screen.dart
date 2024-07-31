@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/widgets/status_toggle_button.dart';
 import 'package:voltican_fitness/widgets/trainer_code.dart';
 
 class TraineeProfileScreen extends StatelessWidget {
@@ -21,8 +22,8 @@ class TraineeProfileScreen extends StatelessWidget {
               _ProfileInfo(),
               const SizedBox(height: 20),
               _EditProfileButton(),
-              const SizedBox(height: 20),
-              const TrainerCodeWidget()
+              const SizedBox(height: 50),
+              const TrainerCodeWidget(),
             ],
           ),
         ),
@@ -64,6 +65,7 @@ class _ProfileInfo extends StatelessWidget {
     return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        StatusToggleButton(),
         _InfoField(label: 'Name', value: 'John Doe'),
         _InfoField(label: 'Email', value: 'john.doe@example.com'),
         _InfoField(label: 'Phone', value: '+1 234 567 890'),

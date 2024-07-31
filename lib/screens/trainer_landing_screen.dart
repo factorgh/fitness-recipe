@@ -39,6 +39,13 @@ class TrainerLandeingScreen extends StatelessWidget {
       "assets/images/pf4.jpg",
       "assets/images/pf5.jpg",
     ];
+    final emails = [
+      'albert.m@example.com',
+      'ernest.m@example.com.',
+      'lucy.m@example.com',
+      'mills.m@example.com',
+      'william.m@example.com',
+    ];
 
     void handleCategorySelected(String category) {
       // Handle category selection
@@ -221,6 +228,7 @@ class TrainerLandeingScreen extends StatelessWidget {
             ),
             // Trainers
             TopTrainerSlider(
+              emails: emails,
               recipes: trainers,
               onTrainerSelected: handleTrainerSelected,
               images: images,

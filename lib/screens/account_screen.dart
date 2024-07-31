@@ -99,7 +99,8 @@ class _AccountScreenState extends State<AccountScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 padding: const EdgeInsets.symmetric(vertical: 15),
-                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                textStyle:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               child: const Text(
                 'Change Password',
@@ -107,6 +108,21 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
             ),
             const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                // Add your change password logic here
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                textStyle:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              child: const Text(
+                'Delete Account',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           ],
         ),
       ),
