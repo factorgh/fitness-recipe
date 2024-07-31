@@ -10,26 +10,69 @@ class CodeScreen extends StatefulWidget {
 }
 
 class _CodeScreenState extends State<CodeScreen> {
-  bool _showTrainer = false;
-
-  // Show snack bar logic before naviagting to tab screen
+  // Show snack bar logic before navigating to tab screen
   void _showSnackBarAndNavigate(BuildContext context) {
     const snackBar = SnackBar(
       content: Text(
         'Trainer confirmation successful!',
       ),
       duration: Duration(seconds: 2),
-      backgroundColor: Colors.red,
+      backgroundColor: Colors.blue,
     );
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
     // Wait for the duration of the SnackBar before navigating
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => const TabsScreen(userRole: 0)),
-      );
-    });
+
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const TabsScreen(userRole: 0)),
+    );
+  }
+
+  void _showTrainerDetails(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.3,
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 10,
+                ),
+                const CircleAvatar(
+                  radius: 40,
+                  backgroundColor: Colors.black12,
+                  backgroundImage: AssetImage("assets/images/pf2.jpg"),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                const Text(
+                  "Albert M.",
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _showSnackBarAndNavigate(context);
+                  },
+                  child: const Text(
+                    "Confirm trainer",
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -37,111 +80,75 @@ class _CodeScreenState extends State<CodeScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 30,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Enter trainer's code",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 30,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const LoginScreen()));
+                    },
+                    child: const Icon(
+                      Icons.logout,
+                      size: 20,
+                      color: Colors.red,
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const LoginScreen()));
-                      },
-                      child: const Icon(
-                        Icons.logout,
-                        size: 20,
-                        color: Colors.blueAccent,
+                  )
+                ],
+              ),
+              SizedBox(height: MediaQuery.of(context).size.height / 3),
+              Column(
+                children: [
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Enter trainer's code",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w500),
                       ),
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Enter your code',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        labelText: 'Enter your code',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Center(
-                  child: OutlinedButton(
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Center(
+                    child: ElevatedButton(
                       onPressed: () {
-                        setState(() {
-                          _showTrainer = true;
-                        });
+                        _showTrainerDetails(context);
                       },
-                      child: const Text("Confirm code")),
-                ),
-                const SizedBox(
-                  height: 50,
-                ),
-                // Show trainer details if confirmed
-                _showTrainer
-                    ? Center(
-                        child: Container(
-                        height: 200,
-                        width: 200,
-                        decoration: BoxDecoration(
-                            color: Colors.black12,
-                            borderRadius: BorderRadius.circular(20)),
-                        child: GestureDetector(
-                            onTap: () {},
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 5),
-                              child: Column(
-                                children: [
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  const CircleAvatar(
-                                    radius: 40,
-                                    backgroundColor: Colors.black12,
-                                    backgroundImage:
-                                        AssetImage("assets/images/pf2.jpg"),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  const Text("Albert M.",
-                                      style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold)),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  OutlinedButton(
-                                      onPressed: () {
-                                        _showSnackBarAndNavigate(context);
-                                      },
-                                      child: const Text(
-                                        "confirm trainer",
-                                      )),
-                                ],
-                              ),
-                            )),
-                      ))
-                    : const SizedBox()
-              ],
-            )),
+                      child: const Text("Confirm code"),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

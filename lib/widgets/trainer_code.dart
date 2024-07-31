@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/login_screen.dart';
+import 'package:voltican_fitness/screens/code_screen.dart';
 
 class TrainerCodeWidget extends StatefulWidget {
   const TrainerCodeWidget({super.key});
@@ -10,7 +10,40 @@ class TrainerCodeWidget extends StatefulWidget {
 
 class _TrainerCodeWidgetState extends State<TrainerCodeWidget> {
   bool _showTextField = false;
-  final TextEditingController _controller = TextEditingController();
+
+  void _showConfirmationDialog(bool newValue) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Change Trainer"),
+          content: const Text(
+              "Do you want to change your trainer?.Changing trainer will log you out of the current trainers account"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Cancel"),
+              onPressed: () {
+                setState(() {
+                  _showTextField = !newValue; // Revert switch state
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CodeScreen()),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +58,7 @@ class _TrainerCodeWidgetState extends State<TrainerCodeWidget> {
               Switch(
                 value: _showTextField,
                 onChanged: (value) {
-                  setState(() {
-                    _showTextField = value;
-                  });
+                  _showConfirmationDialog(value);
                 },
               ),
               const Text(
@@ -37,32 +68,6 @@ class _TrainerCodeWidgetState extends State<TrainerCodeWidget> {
               ),
             ],
           ),
-          if (_showTextField)
-            Column(
-              children: [
-                TextField(
-                  controller: _controller,
-                  decoration: const InputDecoration(
-                    hintText: 'Enter trainer code',
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle the confirm action here
-                    final trainerCode = _controller.text;
-                    // Do something with the trainer code
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Trainer code: $trainerCode')),
-                    );
-
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const LoginScreen()));
-                  },
-                  child: const Text('Confirm'),
-                ),
-              ],
-            ),
         ],
       ),
     );

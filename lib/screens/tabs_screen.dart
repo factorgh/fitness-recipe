@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/all_trainers_screen.dart';
+
 import 'package:voltican_fitness/screens/calendar_screen.dart';
 import 'package:voltican_fitness/screens/meal_plan_screen.dart';
 import 'package:voltican_fitness/screens/settings_screen.dart';
@@ -27,7 +27,6 @@ class _TabsScreenState extends State<TabsScreen> {
       return const [
         TraineeLandingScreen(),
         CalendarTraineeScreen(),
-        AllTrainersScreen(),
         TraineeSettingsScreen()
       ];
     } else {
@@ -52,10 +51,6 @@ class _TabsScreenState extends State<TabsScreen> {
         BottomNavigationBarItem(
           icon: Icon(Icons.dashboard),
           label: 'Meal Plans', // Extra tab for role 0
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.groups_3),
-          label: 'Trainers',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.settings),

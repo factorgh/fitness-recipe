@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:voltican_fitness/models/meal.dart';
-import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
-import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
-import 'package:voltican_fitness/widgets/button.dart';
 
-class MealDetailScreen extends StatefulWidget {
-  const MealDetailScreen({super.key, required this.meal});
+import 'package:voltican_fitness/widgets/button.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+
+class TraineePlanDetailScreen extends StatefulWidget {
+  const TraineePlanDetailScreen({super.key, required this.meal});
   final Meal meal;
 
   @override
-  State<MealDetailScreen> createState() => _MealDetailScreenState();
+  State<TraineePlanDetailScreen> createState() => _TraineePlanDetailState();
 }
 
-class _MealDetailScreenState extends State<MealDetailScreen> {
+class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
   double value = 3.8;
-  bool isPrivate = false;
-  bool isFollowing = false;
 
   Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
@@ -48,7 +46,9 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
               child: const Text('Delete'),
               onPressed: () {
                 // Perform the delete action
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Close the dialog
+                // You can call a function here to delete the item
+                // For example: _deleteItem();
               },
             ),
           ],
@@ -60,31 +60,21 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // floatingActionButton: SpeedDial(
-      //   animatedIcon: AnimatedIcons.menu_close,
-      //   animatedIconTheme: const IconThemeData(size: 28.0),
-      //   backgroundColor: Colors.green[900],
-      //   visible: true,
-      //   curve: Curves.bounceInOut,
-      //   children: [
-      //     SpeedDialChild(
-      //       child: const Icon(Icons.accessibility),
-      //       backgroundColor: Colors.blue,
-      //       label: 'Accessibility',
-      //       onTap: () {
-      //         print('Accessibility tapped');
-      //       },
-      //     ),
-      //     SpeedDialChild(
-      //       child: const Icon(Icons.add),
-      //       backgroundColor: Colors.red,
-      //       label: 'Add',
-      //       onTap: () {
-      //         print('Add tapped');
-      //       },
-      //     ),
-      //   ],
-      // ),
+      floatingActionButton: SpeedDial(
+        animatedIcon: AnimatedIcons.menu_close,
+        animatedIconTheme: const IconThemeData(size: 28.0),
+        backgroundColor: Colors.green[900],
+        visible: true,
+        curve: Curves.bounceInOut,
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.check),
+            backgroundColor: Colors.blue,
+            label: 'Mark as Complete',
+            onTap: () {},
+          ),
+        ],
+      ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -146,32 +136,6 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         IconButton(
-                          icon: Icon(
-                            isFollowing
-                                ? Icons.person_remove
-                                : Icons.person_add,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isFollowing = !isFollowing;
-                            });
-                          },
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.red, // background color
-                            backgroundColor: Colors.white, // text color
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isFollowing = !isFollowing;
-                            });
-                          },
-                          child: Text(isFollowing ? 'Following' : 'Follow'),
-                        ),
-                        IconButton(
                           icon: const Icon(
                             Icons.share,
                             color: Colors.white,
@@ -206,11 +170,6 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                         ),
                       ),
                       const Spacer(),
-                      const Icon(
-                        Icons.bookmark,
-                        color: Colors.red,
-                        size: 25,
-                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -241,20 +200,12 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                     style: TextStyle(color: Colors.black38),
                   ),
                   const SizedBox(height: 20),
-                  Row(
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Private',
                         style: TextStyle(fontSize: 16),
-                      ),
-                      Switch(
-                        value: isPrivate,
-                        onChanged: (value) {
-                          setState(() {
-                            isPrivate = value;
-                          });
-                        },
                       ),
                     ],
                   ),
@@ -290,7 +241,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                   ),
                   const SizedBox(height: 30),
                   const Text(
-                    'Procedures',
+                    'Instructions',
                     style: TextStyle(fontSize: 20),
                   ),
                   Container(
@@ -321,36 +272,12 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                   const SizedBox(height: 30),
                   InkWell(
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const EditRecipeScreen()));
-                    },
-                    splashColor: Colors.purple,
-                    child: const ButtonWidget(
-                        backColor: Colors.red,
-                        text: 'Update',
-                        textColor: Colors.white),
-                  ),
-                  const SizedBox(height: 10),
-                  InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const AssignRecipeScreen()));
-                    },
-                    splashColor: Colors.purple,
-                    child: const ButtonWidget(
-                        backColor: Colors.red,
-                        text: 'Assign',
-                        textColor: Colors.white),
-                  ),
-                  const SizedBox(height: 10),
-                  InkWell(
-                    onTap: () {
                       _showDeleteConfirmationDialog(context);
                     },
                     splashColor: Colors.purple,
                     child: const ButtonWidget(
                         backColor: Colors.red,
-                        text: 'Delete',
+                        text: 'Submit Review',
                         textColor: Colors.white),
                   ),
                   const SizedBox(height: 10),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/models/meal.dart';
+import 'package:voltican_fitness/screens/trainee_plan_detail.dart';
 
 class PlanItem extends StatelessWidget {
   const PlanItem({super.key});
@@ -6,7 +8,16 @@ class PlanItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => const TraineePlanDetailScreen(
+                meal: Meal(
+                    id: 'm2',
+                    imageUrl:
+                        "https://cdn.pixabay.com/photo/2017/03/27/13/54/bread-2178874_640.jpg",
+                    ingredients: ["potatos", "fries"],
+                    title: "Sandwich and Fries"))));
+      },
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Padding(
