@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/widgets/recipe_advert_slider.dart';
 import 'package:voltican_fitness/widgets/todays_pick.dart';
 import 'package:voltican_fitness/widgets/trainers_slider.dart';
@@ -111,14 +112,24 @@ class _TraineeLandingScreenState extends State<TraineeLandingScreen> {
                     ),
 
                     // right side of row
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Icon(Icons.notifications, size: 15),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => NotificationsScreen()));
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.all(3.0),
+                          child: Icon(
+                            Icons.notifications,
+                            size: 20,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     )
                   ],

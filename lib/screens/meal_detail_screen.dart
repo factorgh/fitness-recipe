@@ -206,11 +206,6 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                         ),
                       ),
                       const Spacer(),
-                      const Icon(
-                        Icons.bookmark,
-                        color: Colors.red,
-                        size: 25,
-                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
