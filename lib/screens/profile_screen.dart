@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/widgets/copy_to_clipboard.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -19,13 +20,9 @@ class ProfileScreen extends StatelessWidget {
             _ProfileInfo(),
             const SizedBox(height: 20),
             _EditProfileButton(),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                OutlinedButton(onPressed: () {}, child: const Text('Get Code')),
-                const SizedBox(width: 20),
-                const Text("#FRALBERT2024"),
-              ],
+            const SizedBox(height: 50),
+            const Row(
+              children: [CopyToClipboardWidget(textToCopy: '#FRALBERT ')],
             )
           ],
         ),

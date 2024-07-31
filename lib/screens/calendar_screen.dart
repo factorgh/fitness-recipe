@@ -5,7 +5,7 @@ import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
 
 import 'package:voltican_fitness/screens/recipe_grid_screen.dart';
 import 'package:voltican_fitness/widgets/calendar_item.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:voltican_fitness/screens/responive_cal_sec.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -34,22 +34,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                GestureDetector(
-                  onTap: () async {
-                    final prefs = await SharedPreferences.getInstance();
-                    final token = prefs.getString('auth_token') ?? '';
-                    print(token);
-                  },
-                  child: const Text(
-                    'Good Morning ',
-                    style: TextStyle(fontSize: 22),
-                  ),
+                const Text(
+                  'Good Morning ',
+                  style: TextStyle(fontSize: 22),
                 ),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const CalendarPage()));
+                      },
                       child: const Icon(
                         Icons.add_task_rounded,
                         size: 30,
