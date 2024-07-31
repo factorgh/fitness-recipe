@@ -41,16 +41,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const CalendarPage()));
-                      },
-                      child: const Icon(
-                        Icons.add_task_rounded,
-                        size: 30,
-                      ),
-                    ),
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     Navigator.of(context).push(MaterialPageRoute(
+                    //         builder: (context) => const CalendarPage()));
+                    //   },
+                    //   child: const Icon(
+                    //     Icons.add_task_rounded,
+                    //     size: 30,
+                    //   ),
+                    // ),
                     const SizedBox(
                       width: 10,
                     ),

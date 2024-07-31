@@ -183,7 +183,12 @@ class _SignupScreenState extends State<SignupScreen> {
                       const Center(child: CircularProgressIndicator())
                     else
                       GestureDetector(
-                        onTap: () => _submit(context),
+                        onTap: () {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                                builder: (context) => const RoleScreen()),
+                          );
+                        },
                         child: const ButtonWidget(
                           backColor: Colors.red,
                           text: 'Signup',

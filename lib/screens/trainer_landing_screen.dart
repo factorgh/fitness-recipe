@@ -4,6 +4,7 @@ import 'package:voltican_fitness/screens/meal_detail_screen.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/widgets/category_slider.dart';
 import 'package:voltican_fitness/widgets/new_recipe_slider.dart';
+import 'package:voltican_fitness/widgets/slider_trainer_landing.dart';
 import 'package:voltican_fitness/widgets/trainers_slider.dart';
 
 class TrainerLandeingScreen extends StatelessWidget {
@@ -227,7 +228,7 @@ class TrainerLandeingScreen extends StatelessWidget {
               ),
             ),
             // Trainers
-            TopTrainerSlider(
+            SliderTrainerLanding(
               emails: emails,
               recipes: trainers,
               onTrainerSelected: handleTrainerSelected,
