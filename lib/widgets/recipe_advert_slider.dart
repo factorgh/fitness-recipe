@@ -17,31 +17,31 @@ class _RecipeSliderState extends State<RecipeSlider> {
   final List<Map<String, String>> _recipes = [
     {
       'title': 'Breakfast show',
-      'description': 'This is a description of Recipe 1.',
+      'description': 'Pizza named best in city.',
       'imageUrl':
           'https://images.pexels.com/photos/1556688/pexels-photo-1556688.jpeg?auto=compress&cs=tinysrgb&w=800'
     },
     {
       'title': 'Atlanta breakfast',
-      'description': 'This is a description of Recipe 2.',
+      'description': 'Smoothie trend takes health world.',
       'imageUrl':
           'https://images.pexels.com/photos/5966431/pexels-photo-5966431.jpeg?auto=compress&cs=tinysrgb&w=800'
     },
     {
       'title': 'MXN INN',
-      'description': 'This is a description of Recipe 3.',
+      'description': 'Chef’s carbonara wins pasta contest.',
       'imageUrl':
           'https://images.pexels.com/photos/6287493/pexels-photo-6287493.jpeg?auto=compress&cs=tinysrgb&w=800'
     },
     {
       'title': 'LUCISON BURGER KING',
-      'description': 'This is a description of Recipe 3.',
+      'description': 'Masala recipe wins culinary award.',
       'imageUrl':
           'https://images.pexels.com/photos/6210876/pexels-photo-6210876.jpeg?auto=compress&cs=tinysrgb&w=800'
     },
     {
-      'title': 'Amazon Restaurants',
-      'description': 'This is a description of Recipe 3.',
+      'title': 'Amazona Restaurants',
+      'description': 'TStir-fry praised for vibrant flavors.',
       'imageUrl':
           'https://images.pexels.com/photos/5946643/pexels-photo-5946643.jpeg?auto=compress&cs=tinysrgb&w=800'
     },
