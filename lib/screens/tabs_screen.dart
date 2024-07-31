@@ -7,7 +7,8 @@ import 'package:voltican_fitness/screens/trainee_landing_screen.dart';
 import 'package:voltican_fitness/screens/trainee_settings_screen.dart';
 import 'package:voltican_fitness/screens/trainees_screen.dart';
 import 'package:voltican_fitness/screens/calendar_trainee_screen.dart';
-import 'package:voltican_fitness/screens/trainer_landing_screen.dart'; // Assuming you have this screen
+import 'package:voltican_fitness/screens/trainer_landing_screen.dart';
+import 'package:voltican_fitness/screens/trainer_search.dart'; // Assuming you have this screen
 
 class TabsScreen extends StatefulWidget {
   final int userRole; // Pass user role to the widget
@@ -26,6 +27,7 @@ class _TabsScreenState extends State<TabsScreen> {
     if (widget.userRole == 0) {
       return const [
         TraineeLandingScreen(),
+        TrainerSearchScreen(),
         CalendarTraineeScreen(),
         TraineeSettingsScreen()
       ];
@@ -47,6 +49,10 @@ class _TabsScreenState extends State<TabsScreen> {
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.search_rounded),
+          label: 'Search', // Extra tab for role 0
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.dashboard),

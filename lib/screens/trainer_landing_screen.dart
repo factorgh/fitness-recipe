@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/models/meal.dart';
 import 'package:voltican_fitness/screens/meal_detail_screen.dart';
+import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/widgets/category_slider.dart';
 import 'package:voltican_fitness/widgets/new_recipe_slider.dart';
 import 'package:voltican_fitness/widgets/trainers_slider.dart';
@@ -120,7 +121,11 @@ class TrainerLandeingScreen extends StatelessWidget {
                             color: Colors.white,
                           ),
                           child: IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        NotificationsScreen()));
+                              },
                               icon: const Icon(
                                   Icons.notifications_none_outlined,
                                   color: Colors.black,

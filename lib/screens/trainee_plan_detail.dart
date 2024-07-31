@@ -3,7 +3,6 @@ import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:voltican_fitness/models/meal.dart';
 
 import 'package:voltican_fitness/widgets/button.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class TraineePlanDetailScreen extends StatefulWidget {
   const TraineePlanDetailScreen({super.key, required this.meal});
@@ -23,14 +22,14 @@ class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(
-            'Confirm Delete',
+            'Confirm completion',
             style: TextStyle(color: Colors.black87),
           ),
           content: const SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text(
-                  'Are you sure you want to delete this item?',
+                  'Are you sure you want to mark as completed',
                 ),
               ],
             ),
@@ -43,7 +42,7 @@ class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
               },
             ),
             TextButton(
-              child: const Text('Delete'),
+              child: const Text('Mark as Completed'),
               onPressed: () {
                 // Perform the delete action
                 Navigator.of(context).pop(); // Close the dialog
@@ -60,21 +59,21 @@ class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: SpeedDial(
-        animatedIcon: AnimatedIcons.menu_close,
-        animatedIconTheme: const IconThemeData(size: 28.0),
-        backgroundColor: Colors.green[900],
-        visible: true,
-        curve: Curves.bounceInOut,
-        children: [
-          SpeedDialChild(
-            child: const Icon(Icons.check),
-            backgroundColor: Colors.blue,
-            label: 'Mark as Complete',
-            onTap: () {},
-          ),
-        ],
-      ),
+      // floatingActionButton: SpeedDial(
+      //   animatedIcon: AnimatedIcons.menu_close,
+      //   animatedIconTheme: const IconThemeData(size: 28.0),
+      //   backgroundColor: Colors.green[900],
+      //   visible: true,
+      //   curve: Curves.bounceInOut,
+      //   children: [
+      //     SpeedDialChild(
+      //       child: const Icon(Icons.check),
+      //       backgroundColor: Colors.blue,
+      //       label: 'Mark as Complete',
+      //       onTap: () {},
+      //     ),
+      //   ],
+      // ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -270,6 +269,28 @@ class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
                     style: TextStyle(color: Colors.black38),
                   ),
                   const SizedBox(height: 30),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          child: TextField(
+                            decoration: InputDecoration(
+                              labelText: 'Enter a review',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      const Icon(Icons.send, size: 30, color: Colors.red),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
                   InkWell(
                     onTap: () {
                       _showDeleteConfirmationDialog(context);
@@ -277,7 +298,7 @@ class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
                     splashColor: Colors.purple,
                     child: const ButtonWidget(
                         backColor: Colors.red,
-                        text: 'Submit Review',
+                        text: 'Mark as completed',
                         textColor: Colors.white),
                   ),
                   const SizedBox(height: 10),

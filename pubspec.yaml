@@ -115,6 +115,15 @@ flutter:
     - assets/images/pf4.jpg
     - assets/images/pf5.jpg
     - assets/recipe.jpg
+    - assets/images/recipes/r1.jpg
+    - assets/images/recipes/r2.jpg
+    - assets/images/recipes/r3.jpg
+    - assets/images/recipes/r4.jpg
+    - assets/images/recipes/r5.jpg
+    - assets/images/recipes/r6.jpg
+    - assets/images/recipes/r7.jpg
+    - assets/images/recipes/r8.jpg
+    - assets/images/recipes/r9.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

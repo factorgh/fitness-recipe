@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/widgets/trainer_column_item.dart';
 
 class TrainerProfileScreen extends StatelessWidget {
   TrainerProfileScreen({super.key});
@@ -48,19 +47,6 @@ class TrainerProfileScreen extends StatelessWidget {
                   SizedBox(
                     width: 20,
                   ),
-                  TrainerColumnItem(count: "30", title: "Followers"),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  TrainerColumnItem(count: "5", title: "Following"),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  TrainerColumnItem(count: "10", title: "Recipes"),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  TrainerColumnItem(count: "100", title: "Meal Plans"),
                 ],
               ),
             ),
