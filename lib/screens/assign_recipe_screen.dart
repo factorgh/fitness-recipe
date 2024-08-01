@@ -184,10 +184,11 @@ class _AssignRecipeScreenState extends State<AssignRecipeScreen> {
                 value: _selectedDuration,
                 items: [
                   'Does Not Repeat',
-                  'Daily',
-                  'Weekly',
-                  'Monthly',
-                  'Yearly',
+                  'Week',
+                  'Month',
+                  'Quarter ',
+                  'Half-Year',
+                  'Year',
                   'Custom'
                 ]
                     .map((duration) => DropdownMenuItem<String>(

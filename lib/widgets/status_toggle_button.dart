@@ -22,7 +22,7 @@ class _StatusToggleButtonState extends State<StatusToggleButton> {
       child: GestureDetector(
         onTap: _toggleButton,
         child: Text(
-          isPublic ? 'Make Profile Private' : 'Make Profile Public',
+          isPublic ? 'Make Information Private' : 'Make Information Public',
           style: TextStyle(
             color: isPublic ? Colors.blue : Colors.red,
             fontSize: 16,

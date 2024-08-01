@@ -136,6 +136,7 @@ class _MealPlanScreenState extends State<MealPlanScreen>
             tabs: const [
               Tab(text: 'My Recipes'),
               Tab(text: 'Others'),
+              Tab(text: 'Explore'),
             ],
           ),
           const SizedBox(height: 10),
@@ -144,6 +145,7 @@ class _MealPlanScreenState extends State<MealPlanScreen>
               controller: _tabController,
               children: [
                 buildTabContent(),
+                buildRecipeTabContent(),
                 buildRecipeTabContent(),
               ],
             ),

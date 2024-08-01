@@ -65,11 +65,11 @@ class _ProfileInfo extends StatelessWidget {
     return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        StatusToggleButton(),
         _InfoField(label: 'Name', value: 'John Doe'),
         _InfoField(label: 'Email', value: 'john.doe@example.com'),
         _InfoField(label: 'Phone', value: '+1 234 567 890'),
         _InfoField(label: 'Address', value: '123 Main Street, City, Country'),
+        StatusToggleButton(),
       ],
     );
   }
