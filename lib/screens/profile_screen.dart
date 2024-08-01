@@ -21,9 +21,7 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 20),
             _EditProfileButton(),
             const SizedBox(height: 50),
-            const Row(
-              children: [CopyToClipboardWidget(textToCopy: '#FRALBERT ')],
-            )
+            const CopyToClipboardWidget(textToCopy: '#FRALBERT ')
           ],
         ),
       ),

@@ -3,7 +3,9 @@ import 'package:voltican_fitness/data/dummy_data.dart';
 import 'package:voltican_fitness/models/meal.dart';
 import 'package:voltican_fitness/screens/create_recipe.screen.dart';
 import 'package:voltican_fitness/screens/meal_detail_screen.dart';
+import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/widgets/meal_item.dart';
+import 'package:voltican_fitness/widgets/recipe_item_trainer.dart';
 
 class MealPlanScreen extends StatefulWidget {
   const MealPlanScreen({super.key});
@@ -34,6 +36,12 @@ class _MealPlanScreenState extends State<MealPlanScreen>
     ));
   }
 
+  void selectRecipe(BuildContext context, Meal meal) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => TrainerMealDetailScreen(meal: meal),
+    ));
+  }
+
   Widget buildMealList() {
     return ListView.builder(
       shrinkWrap: true,
@@ -42,6 +50,19 @@ class _MealPlanScreenState extends State<MealPlanScreen>
         meal: dummyMeals[index],
         selectMeal: (meal) {
           selectMeal(context, meal);
+        },
+      ),
+    );
+  }
+
+  Widget buildRecipeList() {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: dummyMeals.length,
+      itemBuilder: (context, index) => RecipeItemTrainer(
+        meal: dummyMeals[index],
+        selectMeal: (meal) {
+          selectRecipe(context, meal);
         },
       ),
     );
@@ -123,7 +144,7 @@ class _MealPlanScreenState extends State<MealPlanScreen>
               controller: _tabController,
               children: [
                 buildTabContent(),
-                buildTabContent(),
+                buildRecipeTabContent(),
               ],
             ),
           ),
@@ -146,6 +167,25 @@ class _MealPlanScreenState extends State<MealPlanScreen>
           ),
           const SizedBox(height: 10),
           Expanded(child: buildMealList()),
+        ],
+      ),
+    );
+  }
+
+  Widget buildRecipeTabContent() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: buildSearchBar()),
+              buildFilterIcon(),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Expanded(child: buildRecipeList()),
         ],
       ),
     );

@@ -17,26 +17,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const Icon(Icons.notifications),
+        leading: const SizedBox(),
         centerTitle: true,
         title: const Text(
           'Settings',
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
         ),
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              icon: const Icon(
-                Icons.help_outline,
-                color: Colors.red,
-              ),
-              onPressed: () {
-                // Add your help action here
-              },
-            ),
-          ),
-        ],
       ),
       body: SafeArea(
         child: Container(

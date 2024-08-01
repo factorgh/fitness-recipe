@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/models/meal.dart';
-import 'package:voltican_fitness/screens/meal_detail_screen.dart';
+
 import 'package:voltican_fitness/screens/notify_screen.dart';
+import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/widgets/category_slider.dart';
 import 'package:voltican_fitness/widgets/new_recipe_slider.dart';
 import 'package:voltican_fitness/widgets/slider_trainer_landing.dart';
-import 'package:voltican_fitness/widgets/trainers_slider.dart';
 
 class TrainerLandeingScreen extends StatelessWidget {
   const TrainerLandeingScreen({super.key});
@@ -58,7 +58,7 @@ class TrainerLandeingScreen extends StatelessWidget {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => const MealDetailScreen(
+              builder: (context) => const TrainerMealDetailScreen(
                     meal: Meal(
                         id: 'm2',
                         imageUrl:
@@ -173,7 +173,7 @@ class TrainerLandeingScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Categories",
+                    "Explore All Recipes",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                   ),
                   Text(
@@ -197,7 +197,7 @@ class TrainerLandeingScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Popular Recipes",
+                    "Popular ",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                   ),
                   Text(

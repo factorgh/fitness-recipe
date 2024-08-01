@@ -5,15 +5,16 @@ import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 
-class MealDetailScreen extends StatefulWidget {
-  const MealDetailScreen({super.key, required this.meal});
+class TrainerMealDetailScreen extends StatefulWidget {
+  const TrainerMealDetailScreen({super.key, required this.meal});
   final Meal meal;
 
   @override
-  State<MealDetailScreen> createState() => _MealDetailScreenState();
+  State<TrainerMealDetailScreen> createState() =>
+      _TrainerMealDetailScreenState();
 }
 
-class _MealDetailScreenState extends State<MealDetailScreen> {
+class _TrainerMealDetailScreenState extends State<TrainerMealDetailScreen> {
   double value = 3.8;
   bool isPrivate = false;
   bool isFollowing = false;
@@ -145,36 +146,36 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        // IconButton(
-                        //   icon: Icon(
-                        //     isFollowing
-                        //         ? Icons.person_remove
-                        //         : Icons.person_add,
-                        //     color: Colors.white,
-                        //     size: 30,
-                        //   ),
-                        //   onPressed: () {
-                        //     setState(() {
-                        //       isFollowing = !isFollowing;
-                        //     });
-                        //   },
-                        // ),
-                        // ElevatedButton(
-                        //   style: ElevatedButton.styleFrom(
-                        //     foregroundColor: Colors.red, // background color
-                        //     backgroundColor: Colors.white, // text color
-                        //   ),
-                        //   onPressed: () {
-                        //     setState(() {
-                        //       isFollowing = !isFollowing;
-                        //     });
-                        //   },
-                        //   child: Text(isFollowing ? 'Following' : 'Follow'),
-                        // ),
+                        IconButton(
+                          icon: Icon(
+                            isFollowing
+                                ? Icons.person_remove
+                                : Icons.person_add,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isFollowing = !isFollowing;
+                            });
+                          },
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.red, // background color
+                            backgroundColor: Colors.white, // text color
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isFollowing = !isFollowing;
+                            });
+                          },
+                          child: Text(isFollowing ? 'Following' : 'Follow'),
+                        ),
                         IconButton(
                           icon: const Icon(
                             Icons.share,
-                            color: Colors.brown,
+                            color: Colors.white,
                             size: 30,
                           ),
                           onPressed: () {
@@ -197,63 +198,128 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                 children: [
                   const SizedBox(height: 20),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         widget.meal.title,
                         style: const TextStyle(
-                          fontSize: 20,
+                          fontSize: 23,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       const Spacer(),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      RatingStars(
-                        value: value,
-                        onValueChanged: (v) {
-                          setState(() {
-                            value = v;
-                          });
-                        },
-                        starCount: 5,
-                        starSpacing: 2,
-                        valueLabelVisibility: true,
-                        maxValue: 5,
-                        starOffColor: const Color(0xffe7e8ea),
-                        starColor: Colors.yellow,
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.black12, width: 1),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 5),
+                          child: Column(
+                            children: [
+                              RatingStars(
+                                value: value,
+                                onValueChanged: (v) {
+                                  setState(() {
+                                    value = v;
+                                  });
+                                },
+                                starCount: 5,
+                                starSize: 15,
+                                starSpacing: 2,
+                                valueLabelVisibility: false,
+                                maxValue: 5,
+                                starOffColor: const Color(0xffe7e8ea),
+                                starColor: Colors.yellow,
+                              ),
+                              const SizedBox(width: 10),
+                              const Text("(32 Reviews)",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 12)),
+                            ],
+                          ),
+                        ),
                       ),
-                      const SizedBox(width: 10),
-                      const Text("(32 Reviews)"),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Recipe by",
+                        style: TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                      SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage:
+                                AssetImage('assets/images/pf2.jpg'),
+                          ),
+                          SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Dianne Russell",
+                                style: TextStyle(fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                "Dian",
+                                style: TextStyle(fontWeight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
+                          Spacer(),
+                          // Contact section goes here
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
+
+                  const Text(
+                    'Description',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                  ),
                   const Text(
                     "psum passages, and more recently with desk publishing software like Aldus PageMaker \n"
                     "psum passages, and more recently with desk publishing software like Aldus PageMaker  .",
                     style: TextStyle(color: Colors.black38),
                   ),
                   const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Private',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Switch(
-                        value: isPrivate,
-                        onChanged: (value) {
-                          setState(() {
-                            isPrivate = value;
-                          });
-                        },
-                      ),
-                    ],
+                  Container(
+                    width: double.infinity,
+                    height: 0.5,
+                    decoration: BoxDecoration(
+                      color: Colors.black12,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                   const SizedBox(height: 20),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     const Text(
+                  //       'Private',
+                  //       style: TextStyle(fontSize: 16),
+                  //     ),
+                  //     Switch(
+                  //       value: isPrivate,
+                  //       onChanged: (value) {
+                  //         setState(() {
+                  //           isPrivate = value;
+                  //         });
+                  //       },
+                  //     ),
+                  //   ],
+                  // ),
+
                   const Row(
                     children: [
                       Icon(
@@ -268,6 +334,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 10),
                   const Text(
                     '1 Cucumber (38 Cal)',
@@ -300,6 +367,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 10),
                   const Text(
                     '1. psum passages, and more recently with desk  ',
@@ -326,7 +394,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                     splashColor: Colors.purple,
                     child: const ButtonWidget(
                         backColor: Colors.red,
-                        text: 'Update',
+                        text: 'Edit and Assign',
                         textColor: Colors.white),
                   ),
                   const SizedBox(height: 10),
@@ -338,18 +406,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                     splashColor: Colors.purple,
                     child: const ButtonWidget(
                         backColor: Colors.red,
-                        text: 'Assign',
-                        textColor: Colors.white),
-                  ),
-                  const SizedBox(height: 10),
-                  InkWell(
-                    onTap: () {
-                      _showDeleteConfirmationDialog(context);
-                    },
-                    splashColor: Colors.purple,
-                    child: const ButtonWidget(
-                        backColor: Colors.red,
-                        text: 'Delete',
+                        text: 'Save',
                         textColor: Colors.white),
                   ),
                   const SizedBox(height: 10),

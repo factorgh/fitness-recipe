@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/models/meal.dart';
-import 'package:voltican_fitness/screens/meal_detail_screen.dart';
+import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 
 class SearchScreen extends StatelessWidget {
   SearchScreen({super.key});
@@ -25,7 +25,7 @@ class SearchScreen extends StatelessWidget {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => const MealDetailScreen(
+              builder: (context) => const TrainerMealDetailScreen(
                     meal: Meal(
                         id: 'm2',
                         imageUrl:

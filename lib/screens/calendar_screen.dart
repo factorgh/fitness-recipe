@@ -5,7 +5,6 @@ import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
 
 import 'package:voltican_fitness/screens/recipe_grid_screen.dart';
 import 'package:voltican_fitness/widgets/calendar_item.dart';
-import 'package:voltican_fitness/screens/responive_cal_sec.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
