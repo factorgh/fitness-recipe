@@ -131,8 +131,12 @@ class _TraineesScreenState extends State<TraineesScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const Icon(Icons.person),
-        title: const Text('Trainers'),
+        leading: const SizedBox(),
+        title: const Text(
+          'Trainees & Trainers',
+          style: TextStyle(fontWeight: FontWeight.w500),
+        ),
+        centerTitle: true,
       ),
       body: Column(
         children: [

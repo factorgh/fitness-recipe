@@ -1,27 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/data/dummy_data.dart';
 import 'package:voltican_fitness/models/meal.dart';
-import 'package:voltican_fitness/screens/create_recipe.screen.dart';
 import 'package:voltican_fitness/screens/meal_detail_screen.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/widgets/meal_item.dart';
 import 'package:voltican_fitness/widgets/recipe_item_trainer.dart';
 
-class MealPlanScreen extends StatefulWidget {
-  const MealPlanScreen({super.key});
+class TraineeRecipeScreen extends StatefulWidget {
+  const TraineeRecipeScreen({super.key});
 
   @override
-  _MealPlanScreenState createState() => _MealPlanScreenState();
+  _TraineeRecipeScreenState createState() => _TraineeRecipeScreenState();
 }
 
-class _MealPlanScreenState extends State<MealPlanScreen>
+class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -82,22 +81,22 @@ class _MealPlanScreenState extends State<MealPlanScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                "Recipes",
+                "All Recipes",
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               Row(
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const CreateRecipeScreen()));
-                    },
-                    child: const Icon(
-                      Icons.add,
-                      color: Colors.black,
-                      size: 25,
-                    ),
-                  ),
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     Navigator.of(context).push(MaterialPageRoute(
+                  //         builder: (context) => const CreateRecipeScreen()));
+                  //   },
+                  //   child: const Icon(
+                  //     Icons.add,
+                  //     color: Colors.black,
+                  //     size: 25,
+                  //   ),
+                  // ),
                   const SizedBox(width: 10),
                   Container(
                     padding:
@@ -114,7 +113,7 @@ class _MealPlanScreenState extends State<MealPlanScreen>
                         ),
                         const SizedBox(width: 5),
                         const Text(
-                          'Trainer',
+                          'Trainee',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 12,
@@ -134,9 +133,8 @@ class _MealPlanScreenState extends State<MealPlanScreen>
             labelColor: Colors.red,
             unselectedLabelColor: Colors.black,
             tabs: const [
-              Tab(text: 'My Recipes'),
-              Tab(text: 'Others'),
               Tab(text: 'Explore'),
+              Tab(text: 'Saved Recipe'),
             ],
           ),
           const SizedBox(height: 10),
@@ -145,7 +143,6 @@ class _MealPlanScreenState extends State<MealPlanScreen>
               controller: _tabController,
               children: [
                 buildTabContent(),
-                buildRecipeTabContent(),
                 buildRecipeTabContent(),
               ],
             ),

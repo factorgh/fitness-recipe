@@ -189,7 +189,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                   maxLines: 4,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'Which ingredients were used in this meal?',
+                    hintText: 'Which ingredients were used in this recipe?',
                     contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),

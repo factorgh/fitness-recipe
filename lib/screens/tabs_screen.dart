@@ -4,6 +4,7 @@ import 'package:voltican_fitness/screens/calendar_screen.dart';
 import 'package:voltican_fitness/screens/meal_plan_screen.dart';
 import 'package:voltican_fitness/screens/settings_screen.dart';
 import 'package:voltican_fitness/screens/trainee_landing_screen.dart';
+import 'package:voltican_fitness/screens/trainee_recipe_screen.dart';
 import 'package:voltican_fitness/screens/trainee_settings_screen.dart';
 import 'package:voltican_fitness/screens/trainees_screen.dart';
 import 'package:voltican_fitness/screens/calendar_trainee_screen.dart';
@@ -27,8 +28,9 @@ class _TabsScreenState extends State<TabsScreen> {
     if (widget.userRole == 0) {
       return const [
         TraineeLandingScreen(),
-        TrainerSearchScreen(),
+        TraineeRecipeScreen(),
         CalendarTraineeScreen(),
+        TrainerSearchScreen(),
         TraineeSettingsScreen()
       ];
     } else {
@@ -51,12 +53,16 @@ class _TabsScreenState extends State<TabsScreen> {
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.search_rounded),
-          label: 'Search', // Extra tab for role 0
+          icon: Icon(Icons.restaurant_menu),
+          label: 'Recipes',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.dashboard),
           label: 'Meal Plans', // Extra tab for role 0
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.search_rounded),
+          label: 'Search', // Extra tab for role 0
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.settings),

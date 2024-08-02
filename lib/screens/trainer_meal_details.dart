@@ -282,15 +282,14 @@ class _TrainerMealDetailScreenState extends State<TrainerMealDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 30),
-
                   const Text(
                     'Description',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                   ),
                   const Text(
                     "psum passages, and more recently with desk publishing software like Aldus PageMaker \n"
                     "psum passages, and more recently with desk publishing software like Aldus PageMaker  .",
-                    style: TextStyle(color: Colors.black38),
+                    style: TextStyle(color: Colors.black54),
                   ),
                   const SizedBox(height: 20),
                   Container(
@@ -302,24 +301,6 @@ class _TrainerMealDetailScreenState extends State<TrainerMealDetailScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     const Text(
-                  //       'Private',
-                  //       style: TextStyle(fontSize: 16),
-                  //     ),
-                  //     Switch(
-                  //       value: isPrivate,
-                  //       onChanged: (value) {
-                  //         setState(() {
-                  //           isPrivate = value;
-                  //         });
-                  //       },
-                  //     ),
-                  //   ],
-                  // ),
-
                   const Row(
                     children: [
                       Icon(
@@ -334,7 +315,6 @@ class _TrainerMealDetailScreenState extends State<TrainerMealDetailScreen> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 10),
                   const Text(
                     '1 Cucumber (38 Cal)',
@@ -367,7 +347,6 @@ class _TrainerMealDetailScreenState extends State<TrainerMealDetailScreen> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 10),
                   const Text(
                     '1. psum passages, and more recently with desk  ',

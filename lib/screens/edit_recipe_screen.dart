@@ -107,7 +107,7 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Enter Meal Plan Name',
+              'Enter Recipe Name',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -126,7 +126,7 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
                   controller: _mealNameController,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'Enter meal name',
+                    hintText: 'Enter recipe name',
                     contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),
@@ -157,7 +157,7 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
                   maxLines: 4,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'Enter meal description',
+                    hintText: 'Enter recipe description',
                     contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),
@@ -188,7 +188,7 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
                   maxLines: 4,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'Which ingredients were used in this meal?',
+                    hintText: 'Which ingredients were used in this recipe?',
                     contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),

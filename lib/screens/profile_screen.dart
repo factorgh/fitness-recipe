@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/widgets/copy_to_clipboard.dart';
+import 'package:voltican_fitness/widgets/status_toggle_button.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -18,6 +19,8 @@ class ProfileScreen extends StatelessWidget {
             _ProfileHeader(),
             const SizedBox(height: 20),
             _ProfileInfo(),
+            const SizedBox(height: 20),
+            const StatusToggleButton(),
             const SizedBox(height: 20),
             _EditProfileButton(),
             const SizedBox(height: 50),

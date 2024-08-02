@@ -165,7 +165,7 @@ class TrainerLandeingScreen extends StatelessWidget {
             ),
             // Second Row
             const SizedBox(
-              height: 10,
+              height: 20,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -198,7 +198,7 @@ class TrainerLandeingScreen extends StatelessWidget {
                 children: [
                   const Text(
                     "Popular ",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                   ),
                   Text(
                     "See All",
@@ -222,7 +222,7 @@ class TrainerLandeingScreen extends StatelessWidget {
                 children: [
                   Text(
                     "Top Trainers",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),

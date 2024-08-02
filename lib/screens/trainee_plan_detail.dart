@@ -224,102 +224,66 @@ class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
                   ),
                   const SizedBox(height: 20),
                   const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      Icon(
+                        Icons.no_food_sharp,
+                        size: 25,
+                        color: Colors.orange,
+                      ),
+                      SizedBox(width: 5),
                       Text(
-                        'Private',
+                        'Ingredients',
                         style: TextStyle(fontSize: 16),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Ingredients',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Container(
-                    width: 120,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
                   const SizedBox(height: 10),
                   const Text(
-                    'Cucumber (38 Cal)',
+                    '1 Cucumber (38 Cal)',
                     style: TextStyle(color: Colors.black38),
                   ),
                   const Text(
-                    'Cabbage (38 Cal)',
+                    '2 Cups of rice',
                     style: TextStyle(color: Colors.black38),
                   ),
                   const Text(
-                    'Carrot (38 Cal)',
+                    '2 teaspoons of honey',
                     style: TextStyle(color: Colors.black38),
                   ),
                   const Text(
-                    'Tomato (38 Cal)',
+                    '1 tablespoon of salt',
                     style: TextStyle(color: Colors.black38),
                   ),
                   const SizedBox(height: 30),
-                  const Text(
-                    'Instructions',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Container(
-                    width: 120,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    '1. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
-                    style: TextStyle(color: Colors.black38),
-                  ),
-                  const Text(
-                    '2. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
-                    style: TextStyle(color: Colors.black38),
-                  ),
-                  const Text(
-                    '3. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
-                    style: TextStyle(color: Colors.black38),
-                  ),
-                  const Text(
-                    '4. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
-                    style: TextStyle(color: Colors.black38),
-                  ),
-                  const SizedBox(height: 30),
-                  const Text(
-                    'Nutritional Facts',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Container(
-                    width: 150,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                  const Row(
+                    children: [
+                      Icon(
+                        Icons.text_snippet,
+                        size: 25,
+                        color: Colors.orange,
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        'Instructions',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 10),
                   const Text(
-                    '1. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
+                    '1. psum passages, and more recently with desk  ',
                     style: TextStyle(color: Colors.black38),
                   ),
                   const Text(
-                    '2. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
+                    '2. psum passages, and more recently with desk',
                     style: TextStyle(color: Colors.black38),
                   ),
                   const Text(
-                    '3. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
+                    '3. psum passages, and more recently with desk ',
                     style: TextStyle(color: Colors.black38),
                   ),
                   const Text(
-                    '4. Lorem ipsum passages, and more recently with desk publishing software like Aldus PageMaker.',
+                    '4. psum passages, and more recently with desk ',
                     style: TextStyle(color: Colors.black38),
                   ),
                   const SizedBox(height: 30),
