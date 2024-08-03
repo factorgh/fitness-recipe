@@ -174,7 +174,7 @@ class TrainerLandeingScreen extends StatelessWidget {
                 children: [
                   const Text(
                     "Explore All Recipes",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                   ),
                   Text(
                     "See All",
@@ -212,7 +212,7 @@ class TrainerLandeingScreen extends StatelessWidget {
             NewRecipeSlider(
                 recipes: recipes, onCategorySelected: handleRecipSelected),
             const SizedBox(
-              height: 10,
+              height: 20,
             ),
             // Trainers section
             const Padding(

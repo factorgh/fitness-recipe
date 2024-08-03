@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-
 import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
-
 import 'package:voltican_fitness/screens/recipe_grid_screen.dart';
 import 'package:voltican_fitness/widgets/calendar_item.dart';
+import 'package:voltican_fitness/widgets/meal_period_selector.dart';
+import 'package:voltican_fitness/widgets/week_range_selector.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -16,6 +16,164 @@ class CalendarScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarScreen> {
   DateTime focusedDay = DateTime.now();
   DateTime? selectedDay;
+  String _selectedDuration = 'Does Not Repeat';
+  Map<String, List<String>> selectedMeals = {};
+
+  void handleSelectionChange(Map<String, List<String>> newSelectedMeals) {
+    setState(() {
+      selectedMeals = newSelectedMeals;
+    });
+    // Perform any additional actions here, like saving to a database
+  }
+
+  void _showBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.5,
+        minChildSize: 0.5,
+        maxChildSize: 1.0,
+        expand: false,
+        builder: (context, scrollController) {
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  height: 30,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20)),
+                  child: Center(
+                      child: Container(
+                    height: 5,
+                    width: 30,
+                    decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(30)),
+                  )),
+                ),
+                Expanded(
+                  child: ListView(
+                    controller: scrollController,
+                    padding: const EdgeInsets.all(8.0),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 15.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Enter a meal plan name",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w500),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            const TextField(
+                              decoration: InputDecoration(
+                                labelText: 'Enter a meal plan name',
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.black,
+                                    width: 1,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const Text(
+                              "Select a duration",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w500),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: DropdownButton<String>(
+                                value: _selectedDuration,
+                                items: [
+                                  'Does Not Repeat',
+                                  'Week',
+                                  'Month',
+                                  'Quarter',
+                                  'Half-Year',
+                                  'Year',
+                                  'Custom'
+                                ]
+                                    .map((duration) => DropdownMenuItem<String>(
+                                          value: duration,
+                                          child: Text(duration),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedDuration = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const Text(
+                              "Determine days for meal  ",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w500),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            WeekRangeSelector(
+                                onSelectionChanged: _onSelectionChanged),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const Text(
+                              "Select meal periods  ",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w500),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            MealPeriodSelector(
+                                onSelectionChanged: handleSelectionChange),
+                            const SizedBox(height: 20),
+                            if (selectedMeals.isNotEmpty)
+                              ...selectedMeals.entries.map((entry) {
+                                String mealPeriod = entry.key;
+                                List<String> recipes = entry.value;
+                                return ListTile(
+                                  title: Text(mealPeriod),
+                                  subtitle: Text(recipes.join(', ')),
+                                );
+                              }),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _onSelectionChanged(List<String> selectedDays) {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +182,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             child: Container(
       width: double.maxFinite,
       height: double.maxFinite,
-      margin: const EdgeInsets.only(left: 20, right: 20),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -35,66 +193,27 @@ class _CalendarScreenState extends State<CalendarScreen> {
               children: [
                 const Text(
                   'Good Morning ',
-                  style: TextStyle(fontSize: 22),
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black45),
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // GestureDetector(
-                    //   onTap: () {
-                    //     Navigator.of(context).push(MaterialPageRoute(
-                    //         builder: (context) => const CalendarPage()));
-                    //   },
-                    //   child: const Icon(
-                    //     Icons.add_task_rounded,
-                    //     size: 30,
-                    //   ),
-                    // ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Container(
-                      width: 80,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircleAvatar(
-                            radius: 10,
-                            backgroundColor: Colors.grey[300],
-                          ),
-                          const SizedBox(width: 5),
-                          const Text(
-                            'Trainer',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                  ],
+                const Spacer(),
+                OutlinedButton(
+                    onPressed: () {
+                      _showBottomSheet(context);
+                    },
+                    child: const Text(
+                      'Add Meal Plan',
+                      style: TextStyle(fontSize: 12),
+                    )),
+                const SizedBox(
+                  width: 5,
                 ),
               ],
             ),
             const SizedBox(
               height: 30,
-            ),
-            const Row(
-              children: [
-                SizedBox(
-                  width: 3,
-                ),
-                Spacer(),
-              ],
             ),
             TableCalendar(
               firstDay: DateTime.utc(2001, 7, 20),
@@ -157,14 +276,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   ),
                   const CalendarItem(
                     titleIcon: Icons.restaurant_menu,
-                    mealPlan: "Baked Salmon with strwaberries",
+                    mealPlan: "Baked Salmon with strawberries",
                   ),
                   const SizedBox(
                     height: 20,
                   ),
                   const CalendarItem(
                     titleIcon: Icons.restaurant_menu,
-                    mealPlan: "Baked Salmon with strwaberries",
+                    mealPlan: "Baked Salmon with strawberries",
                   ),
                 ],
               )),
