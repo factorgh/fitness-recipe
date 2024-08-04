@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
 class MealPeriodSelector extends StatefulWidget {
-  final void Function(Map<String, List<String>> selectedMeals)
+  final void Function(Map<String, List<Map<String, dynamic>>> selectedMeals)
       onSelectionChanged;
 
-  const MealPeriodSelector({required this.onSelectionChanged, super.key});
+  const MealPeriodSelector(
+      {required this.onSelectionChanged,
+      super.key,
+      required Null Function() onCompleteSchedule});
 
   @override
   _MealPeriodSelectorState createState() => _MealPeriodSelectorState();
@@ -12,7 +15,7 @@ class MealPeriodSelector extends StatefulWidget {
 
 class _MealPeriodSelectorState extends State<MealPeriodSelector> {
   final List<String> _mealPeriods = ['Breakfast', 'Lunch', 'Snack', 'Dinner'];
-  final Map<String, List<String>> _selectedMeals = {};
+  final Map<String, List<Map<String, dynamic>>> _selectedMeals = {};
   final List<String> _recipes = [
     'Recipe 1',
     'Recipe 2',
@@ -29,22 +32,66 @@ class _MealPeriodSelectorState extends State<MealPeriodSelector> {
     });
   }
 
-  void _onRecipeTap(String recipe) {
+  void _onRecipeTap(String recipe) async {
+    TimeOfDay? selectedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (selectedTime != null) {
+      setState(() {
+        _selectedRecipe = recipe;
+        if (_selectedMealPeriod != null) {
+          if (!_selectedMeals.containsKey(_selectedMealPeriod!)) {
+            _selectedMeals[_selectedMealPeriod!] = [];
+          }
+          if (_selectedMealPeriod == 'Snack') {
+            _selectedMeals[_selectedMealPeriod!]!.add({
+              'recipe': recipe,
+              'time': selectedTime.format(context),
+            });
+          } else {
+            _selectedMeals[_selectedMealPeriod!] = [
+              {
+                'recipe': recipe,
+                'time': selectedTime.format(context),
+              }
+            ];
+          }
+        }
+        widget.onSelectionChanged(_selectedMeals);
+      });
+    }
+  }
+
+  void _removeRecipe(String mealPeriod, String recipe) {
     setState(() {
-      _selectedRecipe = recipe;
-      if (_selectedMealPeriod != null) {
-        if (!_selectedMeals.containsKey(_selectedMealPeriod!)) {
-          _selectedMeals[_selectedMealPeriod!] = [];
-        }
-        if (_selectedMealPeriod == 'Snack') {
-          _selectedMeals[_selectedMealPeriod!]!.add(recipe);
-        } else {
-          _selectedMeals[_selectedMealPeriod!] = [recipe];
-        }
+      _selectedMeals[mealPeriod]
+          ?.removeWhere((item) => item['recipe'] == recipe);
+      if (_selectedMeals[mealPeriod]!.isEmpty) {
+        _selectedMeals.remove(mealPeriod);
       }
       widget.onSelectionChanged(_selectedMeals);
     });
   }
+
+  // void _changeTime(String mealPeriod, String recipe) async {
+  //   TimeOfDay? selectedTime = await showTimePicker(
+  //     context: context,
+  //     initialTime: TimeOfDay.now(),
+  //   );
+
+  //   if (selectedTime != null) {
+  //     setState(() {
+  //       for (var meal in _selectedMeals[mealPeriod]!) {
+  //         if (meal['recipe'] == recipe) {
+  //           meal['time'] = selectedTime.format(context);
+  //         }
+  //       }
+  //       widget.onSelectionChanged(_selectedMeals);
+  //     });
+  //   }
+  // }
 
   Widget _buildMealPeriodSelector() {
     return Row(
@@ -91,9 +138,9 @@ class _MealPeriodSelectorState extends State<MealPeriodSelector> {
               width: 120,
               margin: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(
-                      'assets/images/$recipe.jpg'), // Placeholder image path
+                image: const DecorationImage(
+                  image:
+                      AssetImage('assets/recipe.jpg'), // Placeholder image path
                   fit: BoxFit.cover,
                 ),
                 borderRadius: BorderRadius.circular(15),
@@ -126,7 +173,7 @@ class _MealPeriodSelectorState extends State<MealPeriodSelector> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: _selectedMeals.entries.map((entry) {
         String mealPeriod = entry.key;
-        List<String> recipes = entry.value;
+        List<Map<String, dynamic>> meals = entry.value;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -136,10 +183,13 @@ class _MealPeriodSelectorState extends State<MealPeriodSelector> {
             ),
             Wrap(
               spacing: 8,
-              children: recipes.map((recipe) {
+              children: meals.map((meal) {
                 return Chip(
-                  label: Text(recipe),
+                  label: Text('${meal['recipe']} (${meal['time']})'),
                   backgroundColor: Colors.blue.withOpacity(0.2),
+                  deleteIcon: const Icon(Icons.cancel),
+                  onDeleted: () => _removeRecipe(mealPeriod, meal['recipe']),
+                  // onSelected: () => _changeTime(mealPeriod, meal['recipe']),
                 );
               }).toList(),
             ),

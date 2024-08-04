@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
+import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
 import 'package:voltican_fitness/screens/recipe_grid_screen.dart';
 import 'package:voltican_fitness/widgets/calendar_item.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
@@ -17,9 +18,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
   DateTime focusedDay = DateTime.now();
   DateTime? selectedDay;
   String _selectedDuration = 'Does Not Repeat';
-  Map<String, List<String>> selectedMeals = {};
+  Map<String, List<Map<String, dynamic>>> selectedMeals = {};
 
-  void handleSelectionChange(Map<String, List<String>> newSelectedMeals) {
+  void handleSelectionChange(
+      Map<String, List<Map<String, dynamic>>> newSelectedMeals) {
     setState(() {
       selectedMeals = newSelectedMeals;
     });
@@ -37,7 +39,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
         maxChildSize: 1.0,
         expand: false,
         builder: (context, scrollController) {
-          return Container(
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -146,17 +150,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               height: 10,
                             ),
                             MealPeriodSelector(
-                                onSelectionChanged: handleSelectionChange),
+                              onSelectionChanged: handleSelectionChange,
+                              onCompleteSchedule: () {},
+                            ),
                             const SizedBox(height: 20),
-                            if (selectedMeals.isNotEmpty)
-                              ...selectedMeals.entries.map((entry) {
-                                String mealPeriod = entry.key;
-                                List<String> recipes = entry.value;
-                                return ListTile(
-                                  title: Text(mealPeriod),
-                                  subtitle: Text(recipes.join(', ')),
-                                );
-                              }),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AssignRecipeScreen()));
+                              },
+                              child: const Text('Complete Schedule'),
+                            ),
+                            const SizedBox(height: 20),
                           ],
                         ),
                       ),

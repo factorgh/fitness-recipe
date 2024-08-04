@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/models/event.dart';
 import 'package:voltican_fitness/services/event_provider.dart';
+import 'package:voltican_fitness/services/noti_setup.dart';
 import 'package:voltican_fitness/services/notification_service.dart';
 
 class CalendarPage extends StatefulWidget {
