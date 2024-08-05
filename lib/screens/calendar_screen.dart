@@ -25,7 +25,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     setState(() {
       selectedMeals = newSelectedMeals;
     });
-    // Perform any additional actions here, like saving to a database
   }
 
   void _showBottomSheet(BuildContext context) {

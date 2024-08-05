@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:voltican_fitness/screens/role_screen.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 import 'package:voltican_fitness/widgets/or_divider.dart';
-import 'package:voltican_fitness/screens/login_screen.dart';
+import 'package:voltican_fitness/Features/auth/presentation/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupScreen extends StatefulWidget {

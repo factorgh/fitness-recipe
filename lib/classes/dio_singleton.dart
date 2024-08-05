@@ -16,7 +16,7 @@ class DioSingleton {
   Future<void> _initializeDio() async {
     final prefs = await SharedPreferences.getInstance();
     dio = Dio(BaseOptions(
-      baseUrl: 'https://fitness.adroit360.com/api/v1',
+      baseUrl: 'http://localhost:3000/api/v1',
     ));
     dio.interceptors.add(AuthInterceptor(prefs));
   }

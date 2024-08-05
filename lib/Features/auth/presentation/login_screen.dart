@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 
-import 'package:voltican_fitness/screens/signup_screen.dart';
+import 'package:voltican_fitness/Features/auth/presentation/signup_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:voltican_fitness/widgets/button.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';

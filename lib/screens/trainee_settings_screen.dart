@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/screens/account_screen.dart';
 import 'package:voltican_fitness/screens/general_screen.dart';
-import 'package:voltican_fitness/screens/login_screen.dart';
+import 'package:voltican_fitness/Features/auth/presentation/login_screen.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/screens/trainee_profile_screen.dart';
 
