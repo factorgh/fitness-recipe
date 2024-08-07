@@ -3,8 +3,8 @@ import 'package:voltican_fitness/data/dummy_data.dart';
 import 'package:voltican_fitness/models/meal.dart';
 import 'package:voltican_fitness/screens/meal_detail_screen.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
-import 'package:voltican_fitness/widgets/meal_item.dart';
-import 'package:voltican_fitness/widgets/recipe_item_trainer.dart';
+import 'package:voltican_fitness/Features/auth/presentation/widgets/meal_item.dart';
+import 'package:voltican_fitness/Features/auth/presentation/widgets/recipe_item_trainer.dart';
 
 class TraineeRecipeScreen extends StatefulWidget {
   const TraineeRecipeScreen({super.key});

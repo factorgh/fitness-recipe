@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:voltican_fitness/widgets/button.dart';
+import 'package:voltican_fitness/Features/auth/presentation/widgets/button.dart';
 
 class EditRecipeScreen extends StatefulWidget {
   const EditRecipeScreen({super.key});

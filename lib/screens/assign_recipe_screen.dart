@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
-import 'package:voltican_fitness/widgets/button.dart';
+import 'package:voltican_fitness/Features/auth/presentation/widgets/button.dart';
 
 class AssignRecipeScreen extends StatefulWidget {
   const AssignRecipeScreen({super.key});

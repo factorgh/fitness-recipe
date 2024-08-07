@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
-import 'package:voltican_fitness/widgets/recipe_advert_slider.dart';
-import 'package:voltican_fitness/widgets/todays_pick.dart';
-import 'package:voltican_fitness/widgets/trainers_slider.dart';
+import 'package:voltican_fitness/Features/auth/presentation/widgets/recipe_advert_slider.dart';
+import 'package:voltican_fitness/Features/auth/presentation/widgets/todays_pick.dart';
+import 'package:voltican_fitness/Features/auth/presentation/widgets/trainers_slider.dart';
 
 class TraineeLandingScreen extends StatefulWidget {
   const TraineeLandingScreen({super.key});

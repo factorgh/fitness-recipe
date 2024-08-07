@@ -1,8 +1,9 @@
 // data/datasources/auth_remote_datasource.dart
 import 'package:dio/dio.dart';
 import '../models/user_model.dart';
+import '../../../../classes/dio_singleton.dart';
 
-abstract class AuthRemoteDataSource {
+abstract interface class AuthRemoteDataSource {
   Future<UserModel> signup(
       String email, String password, String fullName, String username);
   Future<UserModel> login(
@@ -12,15 +13,14 @@ abstract class AuthRemoteDataSource {
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  final Dio dio;
+  final Dio _dio;
 
-  AuthRemoteDataSourceImpl({required this.dio});
+  AuthRemoteDataSourceImpl() : _dio = DioSingleton().dio;
 
   @override
   Future<UserModel> signup(
       String email, String password, String fullName, String username) async {
-    final response =
-        await dio.post('http://localhost:3000/api/v1/users/signup', data: {
+    final response = await _dio.post('/users/signup', data: {
       'email': email,
       'password': password,
       'username': username,
@@ -31,8 +31,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<UserModel> login(String email, String password) async {
-    final response =
-        await dio.post('http://localhost:3000/api/v1/users/login', data: {
+    final response = await _dio.post('/users/login', data: {
       'email': email,
       'password': password,
     });

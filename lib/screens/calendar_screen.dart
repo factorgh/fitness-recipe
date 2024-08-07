@@ -3,9 +3,9 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
 import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
 import 'package:voltican_fitness/screens/recipe_grid_screen.dart';
-import 'package:voltican_fitness/widgets/calendar_item.dart';
-import 'package:voltican_fitness/widgets/meal_period_selector.dart';
-import 'package:voltican_fitness/widgets/week_range_selector.dart';
+import 'package:voltican_fitness/Features/auth/presentation/widgets/calendar_item.dart';
+import 'package:voltican_fitness/Features/auth/presentation/widgets/meal_period_selector.dart';
+import 'package:voltican_fitness/Features/auth/presentation/widgets/week_range_selector.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -72,7 +72,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              "Enter a meal plan name",
+                              "Enter meal plan name",
                               style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.w500),
                             ),
@@ -81,7 +81,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             ),
                             const TextField(
                               decoration: InputDecoration(
-                                labelText: 'Enter a meal plan name',
+                                labelText: 'Enter meal plan name',
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide(
                                     color: Colors.black,
