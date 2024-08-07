@@ -1,7 +1,7 @@
 // data/datasources/auth_remote_datasource.dart
 import 'package:dio/dio.dart';
+import 'package:voltican_fitness/classes/dio_client.dart';
 import '../models/user_model.dart';
-import '../../../../classes/dio_singleton.dart';
 
 abstract interface class AuthRemoteDataSource {
   Future<UserModel> signup(
