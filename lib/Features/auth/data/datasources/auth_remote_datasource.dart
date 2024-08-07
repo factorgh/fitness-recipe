@@ -15,7 +15,7 @@ abstract interface class AuthRemoteDataSource {
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final Dio _dio;
 
-  AuthRemoteDataSourceImpl() : _dio = DioSingleton().dio;
+  AuthRemoteDataSourceImpl() : _dio = DioClient().dio;
 
   @override
   Future<UserModel> signup(
@@ -28,7 +28,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     });
     print(
         response.data.result); // For debug purposes, remove before production.
-    return UserModel.fromJson(response.data.result);
+    return UserModel.fromJson(response.data);
   }
 
   @override

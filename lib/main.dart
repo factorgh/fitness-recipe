@@ -5,10 +5,12 @@ import 'package:voltican_fitness/Features/auth/data/datasources/auth_remote_data
 import 'package:voltican_fitness/Features/auth/data/repositories/auth_repo_impl.dart';
 import 'package:voltican_fitness/Features/auth/domain/usecases/signup_usecase.dart';
 import 'package:voltican_fitness/Features/auth/presentation/bloc/auth_bloc.dart';
+
 import 'package:voltican_fitness/screens/onboarding_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((fn) {
     runApp(MultiBlocProvider(providers: [
