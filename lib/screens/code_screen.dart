@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/Features/auth/presentation/login_screen.dart';
+import 'package:voltican_fitness/Features/auth/presentation/pages/login_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
 
 class CodeScreen extends StatefulWidget {

@@ -30,10 +30,17 @@ class AuthInterceptor extends Interceptor {
   @override
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
+    print('URL: ${options.uri}');
+    print('Method: ${options.method}');
+    print('Headers: ${options.headers}');
+    print('Data: ${options.data}');
+    print('---');
+
     final token = prefs.getString('auth_token');
     if (token != null) {
       options.headers['Authorization'] = token;
     }
+
     handler.next(options);
   }
 }

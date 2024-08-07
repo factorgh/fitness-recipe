@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/Features/auth/presentation/widgets/copy_to_clipboard.dart';
-import 'package:voltican_fitness/Features/auth/presentation/widgets/status_toggle_button.dart';
+import 'package:voltican_fitness/widgets/copy_to_clipboard.dart';
+import 'package:voltican_fitness/widgets/status_toggle_button.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

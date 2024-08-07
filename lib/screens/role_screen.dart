@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/screens/code_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
-import 'package:voltican_fitness/Features/auth/presentation/widgets/role_widget.dart';
+import 'package:voltican_fitness/widgets/role_widget.dart';
 
 class RoleScreen extends StatefulWidget {
   const RoleScreen({super.key});

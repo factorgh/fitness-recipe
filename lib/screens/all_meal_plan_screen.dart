@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:voltican_fitness/Features/auth/presentation/widgets/calendar_item.dart';
+import 'package:voltican_fitness/widgets/calendar_item.dart';
 
 class AllMealPlan extends StatefulWidget {
   const AllMealPlan({super.key});

@@ -1,13 +1,9 @@
-// ignore_for_file: use_build_context_synchronously
-
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:voltican_fitness/screens/role_screen.dart';
-import 'package:voltican_fitness/Features/auth/presentation/widgets/button.dart';
-import 'package:voltican_fitness/Features/auth/presentation/widgets/or_divider.dart';
-import 'package:voltican_fitness/Features/auth/presentation/login_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:voltican_fitness/Features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:voltican_fitness/widgets/button.dart';
+import 'package:voltican_fitness/widgets/or_divider.dart';
+import 'package:voltican_fitness/Features/auth/presentation/pages/login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -18,69 +14,27 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
-  var _enteredUsername = '';
-  var _enteredEmail = '';
-  var _enteredPassword = '';
-  var _enteredFullName = '';
-  bool _isLoading = false;
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _fullNameController = TextEditingController();
+
   bool _isPasswordVisible = false;
-
-  void _submit(BuildContext context) async {
-    final isValid = _formKey.currentState!.validate();
-    if (isValid) {
-      _formKey.currentState!.save();
-      setState(() {
-        _isLoading = true;
-      });
-      try {
-        final url =
-            Uri.parse('https://fitness.adroit360.com/api/v1/auth/register');
-        final response = await http.post(
-          url,
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode({
-            'name': _enteredFullName,
-            'email': _enteredEmail,
-            'password': _enteredPassword,
-            'username': _enteredUsername,
-          }),
-        );
-
-        // Get token from response body
-        final token = json.decode(response.body)['token'];
-
-        // Save user token to shared preferences
-        final prefs = await SharedPreferences.getInstance();
-        prefs.setString('auth_token', token);
-
-        if (response.statusCode == 200) {
-          if (!mounted) return;
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const RoleScreen()),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Signup failed. Please try again.')),
-          );
-        }
-      } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('An error occurred. Please try again.')),
-        );
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
-    }
-  }
+  bool _isLoading = false;
 
   void _goToLogin(BuildContext ctx) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (ctx) => const LoginScreen()),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _usernameController.dispose();
+    _fullNameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -116,7 +70,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     _buildTextField(
                       label: 'Full Name',
                       hint: 'Enter your full name',
-                      onSaved: (value) => _enteredFullName = value!,
+                      controller: _fullNameController,
                       validator: (value) =>
                           value == null || value.trim().isEmpty
                               ? "Please enter your full name"
@@ -126,7 +80,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     _buildTextField(
                       label: 'Username',
                       hint: 'Enter a username',
-                      onSaved: (value) => _enteredUsername = value!,
+                      controller: _usernameController,
                       validator: (value) =>
                           value == null || value.trim().isEmpty
                               ? "Please enter a username"
@@ -136,7 +90,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     _buildTextField(
                       label: 'Email address',
                       hint: 'Enter your email address',
-                      onSaved: (value) => _enteredEmail = value!,
+                      controller: _emailController,
                       validator: (value) => value == null ||
                               value.trim().isEmpty ||
                               !value.contains('@')
@@ -145,6 +99,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
+                      controller: _passwordController,
                       obscureText: !_isPasswordVisible,
                       decoration: InputDecoration(
                         hintText: 'Enter a password',
@@ -176,7 +131,6 @@ class _SignupScreenState extends State<SignupScreen> {
                               value.length < 6
                           ? "Password must be more than 6 characters"
                           : null,
-                      onSaved: (value) => _enteredPassword = value!,
                     ),
                     const SizedBox(height: 20),
                     if (_isLoading)
@@ -184,10 +138,19 @@ class _SignupScreenState extends State<SignupScreen> {
                     else
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                                builder: (context) => const RoleScreen()),
-                          );
+                          if (_formKey.currentState!.validate()) {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            context.read<AuthBloc>().add(
+                                  AuthSignUp(
+                                    _emailController.text,
+                                    _passwordController.text,
+                                    _usernameController.text,
+                                    _fullNameController.text,
+                                  ),
+                                );
+                          }
                         },
                         child: const ButtonWidget(
                           backColor: Colors.red,
@@ -226,7 +189,7 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget _buildTextField({
     required String label,
     required String hint,
-    required FormFieldSetter<String> onSaved,
+    required TextEditingController controller,
     required FormFieldValidator<String> validator,
   }) {
     return Column(
@@ -237,6 +200,7 @@ class _SignupScreenState extends State<SignupScreen> {
           style: const TextStyle(color: Color.fromARGB(255, 133, 132, 132)),
         ),
         TextFormField(
+          controller: controller,
           decoration: InputDecoration(
             hintText: hint,
             border: OutlineInputBorder(
@@ -249,7 +213,6 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
           ),
           validator: validator,
-          onSaved: onSaved,
         ),
       ],
     );

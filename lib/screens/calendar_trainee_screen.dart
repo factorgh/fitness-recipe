@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import 'package:voltican_fitness/Features/auth/presentation/widgets/plan_item.dart';
+import 'package:voltican_fitness/widgets/plan_item.dart';
 
 class CalendarTraineeScreen extends StatefulWidget {
   const CalendarTraineeScreen({super.key});

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/Features/auth/presentation/login_screen.dart';
-import 'package:voltican_fitness/Features/auth/presentation/signup_screen.dart';
+import 'package:voltican_fitness/Features/auth/presentation/pages/login_screen.dart';
+import 'package:voltican_fitness/Features/auth/presentation/pages/signup_screen.dart';
 
-import 'package:voltican_fitness/Features/auth/presentation/widgets/button.dart';
-import 'package:voltican_fitness/Features/auth/presentation/widgets/custom_button.dart';
+import 'package:voltican_fitness/widgets/button.dart';
+import 'package:voltican_fitness/widgets/custom_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});

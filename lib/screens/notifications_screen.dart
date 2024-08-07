@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/Features/auth/presentation/widgets/notification_item.dart';
+import 'package:voltican_fitness/widgets/notification_item.dart';
 
 class Notifications extends StatefulWidget {
   const Notifications({super.key});

@@ -3,7 +3,7 @@ import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:voltican_fitness/models/meal.dart';
 import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
-import 'package:voltican_fitness/Features/auth/presentation/widgets/button.dart';
+import 'package:voltican_fitness/widgets/button.dart';
 
 class PlanDetailScreen extends StatefulWidget {
   const PlanDetailScreen({super.key, required this.meal});

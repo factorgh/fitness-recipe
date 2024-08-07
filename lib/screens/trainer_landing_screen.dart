@@ -3,9 +3,9 @@ import 'package:voltican_fitness/models/meal.dart';
 
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
-import 'package:voltican_fitness/Features/auth/presentation/widgets/category_slider.dart';
-import 'package:voltican_fitness/Features/auth/presentation/widgets/new_recipe_slider.dart';
-import 'package:voltican_fitness/Features/auth/presentation/widgets/slider_trainer_landing.dart';
+import 'package:voltican_fitness/widgets/category_slider.dart';
+import 'package:voltican_fitness/widgets/new_recipe_slider.dart';
+import 'package:voltican_fitness/widgets/slider_trainer_landing.dart';
 
 class TrainerLandeingScreen extends StatelessWidget {
   const TrainerLandeingScreen({super.key});

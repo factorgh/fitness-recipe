@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
-import 'package:voltican_fitness/Features/auth/presentation/widgets/custom_button.dart';
+import 'package:voltican_fitness/widgets/custom_button.dart';
 
 class CreateRecipeScreen extends StatefulWidget {
   const CreateRecipeScreen({super.key});

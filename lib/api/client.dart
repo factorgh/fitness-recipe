@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthInterceptor extends Interceptor {
   late final SharedPreferences prefs;
-  Dio dio = Dio(BaseOptions(baseUrl: "https://fitness.adroit360.com"));
+  Dio dio = Dio(BaseOptions(baseUrl: "http://localhost:3000/api/v1"));
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
