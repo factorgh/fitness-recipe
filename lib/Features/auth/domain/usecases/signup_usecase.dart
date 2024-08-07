@@ -10,9 +10,6 @@ class SignUpUseCase implements UseCase<String, UserSignUpParams> {
   SignUpUseCase(this.authRepository);
   @override
   Future<Either<Failure, String>> call(UserSignUpParams params) async {
-    print('-------------- details -------------');
-    print(params.email);
-
     return await authRepository.signUp(
         fullName: params.fullName,
         username: params.username,

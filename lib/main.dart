@@ -1,27 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:voltican_fitness/Features/auth/data/datasources/auth_remote_datasource.dart';
-import 'package:voltican_fitness/Features/auth/data/repositories/auth_repo_impl.dart';
-import 'package:voltican_fitness/Features/auth/domain/usecases/signup_usecase.dart';
+
 import 'package:voltican_fitness/Features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:voltican_fitness/init_dependencies.dart';
 
 import 'package:voltican_fitness/screens/onboarding_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await initDependencies();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((fn) {
     runApp(MultiBlocProvider(providers: [
       BlocProvider(
-        create: (_) => AuthBloc(
-          signUpUseCase: SignUpUseCase(
-            AuthRepositoryImpl(
-              remoteDataSource: AuthRemoteDataSourceImpl(),
-            ),
-          ),
-        ),
+        create: (_) => serviceLocator<AuthBloc>(),
       )
     ], child: const MyApp()));
   });

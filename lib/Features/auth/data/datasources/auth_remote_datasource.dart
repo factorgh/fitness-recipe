@@ -28,7 +28,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     });
     print(
         response.data.result); // For debug purposes, remove before production.
-    return UserModel.fromJson(response.data);
+    return UserModel.fromJson(response.data.result);
   }
 
   @override
@@ -37,6 +37,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       'email': email,
       'password': password,
     });
-    return UserModel.fromJson(response.data);
+    return UserModel.fromJson(response.data.result);
   }
 }
