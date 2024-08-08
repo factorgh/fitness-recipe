@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/data/dummy_data.dart';
-import 'package:voltican_fitness/models/meal.dart';
+import 'package:voltican_fitness/models 2/meal.dart';
 
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/widgets/meal_item.dart';

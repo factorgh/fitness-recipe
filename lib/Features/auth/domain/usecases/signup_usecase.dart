@@ -1,5 +1,4 @@
 import 'package:fpdart/fpdart.dart';
-
 import 'package:voltican_fitness/Features/auth/domain/repositories/auth_repositories.dart';
 import 'package:voltican_fitness/core/error/failure.dart';
 import 'package:voltican_fitness/core/error/usecase/usecase.dart';

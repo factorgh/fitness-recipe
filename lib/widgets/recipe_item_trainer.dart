@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
-import 'package:voltican_fitness/models/meal.dart';
+import 'package:voltican_fitness/models 2/meal.dart';
 
 class RecipeItemTrainer extends StatelessWidget {
   const RecipeItemTrainer(

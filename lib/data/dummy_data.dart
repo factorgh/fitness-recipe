@@ -1,4 +1,4 @@
-import "package:voltican_fitness/models/meal.dart";
+import 'package:voltican_fitness/models 2/meal.dart';
 
 const dummyMeals = [
   Meal(

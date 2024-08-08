@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
-import 'package:voltican_fitness/models/meal.dart';
+import 'package:voltican_fitness/models 2/meal.dart';
 import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
 import 'package:voltican_fitness/widgets/button.dart';

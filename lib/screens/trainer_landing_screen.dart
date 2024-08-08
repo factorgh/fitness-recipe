@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/models/meal.dart';
+import 'package:voltican_fitness/models 2/meal.dart';
 
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';

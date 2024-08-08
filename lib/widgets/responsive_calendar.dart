@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:voltican_fitness/models/event.dart';
+import 'package:voltican_fitness/models 2/event.dart';
 import 'package:voltican_fitness/services/event_provider.dart';
 import 'package:voltican_fitness/services/noti_setup.dart';
 
