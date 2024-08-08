@@ -132,6 +132,7 @@ flutter:
     - assets/images/recipes/r9.jpg
     - assets/images/role1.png
     - assets/images/role2.png
+    - assets/animations/loader.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

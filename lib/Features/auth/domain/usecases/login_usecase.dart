@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:voltican_fitness/Features/auth/domain/entities/user_entity.dart';
 
 import 'package:voltican_fitness/Features/auth/domain/repositories/auth_repositories.dart';
 import 'package:voltican_fitness/core/error/failure.dart';
@@ -9,7 +10,7 @@ class LoginUseCase implements UseCase<String, UserLoginParams> {
 
   LoginUseCase(this.authRepository);
   @override
-  Future<Either<Failure, String>> call(UserLoginParams params) async {
+  Future<Either<Failure, User>> call(UserLoginParams params) async {
     print('-------------- details -------------');
     print(params.username);
 

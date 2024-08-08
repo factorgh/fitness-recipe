@@ -4,12 +4,12 @@ import 'package:http/http.dart' as http;
 
 Future<String> uploadImageToCloudinary(File file) async {
   const cloudinaryUrl = '';
-  const apiKey = 'YOUR_API_KEY';
-  const apiSecret = 'YOUR_API_SECRET';
+  const apiKey = '774899867548469';
+  const apiSecret = 'B22K7pSzlTQqbeHtojLWBkNrCGw';
 
   final request = http.MultipartRequest('POST', Uri.parse(cloudinaryUrl))
     ..fields['upload_preset'] =
-        'YOUR_UPLOAD_PRESET' // Required if using unsigned upload
+        'ml_default' // Required if using unsigned upload
     ..files.add(http.MultipartFile(
       'file',
       file.readAsBytes().asStream(),
