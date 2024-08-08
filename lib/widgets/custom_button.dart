@@ -6,25 +6,37 @@ class CustomButton extends StatelessWidget {
   final Color textColor;
   final double width;
   final double size;
-  const CustomButton(
-      {super.key,
-      required this.backColor,
-      required this.text,
-      required this.width,
-      required this.size,
-      required this.textColor});
+  final VoidCallback? onPressed;
+
+  const CustomButton({
+    super.key,
+    required this.backColor,
+    required this.text,
+    required this.width,
+    required this.size,
+    required this.textColor,
+    this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: width,
       height: MediaQuery.of(context).size.height / 16,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10), color: backColor),
-      child: Center(
-        child: Text(
-          text,
-          style: TextStyle(color: textColor, fontSize: size),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          elevation: 0, // remove shadow
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyle(color: textColor, fontSize: size),
+          ),
         ),
       ),
     );

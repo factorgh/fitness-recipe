@@ -1,21 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 
 Future<String> uploadImageToCloudinary(File file) async {
-  const cloudinaryUrl = '';
-  const apiKey = '774899867548469';
-  const apiSecret = 'B22K7pSzlTQqbeHtojLWBkNrCGw';
+  const uploadUrl = 'https://api.cloudinary.com/v1_1/daq5dsnqy/image/upload';
+  const uploadPreset = 'ml_default';
 
-  final request = http.MultipartRequest('POST', Uri.parse(cloudinaryUrl))
-    ..fields['upload_preset'] =
-        'ml_default' // Required if using unsigned upload
+  final request = http.MultipartRequest('POST', Uri.parse(uploadUrl))
+    ..fields['upload_preset'] = uploadPreset
     ..files.add(http.MultipartFile(
       'file',
       file.readAsBytes().asStream(),
       file.lengthSync(),
       filename: file.path.split('/').last,
-      contentType: MediaType('image', 'jpeg'), // Adjust based on file type
+      contentType: DioMediaType('image', 'jpeg'), // Adjust based on file type
     ));
 
   try {
@@ -34,15 +33,15 @@ Future<String> uploadImageToCloudinary(File file) async {
   }
 }
 
-Future<void> sendImageUrlToBackend(String imageUrl) async {
-  final response = await http.post(
-    Uri.parse('http://yourapi.com/save-image-url'),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({'imageUrl': imageUrl}),
-  );
-  if (response.statusCode == 200) {
-    print('Image URL saved successfully');
-  } else {
-    print('Failed to save image URL');
-  }
-}
+// Future<void> sendImageUrlToBackend(String imageUrl) async {
+//   final response = await http.post(
+//     Uri.parse('http://yourapi.com/save-image-url'),
+//     headers: {'Content-Type': 'application/json'},
+//     body: jsonEncode({'imageUrl': imageUrl}),
+//   );
+//   if (response.statusCode == 200) {
+//     print('Image URL saved successfully');
+//   } else {
+//     print('Failed to save image URL');
+//   }
+// }

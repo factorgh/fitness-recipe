@@ -22,7 +22,6 @@ class _SignupScreenState extends State<SignupScreen> {
   final _fullNameController = TextEditingController();
 
   bool _isPasswordVisible = false;
-  bool _isLoading = false;
 
   void _goToLogin(BuildContext ctx) {
     Navigator.of(context).push(
@@ -53,7 +52,7 @@ class _SignupScreenState extends State<SignupScreen> {
             },
             builder: (context, state) {
               if (state is AuthLoading) {
-                return const MyLoader();
+                return const Center(child: MyLoader());
               }
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -145,31 +144,25 @@ class _SignupScreenState extends State<SignupScreen> {
                               : null,
                         ),
                         const SizedBox(height: 20),
-                        if (_isLoading)
-                          const Center(child: CircularProgressIndicator())
-                        else
-                          GestureDetector(
-                            onTap: () {
-                              if (_formKey.currentState!.validate()) {
-                                setState(() {
-                                  _isLoading = true;
-                                });
-                                context.read<AuthBloc>().add(
-                                      AuthSignUp(
-                                        _emailController.text,
-                                        _passwordController.text,
-                                        _usernameController.text,
-                                        _fullNameController.text,
-                                      ),
-                                    );
-                              }
-                            },
-                            child: const ButtonWidget(
-                              backColor: Colors.red,
-                              text: 'Signup',
-                              textColor: Colors.white,
-                            ),
+                        GestureDetector(
+                          onTap: () {
+                            if (_formKey.currentState!.validate()) {
+                              context.read<AuthBloc>().add(
+                                    AuthSignUp(
+                                      _emailController.text,
+                                      _passwordController.text,
+                                      _usernameController.text,
+                                      _fullNameController.text,
+                                    ),
+                                  );
+                            }
+                          },
+                          child: const ButtonWidget(
+                            backColor: Colors.red,
+                            text: 'Signup',
+                            textColor: Colors.white,
                           ),
+                        ),
                         const SizedBox(height: 20),
                       ],
                     ),

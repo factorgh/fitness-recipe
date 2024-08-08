@@ -10,6 +10,9 @@ abstract interface class AuthRemoteDataSource {
     String email,
     String password,
   );
+  Future<UserModel> getCurrentUser(
+    String userId,
+  );
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -37,6 +40,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       'email': email,
       'password': password,
     });
+    return UserModel.fromJson(response.data.result);
+  }
+
+  @override
+  Future<UserModel> getCurrentUser(String userId) async {
+    final response = await _dio.get('/users/$userId');
     return UserModel.fromJson(response.data.result);
   }
 }

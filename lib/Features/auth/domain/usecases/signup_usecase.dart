@@ -1,15 +1,16 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:voltican_fitness/Features/auth/domain/entities/user_entity.dart';
 
 import 'package:voltican_fitness/Features/auth/domain/repositories/auth_repositories.dart';
 import 'package:voltican_fitness/core/error/failure.dart';
 import 'package:voltican_fitness/core/error/usecase/usecase.dart';
 
-class SignUpUseCase implements UseCase<String, UserSignUpParams> {
+class SignUpUseCase implements UseCase<User, UserSignUpParams> {
   final AuthRepository authRepository;
 
   SignUpUseCase(this.authRepository);
   @override
-  Future<Either<Failure, String>> call(UserSignUpParams params) async {
+  Future<Either<Failure, User>> call(UserSignUpParams params) async {
     final result = await authRepository.signUp(
         fullName: params.fullName,
         username: params.username,
@@ -17,7 +18,7 @@ class SignUpUseCase implements UseCase<String, UserSignUpParams> {
         password: params.password);
     return result.fold(
       (failure) => Left(failure),
-      (user) => Right(user.id), // Assuming 'user.id' is a String
+      (user) => Right(user), // Assuming 'user.id' is a String
     );
   }
 }

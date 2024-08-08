@@ -5,7 +5,7 @@ import 'package:voltican_fitness/Features/auth/domain/repositories/auth_reposito
 import 'package:voltican_fitness/core/error/failure.dart';
 import 'package:voltican_fitness/core/error/usecase/usecase.dart';
 
-class LoginUseCase implements UseCase<String, UserLoginParams> {
+class LoginUseCase implements UseCase<User, UserLoginParams> {
   final AuthRepository authRepository;
 
   LoginUseCase(this.authRepository);

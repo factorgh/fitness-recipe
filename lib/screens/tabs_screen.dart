@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:voltican_fitness/screens/calendar_screen.dart';
-import 'package:voltican_fitness/screens/meal_plan_screen.dart';
+import 'package:voltican_fitness/screens/recipes_screen.dart';
 import 'package:voltican_fitness/screens/settings_screen.dart';
 import 'package:voltican_fitness/screens/trainee_landing_screen.dart';
 import 'package:voltican_fitness/screens/trainee_recipe_screen.dart';
