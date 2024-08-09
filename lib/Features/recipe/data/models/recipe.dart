@@ -29,6 +29,9 @@ class RecipeModel extends Equatable {
   final String title;
   final List<String> ingredients;
   final String instructions;
+  final String description;
+  final String facts;
+  final String imageUrl;
   final List<RatingModel> ratings;
   final String createdBy;
   final DateTime createdAt;
@@ -39,6 +42,9 @@ class RecipeModel extends Equatable {
     required this.title,
     required this.ingredients,
     required this.instructions,
+    required this.description,
+    required this.facts,
+    required this.imageUrl,
     required this.ratings,
     required this.createdBy,
     required this.createdAt,
@@ -51,8 +57,11 @@ class RecipeModel extends Equatable {
       title: json['title'] as String,
       ingredients: List<String>.from(json['ingredients']),
       instructions: json['instructions'] as String,
-      ratings: (json['ratings'] as List)
-          .map((rating) => RatingModel.fromJson(rating))
+      description: json['description'] as String,
+      facts: json['facts'] as String,
+      imageUrl: json['imageUrl'] as String,
+      ratings: (json['ratings'] as List<dynamic>)
+          .map((rating) => RatingModel.fromJson(rating as Map<String, dynamic>))
           .toList(),
       createdBy: json['createdBy'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
@@ -66,6 +75,9 @@ class RecipeModel extends Equatable {
       'title': title,
       'ingredients': ingredients,
       'instructions': instructions,
+      'description': description,
+      'facts': facts,
+      'imageUrl': imageUrl,
       'ratings': ratings.map((rating) => rating.toJson()).toList(),
       'createdBy': createdBy,
       'created_at': createdAt.toIso8601String(),
@@ -79,6 +91,9 @@ class RecipeModel extends Equatable {
         title,
         ingredients,
         instructions,
+        description,
+        facts,
+        imageUrl,
         ratings,
         createdBy,
         createdAt,

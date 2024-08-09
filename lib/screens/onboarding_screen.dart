@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/Features/auth/presentation/pages/login_screen.dart';
-import 'package:voltican_fitness/Features/auth/presentation/pages/signup_screen.dart';
+import 'package:voltican_fitness/screens/login_screen.dart';
+import 'package:voltican_fitness/screens/signup_screen.dart';
 
 import 'package:voltican_fitness/widgets/button.dart';
 import 'package:voltican_fitness/widgets/custom_button.dart';

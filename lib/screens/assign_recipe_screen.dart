@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/tabs_screen.dart';
+import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
+
 import 'package:voltican_fitness/widgets/button.dart';
 
 class AssignRecipeScreen extends StatefulWidget {
@@ -143,7 +144,7 @@ class _AssignRecipeScreenState extends State<AssignRecipeScreen> {
               GestureDetector(
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const TabsScreen(userRole: 1)));
+                      builder: (context) => const AllMealPlan()));
                 },
                 child: const ButtonWidget(
                     backColor: Colors.red,

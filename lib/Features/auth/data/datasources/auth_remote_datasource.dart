@@ -35,9 +35,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserModel> login(String email, String password) async {
+  Future<UserModel> login(String username, String password) async {
     final response = await _dio.post('/users/login', data: {
-      'email': email,
+      'username': username,
       'password': password,
     });
     return UserModel.fromJson(response.data.result);

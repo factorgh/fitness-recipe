@@ -5,7 +5,7 @@ import 'package:voltican_fitness/core/error/common/Loader.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 import 'package:voltican_fitness/widgets/or_divider.dart';
-import 'package:voltican_fitness/Features/auth/presentation/pages/login_screen.dart';
+import 'package:voltican_fitness/screens/login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -146,16 +146,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         const SizedBox(height: 20),
                         GestureDetector(
                           onTap: () {
-                            if (_formKey.currentState!.validate()) {
-                              context.read<AuthBloc>().add(
-                                    AuthSignUp(
-                                      _emailController.text,
-                                      _passwordController.text,
-                                      _usernameController.text,
-                                      _fullNameController.text,
-                                    ),
-                                  );
-                            }
+                            if (_formKey.currentState!.validate()) {}
                           },
                           child: const ButtonWidget(
                             backColor: Colors.red,

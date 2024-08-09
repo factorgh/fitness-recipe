@@ -31,3 +31,11 @@ final class AuthLogin extends AuthEvent {
   @override
   List<Object> get props => [username, password];
 }
+
+final class IsUserLoggedIn extends AuthEvent {
+  final String userId;
+  const IsUserLoggedIn(this.userId);
+
+  @override
+  List<Object> get props => [userId];
+}

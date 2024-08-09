@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/screens/single_meal_screen.dart';
 // import 'package:voltican_fitness/screens/meal_edit_screen.dart';
 import 'package:voltican_fitness/widgets/simple_button.dart';
 
@@ -166,10 +167,14 @@ class CalendarItem extends StatelessWidget {
                     ),
                     InkWell(
                       onTap: () {
-                        _showDeleteConfirmationDialog(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    SingleMealPlanDetailScreen()));
                       },
                       child: const SimpleButton(
-                          title: "delete",
+                          title: "View Details",
                           backColor: Colors.red,
                           size: 100,
                           textColor: Colors.white),

@@ -27,7 +27,7 @@ class MealPlanRepositoryImpl implements MealPlanRepository {
   Future<Either<Failure, MealPlan>> getMealPlan(String id) async {
     try {
       final remoteMealPlan = await remoteDataSource.getMealPlan(id);
-      return Right(remoteMealPlan.toEntity());
+      return Right(remoteMealPlan);
     } on ServerException {
       return Left(Failure()); // Use specific Failure subclass
     }
