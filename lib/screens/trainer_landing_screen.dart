@@ -1,17 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models 2/meal.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
+import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/widgets/category_slider.dart';
 import 'package:voltican_fitness/widgets/new_recipe_slider.dart';
 import 'package:voltican_fitness/widgets/slider_trainer_landing.dart';
+import 'package:badges/badges.dart' as badges;
 
-class TrainerLandeingScreen extends StatelessWidget {
+class TrainerLandeingScreen extends ConsumerStatefulWidget {
   const TrainerLandeingScreen({super.key});
 
   @override
+  ConsumerState<TrainerLandeingScreen> createState() =>
+      _TrainerLandeingScreenState();
+}
+
+class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
+  final AuthService authService = AuthService();
+  @override
+  void initState() {
+    super.initState();
+    authService.getMe(context: context, ref: ref);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userProvider);
     final categories = [
       'Breakfast',
       'Deserts',
@@ -50,7 +68,6 @@ class TrainerLandeingScreen extends StatelessWidget {
 
     void handleCategorySelected(String category) {
       // Handle category selection
-      print('Selected category: $category');
     }
 
     void handleRecipSelected(String category) {
@@ -66,12 +83,10 @@ class TrainerLandeingScreen extends StatelessWidget {
                         ingredients: ["potatos", "fries"],
                         title: "Sandwich and Fries"),
                   )));
-      print('Selected category: $category');
     }
 
     void handleTrainerSelected(String trainer) {
       // Handle category selection
-      print('Selected category: $trainer');
     }
 
     return Scaffold(
@@ -95,27 +110,27 @@ class TrainerLandeingScreen extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Row(
+                        Row(
                           children: [
-                            CircleAvatar(
+                            const CircleAvatar(
                               radius: 20,
                               backgroundImage:
                                   AssetImage('assets/images/pf2.jpg'),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 3,
                             ),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Hello, Jennifer',
-                                  style: TextStyle(
+                                  'Hello, $user.user.username',
+                                  style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white),
                                 ),
-                                Text(
+                                const Text(
                                   'Check amazing recipes..',
                                   style: TextStyle(color: Colors.white),
                                 )
@@ -123,22 +138,37 @@ class TrainerLandeingScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            color: Colors.white,
+                        badges.Badge(
+                          position:
+                              badges.BadgePosition.topEnd(top: -2, end: 1),
+                          showBadge: true,
+                          badgeContent: const Text(
+                            "4",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          badgeAnimation: const badges.BadgeAnimation.slide(
+                            animationDuration: Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          ),
+                          badgeStyle: badges.BadgeStyle(
+                            shape: badges.BadgeShape.circle,
+                            badgeColor: Colors.blueGrey[900]!,
+                            padding: const EdgeInsets.all(6),
+                            borderRadius: BorderRadius.circular(8),
+                            elevation: 3,
                           ),
                           child: IconButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        NotificationsScreen()));
-                              },
-                              icon: const Icon(
-                                  Icons.notifications_none_outlined,
-                                  color: Colors.black,
-                                  size: 30)),
-                        ),
+                            icon: const Icon(
+                              Icons.notifications,
+                              color: Colors.white,
+                              size: 25,
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => NotificationsScreen()));
+                            },
+                          ),
+                        )
                       ],
                     ),
                   ),

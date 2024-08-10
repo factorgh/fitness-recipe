@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/screens/signup_screen.dart';
+import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/widgets/button.dart';
-import 'package:voltican_fitness/screens/tabs_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+  final AuthService authService = AuthService();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool _passwordVisible = false;
+  bool _isLoading = false; // New: To manage loading state
 
   @override
   void dispose() {
@@ -28,6 +31,32 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.of(ctx).push(
       MaterialPageRoute(builder: (ctx) => const SignupScreen()),
     );
+  }
+
+  void _login(BuildContext context) async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      await authService.signIn(
+        context: context,
+        ref: ref, // Use ref from the state
+        username: _usernameController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      // Uncomment and use this after successful login
+      // Navigator.of(context).pushReplacement(
+      //   MaterialPageRoute(
+      //     builder: (ctx) => const TabsScreen(userRole: 1),
+      //   ),
+      // );
+    }
   }
 
   @override
@@ -160,20 +189,18 @@ class _LoginScreenState extends State<LoginScreen> {
               Column(
                 children: [
                   InkWell(
-                    onTap: () {
-                      if (_formKey.currentState!.validate()) {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (ctx) => const TabsScreen(userRole: 1),
+                    onTap: _isLoading
+                        ? null
+                        : () => _login(context), // Only pass context here
+                    child: _isLoading
+                        ? const CircularProgressIndicator(
+                            color: Colors.red,
+                          )
+                        : ButtonWidget(
+                            backColor: _isLoading ? Colors.grey : Colors.red,
+                            text: _isLoading ? 'Logging in...' : 'Login',
+                            textColor: Colors.white,
                           ),
-                        );
-                      }
-                    },
-                    child: const ButtonWidget(
-                      backColor: Colors.red,
-                      text: 'Login',
-                      textColor: Colors.white,
-                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

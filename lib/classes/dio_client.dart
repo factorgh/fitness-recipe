@@ -18,6 +18,7 @@ class _AuthInterceptor extends Interceptor {
       RequestOptions options, RequestInterceptorHandler handler) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('auth_token');
+    print("--------token from shared preferences: $token");
 
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';
@@ -34,7 +35,7 @@ class _AuthInterceptor extends Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    print('--- Response ---');
+    print('--- Response --- ');
     print('Status Code: ${response.statusCode}');
     print('Data: ${response.data}');
     print('---');
