@@ -1,9 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models%202/user.dart';
-// Import your User model
+import 'package:voltican_fitness/models/user.dart';
 
 // A StateNotifier to manage the User state
-class UserNotifier extends StateNotifier {
+class UserNotifier extends StateNotifier<User?> {
   UserNotifier() : super(null);
 
   // Method to set user
@@ -18,6 +17,6 @@ class UserNotifier extends StateNotifier {
 }
 
 // A provider to access UserNotifier
-final userProvider = StateNotifierProvider((ref) {
+final userProvider = StateNotifierProvider<UserNotifier, User?>((ref) {
   return UserNotifier();
 });

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models 2/meal.dart';
+import 'package:voltican_fitness/models/meal.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 
 import 'package:voltican_fitness/screens/notify_screen.dart';
@@ -29,7 +29,6 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(userProvider);
     final categories = [
       'Breakfast',
       'Deserts',
@@ -110,27 +109,27 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
+                        const Row(
                           children: [
-                            const CircleAvatar(
+                            CircleAvatar(
                               radius: 20,
                               backgroundImage:
                                   AssetImage('assets/images/pf2.jpg'),
                             ),
-                            const SizedBox(
+                            SizedBox(
                               width: 3,
                             ),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Hello, $user.user.username',
-                                  style: const TextStyle(
+                                  'Hello, ',
+                                  style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white),
                                 ),
-                                const Text(
+                                Text(
                                   'Check amazing recipes..',
                                   style: TextStyle(color: Colors.white),
                                 )

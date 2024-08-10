@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
-import 'package:voltican_fitness/models 2/meal.dart';
+import 'package:voltican_fitness/models/meal.dart';
 
 class TraineePlanDetailScreen extends StatefulWidget {
   const TraineePlanDetailScreen({super.key, required this.meal});

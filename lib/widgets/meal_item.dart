@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
-import 'package:voltican_fitness/models 2/meal.dart';
+import 'package:voltican_fitness/models/meal.dart';
 
 class MealItem extends StatelessWidget {
   const MealItem({super.key, required this.meal, required this.selectMeal});

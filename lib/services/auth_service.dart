@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:voltican_fitness/classes/dio_client.dart';
 import 'package:voltican_fitness/commons/constants/error_handling.dart';
-import 'package:voltican_fitness/models%202/user.dart';
+import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/role_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
@@ -126,8 +126,10 @@ class AuthService {
     );
 
     // Convert the response data to a User object
+    User user = User.fromJson(res.data);
+    print(user);
 
     // Now pass the User object to your provider
-    ref.read(userProvider.notifier).setUser(res.data);
+    ref.read(userProvider.notifier).setUser(user);
   }
 }

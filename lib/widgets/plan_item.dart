@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/models 2/meal.dart';
+import 'package:voltican_fitness/models/meal.dart';
 import 'package:voltican_fitness/screens/trainee_plan_detail.dart';
 
 class PlanItem extends StatelessWidget {
