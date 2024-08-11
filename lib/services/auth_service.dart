@@ -30,8 +30,8 @@ class AuthService {
         username: username,
         role: '0',
         token: '',
-        imageUrl: "",
         password: password,
+        imageUrl: "",
         savedRecipes: [],
         following: [],
         mealPlans: [],
@@ -121,15 +121,21 @@ class AuthService {
     required BuildContext context,
     required WidgetRef ref,
   }) async {
-    dio.Response res = await client.dio.get(
-      "/users/me",
-    );
+    try {
+      dio.Response res = await client.dio.get(
+        "/users/me",
+      );
 
-    // Convert the response data to a User object
-    User user = User.fromJson(res.data);
-    print(user);
+      print('Response data: ${res.data}'); // Print the raw response data
 
-    // Now pass the User object to your provider
-    ref.read(userProvider.notifier).setUser(user);
+      // Convert the response data to a User object
+      User user = User.fromJson(res.data);
+      print("------username------ ${user.username}");
+
+      // Pass the User object to your provider
+      ref.read(userProvider.notifier).setUser(user);
+    } catch (e) {
+      print('Error fetching user data: $e'); // Print error details
+    }
   }
 }

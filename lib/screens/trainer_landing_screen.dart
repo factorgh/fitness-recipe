@@ -29,6 +29,7 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userProvider);
     final categories = [
       'Breakfast',
       'Deserts',
@@ -109,27 +110,27 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Row(
+                        Row(
                           children: [
-                            CircleAvatar(
+                            const CircleAvatar(
                               radius: 20,
                               backgroundImage:
                                   AssetImage('assets/images/pf2.jpg'),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 3,
                             ),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Hello, ',
-                                  style: TextStyle(
+                                  'Hello, ${user!.fullName}',
+                                  style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white),
                                 ),
-                                Text(
+                                const Text(
                                   'Check amazing recipes..',
                                   style: TextStyle(color: Colors.white),
                                 )

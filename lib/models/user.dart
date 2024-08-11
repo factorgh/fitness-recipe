@@ -22,8 +22,8 @@ class User {
     required this.username,
     required this.role,
     required this.imageUrl,
-    required this.password,
     required this.token,
+    required this.password,
     required this.savedRecipes,
     required this.mealPlans,
     required this.following,
@@ -38,9 +38,8 @@ class User {
       'email': email,
       'username': username,
       'role': role,
-      'imageUrl': imageUrl,
-      'password': password,
       'token': token,
+      'password': password,
       'savedRecipes': savedRecipes,
       'mealPlans': mealPlans,
       'following': following,
@@ -51,21 +50,29 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['_id'] as String? ??
-          '', // Provide a default empty string if id is null
-      fullName: json['fullName'] as String? ?? '', // Same for fullName
+      id: json['_id'] as String? ?? '',
+      fullName: json['fullName'] as String? ?? '',
       email: json['email'] as String? ?? '',
       username: json['username'] as String? ?? '',
       role: json['role'] as String? ?? '',
       imageUrl: json['imageUrl'] as String? ?? '',
       password: json['password'] as String? ?? '',
-      token: json['token'] as String? ?? '',
       savedRecipes: List<String>.from(json['savedRecipes'] ?? []),
-      mealPlans: List<String>.from(json['mealPlans'] ?? []),
       following: List<String>.from(json['following'] ?? []),
-      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
+      mealPlans: List<String>.from(json['mealPlans'] ?? []),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'])
+          : DateTime.now(),
+      token: json['token'] as String? ?? '',
     );
+  }
+
+  @override
+  String toString() {
+    return 'User{id: $id, fullName: $fullName, email: $email, username: $username, role: $role, imageUrl: $imageUrl, token: $token, savedRecipes: $savedRecipes, mealPlans: $mealPlans, following: $following, createdAt: $createdAt, updatedAt: $updatedAt}';
   }
 
   String toJson() => json.encode(toMap());
