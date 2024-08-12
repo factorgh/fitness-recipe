@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
+import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
+
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
 import 'package:voltican_fitness/widgets/week_range_selector.dart';
 
@@ -14,6 +15,15 @@ class _MealCreationScreenState extends State<MealCreationScreen> {
   String _selectedDuration = 'Does Not Repeat';
   DateTime? _startDate;
   DateTime? _endDate;
+  final List<String> _allTrainees = [
+    'John Doe',
+    'Jane Smith',
+    'Alice Johnson',
+    'Bob Brown'
+  ];
+  List<String> _searchResults = [];
+  final List<String> _selectedTrainees = [];
+  final TextEditingController _searchController = TextEditingController();
 
   Map<String, List<Map<String, dynamic>>> selectedMeals = {};
 
@@ -57,6 +67,53 @@ class _MealCreationScreenState extends State<MealCreationScreen> {
         }
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _searchTrainees(String query) {
+    setState(() {
+      _searchResults = _allTrainees
+          .where(
+              (trainee) => trainee.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
+  void _addTrainee(String trainee) {
+    if (_selectedTrainees.contains(trainee)) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Duplicate Entry'),
+          content: const Text('This trainee has already been added.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      setState(() {
+        _selectedTrainees.add(trainee);
+        _searchController.clear();
+        _searchResults.clear();
+      });
+    }
+  }
+
+  void _removeTrainee(String trainee) {
+    setState(() {
+      _selectedTrainees.remove(trainee);
+    });
   }
 
   @override
@@ -206,18 +263,74 @@ class _MealCreationScreenState extends State<MealCreationScreen> {
             ),
             const SizedBox(height: 20),
             const Text(
-              "Assign recipes to meals",
+              "Assign recipes to trainees",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            const SizedBox(height: 20),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox(height: 20),
+
+                // Search Field for Trainees
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    labelText: 'Search Trainees',
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () {
+                        _searchTrainees(_searchController.text);
+                      },
+                    ),
+                  ),
+                  onSubmitted: (query) {
+                    _searchTrainees(query);
+                  },
+                ),
+                const SizedBox(height: 10),
+
+                // Search Results
+                if (_searchResults.isNotEmpty)
+                  ..._searchResults.map((trainee) => ListTile(
+                        title: Text(trainee),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () {
+                            _addTrainee(trainee);
+                          },
+                        ),
+                      )),
+
+                const SizedBox(height: 20),
+
+                // Selected Trainees
+                if (_selectedTrainees.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Selected Trainees:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      ..._selectedTrainees.map((trainee) => Chip(
+                            label: Text(trainee),
+                            deleteIcon: const Icon(Icons.close),
+                            onDeleted: () {
+                              _removeTrainee(trainee);
+                            },
+                          )),
+                    ],
+                  ),
+              ],
+            ),
+            const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const AssignRecipeScreen(),
-                  ),
-                );
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const AllMealPlan()));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,

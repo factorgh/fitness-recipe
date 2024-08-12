@@ -122,7 +122,7 @@ class RecipeService {
 
   Future<List<Recipe>> fetchRecipesByUser() async {
     try {
-      final response = await client.dio.get('/recipes/by-user');
+      final response = await client.dio.get('/recipes/user/by-user/');
 
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;

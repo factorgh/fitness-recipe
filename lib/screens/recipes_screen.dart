@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/commons/constants/loading_spinner.dart';
@@ -6,6 +8,7 @@ import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/providers/recipe_provider.dart';
 import 'package:voltican_fitness/screens/create_recipe.screen.dart';
 import 'package:voltican_fitness/screens/meal_detail_screen.dart';
+import 'package:voltican_fitness/screens/saved_trainer_meal_details.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
@@ -77,6 +80,12 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
     ));
   }
 
+  void selectSavedRecipe(BuildContext context, Recipe meal) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => SavedTrainerMealDetailScreen(meal: meal),
+    ));
+  }
+
   Widget buildMealList() {
     return ListView.builder(
       shrinkWrap: true,
@@ -112,7 +121,7 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
             itemBuilder: (context, index) => RecipeItemTrainer(
               meal: recipes![index], // Ensure this matches the type expected
               selectMeal: (meal) {
-                selectRecipe(context, meal);
+                selectSavedRecipe(context, meal);
               },
             ),
           );
