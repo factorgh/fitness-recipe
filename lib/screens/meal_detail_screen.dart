@@ -1,20 +1,24 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/providers/recipe_provider.dart';
 import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 
-class MealDetailScreen extends StatefulWidget {
+class MealDetailScreen extends ConsumerStatefulWidget {
   const MealDetailScreen({super.key, required this.meal});
   final Recipe meal;
 
   @override
-  State<MealDetailScreen> createState() => _MealDetailScreenState();
+  ConsumerState<MealDetailScreen> createState() => _MealDetailScreenState();
 }
 
-class _MealDetailScreenState extends State<MealDetailScreen> {
+class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
   double value = 3.8;
   bool isPrivate = false;
   bool isFollowing = false;
@@ -47,8 +51,12 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
             ),
             TextButton(
               child: const Text('Delete'),
-              onPressed: () {
-                // Perform the delete action
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await ref
+                    .read(savedRecipesProvider.notifier)
+                    .deleteRecipe(widget.meal.id!);
+
                 Navigator.of(context).pop();
               },
             ),
@@ -322,7 +330,9 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                   InkWell(
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const EditRecipeScreen()));
+                          builder: (context) => EditRecipeScreen(
+                                recipe: widget.meal,
+                              )));
                     },
                     splashColor: Colors.purple,
                     child: const ButtonWidget(

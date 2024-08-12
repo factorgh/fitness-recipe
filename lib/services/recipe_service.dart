@@ -13,7 +13,7 @@ import 'package:voltican_fitness/utils/show_snackbar.dart';
 class RecipeService {
   final DioClient client = DioClient();
 
-  void createRecipe({
+  Future<void> createRecipe({
     required BuildContext context,
     required String title,
     required String description,
@@ -83,5 +83,79 @@ class RecipeService {
       showSnack(context, e.toString());
     }
     return recipeList;
+  }
+
+  Future<void> saveRecipe(String userId, String recipeId) async {
+    try {
+      final response = await client.dio.post(
+        '/recipes/save-recipe',
+        data: {
+          'userId': userId,
+          'recipeId': recipeId,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Recipe saved successfully');
+      } else {
+        print('Failed to save recipe');
+      }
+    } catch (e) {
+      print('Error saving recipe: $e');
+    }
+  }
+
+  Future<List<Recipe>> fetchSavedRecipes(String userId) async {
+    try {
+      final response = await client.dio.get('saved-recipes/$userId');
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        return data.map((recipe) => Recipe.fromJson(recipe)).toList();
+      } else {
+        throw Exception('Failed to load saved recipes');
+      }
+    } catch (e) {
+      throw Exception('Error loading saved recipes: $e');
+    }
+  }
+
+  Future<List<Recipe>> fetchRecipesByUser() async {
+    try {
+      final response = await client.dio.get('/recipes/by-user');
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        return data.map((recipe) => Recipe.fromJson(recipe)).toList();
+      } else {
+        throw Exception('Failed to load recipes');
+      }
+    } catch (e) {
+      throw Exception('Error loading recipes: $e');
+    }
+  }
+
+  Future<void> deleteRecipe(String recipeId) async {
+    try {
+      await client.dio.delete('/recipes/$recipeId');
+    } catch (e) {
+      throw Exception('Error deleting recipe: $e');
+    }
+  }
+
+  Future<void> updateRecipe(
+      String recipeId, Map<String, dynamic> updatedRecipe) async {
+    try {
+      final response = await client.dio.put(
+        '/recipes/$recipeId',
+        data: updatedRecipe,
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update recipe');
+      }
+    } catch (e) {
+      throw Exception('Error updating recipe: $e');
+    }
   }
 }

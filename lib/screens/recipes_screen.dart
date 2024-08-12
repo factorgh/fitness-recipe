@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/commons/constants/loading_spinner.dart';
 
 import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/providers/recipe_provider.dart';
 import 'package:voltican_fitness/screens/create_recipe.screen.dart';
 import 'package:voltican_fitness/screens/meal_detail_screen.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
@@ -10,17 +12,19 @@ import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/recipe_item.dart';
 import 'package:voltican_fitness/widgets/recipe_item_trainer.dart';
 
-class MealPlanScreen extends StatefulWidget {
+class MealPlanScreen extends ConsumerStatefulWidget {
   const MealPlanScreen({super.key});
 
   @override
   _MealPlanScreenState createState() => _MealPlanScreenState();
 }
 
-class _MealPlanScreenState extends State<MealPlanScreen>
+class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   List<Recipe>? userRecipes;
+  List<Recipe>? myRecipes;
+
   final RecipeService recipeService = RecipeService();
 
   @override
@@ -28,6 +32,7 @@ class _MealPlanScreenState extends State<MealPlanScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     fetchAllRecipes();
+    fetchAllUserRecipes();
   }
 
   Future<void> fetchAllRecipes() async {
@@ -39,6 +44,18 @@ class _MealPlanScreenState extends State<MealPlanScreen>
     } catch (e) {
       print('Error fetching recipes: $e');
       showSnack(context, 'Failed to load recipes');
+    }
+  }
+
+  Future<void> fetchAllUserRecipes() async {
+    print('Fetching recipes...');
+    try {
+      myRecipes = await recipeService.fetchRecipesByUser();
+      print('Recipes fetched: ${myRecipes?.length}');
+      setState(() {});
+    } catch (e) {
+      print('Error fetching recipes: $e');
+      showSnack(context, 'Failed to load  user recipes');
     }
   }
 
@@ -86,8 +103,24 @@ class _MealPlanScreenState extends State<MealPlanScreen>
     );
   }
 
+  Widget buildSavedRecipeList(recipes) {
+    return recipes.isEmpty
+        ? const Center(child: Text('No saved recipes found'))
+        : ListView.builder(
+            shrinkWrap: true,
+            itemCount: recipes?.length ?? 0,
+            itemBuilder: (context, index) => RecipeItemTrainer(
+              meal: recipes![index], // Ensure this matches the type expected
+              selectMeal: (meal) {
+                selectRecipe(context, meal);
+              },
+            ),
+          );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final savedRecipes = ref.watch(savedRecipesProvider);
     return Container(
       width: double.infinity,
       height: double.maxFinite,
@@ -163,7 +196,7 @@ class _MealPlanScreenState extends State<MealPlanScreen>
               controller: _tabController,
               children: [
                 userRecipes == null ? const Loader() : buildTabContent(),
-                buildRecipeTabContent(),
+                buildSavedRecipeTabContent(savedRecipes),
                 buildRecipeTabContent(),
               ],
             ),
@@ -206,6 +239,25 @@ class _MealPlanScreenState extends State<MealPlanScreen>
           ),
           const SizedBox(height: 10),
           Expanded(child: buildRecipeList()),
+        ],
+      ),
+    );
+  }
+
+  Widget buildSavedRecipeTabContent(recipes) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: buildSearchBar()),
+              buildFilterIcon(),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Expanded(child: buildSavedRecipeList(recipes)),
         ],
       ),
     );

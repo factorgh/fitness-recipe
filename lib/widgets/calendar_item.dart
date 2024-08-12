@@ -119,8 +119,7 @@ class CalendarItem extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                         image: const DecorationImage(
                             fit: BoxFit.cover,
-                            image:
-                                AssetImage("assets/images/onboarding_3.png")),
+                            image: AssetImage("assets/images/pf2.jpg")),
                       ),
                     ),
                     Container(
@@ -131,8 +130,7 @@ class CalendarItem extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                         image: const DecorationImage(
                             fit: BoxFit.cover,
-                            image:
-                                AssetImage("assets/images/onboarding_3.png")),
+                            image: AssetImage("assets/images/pf3.jpg")),
                       ),
                     ),
                     Container(
@@ -143,8 +141,7 @@ class CalendarItem extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                         image: const DecorationImage(
                             fit: BoxFit.cover,
-                            image:
-                                AssetImage("assets/images/onboarding_3.png")),
+                            image: AssetImage("assets/images/pf.jpg")),
                       ),
                     ),
                     const SizedBox(

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,7 +61,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
     super.dispose();
   }
 
-  void _createRecipe(User user) {
+  Future<void> _createRecipe(User user) async {
     if (_selectedImage == null ||
         _mealNameController.text.isEmpty ||
         _descriptionController.text.isEmpty ||
@@ -75,9 +77,11 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
             content: const Text('Please fill in all required fields.'),
             actions: [
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
                 child: const Text('Ok'),
-              )
+              ),
             ],
           );
         },
@@ -88,21 +92,28 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
     setState(() {
       _isLoading = true;
     });
-    recipeService.createRecipe(
-      context: context,
-      title: _mealNameController.text,
-      description: _descriptionController.text,
-      ingredients: _ingredientsController.text.split(","),
-      instructions: _instructionsController.text,
-      facts: _nutritionalFactsController.text,
-      imageUrl: _selectedImage!,
 
-      period: selectedMealPeriod!,
-      createdBy: user, // Access the user ID here
-    );
-    setState(() {
-      _isLoading = false;
-    });
+    try {
+      await recipeService.createRecipe(
+        context: context,
+        title: _mealNameController.text,
+        description: _descriptionController.text,
+        ingredients: _ingredientsController.text.split(","),
+        instructions: _instructionsController.text,
+        facts: _nutritionalFactsController.text,
+        imageUrl: _selectedImage!,
+        period: selectedMealPeriod!,
+        createdBy: user,
+      );
+
+      // Optionally handle success (e.g., show a success message)
+    } catch (e) {
+      // Handle any errors (e.g., show an error message)
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -248,8 +259,8 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                           backColor: Colors.red,
                           text: 'Save and Complete',
                           textColor: Colors.white,
-                          onPressed: () {
-                            _createRecipe(user!);
+                          onPressed: () async {
+                            await _createRecipe(user!);
                             Navigator.of(context).pop();
                           },
                         ),
@@ -259,8 +270,8 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                     backColor: Colors.red,
                     text: 'Save and Assign',
                     textColor: Colors.white,
-                    onPressed: () {
-                      _createRecipe(user!);
+                    onPressed: () async {
+                      await _createRecipe(user!);
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => const AssignRecipeScreen(),
@@ -326,11 +337,10 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
         child: TextFormField(
           controller: controller,
           maxLines: null,
-          expands: true,
-          textAlignVertical: TextAlignVertical.top,
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: hintText,
+            contentPadding: const EdgeInsets.symmetric(vertical: 15),
           ),
         ),
       ),

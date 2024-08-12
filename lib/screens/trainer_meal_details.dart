@@ -1,21 +1,27 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
+import 'package:voltican_fitness/providers/recipe_provider.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
+import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 
-class TrainerMealDetailScreen extends StatefulWidget {
+class TrainerMealDetailScreen extends ConsumerStatefulWidget {
   const TrainerMealDetailScreen({super.key, required this.meal});
   final Recipe meal;
 
   @override
-  State<TrainerMealDetailScreen> createState() =>
+  ConsumerState<TrainerMealDetailScreen> createState() =>
       _TrainerMealDetailScreenState();
 }
 
-class _TrainerMealDetailScreenState extends State<TrainerMealDetailScreen> {
+class _TrainerMealDetailScreenState
+    extends ConsumerState<TrainerMealDetailScreen> {
   double value = 3.8;
   bool isPrivate = false;
   bool isFollowing = false;
@@ -61,6 +67,7 @@ class _TrainerMealDetailScreenState extends State<TrainerMealDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userProvider);
     return Scaffold(
       // floatingActionButton: SpeedDial(
       //   animatedIcon: AnimatedIcons.menu_close,
@@ -287,10 +294,9 @@ class _TrainerMealDetailScreenState extends State<TrainerMealDetailScreen> {
                     'Description',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                   ),
-                  const Text(
-                    "psum passages, and more recently with desk publishing software like Aldus PageMaker \n"
-                    "psum passages, and more recently with desk publishing software like Aldus PageMaker  .",
-                    style: TextStyle(color: Colors.black54),
+                  Text(
+                    widget.meal.description,
+                    style: const TextStyle(color: Colors.black54),
                   ),
                   const SizedBox(height: 20),
                   Container(
@@ -316,22 +322,31 @@ class _TrainerMealDetailScreenState extends State<TrainerMealDetailScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    '1 Cucumber (38 Cal)',
-                    style: TextStyle(color: Colors.black38),
-                  ),
-                  const Text(
-                    '2 Cups of rice',
-                    style: TextStyle(color: Colors.black38),
-                  ),
-                  const Text(
-                    '2 teaspoons of honey',
-                    style: TextStyle(color: Colors.black38),
-                  ),
-                  const Text(
-                    '1 tablespoon of salt',
-                    style: TextStyle(color: Colors.black38),
+
+                  // Expanded(
+                  //   child: ListView.builder(
+                  //     itemCount: widget.meal.ingredients.length,
+                  //     itemBuilder: (context, index) {
+                  //       final List<String> ingredientsList =
+                  //           widget.meal.ingredients;
+                  //       return ListTile(
+                  //         title: Text(ingredientsList[index]),
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
+                  SizedBox(
+                    height: 100, // Set a specific height
+                    child: ListView.builder(
+                      itemCount: widget.meal.ingredients.length,
+                      itemBuilder: (context, index) {
+                        final List<String> ingredientsList =
+                            widget.meal.ingredients;
+                        return ListTile(
+                          title: Text(ingredientsList[index]),
+                        );
+                      },
+                    ),
                   ),
                   const SizedBox(height: 30),
                   const Row(
@@ -349,27 +364,15 @@ class _TrainerMealDetailScreenState extends State<TrainerMealDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    '1. psum passages, and more recently with desk  ',
-                    style: TextStyle(color: Colors.black38),
-                  ),
-                  const Text(
-                    '2. psum passages, and more recently with desk',
-                    style: TextStyle(color: Colors.black38),
-                  ),
-                  const Text(
-                    '3. psum passages, and more recently with desk ',
-                    style: TextStyle(color: Colors.black38),
-                  ),
-                  const Text(
-                    '4. psum passages, and more recently with desk ',
-                    style: TextStyle(color: Colors.black38),
+                  Text(
+                    widget.meal.instructions,
                   ),
                   const SizedBox(height: 30),
                   InkWell(
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const EditRecipeScreen()));
+                          builder: (context) =>
+                              EditRecipeScreen(recipe: widget.meal)));
                     },
                     splashColor: Colors.purple,
                     child: const ButtonWidget(
@@ -377,11 +380,17 @@ class _TrainerMealDetailScreenState extends State<TrainerMealDetailScreen> {
                         text: 'Edit and Assign',
                         textColor: Colors.white),
                   ),
+
                   const SizedBox(height: 10),
                   InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const AssignRecipeScreen()));
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      await ref
+                          .read(savedRecipesProvider.notifier)
+                          .saveRecipe(user!.id, widget.meal);
+                      showSnack(context, 'Recipe has been saved successfully');
+                      // Navigator.of(context).push(MaterialPageRoute(
+                      //     builder: (context) => const AssignRecipeScreen()));
                     },
                     splashColor: Colors.purple,
                     child: const ButtonWidget(

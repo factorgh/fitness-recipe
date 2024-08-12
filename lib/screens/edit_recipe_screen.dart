@@ -1,21 +1,57 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:voltican_fitness/widgets/button.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/providers/recipe_provider.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 
-class EditRecipeScreen extends StatefulWidget {
-  const EditRecipeScreen({super.key});
+import 'package:voltican_fitness/widgets/custom_button.dart';
+
+class EditRecipeScreen extends ConsumerStatefulWidget {
+  const EditRecipeScreen({super.key, required this.recipe});
+  final Recipe recipe;
 
   @override
-  State<EditRecipeScreen> createState() => _EditRecipeScreenState();
+  ConsumerState<EditRecipeScreen> createState() => _EditRecipeScreenState();
 }
 
-class _EditRecipeScreenState extends State<EditRecipeScreen> {
+class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
   File? _selectedImage;
+  String? selectedMealPeriod;
+  bool _isLoading = false; // Track the loading state
+
+  final List<String> mealPeriods = [
+    'Breakfast',
+    'Lunch',
+    'Snack',
+    'Dinner',
+  ];
 
   final TextEditingController _mealNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _ingredientsController = TextEditingController();
+  final TextEditingController _instructionsController = TextEditingController();
+  final TextEditingController _nutritionalFactsController =
+      TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _mealNameController.text = widget.recipe.title;
+    _descriptionController.text = widget.recipe.description;
+    _ingredientsController.text =
+        widget.recipe.ingredients.join(","); // Convert list to string
+    _instructionsController.text = widget.recipe.instructions;
+    _nutritionalFactsController.text = widget.recipe.facts;
+    // Initialize the image if URL exists
+    if (widget.recipe.imageUrl.isNotEmpty) {
+      _selectedImage = null; // We don't need to use File for network images
+    }
+    selectedMealPeriod = widget.recipe.period;
+  }
 
   void _takePicture() async {
     final imagePicker = ImagePicker();
@@ -31,29 +67,54 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
     });
   }
 
+  void _saveRecipe() async {
+    setState(() {
+      _isLoading = true; // Set loading state to true
+    });
+
+    try {
+      final user = ref.watch(userProvider);
+      final updatedRecipe = Recipe(
+        id: widget.recipe.id,
+        title: _mealNameController.text,
+        description: _descriptionController.text,
+        ingredients: _ingredientsController.text.split(","),
+        instructions: _instructionsController.text,
+        facts: _nutritionalFactsController.text,
+        imageUrl: _selectedImage != null
+            ? await _uploadImage()
+            : widget.recipe.imageUrl,
+        updatedAt: DateTime.now(),
+        createdAt: widget.recipe.createdAt, // Use the existing creation date
+        createdBy: user!.id,
+        period: selectedMealPeriod!,
+      );
+
+      await ref
+          .read(savedRecipesProvider.notifier)
+          .updateRecipe(widget.recipe.id as String, updatedRecipe);
+
+      Navigator.of(context).pop();
+    } catch (e) {
+      // Handle errors if needed
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save recipe: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false; // Set loading state to false
+      });
+    }
+  }
+
+  Future<String> _uploadImage() async {
+    // Implement image upload logic here
+    return 'uploaded_image_url';
+  }
+
   @override
   Widget build(BuildContext context) {
-    Widget content = Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.add_photo_alternate_outlined,
-            size: 40,
-            color: Colors.grey[600],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Upload Image',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
+    Widget content;
 
     if (_selectedImage != null) {
       content = ClipRRect(
@@ -63,6 +124,54 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
           fit: BoxFit.cover,
           width: double.infinity,
           height: 200,
+        ),
+      );
+    } else if (widget.recipe.imageUrl.isNotEmpty) {
+      content = ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Image.network(
+          widget.recipe.imageUrl,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: 200,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              return child;
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return const Center(
+              child: Icon(
+                Icons.error,
+                color: Colors.red,
+                size: 50,
+              ),
+            );
+          },
+        ),
+      );
+    } else {
+      content = Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.add_photo_alternate_outlined,
+              size: 40,
+              color: Colors.grey[600],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Upload Image',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -213,13 +322,13 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: TextField(
-                  controller: _ingredientsController,
+                  controller: _instructionsController,
                   keyboardType: TextInputType.multiline,
                   minLines: 1,
                   maxLines: 4,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'Add the instructions involved ',
+                    hintText: 'Enter the instructions for the recipe',
                     contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),
@@ -244,27 +353,62 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: TextField(
-                  controller: _ingredientsController,
+                  controller: _nutritionalFactsController,
                   keyboardType: TextInputType.multiline,
                   minLines: 1,
                   maxLines: 4,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'Add the right nutritional facts',
+                    hintText: 'Enter nutritional facts',
                     contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 30),
-            GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pop();
+            const SizedBox(height: 20),
+            Text(
+              'Meal Period',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.blueGrey[800],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.black38),
+              ),
+              child: DropdownButton<String>(
+                value: selectedMealPeriod,
+                items: mealPeriods.map((period) {
+                  return DropdownMenuItem(
+                    value: period,
+                    child: Text(period),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedMealPeriod = value;
+                  });
                 },
-                child: const ButtonWidget(
+                underline: Container(),
+                isExpanded: true,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : CustomButton(
+                    width: double.infinity,
+                    size: 15,
                     backColor: Colors.red,
-                    text: 'Next',
-                    textColor: Colors.white))
+                    textColor: Colors.white,
+                    text: 'Save Recipe',
+                    onPressed: _saveRecipe,
+                  ),
           ],
         ),
       ),

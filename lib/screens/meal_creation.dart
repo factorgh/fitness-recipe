@@ -12,6 +12,8 @@ class MealCreationScreen extends StatefulWidget {
 
 class _MealCreationScreenState extends State<MealCreationScreen> {
   String _selectedDuration = 'Does Not Repeat';
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   Map<String, List<Map<String, dynamic>>> selectedMeals = {};
 
@@ -28,6 +30,33 @@ class _MealCreationScreenState extends State<MealCreationScreen> {
 
   void handleSelectionChange(List<String> selectedPeriods) {
     setState(() {});
+  }
+
+  Future<void> _selectDate(BuildContext context, bool isStartDate) async {
+    DateTime initialDate = DateTime.now();
+    if (isStartDate && _startDate != null) {
+      initialDate = _startDate!;
+    } else if (!isStartDate && _endDate != null) {
+      initialDate = _endDate!;
+    }
+
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (pickedDate != null &&
+        pickedDate != (isStartDate ? _startDate : _endDate)) {
+      setState(() {
+        if (isStartDate) {
+          _startDate = pickedDate;
+        } else {
+          _endDate = pickedDate;
+        }
+      });
+    }
   }
 
   @override
@@ -87,6 +116,73 @@ class _MealCreationScreenState extends State<MealCreationScreen> {
                 });
               },
             ),
+            const SizedBox(height: 20),
+            _selectedDuration == 'Custom'
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Start Date', style: TextStyle(fontSize: 16)),
+                      const SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () => _selectDate(context, true),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 15),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.black38),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                _startDate != null
+                                    ? _startDate!
+                                        .toLocal()
+                                        .toString()
+                                        .split(' ')[0]
+                                    : 'Select start date',
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                              Icon(Icons.calendar_today,
+                                  color: Colors.grey[600]),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text('End Date', style: TextStyle(fontSize: 16)),
+                      const SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () => _selectDate(context, false),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 15),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.black38),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                _endDate != null
+                                    ? _endDate!
+                                        .toLocal()
+                                        .toString()
+                                        .split(' ')[0]
+                                    : 'Select end date',
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                              Icon(Icons.calendar_today,
+                                  color: Colors.grey[600]),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : const SizedBox.shrink(),
             const SizedBox(height: 20),
             const Text(
               "Determine Days for Meal",
