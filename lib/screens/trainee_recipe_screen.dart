@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/data/dummy_data.dart';
-import 'package:voltican_fitness/models/meal.dart';
+
+import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/screens/meal_detail_screen.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/widgets/recipe_item.dart';
@@ -16,6 +16,7 @@ class TraineeRecipeScreen extends StatefulWidget {
 class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  List<Recipe> userRecipes = [];
 
   @override
   void initState() {
@@ -29,13 +30,13 @@ class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
     super.dispose();
   }
 
-  void selectMeal(BuildContext context, Meal meal) {
+  void selectMeal(BuildContext context, Recipe meal) {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => MealDetailScreen(meal: meal),
     ));
   }
 
-  void selectRecipe(BuildContext context, Meal meal) {
+  void selectRecipe(BuildContext context, Recipe meal) {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => TrainerMealDetailScreen(meal: meal),
     ));
@@ -44,9 +45,9 @@ class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
   Widget buildMealList() {
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: dummyMeals.length,
+      itemCount: userRecipes.length,
       itemBuilder: (context, index) => RecipeItem(
-        meal: dummyMeals[index],
+        meal: userRecipes[index],
         selectMeal: (meal) {
           selectMeal(context, meal);
         },
@@ -57,9 +58,9 @@ class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
   Widget buildRecipeList() {
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: dummyMeals.length,
+      itemCount: userRecipes.length,
       itemBuilder: (context, index) => RecipeItemTrainer(
-        meal: dummyMeals[index],
+        meal: userRecipes[index],
         selectMeal: (meal) {
           selectRecipe(context, meal);
         },

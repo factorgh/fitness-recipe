@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/models/meal.dart';
+
+import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 
 class SearchScreen extends StatelessWidget {
@@ -26,13 +27,21 @@ class SearchScreen extends StatelessWidget {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => const TrainerMealDetailScreen(
-                    meal: Meal(
-                        id: 'm2',
-                        imageUrl:
-                            "https://cdn.pixabay.com/photo/2017/03/27/13/54/bread-2178874_640.jpg",
-                        ingredients: ["potatos", "fries"],
-                        title: "Sandwich and Fries"),
+              builder: (context) => TrainerMealDetailScreen(
+                    meal: Recipe(
+                      id: 'm2',
+                      imageUrl:
+                          "https://cdn.pixabay.com/photo/2017/03/27/13/54/bread-2178874_640.jpg",
+                      ingredients: ["potatos", "fries"],
+                      title: "Sandwich and Fries",
+                      instructions: '',
+                      facts: '',
+                      description: '',
+                      createdBy: '',
+                      period: '',
+                      createdAt: DateTime.now(),
+                      updatedAt: DateTime.now(),
+                    ),
                   )));
     }
 

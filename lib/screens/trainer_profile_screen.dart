@@ -1,15 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/data/dummy_data.dart';
-import 'package:voltican_fitness/models/meal.dart';
+
+import 'package:voltican_fitness/models/recipe.dart';
 
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/widgets/recipe_item.dart';
 
 class TrainerProfileScreen extends StatelessWidget {
   TrainerProfileScreen({super.key});
+  final List<Recipe> userRecipes = [];
 
-  void selectMeal(BuildContext context, Meal meal) {
+  void selectMeal(BuildContext context, Recipe meal) {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => TrainerMealDetailScreen(meal: meal),
     ));
@@ -48,7 +49,9 @@ class TrainerProfileScreen extends StatelessWidget {
                           "https://images.pexels.com/photos/428361/pexels-photo-428361.jpeg?auto=compress&cs=tinysrgb&w=800"),
                     ),
                     SizedBox(height: 10),
-                    Text("Albert Smith", style: TextStyle(fontSize: 12)),
+                    Text("Albert Smith",
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w500)),
                     SizedBox(height: 10),
                     Text("albert@example.com", style: TextStyle(fontSize: 12)),
                   ],
@@ -61,9 +64,9 @@ class TrainerProfileScreen extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(8.0),
-              itemCount: dummyMeals.length,
+              itemCount: userRecipes.length,
               itemBuilder: (context, index) => RecipeItem(
-                meal: dummyMeals[index],
+                meal: userRecipes[index],
                 selectMeal: (meal) {
                   selectMeal(context, meal);
                 },

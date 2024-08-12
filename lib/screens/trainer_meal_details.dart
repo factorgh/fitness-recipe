@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
-import 'package:voltican_fitness/models/meal.dart';
+
+import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 
 class TrainerMealDetailScreen extends StatefulWidget {
   const TrainerMealDetailScreen({super.key, required this.meal});
-  final Meal meal;
+  final Recipe meal;
 
   @override
   State<TrainerMealDetailScreen> createState() =>

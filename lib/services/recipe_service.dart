@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloudinary_public/cloudinary_public.dart';
@@ -68,21 +67,15 @@ class RecipeService {
   Future<List<Recipe>> fetchAllRecipes(BuildContext context) async {
     List<Recipe> recipeList = [];
     try {
-      final res = await client.dio.get(
-        '/recipes',
-      );
+      final res = await client.dio.get('/recipes');
+      print(res.data);
       httpErrorHandle(
         response: res,
         context: context,
         onSuccess: () {
-          for (int i = 0; i < jsonDecode(res.data).length; i++) {
-            recipeList.add(
-              Recipe.fromJson(
-                jsonEncode(
-                  jsonDecode(res.data)[i],
-                ) as Map<String, dynamic>,
-              ),
-            );
+          final List<dynamic> data = res.data;
+          for (var item in data) {
+            recipeList.add(Recipe.fromJson(item as Map<String, dynamic>));
           }
         },
       );

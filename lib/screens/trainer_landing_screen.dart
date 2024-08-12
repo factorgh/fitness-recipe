@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models/meal.dart';
+
 import 'package:voltican_fitness/providers/user_provider.dart';
 
 import 'package:voltican_fitness/screens/notify_screen.dart';
-import 'package:voltican_fitness/screens/trainer_meal_details.dart';
+
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/widgets/category_slider.dart';
 import 'package:voltican_fitness/widgets/new_recipe_slider.dart';
@@ -79,17 +79,17 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
 
     void handleRecipSelected(String category) {
       // Handle category selection
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const TrainerMealDetailScreen(
-                    meal: Meal(
-                        id: 'm2',
-                        imageUrl:
-                            "https://cdn.pixabay.com/photo/2017/03/27/13/54/bread-2178874_640.jpg",
-                        ingredients: ["potatos", "fries"],
-                        title: "Sandwich and Fries"),
-                  )));
+      // Navigator.push(
+      //     context,
+      //     MaterialPageRoute(
+      //         builder: (context) => const TrainerMealDetailScreen(
+      //               meal: Meal(
+      //                   id: 'm2',
+      //                   imageUrl:
+      //                       "https://cdn.pixabay.com/photo/2017/03/27/13/54/bread-2178874_640.jpg",
+      //                   ingredients: ["potatos", "fries"],
+      //                   title: "Sandwich and Fries"),
+      //             )));
     }
 
     void handleTrainerSelected(String trainer) {
