@@ -3,7 +3,7 @@ import 'package:voltican_fitness/data/dummy_data.dart';
 import 'package:voltican_fitness/models/meal.dart';
 import 'package:voltican_fitness/screens/meal_detail_screen.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
-import 'package:voltican_fitness/widgets/meal_item.dart';
+import 'package:voltican_fitness/widgets/recipe_item.dart';
 import 'package:voltican_fitness/widgets/recipe_item_trainer.dart';
 
 class TraineeRecipeScreen extends StatefulWidget {
@@ -45,7 +45,7 @@ class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
     return ListView.builder(
       shrinkWrap: true,
       itemCount: dummyMeals.length,
-      itemBuilder: (context, index) => MealItem(
+      itemBuilder: (context, index) => RecipeItem(
         meal: dummyMeals[index],
         selectMeal: (meal) {
           selectMeal(context, meal);

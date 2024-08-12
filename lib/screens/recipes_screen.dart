@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/commons/constants/loading_spinner.dart';
 import 'package:voltican_fitness/data/dummy_data.dart';
 import 'package:voltican_fitness/models/meal.dart';
+import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/screens/create_recipe.screen.dart';
 import 'package:voltican_fitness/screens/meal_detail_screen.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
-import 'package:voltican_fitness/widgets/meal_item.dart';
+import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/widgets/recipe_item.dart';
 import 'package:voltican_fitness/widgets/recipe_item_trainer.dart';
 
 class MealPlanScreen extends StatefulWidget {
@@ -17,11 +20,19 @@ class MealPlanScreen extends StatefulWidget {
 class _MealPlanScreenState extends State<MealPlanScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  List<Recipe>? userRecipes;
+  final RecipeService recipeService = RecipeService();
 
   @override
   void initState() {
     super.initState();
+    fetchAllRecipes();
     _tabController = TabController(length: 3, vsync: this);
+  }
+
+  fetchAllRecipes() async {
+    userRecipes = await recipeService.fetchAllRecipes(context);
+    setState(() {});
   }
 
   @override
@@ -42,11 +53,12 @@ class _MealPlanScreenState extends State<MealPlanScreen>
     ));
   }
 
+// My recipes builder goes here
   Widget buildMealList() {
     return ListView.builder(
       shrinkWrap: true,
       itemCount: dummyMeals.length,
-      itemBuilder: (context, index) => MealItem(
+      itemBuilder: (context, index) => RecipeItem(
         meal: dummyMeals[index],
         selectMeal: (meal) {
           selectMeal(context, meal);
@@ -144,7 +156,7 @@ class _MealPlanScreenState extends State<MealPlanScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                buildTabContent(),
+                userRecipes == null ? const Loader() : buildTabContent(),
                 buildRecipeTabContent(),
                 buildRecipeTabContent(),
               ],

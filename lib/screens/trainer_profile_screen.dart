@@ -4,7 +4,7 @@ import 'package:voltican_fitness/data/dummy_data.dart';
 import 'package:voltican_fitness/models/meal.dart';
 
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
-import 'package:voltican_fitness/widgets/meal_item.dart';
+import 'package:voltican_fitness/widgets/recipe_item.dart';
 
 class TrainerProfileScreen extends StatelessWidget {
   TrainerProfileScreen({super.key});
@@ -62,7 +62,7 @@ class TrainerProfileScreen extends StatelessWidget {
             child: ListView.builder(
               padding: const EdgeInsets.all(8.0),
               itemCount: dummyMeals.length,
-              itemBuilder: (context, index) => MealItem(
+              itemBuilder: (context, index) => RecipeItem(
                 meal: dummyMeals[index],
                 selectMeal: (meal) {
                   selectMeal(context, meal);

@@ -37,6 +37,13 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
       'Dinner',
       'Others',
     ];
+    final categoryimages = [
+      "assets/images/recipes/r6.jpg",
+      "assets/images/recipes/r1.jpg",
+      "assets/images/recipes/r4.jpg",
+      "assets/images/recipes/r5.jpg",
+      "assets/images/recipes/r2.jpg",
+    ];
     final recipes = [
       'Breakfast',
       'Deserts',
@@ -124,7 +131,7 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Hello, ${user!.fullName}',
+                                  'Hello, ${user?.fullName}',
                                   style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
@@ -217,6 +224,7 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
 
             // Categories
             CategorySlider(
+              images: categoryimages,
               categories: categories,
               onCategorySelected: handleCategorySelected,
             ),

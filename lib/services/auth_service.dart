@@ -16,7 +16,7 @@ import 'package:voltican_fitness/utils/show_snackbar.dart';
 class AuthService {
   final DioClient client = DioClient();
 
-  void signup({
+  Future<void> signup({
     required BuildContext context,
     required String fullName,
     required String username,
@@ -29,7 +29,6 @@ class AuthService {
         email: email,
         username: username,
         role: '0',
-        token: '',
         password: password,
         imageUrl: "",
         savedRecipes: [],

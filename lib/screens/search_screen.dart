@@ -3,7 +3,8 @@ import 'package:voltican_fitness/models/meal.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 
 class SearchScreen extends StatelessWidget {
-  SearchScreen({super.key});
+  final String category;
+  SearchScreen({super.key, required this.category});
   final List<Map<String, String>> recipes = [
     {
       'name': 'Spaghetti Carbonara',
@@ -37,7 +38,7 @@ class SearchScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('BreakFast'),
+        title: Text(category),
         centerTitle: true,
       ),
       body: SafeArea(

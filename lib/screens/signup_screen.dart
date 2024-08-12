@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
+import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 import 'package:voltican_fitness/widgets/or_divider.dart';
 import 'package:voltican_fitness/screens/login_screen.dart';
@@ -37,23 +38,28 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  void signup() {
+  void signup() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
 
-      authService.signup(
-        context: context,
-        fullName: _fullNameController.text.trim(),
-        username: _usernameController.text.trim(),
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-
-      setState(() {
-        _isLoading = false;
-      });
+      try {
+        await authService.signup(
+          context: context,
+          fullName: _fullNameController.text.trim(),
+          username: _usernameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+      } catch (e) {
+        // Handle signup error here (e.g., show a snackbar)
+        showSnack(context, 'Signup failed: $e');
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 

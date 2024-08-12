@@ -3,11 +3,13 @@ import 'package:voltican_fitness/screens/search_screen.dart';
 
 class CategorySlider extends StatelessWidget {
   final List<String> categories;
+  final List<String> images;
   final Function(String) onCategorySelected;
 
   const CategorySlider({
     super.key,
     required this.categories,
+    required this.images,
     required this.onCategorySelected,
   });
 
@@ -20,16 +22,17 @@ class CategorySlider extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
         itemBuilder: (context, index) {
-          return _buildCategoryItem(context, categories[index]);
+          return _buildCategoryItem(context, categories[index], images[index]);
         },
       ),
     );
   }
 
-  Widget _buildCategoryItem(BuildContext context, String category) {
+  Widget _buildCategoryItem(
+      BuildContext context, String category, String image) {
     return GestureDetector(
-      onTap: () => Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => SearchScreen())),
+      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => SearchScreen(category: category))),
       child: Container(
         width: 150, // Adjust width as needed
         margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -39,8 +42,8 @@ class CategorySlider extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(40),
-                image: const DecorationImage(
-                  image: AssetImage("assets/recipe.jpg"),
+                image: DecorationImage(
+                  image: AssetImage(image),
                   fit: BoxFit.cover,
                 ),
               ),

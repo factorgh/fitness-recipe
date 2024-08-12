@@ -8,7 +8,7 @@ class User {
   final String role;
   final String imageUrl;
   final String password;
-  final String token;
+
   final List<String> savedRecipes;
   final List<String> mealPlans;
   final List<String> following;
@@ -22,7 +22,6 @@ class User {
     required this.username,
     required this.role,
     required this.imageUrl,
-    required this.token,
     required this.password,
     required this.savedRecipes,
     required this.mealPlans,
@@ -33,18 +32,18 @@ class User {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'id': id,
+      '_id': id,
       'fullName': fullName,
       'email': email,
       'username': username,
+      'imageUrl': imageUrl,
       'role': role,
-      'token': token,
       'password': password,
       'savedRecipes': savedRecipes,
       'mealPlans': mealPlans,
       'following': following,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
     };
   }
 
@@ -66,13 +65,12 @@ class User {
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'])
           : DateTime.now(),
-      token: json['token'] as String? ?? '',
     );
   }
 
   @override
   String toString() {
-    return 'User{id: $id, fullName: $fullName, email: $email, username: $username, role: $role, imageUrl: $imageUrl, token: $token, savedRecipes: $savedRecipes, mealPlans: $mealPlans, following: $following, createdAt: $createdAt, updatedAt: $updatedAt}';
+    return 'User{id: $id, fullName: $fullName, email: $email, username: $username, role: $role, imageUrl: $imageUrl,  savedRecipes: $savedRecipes, mealPlans: $mealPlans, following: $following, createdAt: $createdAt, updatedAt: $updatedAt}';
   }
 
   String toJson() => json.encode(toMap());

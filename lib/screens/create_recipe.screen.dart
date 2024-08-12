@@ -1,18 +1,34 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:voltican_fitness/models/user.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
+import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/widgets/custom_button.dart';
 
-class CreateRecipeScreen extends StatefulWidget {
+class CreateRecipeScreen extends ConsumerStatefulWidget {
   const CreateRecipeScreen({super.key});
 
   @override
-  State<CreateRecipeScreen> createState() => _CreateRecipeScreenState();
+  _CreateRecipeScreenState createState() => _CreateRecipeScreenState();
 }
 
-class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
+class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
+  final RecipeService recipeService = RecipeService();
+
+  bool _isLoading = false;
   File? _selectedImage;
+
+  String? selectedMealPeriod;
+
+  final List<String> mealPeriods = [
+    'Breakfast',
+    'Lunch',
+    'Snack',
+    'Dinner',
+  ];
 
   final TextEditingController _mealNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -43,41 +59,55 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
     super.dispose();
   }
 
+  void _createRecipe(User user) {
+    if (_selectedImage == null ||
+        _mealNameController.text.isEmpty ||
+        _descriptionController.text.isEmpty ||
+        _ingredientsController.text.isEmpty ||
+        _instructionsController.text.isEmpty ||
+        _nutritionalFactsController.text.isEmpty ||
+        selectedMealPeriod == null) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Please fill in all required fields.'),
+            actions: [
+              TextButton(
+                onPressed: () {},
+                child: const Text('Ok'),
+              )
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+    recipeService.createRecipe(
+      context: context,
+      title: _mealNameController.text,
+      description: _descriptionController.text,
+      ingredients: _ingredientsController.text.split(","),
+      instructions: _instructionsController.text,
+      facts: _nutritionalFactsController.text,
+      imageUrl: _selectedImage!,
+
+      period: selectedMealPeriod!,
+      createdBy: user, // Access the user ID here
+    );
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    Widget content = Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.add_photo_alternate_outlined,
-            size: 40,
-            color: Colors.grey[600],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Upload Image',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (_selectedImage != null) {
-      content = ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Image.file(
-          _selectedImage!,
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: 200,
-        ),
-      );
-    }
+    final user = ref.watch(userProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -108,7 +138,37 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                   border: Border.all(color: Colors.black38),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: content,
+                child: _selectedImage == null
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.add_photo_alternate_outlined,
+                              size: 40,
+                              color: Colors.grey[600],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Upload Image',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.file(
+                          _selectedImage!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: 200,
+                        ),
+                      ),
               ),
             ),
             const SizedBox(height: 20),
@@ -147,21 +207,52 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               hintText: 'Add the right nutritional facts',
             ),
             const SizedBox(height: 20),
+            const Text(
+              'Choose a recipe period:',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 10),
+            DropdownButton<String>(
+              value: selectedMealPeriod,
+              hint: const Text('Select a meal period'),
+              isExpanded: true,
+              items: mealPeriods.map((String period) {
+                return DropdownMenuItem<String>(
+                  value: period,
+                  child: Text(period),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedMealPeriod = newValue;
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            if (selectedMealPeriod != null)
+              Text(
+                'Selected recipe period: $selectedMealPeriod',
+                style: const TextStyle(fontSize: 16),
+              ),
+            const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CustomButton(
-                    size: 10,
-                    width: 150,
-                    backColor: Colors.red,
-                    text: 'Save and Complete',
-                    textColor: Colors.white,
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
+                  _isLoading
+                      ? const CircularProgressIndicator()
+                      : CustomButton(
+                          size: 10,
+                          width: 150,
+                          backColor: Colors.red,
+                          text: 'Save and Complete',
+                          textColor: Colors.white,
+                          onPressed: () {
+                            _createRecipe(user!);
+                            Navigator.of(context).pop();
+                          },
+                        ),
                   CustomButton(
                     size: 10,
                     width: 150,
@@ -169,6 +260,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                     text: 'Save and Assign',
                     textColor: Colors.white,
                     onPressed: () {
+                      _createRecipe(user!);
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => const AssignRecipeScreen(),
@@ -224,22 +316,21 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
     required String hintText,
   }) {
     return Container(
-      height: 120,
+      height: 150,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.black38),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: TextField(
+        child: TextFormField(
           controller: controller,
-          keyboardType: TextInputType.multiline,
-          minLines: 1,
-          maxLines: 4,
+          maxLines: null,
+          expands: true,
+          textAlignVertical: TextAlignVertical.top,
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: hintText,
-            contentPadding: const EdgeInsets.symmetric(vertical: 15),
           ),
         ),
       ),
