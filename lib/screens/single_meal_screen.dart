@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
 import 'package:voltican_fitness/widgets/week_range_selector.dart';
 
 class SingleMealPlanDetailScreen extends StatelessWidget {
-  final String mealPlanName = 'Example Meal Plan Name';
+  final String mealPlanName = 'Avocados pear';
   final String duration = 'Week';
   final List<String> selectedDays = ['Monday', 'Wednesday', 'Friday'];
   final Map<String, List<Map<String, dynamic>>> selectedMeals = {
@@ -18,6 +19,13 @@ class SingleMealPlanDetailScreen extends StatelessWidget {
       {'name': 'Pasta', 'time': '7:00 PM'},
     ],
   };
+
+  final categoryimages = [
+    "assets/images/recipes/r6.jpg",
+    "assets/images/recipes/r1.jpg",
+    "assets/images/recipes/r4.jpg",
+    "assets/images/recipes/r5.jpg",
+  ];
 
   SingleMealPlanDetailScreen({super.key});
 
@@ -143,8 +151,7 @@ class SingleMealPlanDetailScreen extends StatelessWidget {
                         const SizedBox(height: 30),
                         ElevatedButton(
                           onPressed: () {
-                            // Handle update logic here
-                            Navigator.pop(context); // Close the bottom sheet
+                            Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
@@ -187,23 +194,33 @@ class SingleMealPlanDetailScreen extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            Text(
-              mealPlanName,
-              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  mealPlanName,
+                  style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                ),
+              ),
             ),
             const SizedBox(height: 20),
             const Text(
-              "Select a Duration",
+              "Duration Selected",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            Text(
-              duration,
-              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  duration,
+                  style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                ),
+              ),
             ),
             const SizedBox(height: 20),
             const Text(
-              "Determine Days for Meal",
+              "Days for Meal",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
@@ -211,18 +228,21 @@ class SingleMealPlanDetailScreen extends StatelessWidget {
               spacing: 8.0,
               runSpacing: 4.0,
               children: selectedDays.map((day) {
-                return Chip(
-                  backgroundColor: Colors.blueAccent,
-                  label: Text(
-                    day,
-                    style: const TextStyle(color: Colors.white),
+                return Card(
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      day,
+                      style: const TextStyle(color: Colors.black45),
+                    ),
                   ),
                 );
               }).toList(),
             ),
             const SizedBox(height: 20),
             const Text(
-              "Select Meal Periods",
+              "Selected Meal Periods",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
@@ -245,15 +265,10 @@ class SingleMealPlanDetailScreen extends StatelessWidget {
                       spacing: 8.0,
                       runSpacing: 4.0,
                       children: entry.value.map((meal) {
-                        return Chip(
-                          backgroundColor: Colors.blueAccent,
-                          label: Text(
-                            '${meal['name']} - ${meal['time']}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
+                        return MealPeriodCard(
+                          mealPeriod: '${meal['name']} ',
+                          time: ' ${meal['time']}',
+                          images: categoryimages,
                         );
                       }).toList(),
                     ),

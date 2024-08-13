@@ -89,9 +89,9 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
   Widget buildMealList() {
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: userRecipes!.length,
+      itemCount: myRecipes!.length,
       itemBuilder: (context, index) => RecipeItem(
-        meal: userRecipes![index],
+        meal: myRecipes![index],
         selectMeal: (meal) {
           selectMeal(context, meal);
         },
@@ -204,9 +204,9 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                userRecipes == null ? const Loader() : buildTabContent(),
+                myRecipes == null ? const Loader() : buildTabContent(),
                 buildSavedRecipeTabContent(savedRecipes),
-                buildRecipeTabContent(),
+                userRecipes == null ? const Loader() : buildRecipeTabContent(),
               ],
             ),
           ),
