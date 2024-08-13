@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/Features/notification/services/notification_service.dart';
 
 import 'package:voltican_fitness/screens/calendar_screen.dart';
 import 'package:voltican_fitness/screens/recipes_screen.dart';
@@ -103,6 +104,8 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // schedule background notification task here
+    NotificationService().scheduleBackgroundTask(widget.userRole);
     return Scaffold(
       body: IndexedStack(
         index: _activePageIndex,

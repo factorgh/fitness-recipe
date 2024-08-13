@@ -1,12 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/Features/notification/services/notification_service.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/onboarding_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
+import 'package:timezone/data/latest.dart' as tz;
+
+import 'package:workmanager/workmanager.dart';
+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    await NotificationService().scheduleDailyMealReminders(0);
+    return Future.value(true);
+  });
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+// Get user timezone
+// Initialize WorkManager
+  Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
+
+  // Initialize Timezone and Notifications
+  tz.initializeTimeZones();
+  NotificationService().init();
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {

@@ -1,26 +1,29 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/models/mealplan.dart';
+import 'package:voltican_fitness/providers/meal_plan_provider.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
+
+import 'package:voltican_fitness/utils/show_snackbar.dart';
+
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
 import 'package:voltican_fitness/widgets/week_range_selector.dart';
 
-class MealCreationScreen extends StatefulWidget {
+class MealCreationScreen extends ConsumerStatefulWidget {
   const MealCreationScreen({super.key});
 
   @override
   _MealCreationScreenState createState() => _MealCreationScreenState();
 }
 
-class _MealCreationScreenState extends State<MealCreationScreen> {
+class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   final _formKey = GlobalKey<FormState>();
   String _selectedDuration = 'Does Not Repeat';
   DateTime? _startDate;
   DateTime? _endDate;
-  final List<String> _allTrainees = [
-    'John Doe',
-    'Jane Smith',
-    'Alice Johnson',
-    'Bob Brown'
-  ];
+  final List<String> _allTrainees = []; // Will be populated with real data
   List<String> _searchResults = [];
   final List<String> _selectedTrainees = [];
   final TextEditingController _searchController = TextEditingController();
@@ -118,13 +121,33 @@ class _MealCreationScreenState extends State<MealCreationScreen> {
     });
   }
 
-  void _completeSchedule() {
+  Future<void> _completeSchedule() async {
+    final user = ref.read(userProvider);
     if (_formKey.currentState!.validate()) {
-      // Form is valid, proceed with the creation
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => const AllMealPlan()));
+      final mealPlan = MealPlan(
+        name: _mealPlanNameController.text,
+        duration: _selectedDuration,
+        startDate: _selectedDuration == 'Custom' ? _startDate : null,
+        endDate: _selectedDuration == 'Custom' ? _endDate : null,
+        days: [], // Populate with selected days
+        periods: [], // Populate with selected periods
+        recipes: [], // Populate with selected recipes
+        trainees: _selectedTrainees
+            .map((trainee) => trainee)
+            .toList(), // Map trainee names to IDs as needed
+        createdBy: user!.id, // Replace with actual user ID
+      );
+
+      try {
+        await ref.read(mealPlanProvider.notifier).createMealPlan(mealPlan);
+        showSnack(context, 'Meal plan created successfully');
+      } catch (e) {
+        // Handle error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create meal plan: $e')),
+        );
+      }
     } else {
-      // Form is not valid, show errors
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all required fields')),
       );
@@ -340,6 +363,8 @@ class _MealCreationScreenState extends State<MealCreationScreen> {
               ElevatedButton(
                 onPressed: _completeSchedule,
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 60),
                 ),
                 child: const Text(
@@ -347,6 +372,7 @@ class _MealCreationScreenState extends State<MealCreationScreen> {
                   style: TextStyle(fontSize: 20),
                 ),
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
