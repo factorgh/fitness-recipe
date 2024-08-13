@@ -33,35 +33,26 @@ class _MealPeriodSelectorState extends State<MealPeriodSelector> {
   }
 
   void _onRecipeTap(String recipe) async {
-    TimeOfDay? selectedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-
-    if (selectedTime != null) {
-      setState(() {
-        _selectedRecipe = recipe;
-        if (_selectedMealPeriod != null) {
-          if (!_selectedMeals.containsKey(_selectedMealPeriod!)) {
-            _selectedMeals[_selectedMealPeriod!] = [];
-          }
-          if (_selectedMealPeriod == 'Snack') {
-            _selectedMeals[_selectedMealPeriod!]!.add({
-              'recipe': recipe,
-              'time': selectedTime.format(context),
-            });
-          } else {
-            _selectedMeals[_selectedMealPeriod!] = [
-              {
-                'recipe': recipe,
-                'time': selectedTime.format(context),
-              }
-            ];
-          }
+    setState(() {
+      _selectedRecipe = recipe;
+      if (_selectedMealPeriod != null) {
+        if (!_selectedMeals.containsKey(_selectedMealPeriod!)) {
+          _selectedMeals[_selectedMealPeriod!] = [];
         }
-        widget.onSelectionChanged(_selectedMeals);
-      });
-    }
+        if (_selectedMealPeriod == 'Snack') {
+          _selectedMeals[_selectedMealPeriod!]!.add({
+            'recipe': recipe,
+          });
+        } else {
+          _selectedMeals[_selectedMealPeriod!] = [
+            {
+              'recipe': recipe,
+            }
+          ];
+        }
+      }
+      widget.onSelectionChanged(_selectedMeals);
+    });
   }
 
   void _removeRecipe(String mealPeriod, String recipe) {
@@ -185,7 +176,7 @@ class _MealPeriodSelectorState extends State<MealPeriodSelector> {
               spacing: 8,
               children: meals.map((meal) {
                 return Chip(
-                  label: Text('${meal['recipe']} (${meal['time']})'),
+                  label: Text('${meal['recipe']} '),
                   backgroundColor: Colors.blue.withOpacity(0.2),
                   deleteIcon: const Icon(Icons.cancel),
                   onDeleted: () => _removeRecipe(mealPeriod, meal['recipe']),

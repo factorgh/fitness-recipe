@@ -288,10 +288,11 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                   ],
                 ),
               const SizedBox(height: 20),
-              const Text(
-                "Determine Days for Meal",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              if (_selectedDuration == 'Custom')
+                const Text(
+                  "Determine Days for Meal",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               const SizedBox(height: 10),
               WeekRangeSelector(
                 onSelectionChanged: _onSelectionChanged,
