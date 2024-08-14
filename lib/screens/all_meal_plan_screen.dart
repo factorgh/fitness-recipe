@@ -84,12 +84,13 @@ class _AllMealPlanState extends ConsumerState<AllMealPlan> {
             onChanged: (value) {
               setState(() {
                 _selectedDuration = value!;
+                ref
+                    .read(mealPlansProvider.notifier)
+                    .filterByDuration(_selectedDuration);
               });
             },
           ),
-          const SizedBox(
-            width: 10,
-          ),
+          const SizedBox(width: 10),
         ],
       ),
       body: Padding(

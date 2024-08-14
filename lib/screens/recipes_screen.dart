@@ -164,10 +164,10 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
     return ListView.builder(
       shrinkWrap: true,
       itemCount: userRecipes.length,
-      itemBuilder: (context, index) => RecipeItemTrainer(
+      itemBuilder: (context, index) => RecipeItem(
         meal: userRecipes[index],
         selectMeal: (meal) {
-          selectRecipe(context, meal);
+          selectMeal(context, meal);
         },
       ),
     );
@@ -198,10 +198,10 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
     return ListView.builder(
       shrinkWrap: true,
       itemCount: allRecipes.length,
-      itemBuilder: (context, index) => RecipeItem(
+      itemBuilder: (context, index) => RecipeItemTrainer(
         meal: allRecipes[index],
         selectMeal: (meal) {
-          selectMeal(context, meal);
+          selectRecipe(context, meal);
         },
       ),
     );
