@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/Features/mealplan/services/mealplan_service.dart';
 
 import 'package:voltican_fitness/models/mealplan.dart';
+import 'package:voltican_fitness/providers/meal_plan_state.dart';
 
 // Provider for MealPlanService
 final mealPlanServiceProvider = Provider<MealPlanService>((ref) {
@@ -64,34 +65,44 @@ class MealPlanNotifier extends StateNotifier<MealPlan?> {
   }
 }
 
-// State provider for the list of meal plans
+//import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final mealPlanServicProvider = Provider<MealPlanService>((ref) {
+  return MealPlanService();
+});
+
 final mealPlansProvider =
-    StateNotifierProvider<MealPlansNotifier, List<MealPlan>>((ref) {
+    StateNotifierProvider<MealPlansNotifier, MealPlansState>((ref) {
   final mealPlanService = ref.watch(mealPlanServiceProvider);
   return MealPlansNotifier(mealPlanService);
 });
 
-// State notifier for managing a list of meal plans
-class MealPlansNotifier extends StateNotifier<List<MealPlan>> {
+class MealPlansNotifier extends StateNotifier<MealPlansState> {
   final MealPlanService _mealPlanService;
 
-  MealPlansNotifier(this._mealPlanService) : super([]);
+  MealPlansNotifier(this._mealPlanService) : super(const MealPlansLoading());
 
   Future<void> fetchAllMealPlans() async {
+    state = const MealPlansLoading();
     try {
-      state = await _mealPlanService.fetchAllMealPlans();
+      final mealPlans = await _mealPlanService.fetchAllMealPlans();
+      state = MealPlansLoaded(mealPlans);
     } catch (e) {
-      // Handle error
-      print('Failed to fetch meal plans: $e');
+      state = MealPlansError('Failed to fetch meal plans: $e');
     }
   }
 
   Future<void> addMealPlan(MealPlan mealPlan) async {
     try {
       final newMealPlan = await _mealPlanService.createMealPlan(mealPlan);
-      state = [...state, newMealPlan]; // Add new meal plan to the list
+      if (state is MealPlansLoaded) {
+        final updatedMealPlans = [
+          ...(state as MealPlansLoaded).mealPlans,
+          newMealPlan
+        ];
+        state = MealPlansLoaded(updatedMealPlans);
+      }
     } catch (e) {
-      // Handle error
       print('Failed to add meal plan: $e');
     }
   }
@@ -100,22 +111,29 @@ class MealPlansNotifier extends StateNotifier<List<MealPlan>> {
     try {
       final updatedMealPlan =
           await _mealPlanService.updateMealPlan(id, mealPlan);
-      state = state
-          .map((plan) => plan.id == id ? updatedMealPlan : plan)
-          .toList(); // Update meal plan in the list
+      if (state is MealPlansLoaded) {
+        final updatedMealPlans = (state as MealPlansLoaded)
+            .mealPlans
+            .map((plan) => plan.id == id ? updatedMealPlan : plan)
+            .toList();
+        state = MealPlansLoaded(updatedMealPlans);
+      }
     } catch (e) {
-      // Handle error
+      print('Failed to update meal plan: $e');
     }
   }
 
   Future<void> deleteMealPlan(String id) async {
     try {
       await _mealPlanService.deleteMealPlan(id);
-      state = state
-          .where((plan) => plan.id != id)
-          .toList(); // Remove meal plan from the list
+      if (state is MealPlansLoaded) {
+        final updatedMealPlans = (state as MealPlansLoaded)
+            .mealPlans
+            .where((plan) => plan.id != id)
+            .toList();
+        state = MealPlansLoaded(updatedMealPlans);
+      }
     } catch (e) {
-      // Handle error
       print('Failed to delete meal plan: $e');
     }
   }

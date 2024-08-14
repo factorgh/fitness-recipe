@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
 
@@ -200,7 +201,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,
-                      color: Colors.black45),
+                      color: Colors.black),
                 ),
                 const Spacer(),
                 OutlinedButton(
@@ -252,7 +253,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        "29 July, 2024",
+                        "Today plans",
                         style: TextStyle(fontSize: 20, color: Colors.black54),
                       ),
                       GestureDetector(

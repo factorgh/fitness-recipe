@@ -6,10 +6,12 @@ class MealPlan {
   final String duration;
   final DateTime? startDate;
   final DateTime? endDate;
-  final List<String>? days;
-  final List<String>? periods;
-  final List<String> recipes; // Assuming these are the recipe IDs
-  final List<String> trainees; // Assuming these are the user IDs
+  final List<String>
+      days; // Changed from List<String>? to List<String> with default empty list
+  final List<String>
+      periods; // Changed from List<String>? to List<String> with default empty list
+  final List<String> recipes; // Assumes these are the recipe IDs
+  final List<String> trainees; // Assumes these are the user IDs
   final String createdBy;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -20,32 +22,37 @@ class MealPlan {
     required this.duration,
     this.startDate,
     this.endDate,
-    this.days,
-    this.periods,
+    List<String>? days,
+    List<String>? periods,
     required this.recipes,
     required this.trainees,
     required this.createdBy,
     this.createdAt,
     this.updatedAt,
-  });
+  })  : days = days ?? [], // Default to empty list if null
+        periods = periods ?? []; // Default to empty list if null
 
   // Factory constructor to create a MealPlan object from a JSON map
   factory MealPlan.fromJson(Map<String, dynamic> json) {
     return MealPlan(
-      id: json['_id'],
-      name: json['name'],
-      duration: json['duration'],
+      id: json['_id'] as String?,
+      name: json['name'] as String? ?? '',
+      duration: json['duration'] as String? ?? '',
       startDate:
           json['startDate'] != null ? DateTime.parse(json['startDate']) : null,
       endDate: json['endDate'] != null ? DateTime.parse(json['endDate']) : null,
-      days: json['days'] != null ? List<String>.from(json['days']) : null,
+      days: json['days'] != null ? List<String>.from(json['days']) : [],
       periods:
-          json['periods'] != null ? List<String>.from(json['periods']) : null,
-      recipes: List<String>.from(json['recipes']),
-      trainees: List<String>.from(json['trainees']),
-      createdBy: json['createdBy'],
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+          json['periods'] != null ? List<String>.from(json['periods']) : [],
+      recipes:
+          json['recipes'] != null ? List<String>.from(json['recipes']) : [],
+      trainees:
+          json['trainees'] != null ? List<String>.from(json['trainees']) : [],
+      createdBy: json['createdBy'] as String? ?? '',
+      createdAt:
+          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+      updatedAt:
+          json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
     );
   }
 

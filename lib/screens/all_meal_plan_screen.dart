@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
+import 'package:voltican_fitness/providers/meal_plan_state.dart';
 import 'package:voltican_fitness/widgets/calendar_item.dart';
 
 class AllMealPlan extends ConsumerStatefulWidget {
@@ -13,15 +14,11 @@ class AllMealPlan extends ConsumerStatefulWidget {
 
 class _AllMealPlanState extends ConsumerState<AllMealPlan> {
   DateTime? _selectedDate;
-  bool _isLoading = false;
-  String? _errorMessage;
-
   String _selectedDuration = 'Does Not Repeat';
 
   @override
   void initState() {
     super.initState();
-
     Future.microtask(() {
       ref.read(mealPlansProvider.notifier).fetchAllMealPlans();
     });
@@ -43,7 +40,8 @@ class _AllMealPlanState extends ConsumerState<AllMealPlan> {
 
   @override
   Widget build(BuildContext context) {
-    final mealPlans = ref.watch(mealPlansProvider);
+    final mealPlansState = ref.watch(mealPlansProvider);
+
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100.0,
@@ -96,24 +94,26 @@ class _AllMealPlanState extends ConsumerState<AllMealPlan> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-        child: _isLoading
+        child: mealPlansState is MealPlansLoading
             ? const Center(child: CircularProgressIndicator())
-            : _errorMessage != null
-                ? Center(child: Text(_errorMessage!))
-                : mealPlans.isEmpty
-                    ? const Center(child: Text('No meal plans available.'))
-                    : ListView.builder(
-                        itemCount: mealPlans.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12.0),
-                            child: CalendarItem(
-                              titleIcon: Icons.restaurant_menu,
-                              mealPlan: mealPlans[index],
-                            ),
-                          );
-                        },
-                      ),
+            : mealPlansState is MealPlansError
+                ? Center(child: Text((mealPlansState).error))
+                : mealPlansState is MealPlansLoaded
+                    ? mealPlansState.mealPlans.isEmpty
+                        ? const Center(child: Text('No meal plans available.'))
+                        : ListView.builder(
+                            itemCount: (mealPlansState).mealPlans.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12.0),
+                                child: CalendarItem(
+                                  titleIcon: Icons.restaurant_menu,
+                                  mealPlan: (mealPlansState).mealPlans[index],
+                                ),
+                              );
+                            },
+                          )
+                    : const Center(child: Text('Unexpected state')),
       ),
     );
   }
