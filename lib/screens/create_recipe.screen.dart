@@ -103,7 +103,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
         period: selectedMealPeriod!,
         createdBy: user,
       );
-
+      setState(() {});
       // Optionally handle success (e.g., show a success message)
     } catch (e) {
       // Handle any errors (e.g., show an error message)

@@ -52,6 +52,7 @@ class MealPlanService {
   Future<List<MealPlan>> fetchAllMealPlans() async {
     try {
       final response = await client.dio.get('/meal-plans');
+      print(response.data);
       final List<dynamic> data = response.data;
       return data.map((json) => MealPlan.fromJson(json)).toList();
     } catch (e) {

@@ -24,14 +24,25 @@ class RecipeService {
     required User createdBy,
     required String period,
   }) async {
+    if (title.isEmpty ||
+        description.isEmpty ||
+        ingredients.isEmpty ||
+        instructions.isEmpty ||
+        facts.isEmpty ||
+        imageUrl.path.isEmpty) {
+      showSnack(
+          context, 'Please fill all required fields and upload an image.');
+      return;
+    }
+
     try {
-      // Get cloudinary instance
+      // Get Cloudinary instance
       final cloudinary = CloudinaryPublic('daq5dsnqy', 'jqx9kpde');
-      // Upload image to cloudinary
+      // Upload image to Cloudinary
       CloudinaryResponse uploadResult = await cloudinary.uploadFile(
           CloudinaryFile.fromFile(imageUrl.path, folder: 'voltican_fitness'));
       final image = uploadResult.secureUrl;
-      print(image);
+      print('Image URL: $image');
 
       // Create new recipe object
       final recipe = Recipe(
@@ -47,20 +58,20 @@ class RecipeService {
           createdAt: DateTime.now(),
           updatedAt: DateTime.now());
 
-      print(recipe);
-      // Save recipe to db
+      print('Recipe: $recipe');
+      // Save recipe to DB
       final res = await client.dio.post('/recipes', data: recipe.toJson());
 
       httpErrorHandle(
           response: res,
           context: context,
           onSuccess: () {
-            showSnack(context, 'Recipe create Successfully!');
+            showSnack(context, 'Recipe created successfully!');
             Navigator.pop(context);
           });
     } catch (e) {
-      print(e.toString());
-      showSnack(context, 'Error adding product: ${e.toString()}');
+      print('Error: ${e.toString()}');
+      showSnack(context, 'Error adding recipe: ${e.toString()}');
     }
   }
 
@@ -68,19 +79,21 @@ class RecipeService {
     List<Recipe> recipeList = [];
     try {
       final res = await client.dio.get('/recipes');
-      print(res.data);
+      print('Response Data: ${res.data}');
+
+      // Handle the HTTP response
       httpErrorHandle(
         response: res,
         context: context,
         onSuccess: () {
           final List<dynamic> data = res.data;
-          for (var item in data) {
-            recipeList.add(Recipe.fromJson(item as Map<String, dynamic>));
-          }
+          recipeList = data
+              .map((item) => Recipe.fromJson(item as Map<String, dynamic>))
+              .toList();
         },
       );
     } catch (e) {
-      showSnack(context, e.toString());
+      showSnack(context, 'Error fetching recipes: ${e.toString()}');
     }
     return recipeList;
   }
@@ -107,7 +120,7 @@ class RecipeService {
 
   Future<List<Recipe>> fetchSavedRecipes(String userId) async {
     try {
-      final response = await client.dio.get('saved-recipes/$userId');
+      final response = await client.dio.get('/recipes/saved-recipes/$userId');
 
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;

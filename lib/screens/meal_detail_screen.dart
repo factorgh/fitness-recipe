@@ -5,7 +5,7 @@ import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/providers/recipe_provider.dart';
+import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
 import 'package:voltican_fitness/widgets/button.dart';
