@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
 
-class AllTrainersScreen extends StatelessWidget {
+class AllTrainersScreen extends ConsumerWidget {
   const AllTrainersScreen({super.key});
   Future<void> showDeleteConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
@@ -45,7 +48,8 @@ class AllTrainersScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider);
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
@@ -82,7 +86,9 @@ class AllTrainersScreen extends StatelessWidget {
             GestureDetector(
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => TrainerProfileScreen()));
+                    builder: (context) => TrainerProfileScreen(
+                          user: user!,
+                        )));
               },
               child: Card(
                 margin:
@@ -112,7 +118,9 @@ class AllTrainersScreen extends StatelessWidget {
             GestureDetector(
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => TrainerProfileScreen()));
+                    builder: (context) => TrainerProfileScreen(
+                          user: user!,
+                        )));
               },
               child: Card(
                 margin:

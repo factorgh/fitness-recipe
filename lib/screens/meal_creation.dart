@@ -2,12 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
+import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
-
+import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
-
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
 import 'package:voltican_fitness/widgets/week_range_selector.dart';
 
@@ -23,18 +25,35 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   String _selectedDuration = 'Does Not Repeat';
   DateTime? _startDate;
   DateTime? _endDate;
-  final List<String> _allTrainees = []; // Will be populated with real data
-  List<String> _searchResults = [];
-  final List<String> _selectedTrainees = [];
+  List<User> _allTrainees = [];
+  List<User> _searchResults = [];
+  final List<User> _selectedTrainees = [];
+  bool _isLoading = false;
+
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _mealPlanNameController = TextEditingController();
 
   Map<String, List<Map<String, dynamic>>> selectedMeals = {};
+  List<Recipe> myRecipes = [];
 
-  void handleMealSelectionChange(
-      Map<String, List<Map<String, dynamic>>> newSelectedMeals) {
+  final RecipeService recipeService = RecipeService();
+  final TrainerService trainerService = TrainerService();
+
+  // This will store the selected recipe IDs flattened into a list of strings
+  List<String> _selectedRecipeIds = [];
+
+  // Callback function to handle selection changes
+  void _handleRecipeSelectionChanged(
+      Map<String, List<Map<String, dynamic>>> selectedMeals) {
+    // Flatten the selected recipe IDs into a list of strings
+    List<String> recipeIds = [];
+
+    selectedMeals.forEach((mealPeriod, meals) {
+      recipeIds.addAll(meals.map((meal) => meal['id'] as String));
+    });
+
     setState(() {
-      selectedMeals = newSelectedMeals;
+      _selectedRecipeIds = recipeIds;
     });
   }
 
@@ -74,22 +93,56 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   }
 
   @override
+  void initState() {
+    fetchAllUserRecipes();
+    getTraineesFollowingTrainer();
+    super.initState();
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     _mealPlanNameController.dispose();
     super.dispose();
   }
 
+  Future<void> fetchAllUserRecipes() async {
+    try {
+      myRecipes = await recipeService.fetchRecipesByUser();
+      setState(() {});
+    } catch (e) {
+      showSnack(context, 'Failed to load user recipes');
+    }
+  }
+
+  Future<void> getTraineesFollowingTrainer() async {
+    try {
+      final user = ref.read(userProvider);
+      if (user != null) {
+        _allTrainees =
+            await trainerService.getTraineesFollowingTrainer(user.id);
+        setState(() {});
+      } else {
+        showSnack(context, 'User not found');
+      }
+    } catch (e) {
+      showSnack(context, 'Failed to load trainees');
+    }
+  }
+
   void _searchTrainees(String query) {
     setState(() {
-      _searchResults = _allTrainees
-          .where(
-              (trainee) => trainee.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      _searchResults = _allTrainees.where((trainee) {
+        final fullName = trainee.fullName.toLowerCase();
+        final username = trainee.username.toLowerCase();
+        final searchQuery = query.toLowerCase();
+
+        return fullName.contains(searchQuery) || username.contains(searchQuery);
+      }).toList();
     });
   }
 
-  void _addTrainee(String trainee) {
+  void _addTrainee(User trainee) {
     if (_selectedTrainees.contains(trainee)) {
       showDialog(
         context: context,
@@ -115,7 +168,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     }
   }
 
-  void _removeTrainee(String trainee) {
+  void _removeTrainee(User trainee) {
     setState(() {
       _selectedTrainees.remove(trainee);
     });
@@ -131,23 +184,35 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         endDate: _selectedDuration == 'Custom' ? _endDate : null,
         days: [], // Populate with selected days
         periods: [], // Populate with selected periods
-        recipes: [], // Populate with selected recipes
+        recipes: _selectedRecipeIds, // Flattened recipe IDs
         trainees: _selectedTrainees
-            .map((trainee) => trainee)
-            .toList(), // Map trainee names to IDs as needed
+            .map((trainee) => trainee.id) // Map User objects to IDs
+            .toList(),
         createdBy: user!.id, // Replace with actual user ID
       );
 
       try {
+        setState(() {
+          _isLoading = true;
+        });
         await ref.read(mealPlanProvider.notifier).createMealPlan(mealPlan);
         showSnack(context, 'Meal plan created successfully');
+        setState(() {
+          _isLoading = false;
+          Navigator.pop(context);
+        });
       } catch (e) {
-        // Handle error
+        setState(() {
+          _isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to create meal plan: $e')),
         );
       }
     } else {
+      setState(() {
+        _isLoading = false;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all required fields')),
       );
@@ -239,23 +304,14 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 15),
                         decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.black38),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              _startDate != null
-                                  ? _startDate!
-                                      .toLocal()
-                                      .toString()
-                                      .split(' ')[0]
-                                  : 'Select start date',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            Icon(Icons.calendar_today, color: Colors.grey[600]),
-                          ],
+                        child: Text(
+                          _startDate != null
+                              ? _startDate!.toString()
+                              : 'Select Start Date',
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ),
                     ),
@@ -268,110 +324,92 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 15),
                         decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.black38),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              _endDate != null
-                                  ? _endDate!.toLocal().toString().split(' ')[0]
-                                  : 'Select end date',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            Icon(Icons.calendar_today, color: Colors.grey[600]),
-                          ],
+                        child: Text(
+                          _endDate != null
+                              ? _endDate!.toString()
+                              : 'Select End Date',
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ),
                     ),
+                    const SizedBox(height: 20),
                   ],
                 ),
-              const SizedBox(height: 20),
-              if (_selectedDuration == 'Custom')
-                const Text(
-                  "Determine Days for Meal",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              const SizedBox(height: 10),
-              WeekRangeSelector(
-                onSelectionChanged: _onSelectionChanged,
-              ),
               const SizedBox(height: 20),
               const Text(
                 "Select Meal Periods",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              MealPeriodSelector(
-                onCompleteSchedule: () {},
-                onSelectionChanged: handleMealSelectionChange,
+              WeekRangeSelector(
+                // Provide your selected days here
+                onSelectionChanged: _onSelectionChanged,
               ),
               const SizedBox(height: 20),
+              MealPeriodSelector(
+                recipes: myRecipes, // Pass actual recipes here
+                onCompleteSchedule: () {},
+                onSelectionChanged: _handleRecipeSelectionChanged,
+              ),
               const Text(
-                "Assign recipes to trainees",
+                "Add Trainees",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      labelText: 'Search Trainees',
-                      border: const OutlineInputBorder(),
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.search),
-                        onPressed: () =>
-                            _searchTrainees(_searchController.text),
-                      ),
-                    ),
+              TextFormField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  labelText: 'Search trainees...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  const SizedBox(height: 10),
-                  Column(
-                    children: _searchResults
-                        .map((trainee) => ListTile(
-                              title: Text(trainee),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.add),
-                                onPressed: () => _addTrainee(trainee),
-                              ),
-                            ))
-                        .toList(),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Selected Trainees:',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  Column(
-                    children: _selectedTrainees
-                        .map((trainee) => ListTile(
-                              title: Text(trainee),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.remove),
-                                onPressed: () => _removeTrainee(trainee),
-                              ),
-                            ))
-                        .toList(),
-                  ),
-                ],
+                ),
+                onChanged: _searchTrainees,
               ),
+              const SizedBox(height: 10),
+              if (_searchResults.isNotEmpty)
+                Column(
+                  children: _searchResults.map((trainee) {
+                    return ListTile(
+                      title: Text(trainee.fullName),
+                      subtitle: Text(trainee.username),
+                      trailing: ElevatedButton(
+                        onPressed: () => _addTrainee(trainee),
+                        child: const Text('Add'),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              const SizedBox(height: 10),
+              const Text(
+                "Selected Trainees",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              if (_selectedTrainees.isNotEmpty)
+                Column(
+                  children: _selectedTrainees.map((trainee) {
+                    return ListTile(
+                      title: Text(trainee.fullName),
+                      subtitle: Text(trainee.username),
+                      trailing: ElevatedButton(
+                        onPressed: () => _removeTrainee(trainee),
+                        child: const Text('Remove'),
+                      ),
+                    );
+                  }).toList(),
+                ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _completeSchedule,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 60),
-                ),
-                child: const Text(
-                  'Complete Schedule',
-                  style: TextStyle(fontSize: 20),
-                ),
+                    backgroundColor: Colors.red, foregroundColor: Colors.white),
+                onPressed: _completeSchedule,
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text('Complete Schedule'),
               ),
               const SizedBox(height: 20),
             ],

@@ -143,6 +143,7 @@ class SingleMealPlanDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         MealPeriodSelector(
+                          recipes: const [],
                           // Pass the selected meals and handle updates
 
                           onSelectionChanged: (newSelectedMeals) {},

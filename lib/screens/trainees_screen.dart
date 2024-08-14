@@ -1,147 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/models/user.dart';
+import 'package:voltican_fitness/providers/trainer_provider.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 
-import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
+final followingIdsProvider = StateProvider<List<String>>((ref) => []);
 
-class TraineesScreen extends StatefulWidget {
+class TraineesScreen extends ConsumerStatefulWidget {
   const TraineesScreen({super.key});
 
   @override
-  _TraineesScreenState createState() => _TraineesScreenState();
+  ConsumerState<TraineesScreen> createState() => _TraineesScreenState();
 }
 
-class _TraineesScreenState extends State<TraineesScreen>
+class _TraineesScreenState extends ConsumerState<TraineesScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  String selectedDropdown = 'Following';
-  String selectedTrainee = 'Followers';
+  late TabController tabController;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() {
-      setState(() {}); // Rebuild the widget tree when the tab changes
-    });
+    tabController = TabController(length: 2, vsync: this);
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    tabController.dispose();
     super.dispose();
-  }
-
-  Widget buildListView(List<Map<String, String>> items, bool isTrainer) {
-    Future<void> showDeleteConfirmationDialog(BuildContext context) async {
-      return showDialog<void>(
-        context: context,
-        barrierDismissible: false, // User must tap button to dismiss
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text(
-              'Confirm Delete',
-              style: TextStyle(color: Colors.black87),
-            ),
-            content: const SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  Text(
-                    'Are you sure you want to peform a delete?',
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('Cancel'),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-              ),
-              TextButton(
-                child: const Text('Delete'),
-                onPressed: () {
-                  // Perform the delete action
-                  Navigator.of(context).pop(); // Close the dialog
-                  // You can call a function here to delete the item
-                  // For example: _deleteItem();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-
-    return ListView.builder(
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        return GestureDetector(
-          onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => TrainerProfileScreen()));
-          },
-          child: Card(
-            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            elevation: 5,
-            child: ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(items[index]['image']!),
-                ),
-                title: Text(items[index]['name']!),
-                subtitle: Text(items[index]['telephone']!),
-                trailing: Column(
-                  children: [
-                    const Text(
-                      "Following",
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    GestureDetector(
-                        onTap: () {
-                          showDeleteConfirmationDialog(context);
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(20)),
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 4, vertical: 2),
-                            child: Text(
-                              "Remove",
-                              style:
-                                  TextStyle(fontSize: 10, color: Colors.white),
-                            ),
-                          ),
-                        ))
-                  ],
-                )),
-          ),
-        );
-      },
-    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final selectedDropdown = ref.watch(trainerFilterProvider);
+    final trainerId =
+        ref.watch(userProvider); // Replace with the actual trainer ID
+
+    final followersAsync = ref.watch(followersProvider(trainerId!.id));
+    final followingTrainersAsync =
+        ref.watch(followingTrainersProvider(trainerId.id));
+
+    final followingIds = ref.watch(followingIdsProvider);
+
+    void followTrainer(String trainerToFollowId) {
+      ref
+          .read(followersProvider(trainerId.id).notifier)
+          .followTrainer(trainerId.id, trainerToFollowId);
+      ref
+          .read(followingIdsProvider.notifier)
+          .update((state) => [...state, trainerToFollowId]);
+    }
+
+    void unfollowTrainer(String trainerToUnfollowId) {
+      ref
+          .read(followersProvider(trainerId.id).notifier)
+          .unfollowTrainer(trainerId.id, trainerToUnfollowId);
+      ref.read(followingIdsProvider.notifier).update(
+          (state) => state.where((id) => id != trainerToUnfollowId).toList());
+    }
+
     return Scaffold(
       appBar: AppBar(
         leading: const SizedBox(),
-        title: const Text(
-          'Trainees & Trainers',
-          style: TextStyle(fontWeight: FontWeight.w500),
-        ),
+        title: const Text('Trainees & Trainers'),
         centerTitle: true,
       ),
       body: Column(
         children: [
           TabBar(
-            controller: _tabController,
+            controller: tabController,
             indicatorColor: Colors.red,
             labelColor: Colors.red,
             unselectedLabelColor: Colors.black,
@@ -150,54 +76,53 @@ class _TraineesScreenState extends State<TraineesScreen>
               Tab(text: 'Trainers'),
             ],
           ),
-          if (_tabController.index ==
-              0) // Display dropdown only on Trainers tab
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                DropdownButton<String>(
-                  value: selectedTrainee,
-                  items: ['Followers', 'All'].map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedTrainee = newValue!;
-                    });
-                  },
-                ),
-              ],
-            ),
-          if (_tabController.index ==
-              1) // Display dropdown only on Trainers tab
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                DropdownButton<String>(
-                  value: selectedDropdown,
-                  items: ['Following', 'Followers'].map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedDropdown = newValue!;
-                    });
-                  },
-                ),
-              ],
-            ),
           Expanded(
             child: TabBarView(
-              controller: _tabController,
+              controller: tabController,
               children: [
-                buildListView(trainees, true), // Pass false for trainees
-                buildListView(trainers, true), // Pass true for trainers
+                followersAsync.when(
+                  data: (followers) => buildListView(followers, false,
+                      followingIds, followTrainer, unfollowTrainer),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (err, stack) => Center(child: Text('Error: $err')),
+                ),
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        DropdownButton<String>(
+                          value: selectedDropdown,
+                          items: ['Following', 'Followers'].map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (newValue) {
+                            ref.read(trainerFilterProvider.notifier).state =
+                                newValue!;
+                          },
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                      child: followingTrainersAsync.when(
+                        data: (followingTrainers) => buildListView(
+                            followingTrainers,
+                            true,
+                            followingIds,
+                            followTrainer,
+                            unfollowTrainer),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (err, stack) =>
+                            Center(child: Text('Error: $err')),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -206,37 +131,38 @@ class _TraineesScreenState extends State<TraineesScreen>
     );
   }
 
-  final List<Map<String, String>> trainees = [
-    {
-      'image':
-          'https://images.pexels.com/photos/1674752/pexels-photo-1674752.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'name': 'John Doe',
-      'telephone': '123-456-7890',
-      'isFollowing': 'false',
-    },
-    {
-      'image':
-          'https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'name': 'Jane Smith',
-      'telephone': '098-765-4321',
-      'isFollowing': 'false',
-    },
-  ];
+  Widget buildListView(
+    List<User> users,
+    bool isFollowing,
+    List<String> followingIds,
+    void Function(String) followTrainer,
+    void Function(String) unfollowTrainer,
+  ) {
+    if (users.isEmpty) {
+      return Center(
+          child:
+              Text('No ${isFollowing ? 'Following Trainers' : 'Followers'}'));
+    }
 
-  final List<Map<String, String>> trainers = [
-    {
-      'image':
-          'https://images.pexels.com/photos/428364/pexels-photo-428364.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'name': 'Alice Johnson',
-      'telephone': '555-123-4567',
-      'isFollowing': 'false',
-    },
-    {
-      'image':
-          'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'name': 'Bob Brown',
-      'telephone': '555-987-6543',
-      'isFollowing': 'false',
-    },
-  ];
+    return ListView.builder(
+      itemCount: users.length,
+      itemBuilder: (context, index) {
+        final user = users[index];
+        final isFollowingUser = followingIds.contains(user.id);
+
+        return ListTile(
+          title: Text(user.fullName),
+          trailing: isFollowingUser
+              ? IconButton(
+                  icon: const Icon(Icons.remove_circle_outline),
+                  onPressed: () => unfollowTrainer(user.id),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.add_circle_outline),
+                  onPressed: () => followTrainer(user.id),
+                ),
+        );
+      },
+    );
+  }
 }

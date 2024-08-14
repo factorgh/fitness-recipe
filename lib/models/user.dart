@@ -8,12 +8,14 @@ class User {
   final String email;
   final String username;
   final String role;
-  final String imageUrl;
+  final String? imageUrl; // Optional
   final String password;
 
   final List<Recipe> savedRecipes;
   final List<String> mealPlans;
   final List<String> following;
+  final List<String> followers; // Optional
+  final String? code; // Optional
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -23,11 +25,13 @@ class User {
     required this.email,
     required this.username,
     required this.role,
-    required this.imageUrl,
+    this.imageUrl, // Optional
     required this.password,
     required this.savedRecipes,
     required this.mealPlans,
     required this.following,
+    this.followers = const [], // Optional
+    this.code, // Optional
     required this.createdAt,
     required this.updatedAt,
   });
@@ -46,7 +50,9 @@ class User {
               .toList() ??
           [],
       following: List<String>.from(json['following'] ?? []),
+      followers: List<String>.from(json['followers'] ?? []), // Optional
       mealPlans: List<String>.from(json['mealPlans'] ?? []),
+      code: json['code'] as String?, // Optional
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
@@ -68,6 +74,8 @@ class User {
       'savedRecipes': savedRecipes.map((recipe) => recipe.toString()).toList(),
       'mealPlans': mealPlans,
       'following': following,
+      'followers': followers, // Optional
+      'code': code, // Optional
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -77,6 +85,6 @@ class User {
 
   @override
   String toString() {
-    return 'User{id: $id, fullName: $fullName, email: $email, username: $username, role: $role, imageUrl: $imageUrl, password: $password, savedRecipes: $savedRecipes, mealPlans: $mealPlans, following: $following, createdAt: $createdAt, updatedAt: $updatedAt}';
+    return 'User{id: $id, fullName: $fullName, email: $email, username: $username, role: $role, imageUrl: $imageUrl, password: $password, savedRecipes: $savedRecipes, mealPlans: $mealPlans, following: $following, followers: $followers, code: $code, createdAt: $createdAt, updatedAt: $updatedAt}';
   }
 }

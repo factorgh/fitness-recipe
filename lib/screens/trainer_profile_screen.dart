@@ -2,12 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/models/user.dart';
 
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/widgets/recipe_item.dart';
 
 class TrainerProfileScreen extends StatelessWidget {
-  TrainerProfileScreen({super.key});
+  final User user;
+  TrainerProfileScreen({super.key, required this.user});
   final List<Recipe> userRecipes = [];
 
   void selectMeal(BuildContext context, Recipe meal) {

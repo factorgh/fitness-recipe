@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
+// import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
 
 class SliderTrainerLanding extends StatelessWidget {
   final List<String> recipes;
@@ -105,8 +105,8 @@ class SliderTrainerLanding extends StatelessWidget {
     // Add email data here if available for each trainer) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => TrainerProfileScreen()));
+        // Navigator.push(context,
+        //     MaterialPageRoute(builder: (context) => TrainerProfileScreen(user:)));
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 5),
