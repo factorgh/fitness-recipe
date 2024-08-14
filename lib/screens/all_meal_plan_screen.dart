@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart'; // Add this package to your pubspec.yaml
+import 'package:voltican_fitness/models/mealplan.dart';
+import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/widgets/calendar_item.dart';
 
-class AllMealPlan extends StatefulWidget {
+class AllMealPlan extends ConsumerStatefulWidget {
   const AllMealPlan({super.key});
 
   @override
-  State<AllMealPlan> createState() => _AllMealPlanState();
+  ConsumerState<AllMealPlan> createState() => _AllMealPlanState();
 }
 
-class _AllMealPlanState extends State<AllMealPlan> {
+class _AllMealPlanState extends ConsumerState<AllMealPlan> {
   DateTime? _selectedDate;
   bool _isLoading = false;
   String? _errorMessage;
-  List<String> _mealPlans = []; // Initialize as empty list
+  List<MealPlan> _mealPlans = []; // Initialize as empty list
 
   @override
   void initState() {
@@ -22,25 +25,16 @@ class _AllMealPlanState extends State<AllMealPlan> {
   }
 
   Future<void> _fetchMealPlans() async {
+    final meals = ref.watch(mealPlansProvider);
     setState(() {
       _isLoading = true;
+
       _errorMessage = null;
     });
 
     try {
-      // Simulate API call with a delay
-      await Future.delayed(const Duration(seconds: 2));
       // Replace the following line with your actual API call
-      setState(() {
-        _mealPlans = [
-          "Baked Salmon with Strawberries",
-          "Grilled Chicken Salad",
-          "Vegetarian Stir Fry",
-          "Beef Tacos",
-          "Pasta Primavera",
-          "Chicken Caesar Wrap"
-        ]; // Sample data, replace with dynamic data from API
-      });
+      _mealPlans = meals;
     } catch (error) {
       setState(() {
         _errorMessage = 'Failed to load meal plans.';

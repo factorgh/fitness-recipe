@@ -6,30 +6,35 @@ import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/onboarding_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:timezone/data/latest.dart' as tz;
-
 import 'package:workmanager/workmanager.dart';
 
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
-    await NotificationService().scheduleDailyMealReminders(0);
+    // Initialize Timezone and Notifications inside the callback
+    tz.initializeTimeZones();
+    await NotificationService().init();
+
+    // Schedule reminders
+    await NotificationService().scheduleDailyMealReminders("0");
+
     return Future.value(true);
   });
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-// Get user timezone
-// Initialize WorkManager
-  Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
 
   // Initialize Timezone and Notifications
   tz.initializeTimeZones();
-  NotificationService().init();
+  await NotificationService().init();
 
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((_) {
-    runApp(const ProviderScope(child: MyApp()));
-  });
+  // Initialize WorkManager
+  await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
+
+  // Lock orientation to portrait
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -50,8 +55,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final user =
-        ref.watch(userProvider); // Watch the user state, not the notifier
+    final user = ref.watch(userProvider); // Watch the user state
     print(user);
     return const MaterialApp(
       debugShowCheckedModeBanner: false,

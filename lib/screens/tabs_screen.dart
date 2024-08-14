@@ -13,7 +13,7 @@ import 'package:voltican_fitness/screens/trainer_landing_screen.dart';
 import 'package:voltican_fitness/screens/trainer_search.dart'; // Assuming you have this screen
 
 class TabsScreen extends StatefulWidget {
-  final int userRole; // Pass user role to the widget
+  final String userRole; // Pass user role to the widget
 
   const TabsScreen({super.key, required this.userRole});
 
@@ -26,7 +26,7 @@ class _TabsScreenState extends State<TabsScreen> {
 
   // Define pages based on user role
   List<Widget> get _pages {
-    if (widget.userRole == 0) {
+    if (widget.userRole == '0') {
       return const [
         TraineeLandingScreen(),
         TraineeRecipeScreen(),
@@ -47,7 +47,7 @@ class _TabsScreenState extends State<TabsScreen> {
 
   // Define navigation items based on user role
   List<BottomNavigationBarItem> get _bottomNavBarItems {
-    if (widget.userRole == 0) {
+    if (widget.userRole == '0') {
       return const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/screens/single_meal_screen.dart';
 // import 'package:voltican_fitness/screens/meal_edit_screen.dart';
 import 'package:voltican_fitness/widgets/simple_button.dart';
 
 class CalendarItem extends StatelessWidget {
-  final String mealPlan;
+  final MealPlan mealPlan;
   final IconData titleIcon;
   const CalendarItem(
       {super.key, required this.mealPlan, required this.titleIcon});
@@ -62,20 +63,20 @@ class CalendarItem extends StatelessWidget {
         children: [
           ExpansionTile(
             leading: Icon(titleIcon),
-            title: Text(mealPlan),
+            title: Text(mealPlan.name),
             trailing: const Icon(Icons.arrow_drop_down),
             shape: Border.all(color: Colors.transparent),
             children: [
-              const Row(
+              Row(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 20,
                   ),
-                  Icon(Icons.schedule),
-                  SizedBox(
+                  const Icon(Icons.schedule),
+                  const SizedBox(
                     width: 20,
                   ),
-                  Text("10:30 AM")
+                  Text(mealPlan.duration)
                 ],
               ),
               const SizedBox(

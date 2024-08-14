@@ -17,7 +17,7 @@ class _RoleScreenState extends State<RoleScreen> {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (ctx) => selectedRole == 'Trainer'
           ? const TabsScreen(
-              userRole: 1,
+              userRole: '1',
             )
           : const CodeScreen(),
     ));

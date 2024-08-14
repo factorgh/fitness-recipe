@@ -25,7 +25,7 @@ class _CodeScreenState extends State<CodeScreen> {
     // Wait for the duration of the SnackBar before navigating
 
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const TabsScreen(userRole: 0)),
+      MaterialPageRoute(builder: (context) => const TabsScreen(userRole: '0')),
     );
   }
 

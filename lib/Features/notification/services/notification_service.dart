@@ -28,7 +28,7 @@ class NotificationService {
   }
 
   // Pass the user role to this method
-  Future<void> scheduleDailyMealReminders(int userRole) async {
+  Future<void> scheduleDailyMealReminders(String userRole) async {
     if (userRole != 1) return; // Only proceed if the user is a trainee (role 1)
 
     final DateTime now = DateTime.now();
@@ -102,15 +102,15 @@ class NotificationService {
     }
   }
 
-  void scheduleBackgroundTask(int userRole) {
-    if (Platform.isAndroid && userRole == 0) {
+  void scheduleBackgroundTask(String userRole) {
+    if (Platform.isAndroid && userRole == '0') {
       // Schedule background task for Android using WorkManager
       Workmanager().registerPeriodicTask(
         "1",
         "dailyMealReminder",
         frequency: const Duration(hours: 24),
       );
-    } else if (Platform.isIOS && userRole == 1) {
+    } else if (Platform.isIOS && userRole == '0') {
       // iOS-specific background task or fetch (if needed)
       scheduleDailyMealReminders(
           userRole); // iOS can rely on this as it runs every app launch

@@ -107,7 +107,7 @@ class AuthService {
 
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (ctx) => const TabsScreen(userRole: 1),
+            builder: (ctx) => const TabsScreen(userRole: '1'),
           ),
         );
       },

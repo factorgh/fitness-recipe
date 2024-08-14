@@ -4,7 +4,7 @@ import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
 
 import 'package:voltican_fitness/screens/meal_creation.dart';
 // import 'package:voltican_fitness/screens/recipe_grid_screen.dart';
-import 'package:voltican_fitness/widgets/calendar_item.dart';
+// import 'package:voltican_fitness/widgets/calendar_item.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -272,24 +272,24 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  const CalendarItem(
-                    titleIcon: Icons.restaurant_menu,
-                    mealPlan: "Poached Eggs meal plan",
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const CalendarItem(
-                    titleIcon: Icons.restaurant_menu,
-                    mealPlan: "Baked Salmon with strawberries",
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const CalendarItem(
-                    titleIcon: Icons.restaurant_menu,
-                    mealPlan: "Baked Salmon with strawberries",
-                  ),
+                  // const CalendarItem(
+                  //   titleIcon: Icons.restaurant_menu,
+                  //   mealPlan: "Poached Eggs meal plan",
+                  // ),
+                  // const SizedBox(
+                  //   height: 20,
+                  // ),
+                  // const CalendarItem(
+                  //   titleIcon: Icons.restaurant_menu,
+                  //   mealPlan: "Baked Salmon with strawberries",
+                  // ),
+                  // const SizedBox(
+                  //   height: 20,
+                  // ),
+                  // const CalendarItem(
+                  //   titleIcon: Icons.restaurant_menu,
+                  //   mealPlan: "Baked Salmon with strawberries",
+                  // ),
                 ],
               )),
             )
