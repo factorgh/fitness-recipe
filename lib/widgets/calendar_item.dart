@@ -169,7 +169,8 @@ class CalendarItem extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    SingleMealPlanDetailScreen()));
+                                    SingleMealPlanDetailScreen(
+                                        mealPlan: mealPlan)));
                       },
                       child: const SimpleButton(
                           title: "View Details",

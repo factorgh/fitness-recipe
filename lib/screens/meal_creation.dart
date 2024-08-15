@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
@@ -233,6 +234,55 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
           child: ListView(
             children: [
               const Text(
+                "Add Trainees",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  labelText: 'Search trainees...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onChanged: _searchTrainees,
+              ),
+              const SizedBox(height: 10),
+              if (_searchResults.isNotEmpty)
+                Column(
+                  children: _searchResults.map((trainee) {
+                    return ListTile(
+                      title: Text(trainee.fullName),
+                      subtitle: Text(trainee.username),
+                      trailing: ElevatedButton(
+                        onPressed: () => _addTrainee(trainee),
+                        child: const Text('Add'),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              const SizedBox(height: 10),
+              const Text(
+                "Selected Trainees",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              if (_selectedTrainees.isNotEmpty)
+                Column(
+                  children: _selectedTrainees.map((trainee) {
+                    return ListTile(
+                      title: Text(trainee.fullName),
+                      subtitle: Text(trainee.username),
+                      trailing: ElevatedButton(
+                        onPressed: () => _removeTrainee(trainee),
+                        child: const Text('Remove'),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              const SizedBox(height: 20),
+              const Text(
                 "Meal Plan Name",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
@@ -309,7 +359,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                         ),
                         child: Text(
                           _startDate != null
-                              ? _startDate!.toString()
+                              ? DateFormat('yyyy-MM-dd').format(_startDate!)
                               : 'Select Start Date',
                           style: const TextStyle(fontSize: 16),
                         ),
@@ -329,7 +379,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                         ),
                         child: Text(
                           _endDate != null
-                              ? _endDate!.toString()
+                              ? DateFormat('yyyy-MM-dd').format(_endDate!)
                               : 'Select End Date',
                           style: const TextStyle(fontSize: 16),
                         ),
@@ -338,77 +388,32 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     const SizedBox(height: 20),
                   ],
                 ),
-              const SizedBox(height: 20),
-              const Text(
-                "Select Meal Periods",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              if (_selectedDuration == 'Custom') const SizedBox(height: 20),
+              if (_selectedDuration == 'Custom')
+                const Text(
+                  "Select Meal Periods",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               const SizedBox(height: 10),
-              WeekRangeSelector(
-                // Provide your selected days here
-                onSelectionChanged: _onSelectionChanged,
-              ),
+              if (_selectedDuration == 'Custom')
+                WeekRangeSelector(
+                  // Provide your selected days here
+                  onSelectionChanged: _onSelectionChanged,
+                ),
               const SizedBox(height: 20),
               MealPeriodSelector(
                 recipes: myRecipes, // Pass actual recipes here
-                onCompleteSchedule: () {},
+
                 onSelectionChanged: _handleRecipeSelectionChanged,
               ),
-              const Text(
-                "Add Trainees",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  labelText: 'Search trainees...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                onChanged: _searchTrainees,
-              ),
-              const SizedBox(height: 10),
-              if (_searchResults.isNotEmpty)
-                Column(
-                  children: _searchResults.map((trainee) {
-                    return ListTile(
-                      title: Text(trainee.fullName),
-                      subtitle: Text(trainee.username),
-                      trailing: ElevatedButton(
-                        onPressed: () => _addTrainee(trainee),
-                        child: const Text('Add'),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              const SizedBox(height: 10),
-              const Text(
-                "Selected Trainees",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              if (_selectedTrainees.isNotEmpty)
-                Column(
-                  children: _selectedTrainees.map((trainee) {
-                    return ListTile(
-                      title: Text(trainee.fullName),
-                      subtitle: Text(trainee.username),
-                      trailing: ElevatedButton(
-                        onPressed: () => _removeTrainee(trainee),
-                        child: const Text('Remove'),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              const SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red, foregroundColor: Colors.white),
                 onPressed: _completeSchedule,
                 child: _isLoading
-                    ? const CircularProgressIndicator()
+                    ? const CircularProgressIndicator(
+                        color: Colors.white,
+                      )
                     : const Text('Complete Schedule'),
               ),
               const SizedBox(height: 20),

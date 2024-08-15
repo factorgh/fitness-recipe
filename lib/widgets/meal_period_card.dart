@@ -4,10 +4,12 @@ class MealPeriodCard extends StatelessWidget {
   const MealPeriodCard(
       {super.key,
       required this.mealPeriod,
-      required this.time,
+      required this.time1,
+      required this.time2,
       required this.images});
   final String mealPeriod;
-  final String time;
+  final String time1;
+  final String time2;
   final List<String> images;
 
   @override
@@ -32,12 +34,20 @@ class MealPeriodCard extends StatelessWidget {
                               fontWeight: FontWeight.w400,
                               color: Colors.black87),
                         ),
-                        SizedBox(width: MediaQuery.of(context).size.width / 3),
+                        SizedBox(width: MediaQuery.of(context).size.width / 4),
                         Row(
                           children: [
                             const Icon(Icons.access_time, size: 20),
                             Text(
-                              time,
+                              time1,
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            const Text(
+                              '-',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            Text(
+                              time2,
                               style: const TextStyle(fontSize: 14),
                             ),
                           ],

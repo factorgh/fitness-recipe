@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
 import 'package:voltican_fitness/widgets/week_range_selector.dart';
 
 class SingleMealPlanDetailScreen extends StatelessWidget {
+  final MealPlan mealPlan;
   final String mealPlanName = 'Avocados pear';
   final String duration = 'Week';
   final List<String> selectedDays = ['Monday', 'Wednesday', 'Friday'];
   final Map<String, List<Map<String, dynamic>>> selectedMeals = {
     'Breakfast': [
-      {'name': 'Oatmeal', 'time': '8:00 AM'},
-      {'name': 'Smoothie', 'time': '8:30 AM'},
+      {'name': 'Oatmeal', 'time1': '12:10 AM', 'time2': '1:30 PM'},
     ],
     'Lunch': [
-      {'name': 'Salad', 'time': '12:00 PM'},
+      {'name': 'Salad', 'time1': '12:10 AM', 'time2': '1:30 PM'},
+    ],
+    'Snack': [
+      {'name': 'Salad', 'time1': '', 'time2': ''},
+      {'name': 'Salad', 'time1': '', 'time2': ''},
+      {'name': 'Salad', 'time1': '', 'time2': ''},
+      {'name': 'Salad', 'time1': '', 'time2': ''},
     ],
     'Dinner': [
-      {'name': 'Pasta', 'time': '7:00 PM'},
+      {'name': 'Pasta', 'time1': '12:10 AM', 'time2': '1:30 PM'},
     ],
   };
 
@@ -27,7 +34,7 @@ class SingleMealPlanDetailScreen extends StatelessWidget {
     "assets/images/recipes/r5.jpg",
   ];
 
-  SingleMealPlanDetailScreen({super.key});
+  SingleMealPlanDetailScreen({super.key, required this.mealPlan});
 
   void _showUpdateBottomSheet(BuildContext context) {
     showModalBottomSheet(
@@ -147,7 +154,6 @@ class SingleMealPlanDetailScreen extends StatelessWidget {
                           // Pass the selected meals and handle updates
 
                           onSelectionChanged: (newSelectedMeals) {},
-                          onCompleteSchedule: () {},
                         ),
                         const SizedBox(height: 30),
                         ElevatedButton(
@@ -183,7 +189,10 @@ class SingleMealPlanDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Meal Plan Details'),
+        title: const Text(
+          'Meal Plan Details',
+          style: TextStyle(fontWeight: FontWeight.w500),
+        ),
         centerTitle: true,
       ),
       body: Padding(
@@ -199,7 +208,7 @@ class SingleMealPlanDetailScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  mealPlanName,
+                  mealPlan.name,
                   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                 ),
               ),
@@ -214,7 +223,7 @@ class SingleMealPlanDetailScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  duration,
+                  mealPlan.duration,
                   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                 ),
               ),
@@ -225,22 +234,28 @@ class SingleMealPlanDetailScreen extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            Wrap(
-              spacing: 8.0,
-              runSpacing: 4.0,
-              children: selectedDays.map((day) {
-                return Card(
-                  elevation: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      day,
-                      style: const TextStyle(color: Colors.black45),
+            if (mealPlan.duration != 'Custom')
+              const Text(
+                'Repeats Everyday',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              ),
+            if (mealPlan.duration == 'Custom')
+              Wrap(
+                spacing: 8.0,
+                runSpacing: 4.0,
+                children: selectedDays.map((day) {
+                  return Card(
+                    elevation: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        day,
+                        style: const TextStyle(color: Colors.black45),
+                      ),
                     ),
-                  ),
-                );
-              }).toList(),
-            ),
+                  );
+                }).toList(),
+              ),
             const SizedBox(height: 20),
             const Text(
               "Selected Meal Periods",
@@ -268,7 +283,8 @@ class SingleMealPlanDetailScreen extends StatelessWidget {
                       children: entry.value.map((meal) {
                         return MealPeriodCard(
                           mealPeriod: '${meal['name']} ',
-                          time: ' ${meal['time']}',
+                          time1: ' ${meal['time1']}',
+                          time2: ' ${meal['time2']}',
                           images: categoryimages,
                         );
                       }).toList(),

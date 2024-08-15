@@ -13,7 +13,7 @@ class FollowersNotifier extends StateNotifier<AsyncValue<List<User>>> {
       final followers = await _trainerService.getFollowers(trainerId);
       state = AsyncValue.data(followers);
     } catch (e) {
-      state = AsyncValue.error(e, StackTrace as StackTrace);
+      state = AsyncValue.error(e, StackTrace.current);
       print('Failed to fetch followers: $e');
     }
   }
@@ -30,7 +30,7 @@ class FollowersNotifier extends StateNotifier<AsyncValue<List<User>>> {
   Future<void> unfollowTrainer(
       String trainerId, String trainerToUnfollowId) async {
     try {
-      await _trainerService.unfollowTrainer(trainerId, trainerToUnfollowId);
+      await _trainerService.unfollowTrainer(trainerToUnfollowId);
       await fetchFollowers(trainerId); // Refresh followers list
     } catch (e) {
       print('Failed to unfollow trainer: $e');
@@ -51,7 +51,7 @@ class FollowingTrainersNotifier extends StateNotifier<AsyncValue<List<User>>> {
           await _trainerService.getFollowingTrainers(trainerId);
       state = AsyncValue.data(followingTrainers);
     } catch (e) {
-      state = AsyncValue.error(e, StackTrace as StackTrace);
+      state = AsyncValue.error(e, StackTrace.current);
       print('Failed to fetch following trainers: $e');
     }
   }
@@ -69,7 +69,7 @@ class FollowingTrainersNotifier extends StateNotifier<AsyncValue<List<User>>> {
   Future<void> unfollowTrainer(
       String trainerId, String trainerToUnfollowId) async {
     try {
-      await _trainerService.unfollowTrainer(trainerId, trainerToUnfollowId);
+      await _trainerService.unfollowTrainer(trainerToUnfollowId);
       await fetchFollowingTrainers(
           trainerId); // Refresh following trainers list
     } catch (e) {

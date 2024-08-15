@@ -32,8 +32,8 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
   @override
   Widget build(BuildContext context) {
     final selectedDropdown = ref.watch(trainerFilterProvider);
-    final trainerId =
-        ref.watch(userProvider); // Replace with the actual trainer ID
+    final trainerId = ref.watch(userProvider);
+    print('Trainer ID: $trainerId');
 
     final followersAsync = ref.watch(followersProvider(trainerId!.id));
     final followingTrainersAsync =
@@ -58,10 +58,18 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
           (state) => state.where((id) => id != trainerToUnfollowId).toList());
     }
 
+    void removeTrainee(String traineeId) {
+      // Implement your logic to remove the trainee
+      print('Remove trainee: $traineeId');
+    }
+
     return Scaffold(
       appBar: AppBar(
         leading: const SizedBox(),
-        title: const Text('Trainees & Trainers'),
+        title: const Text(
+          'Trainees & Trainers',
+          style: TextStyle(fontWeight: FontWeight.w500),
+        ),
         centerTitle: true,
       ),
       body: Column(
@@ -81,47 +89,30 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
               controller: tabController,
               children: [
                 followersAsync.when(
-                  data: (followers) => buildListView(followers, false,
-                      followingIds, followTrainer, unfollowTrainer),
+                  data: (followers) => buildListView(
+                    followers,
+                    false,
+                    followingIds,
+                    followTrainer,
+                    unfollowTrainer,
+                    removeTrainee,
+                  ),
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
-                  error: (err, stack) => Center(child: Text('Error: $err')),
+                  error: (err, _) => Center(child: Text('Error: $err')),
                 ),
-                Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        DropdownButton<String>(
-                          value: selectedDropdown,
-                          items: ['Following', 'Followers'].map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                          onChanged: (newValue) {
-                            ref.read(trainerFilterProvider.notifier).state =
-                                newValue!;
-                          },
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: followingTrainersAsync.when(
-                        data: (followingTrainers) => buildListView(
-                            followingTrainers,
-                            true,
-                            followingIds,
-                            followTrainer,
-                            unfollowTrainer),
-                        loading: () =>
-                            const Center(child: CircularProgressIndicator()),
-                        error: (err, stack) =>
-                            Center(child: Text('Error: $err')),
-                      ),
-                    ),
-                  ],
+                followingTrainersAsync.when(
+                  data: (followingTrainers) => buildListView(
+                    followingTrainers,
+                    true,
+                    followingIds,
+                    followTrainer,
+                    unfollowTrainer,
+                    null,
+                  ),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (err, _) => Center(child: Text('Error: $err')),
                 ),
               ],
             ),
@@ -133,34 +124,97 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
 
   Widget buildListView(
     List<User> users,
-    bool isFollowing,
+    bool isTrainerList,
     List<String> followingIds,
-    void Function(String) followTrainer,
-    void Function(String) unfollowTrainer,
+    Function(String) follow,
+    Function(String) unfollow,
+    Function(String)? removeTrainee,
   ) {
-    if (users.isEmpty) {
-      return Center(
-          child:
-              Text('No ${isFollowing ? 'Following Trainers' : 'Followers'}'));
-    }
-
     return ListView.builder(
       itemCount: users.length,
       itemBuilder: (context, index) {
         final user = users[index];
-        final isFollowingUser = followingIds.contains(user.id);
+        final isFollowing = followingIds.contains(user.id);
 
-        return ListTile(
-          title: Text(user.fullName),
-          trailing: isFollowingUser
-              ? IconButton(
-                  icon: const Icon(Icons.remove_circle_outline),
-                  onPressed: () => unfollowTrainer(user.id),
-                )
-              : IconButton(
-                  icon: const Icon(Icons.add_circle_outline),
-                  onPressed: () => followTrainer(user.id),
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundImage: user.imageUrl != null
+                      ? NetworkImage(user.imageUrl!)
+                      : null,
+                  backgroundColor: Colors.blue,
+                  child: user.imageUrl == null
+                      ? Text(
+                          user.fullName[0].toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 24,
+                            color: Colors.white,
+                          ),
+                        )
+                      : null,
                 ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user.fullName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(user.username),
+                    ],
+                  ),
+                ),
+                if (isTrainerList && !isFollowing)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.red),
+                    onPressed: () => unfollow(user.id),
+                    child: const Text(
+                      "Unfollow",
+                      style: TextStyle(fontSize: 10),
+                    ),
+                  ),
+                if (removeTrainee != null)
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.grey),
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Remove Trainee'),
+                          content: const Text(
+                              'Are you sure you want to remove this trainee?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                removeTrainee(user.id);
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('Remove'),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            ),
+          ),
         );
       },
     );

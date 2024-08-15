@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
@@ -11,51 +13,56 @@ class MealPeriodSelector extends ConsumerStatefulWidget {
     required this.onSelectionChanged,
     required this.recipes,
     super.key,
-    required Null Function() onCompleteSchedule,
   });
 
   @override
   _MealPeriodSelectorState createState() => _MealPeriodSelectorState();
 }
 
-class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector> {
+class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
+    with SingleTickerProviderStateMixin {
   final List<String> _mealPeriods = ['Breakfast', 'Lunch', 'Snack', 'Dinner'];
   final Map<String, List<Map<String, dynamic>>> _selectedMeals = {};
 
-  String? _selectedMealPeriod;
-  String? _selectedRecipeId;
-  bool _isImageLoaded = false;
+  TabController? _tabController;
 
-  void _onMealPeriodTap(String mealPeriod) {
-    setState(() {
-      _selectedMealPeriod = mealPeriod;
-      _selectedRecipeId = null;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: _mealPeriods.length, vsync: this);
   }
 
-  void _onRecipeTap(String recipeId) async {
+  @override
+  void dispose() {
+    _tabController?.dispose();
+    super.dispose();
+  }
+
+  void _onRecipeTap(String recipeId, String mealPeriod) async {
+    String selectedTimeFormatted = '';
+
+    if (mealPeriod != 'Snack') {
+      TimeOfDay? selectedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+
+      if (selectedTime == null) return;
+
+      selectedTimeFormatted = selectedTime.format(context);
+    }
+
     setState(() {
-      _selectedRecipeId = recipeId;
       Recipe? selectedRecipe =
           widget.recipes.firstWhere((recipe) => recipe.id == recipeId);
-      if (_selectedMealPeriod != null) {
-        if (!_selectedMeals.containsKey(_selectedMealPeriod!)) {
-          _selectedMeals[_selectedMealPeriod!] = [];
-        }
-        if (_selectedMealPeriod == 'Snack') {
-          _selectedMeals[_selectedMealPeriod!]!.add({
-            'id': recipeId,
-            'name': selectedRecipe.title,
-          });
-        } else {
-          _selectedMeals[_selectedMealPeriod!] = [
-            {
-              'id': recipeId,
-              'name': selectedRecipe.title,
-            }
-          ];
-        }
+      if (!_selectedMeals.containsKey(mealPeriod)) {
+        _selectedMeals[mealPeriod] = [];
       }
+      _selectedMeals[mealPeriod]!.add({
+        'id': recipeId,
+        'name': selectedRecipe.title,
+        'time': selectedTimeFormatted,
+      });
       widget.onSelectionChanged(_selectedMeals);
     });
   }
@@ -70,53 +77,35 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector> {
     });
   }
 
-  Widget _buildMealPeriodSelector() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: _mealPeriods.map((mealPeriod) {
-        bool isSelected = _selectedMealPeriod == mealPeriod;
-        return GestureDetector(
-          onTap: () => _onMealPeriodTap(mealPeriod),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-            decoration: BoxDecoration(
-              color: isSelected ? Colors.blue : Colors.transparent,
-              borderRadius: BorderRadius.circular(20),
-              border: isSelected ? null : Border.all(color: Colors.grey),
-            ),
-            child: Text(
-              mealPeriod,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
+  Widget _buildRecipeSelector(String mealPeriod) {
+    List<Recipe> filteredRecipes =
+        widget.recipes.where((recipe) => recipe.period == mealPeriod).toList();
+
+    return Container(
+      height: 180,
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.grey[200], // Board background color
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildRecipeSelector() {
-    if (_selectedMealPeriod == null) {
-      return Container();
-    }
-
-    List<Recipe> filteredRecipes = widget.recipes
-        .where((recipe) => recipe.period == _selectedMealPeriod)
-        .toList();
-
-    return SizedBox(
-      height: 150,
+        ],
+      ),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: filteredRecipes.length,
         itemBuilder: (context, index) {
           Recipe recipe = filteredRecipes[index];
-          bool isSelected = _selectedRecipeId == recipe.id;
+          bool isSelected = _selectedMeals[mealPeriod]
+                  ?.any((meal) => meal['id'] == recipe.id) ??
+              false;
 
           return GestureDetector(
-            onTap: () => _onRecipeTap(recipe.id!),
+            onTap: () => _onRecipeTap(recipe.id!, mealPeriod),
             child: Container(
               width: 120,
               margin: const EdgeInsets.all(8),
@@ -126,13 +115,6 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector> {
                 border: isSelected
                     ? Border.all(color: Colors.blue, width: 2)
                     : null,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
@@ -143,20 +125,29 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector> {
                           ? Image.network(
                               recipe.imageUrl,
                               fit: BoxFit.cover,
-                              loadingBuilder: (context, child, progress) {
-                                if (progress == null) {
-                                  _isImageLoaded = true;
-                                  return child;
-                                } else {
-                                  _isImageLoaded = false;
-                                  return Center(
-                                    child: CircularProgressIndicator(
-                                      color: Colors.red,
-                                      value: progress.cumulativeBytesLoaded /
-                                          (progress.expectedTotalBytes ?? 1),
-                                    ),
-                                  );
-                                }
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            (loadingProgress.expectedTotalBytes
+                                                as int)
+                                        : null,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Center(
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    size: 40,
+                                    color: Colors.grey[600],
+                                  ),
+                                );
                               },
                             )
                           : Center(
@@ -167,36 +158,33 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector> {
                               ),
                             ),
                     ),
-                    if (_isImageLoaded)
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? Colors.white.withOpacity(0.8)
-                                : Colors.black.withOpacity(0.6),
-                            borderRadius: const BorderRadius.vertical(
-                              bottom: Radius.circular(15),
-                            ),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 8),
-                          child: Text(
-                            recipe.title.length > 8
-                                ? '${recipe.title.substring(0, 8)}...'
-                                : recipe.title,
-                            style: TextStyle(
-                              color: isSelected ? Colors.blue : Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                            textAlign: TextAlign.center,
-                            overflow: TextOverflow.ellipsis,
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.6),
+                          borderRadius: const BorderRadius.vertical(
+                            bottom: Radius.circular(15),
                           ),
                         ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 8),
+                        child: Text(
+                          recipe.title.length > 8
+                              ? '${recipe.title.substring(0, 8)}...'
+                              : recipe.title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
+                    ),
                   ],
                 ),
               ),
@@ -223,8 +211,13 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector> {
             Wrap(
               spacing: 8,
               children: meals.map((meal) {
+                String displayText = meal['name'];
+                if (mealPeriod != 'Snack' && meal['time'].isNotEmpty) {
+                  displayText += ' @ ${meal['time']}';
+                }
+
                 return Chip(
-                  label: Text('${meal['name']} '),
+                  label: Text(displayText),
                   backgroundColor: Colors.blue.withOpacity(0.2),
                   deleteIcon: const Icon(Icons.cancel),
                   onDeleted: () => _removeRecipe(mealPeriod, meal['id']),
@@ -242,9 +235,22 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildMealPeriodSelector(),
-        const SizedBox(height: 20),
-        _buildRecipeSelector(),
+        TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          tabs: _mealPeriods.map((mealPeriod) {
+            return Tab(text: mealPeriod);
+          }).toList(),
+        ),
+        SizedBox(
+          height: 220, // Adjust height as needed
+          child: TabBarView(
+            controller: _tabController,
+            children: _mealPeriods.map((mealPeriod) {
+              return _buildRecipeSelector(mealPeriod);
+            }).toList(),
+          ),
+        ),
         const SizedBox(height: 20),
         _buildSelectedMeals(),
       ],
