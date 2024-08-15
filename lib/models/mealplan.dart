@@ -1,17 +1,39 @@
 import 'package:flutter/foundation.dart';
 
+class RecipeAllocation {
+  final String recipeId;
+  final DateTime allocatedTime;
+
+  RecipeAllocation({
+    required this.recipeId,
+    required this.allocatedTime,
+  });
+
+  factory RecipeAllocation.fromJson(Map<String, dynamic> json) {
+    return RecipeAllocation(
+      recipeId: json['recipeId'] as String,
+      allocatedTime: DateTime.parse(json['allocatedTime']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'recipeId': recipeId,
+      'allocatedTime': allocatedTime.toIso8601String(),
+    };
+  }
+}
+
 class MealPlan {
   final String? id;
   final String name;
   final String duration;
   final DateTime? startDate;
   final DateTime? endDate;
-  final List<String>
-      days; // Changed from List<String>? to List<String> with default empty list
-  final List<String>
-      periods; // Changed from List<String>? to List<String> with default empty list
-  final List<String> recipes; // Assumes these are the recipe IDs
-  final List<String> trainees; // Assumes these are the user IDs
+  final List<String> days;
+  final List<String> periods;
+  final List<RecipeAllocation> recipeAllocations; // Changed to RecipeAllocation
+  final List<String> trainees;
   final String createdBy;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -24,15 +46,14 @@ class MealPlan {
     this.endDate,
     List<String>? days,
     List<String>? periods,
-    required this.recipes,
+    required this.recipeAllocations, // Changed to RecipeAllocation
     required this.trainees,
     required this.createdBy,
     this.createdAt,
     this.updatedAt,
-  })  : days = days ?? [], // Default to empty list if null
-        periods = periods ?? []; // Default to empty list if null
+  })  : days = days ?? [],
+        periods = periods ?? [];
 
-  // Factory constructor to create a MealPlan object from a JSON map
   factory MealPlan.fromJson(Map<String, dynamic> json) {
     return MealPlan(
       id: json['_id'] as String?,
@@ -44,8 +65,10 @@ class MealPlan {
       days: json['days'] != null ? List<String>.from(json['days']) : [],
       periods:
           json['periods'] != null ? List<String>.from(json['periods']) : [],
-      recipes:
-          json['recipes'] != null ? List<String>.from(json['recipes']) : [],
+      recipeAllocations: json['recipeAllocations'] != null
+          ? List<RecipeAllocation>.from(json['recipeAllocations']
+              .map((item) => RecipeAllocation.fromJson(item)))
+          : [],
       trainees:
           json['trainees'] != null ? List<String>.from(json['trainees']) : [],
       createdBy: json['createdBy'] as String? ?? '',
@@ -56,7 +79,6 @@ class MealPlan {
     );
   }
 
-  // Method to convert a MealPlan object to a JSON map
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
@@ -66,7 +88,7 @@ class MealPlan {
       'endDate': endDate?.toIso8601String(),
       'days': days,
       'periods': periods,
-      'recipes': recipes,
+      'recipeAllocations': recipeAllocations.map((e) => e.toJson()).toList(),
       'trainees': trainees,
       'createdBy': createdBy,
       'createdAt': createdAt?.toIso8601String(),
@@ -76,7 +98,7 @@ class MealPlan {
 
   @override
   String toString() {
-    return 'MealPlan(id: $id, name: $name, duration: $duration, startDate: $startDate, endDate: $endDate, days: $days, periods: $periods, recipes: $recipes, trainees: $trainees, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'MealPlan(id: $id, name: $name, duration: $duration, startDate: $startDate, endDate: $endDate, days: $days, periods: $periods, recipeAllocations: $recipeAllocations, trainees: $trainees, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -90,7 +112,7 @@ class MealPlan {
         other.endDate == endDate &&
         listEquals(other.days, days) &&
         listEquals(other.periods, periods) &&
-        listEquals(other.recipes, recipes) &&
+        listEquals(other.recipeAllocations, recipeAllocations) &&
         listEquals(other.trainees, trainees) &&
         other.createdBy == createdBy &&
         other.createdAt == createdAt &&
@@ -106,7 +128,7 @@ class MealPlan {
         endDate.hashCode ^
         days.hashCode ^
         periods.hashCode ^
-        recipes.hashCode ^
+        recipeAllocations.hashCode ^
         trainees.hashCode ^
         createdBy.hashCode ^
         createdAt.hashCode ^

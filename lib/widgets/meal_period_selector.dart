@@ -1,12 +1,11 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 
 class MealPeriodSelector extends ConsumerStatefulWidget {
-  final void Function(Map<String, List<Map<String, dynamic>>> selectedMeals)
-      onSelectionChanged;
+  final void Function(List<RecipeAllocation>) onSelectionChanged;
+
   final List<Recipe> recipes;
 
   const MealPeriodSelector({
@@ -22,7 +21,7 @@ class MealPeriodSelector extends ConsumerStatefulWidget {
 class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     with SingleTickerProviderStateMixin {
   final List<String> _mealPeriods = ['Breakfast', 'Lunch', 'Snack', 'Dinner'];
-  final Map<String, List<Map<String, dynamic>>> _selectedMeals = {};
+  final Map<String, List<RecipeAllocation>> _selectedMeals = {};
 
   TabController? _tabController;
 
@@ -39,42 +38,55 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
   }
 
   void _onRecipeTap(String recipeId, String mealPeriod) async {
-    String selectedTimeFormatted = '';
+    TimeOfDay? selectedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
 
-    if (mealPeriod != 'Snack') {
-      TimeOfDay? selectedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.now(),
-      );
+    if (selectedTime == null) return;
 
-      if (selectedTime == null) return;
-
-      selectedTimeFormatted = selectedTime.format(context);
-    }
+    DateTime allocatedTime = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+      selectedTime.hour,
+      selectedTime.minute,
+    );
 
     setState(() {
-      Recipe? selectedRecipe =
-          widget.recipes.firstWhere((recipe) => recipe.id == recipeId);
+      // Recipe? selectedRecipe =
+      //     widget.recipes.firstWhere((recipe) => recipe.id == recipeId);
+      RecipeAllocation allocation = RecipeAllocation(
+        recipeId: recipeId,
+        allocatedTime: allocatedTime,
+      );
+
       if (!_selectedMeals.containsKey(mealPeriod)) {
         _selectedMeals[mealPeriod] = [];
       }
-      _selectedMeals[mealPeriod]!.add({
-        'id': recipeId,
-        'name': selectedRecipe.title,
-        'time': selectedTimeFormatted,
-      });
-      widget.onSelectionChanged(_selectedMeals);
+
+      _selectedMeals[mealPeriod]!.add(allocation);
+      widget.onSelectionChanged(_convertToRecipeAllocations());
     });
   }
 
   void _removeRecipe(String mealPeriod, String recipeId) {
     setState(() {
-      _selectedMeals[mealPeriod]?.removeWhere((item) => item['id'] == recipeId);
-      if (_selectedMeals[mealPeriod]!.isEmpty) {
+      _selectedMeals[mealPeriod]
+          ?.removeWhere((allocation) => allocation.recipeId == recipeId);
+      if (_selectedMeals[mealPeriod]?.isEmpty ?? false) {
         _selectedMeals.remove(mealPeriod);
       }
-      widget.onSelectionChanged(_selectedMeals);
+      widget.onSelectionChanged(_convertToRecipeAllocations());
     });
+  }
+
+  List<RecipeAllocation> _convertToRecipeAllocations() {
+    List<RecipeAllocation> allocations = [];
+    _selectedMeals.forEach((mealPeriod, allocationsList) {
+      allocations.addAll(allocationsList);
+    });
+    return allocations;
   }
 
   Widget _buildRecipeSelector(String mealPeriod) {
@@ -85,7 +97,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       height: 180,
       margin: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white, // Board background color
+        color: Colors.white,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
@@ -101,7 +113,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
         itemBuilder: (context, index) {
           Recipe recipe = filteredRecipes[index];
           bool isSelected = _selectedMeals[mealPeriod]
-                  ?.any((meal) => meal['id'] == recipe.id) ??
+                  ?.any((allocation) => allocation.recipeId == recipe.id) ??
               false;
 
           return GestureDetector(
@@ -110,7 +122,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
               width: 120,
               margin: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.grey[300], // Placeholder background color
+                color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(15),
                 border: isSelected
                     ? Border.all(color: Colors.blue, width: 2)
@@ -200,7 +212,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: _selectedMeals.entries.map((entry) {
         String mealPeriod = entry.key;
-        List<Map<String, dynamic>> meals = entry.value;
+        List<RecipeAllocation> allocations = entry.value;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -210,17 +222,19 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
             ),
             Wrap(
               spacing: 8,
-              children: meals.map((meal) {
-                String displayText = meal['name'];
-                if (mealPeriod != 'Snack' && meal['time'].isNotEmpty) {
-                  displayText += ' @ ${meal['time']}';
-                }
+              children: allocations.map((allocation) {
+                Recipe? recipe = widget.recipes
+                    .firstWhere((recipe) => recipe.id == allocation.recipeId);
+                String displayText = recipe.title;
+                displayText +=
+                    ' @ ${allocation.allocatedTime.hour}:${allocation.allocatedTime.minute.toString().padLeft(2, '0')}';
 
                 return Chip(
                   label: Text(displayText),
                   backgroundColor: Colors.blue.withOpacity(0.2),
                   deleteIcon: const Icon(Icons.cancel),
-                  onDeleted: () => _removeRecipe(mealPeriod, meal['id']),
+                  onDeleted: () =>
+                      _removeRecipe(mealPeriod, allocation.recipeId),
                 );
               }).toList(),
             ),

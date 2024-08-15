@@ -31,6 +31,8 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   List<User> _searchResults = [];
   final List<User> _selectedTrainees = [];
   bool _isLoading = false;
+  List<String> _weekDays = [];
+  final List<RecipeAllocation> _selectedRecipeAllocations = [];
 
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _mealPlanNameController = TextEditingController();
@@ -42,25 +44,20 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   final TrainerService trainerService = TrainerService();
 
   // This will store the selected recipe IDs flattened into a list of strings
-  List<String> _selectedRecipeIds = [];
 
   // Callback function to handle selection changes
   void _handleRecipeSelectionChanged(
-      Map<String, List<Map<String, dynamic>>> selectedMeals) {
-    // Flatten the selected recipe IDs into a list of strings
-    List<String> recipeIds = [];
-
-    selectedMeals.forEach((mealPeriod, meals) {
-      recipeIds.addAll(meals.map((meal) => meal['id'] as String));
-    });
-
+      List<RecipeAllocation> selectedAllocations) {
     setState(() {
-      _selectedRecipeIds = recipeIds;
+      _selectedRecipeAllocations.clear();
+      _selectedRecipeAllocations.addAll(selectedAllocations);
     });
   }
 
   void _onSelectionChanged(List<String> selectedDays) {
-    setState(() {});
+    setState(() {
+      _weekDays = selectedDays;
+    });
   }
 
   void handleSelectionChange(List<String> selectedPeriods) {
@@ -216,13 +213,11 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         duration: _selectedDuration,
         startDate: _selectedDuration == 'Custom' ? _startDate : null,
         endDate: _selectedDuration == 'Custom' ? _endDate : null,
-        days: [], // Populate with selected days
-        periods: [], // Populate with selected periods
-        recipes: _selectedRecipeIds, // Flattened recipe IDs
-        trainees: _selectedTrainees
-            .map((trainee) => trainee.id) // Map User objects to IDs
-            .toList(),
-        createdBy: user!.id, // Replace with actual user ID
+        days: _weekDays,
+        periods: [],
+        recipeAllocations: _selectedRecipeAllocations,
+        trainees: _selectedTrainees.map((trainee) => trainee.id).toList(),
+        createdBy: user!.id,
       );
 
       try {
@@ -380,10 +375,11 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
               ),
               const SizedBox(height: 20),
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Text('Start Date',
                             style: TextStyle(fontSize: 16)),

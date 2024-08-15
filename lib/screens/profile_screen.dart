@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/models/user.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/widgets/copy_to_clipboard.dart';
 import 'package:voltican_fitness/widgets/status_toggle_button.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -18,7 +22,7 @@ class ProfileScreen extends StatelessWidget {
           children: [
             _ProfileHeader(),
             const SizedBox(height: 20),
-            _ProfileInfo(),
+            _ProfileInfo(user: user!),
             const SizedBox(height: 20),
             const StatusToggleButton(),
             const SizedBox(height: 20),
@@ -60,15 +64,19 @@ class _ProfileHeader extends StatelessWidget {
 }
 
 class _ProfileInfo extends StatelessWidget {
+  final User user;
+
+  const _ProfileInfo({required this.user});
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _InfoField(label: 'Name', value: 'John Doe'),
-        _InfoField(label: 'Email', value: 'john.doe@example.com'),
-        _InfoField(label: 'Phone', value: '+1 234 567 890'),
-        _InfoField(label: 'Address', value: '123 Main Street, City, Country'),
+        _InfoField(label: 'Name', value: user.fullName),
+        _InfoField(label: 'Email', value: user.email),
+        _InfoField(label: 'Username', value: user.username),
+        const _InfoField(
+            label: 'Address', value: '123 Main Street, City, Country'),
       ],
     );
   }

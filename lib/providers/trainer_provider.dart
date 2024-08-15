@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
 import 'package:voltican_fitness/models/user.dart';
@@ -78,6 +80,25 @@ class FollowingTrainersNotifier extends StateNotifier<AsyncValue<List<User>>> {
   }
 }
 
+// State notifier for managing a list of trainees following the trainer
+class TraineesFollowingNotifier extends StateNotifier<AsyncValue<List<User>>> {
+  final TrainerService _trainerService;
+
+  TraineesFollowingNotifier(this._trainerService)
+      : super(const AsyncValue.loading());
+
+  Future<void> fetchTraineesFollowingTrainer(String trainerId) async {
+    try {
+      final trainees =
+          await _trainerService.getTraineesFollowingTrainer(trainerId);
+      state = AsyncValue.data(trainees);
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+      print('Failed to fetch trainees: $e');
+    }
+  }
+}
+
 // Providers
 final trainerServiceProvider = Provider<TrainerService>((ref) {
   return TrainerService();
@@ -98,4 +119,15 @@ final followingTrainersProvider = StateNotifierProvider.family<
     ..fetchFollowingTrainers(trainerId);
 });
 
+final traineesFollowingProvider = StateNotifierProvider.family<
+    TraineesFollowingNotifier,
+    AsyncValue<List<User>>,
+    String>((ref, trainerId) {
+  final trainerService = ref.watch(trainerServiceProvider);
+  return TraineesFollowingNotifier(trainerService)
+    ..fetchTraineesFollowingTrainer(trainerId);
+});
+
+// Dropdown filter providers
 final trainerFilterProvider = StateProvider<String>((ref) => 'Followers');
+final traineeFilterProvider = StateProvider<String>((ref) => 'All');
