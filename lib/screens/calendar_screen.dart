@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
 
 import 'package:voltican_fitness/screens/meal_creation.dart';
+
 // import 'package:voltican_fitness/screens/recipe_grid_screen.dart';
 // import 'package:voltican_fitness/widgets/calendar_item.dart';
 
@@ -26,159 +27,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
       selectedMeals = newSelectedMeals;
     });
   }
-
-  // void _showBottomSheet(BuildContext context) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled: true,
-  //     backgroundColor: Colors.transparent,
-  //     builder: (context) => DraggableScrollableSheet(
-  //       initialChildSize: 0.5,
-  //       minChildSize: 0.5,
-  //       maxChildSize: 1.0,
-  //       expand: false,
-  //       builder: (context, scrollController) {
-  //         return AnimatedContainer(
-  //           duration: const Duration(milliseconds: 300),
-  //           curve: Curves.easeInOut,
-  //           decoration: const BoxDecoration(
-  //             color: Colors.white,
-  //             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-  //           ),
-  //           child: Column(
-  //             children: [
-  //               Container(
-  //                 height: 30,
-  //                 decoration: BoxDecoration(
-  //                     color: Colors.white,
-  //                     borderRadius: BorderRadius.circular(20)),
-  //                 child: Center(
-  //                     child: Container(
-  //                   height: 5,
-  //                   width: 30,
-  //                   decoration: BoxDecoration(
-  //                       color: Colors.red,
-  //                       borderRadius: BorderRadius.circular(30)),
-  //                 )),
-  //               ),
-  //               Expanded(
-  //                 child: ListView(
-  //                   controller: scrollController,
-  //                   padding: const EdgeInsets.all(8.0),
-  //                   children: [
-  //                     Padding(
-  //                       padding: const EdgeInsets.symmetric(vertical: 15.0),
-  //                       child: Column(
-  //                         crossAxisAlignment: CrossAxisAlignment.start,
-  //                         children: [
-  //                           const Text(
-  //                             "Enter meal plan name",
-  //                             style: TextStyle(
-  //                                 fontSize: 18, fontWeight: FontWeight.w500),
-  //                           ),
-  //                           const SizedBox(
-  //                             height: 10,
-  //                           ),
-  //                           const TextField(
-  //                             decoration: InputDecoration(
-  //                               labelText: 'Enter meal plan name',
-  //                               border: OutlineInputBorder(
-  //                                 borderSide: BorderSide(
-  //                                   color: Colors.black,
-  //                                   width: 1,
-  //                                 ),
-  //                               ),
-  //                             ),
-  //                           ),
-  //                           const SizedBox(
-  //                             height: 20,
-  //                           ),
-  //                           const Text(
-  //                             "Select a duration",
-  //                             style: TextStyle(
-  //                                 fontSize: 18, fontWeight: FontWeight.w500),
-  //                           ),
-  //                           Padding(
-  //                             padding:
-  //                                 const EdgeInsets.symmetric(horizontal: 10),
-  //                             child: DropdownButton<String>(
-  //                               value: _selectedDuration,
-  //                               items: [
-  //                                 'Does Not Repeat',
-  //                                 'Week',
-  //                                 'Month',
-  //                                 'Quarter',
-  //                                 'Half-Year',
-  //                                 'Year',
-  //                                 'Custom'
-  //                               ]
-  //                                   .map((duration) => DropdownMenuItem<String>(
-  //                                         value: duration,
-  //                                         child: Text(duration),
-  //                                       ))
-  //                                   .toList(),
-  //                               onChanged: (value) {
-  //                                 setState(() {
-  //                                   _selectedDuration = value!;
-  //                                 });
-  //                               },
-  //                             ),
-  //                           ),
-  //                           const SizedBox(
-  //                             height: 20,
-  //                           ),
-  //                           const Text(
-  //                             "Determine days for meal  ",
-  //                             style: TextStyle(
-  //                                 fontSize: 18, fontWeight: FontWeight.w500),
-  //                           ),
-  //                           const SizedBox(
-  //                             height: 10,
-  //                           ),
-  //                           WeekRangeSelector(
-  //                               onSelectionChanged: _onSelectionChanged),
-  //                           const SizedBox(
-  //                             height: 20,
-  //                           ),
-  //                           const Text(
-  //                             "Select meal periods  ",
-  //                             style: TextStyle(
-  //                                 fontSize: 18, fontWeight: FontWeight.w500),
-  //                           ),
-  //                           const SizedBox(
-  //                             height: 10,
-  //                           ),
-  //                           MealPeriodSelector(
-  //                             onSelectionChanged: handleSelectionChange,
-  //                             onCompleteSchedule: () {},
-  //                           ),
-  //                           const SizedBox(height: 20),
-  //                           ElevatedButton(
-  //                             onPressed: () {
-  //                               Navigator.of(context).push(MaterialPageRoute(
-  //                                   builder: (context) =>
-  //                                       const AssignRecipeScreen()));
-  //                             },
-  //                             child: const Text('Complete Schedule'),
-  //                           ),
-  //                           const SizedBox(height: 20),
-  //                         ],
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         );
-  //       },
-  //     ),
-  //   );
-  // }
-
-  // void _onSelectionChanged(List<String> selectedDays) {
-  //   setState(() {});
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -275,24 +123,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  // const CalendarItem(
-                  //   titleIcon: Icons.restaurant_menu,
-                  //   mealPlan: "Poached Eggs meal plan",
-                  // ),
-                  // const SizedBox(
-                  //   height: 20,
-                  // ),
-                  // const CalendarItem(
-                  //   titleIcon: Icons.restaurant_menu,
-                  //   mealPlan: "Baked Salmon with strawberries",
-                  // ),
-                  // const SizedBox(
-                  //   height: 20,
-                  // ),
-                  // const CalendarItem(
-                  //   titleIcon: Icons.restaurant_menu,
-                  //   mealPlan: "Baked Salmon with strawberries",
-                  // ),
                 ],
               )),
             )

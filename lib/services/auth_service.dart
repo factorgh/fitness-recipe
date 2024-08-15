@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
@@ -55,10 +55,9 @@ class AuthService {
         });
   }
 
-// SignInUser
   Future<void> signIn({
     required BuildContext context,
-    required WidgetRef ref, // Add WidgetRef to access Riverpod
+    required WidgetRef ref,
     required String username,
     required String password,
   }) async {
@@ -70,40 +69,16 @@ class AuthService {
       },
     );
 
-    // Handle the response
     httpErrorHandle(
       response: res,
       context: context,
       onSuccess: () async {
-        // Extract user data from the response
-        // final data = res.data['user'];
         final token = res.data['token'];
 
-        // // Create a User object from the response data
-        // User user = User(
-        //   id: data['_id'],
-        //   fullName: data['fullName'],
-        //   email: data['email'],
-        //   username: data['username'],
-        //   role: data['role'],
-        //   imageUrl: data['imageUrl'],
-        //   password:
-        //       password, // Usually, you'd want to hash this or handle it differently
-        //   savedRecipes: List<String>.from(data['savedRecipes']),
-        //   following: List<String>.from(data['following']),
-        //   mealPlans: List<String>.from(data['mealPlans']),
-        //   createdAt: DateTime.parse(data['createdAt']),
-        //   updatedAt: DateTime.parse(data['updatedAt']),
-        //   token: token,
-        // );
-
-        // Store the token in SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
 
-        // Optionally navigate to another screen or show a success message
         showSnack(context, 'Signed in successfully');
-        // Navigate user to home screen
 
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -114,8 +89,6 @@ class AuthService {
     );
   }
 
-// Get user using token
-
   void getMe({
     required BuildContext context,
     required WidgetRef ref,
@@ -125,16 +98,63 @@ class AuthService {
         "/users/me",
       );
 
-      print('Response data: ${res.data}'); // Print the raw response data
-
-      // Convert the response data to a User object
       User user = User.fromJson(res.data);
-      print("------username------ ${user.username}");
 
-      // Pass the User object to your provider
       ref.read(userProvider.notifier).setUser(user);
     } catch (e) {
-      print('Error fetching user data: $e'); // Print error details
+      print('Error fetching user data: $e');
+    }
+  }
+
+  Future<void> updateUser({
+    required BuildContext context,
+    required String id,
+    required String fullName,
+    required String username,
+    required String email,
+  }) async {
+    try {
+      dio.Response res = await client.dio.put(
+        "/users/$id",
+        data: {
+          'fullName': fullName,
+          'username': username,
+          'email': email,
+        },
+      );
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          showSnack(context, 'User updated successfully');
+        },
+      );
+    } catch (e) {
+      print('Error updating user: $e');
+      showSnack(context, 'Failed to update user');
+    }
+  }
+
+  Future<void> deleteUser({
+    required BuildContext context,
+    required String id,
+  }) async {
+    try {
+      dio.Response res = await client.dio.delete(
+        "/users/$id",
+      );
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          showSnack(context, 'User deleted successfully');
+        },
+      );
+    } catch (e) {
+      print('Error deleting user: $e');
+      showSnack(context, 'Failed to delete user');
     }
   }
 }

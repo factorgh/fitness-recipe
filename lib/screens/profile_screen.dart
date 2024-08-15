@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/screens/update_profile_screen.dart';
 import 'package:voltican_fitness/widgets/copy_to_clipboard.dart';
 import 'package:voltican_fitness/widgets/status_toggle_button.dart';
 
@@ -110,7 +111,9 @@ class _EditProfileButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        // Add your edit profile logic here
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const UpdateProfileScreen(),
+        ));
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blue,

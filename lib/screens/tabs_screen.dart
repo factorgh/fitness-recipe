@@ -27,12 +27,12 @@ class _TabsScreenState extends State<TabsScreen> {
   // Define pages based on user role
   List<Widget> get _pages {
     if (widget.userRole == '0') {
-      return const [
-        TraineeLandingScreen(),
-        TraineeRecipeScreen(),
-        CalendarTraineeScreen(),
+      return [
+        const TraineeLandingScreen(),
+        const TraineeRecipeScreen(),
+        const CalendarTraineeScreen(),
         TrainerSearchScreen(),
-        TraineeSettingsScreen()
+        const TraineeSettingsScreen()
       ];
     } else {
       return const [

@@ -114,14 +114,17 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                     Expanded(
                       child: followersAsync.when(
                         data: (followers) {
-                          final filteredFollowers =
-                              selectedTraineeFilter == 'All'
-                                  ? followers
-                                  : followers.where((trainee) {
+                          final filteredFollowers = selectedTraineeFilter ==
+                                  'All'
+                              ? followers
+                                  .where((user) => user.role == '0')
+                                  .toList()
+                              : followers
+                                  .where((user) =>
+                                      user.role == '0' &&
                                       // Implement logic to check if trainee is assigned
-                                      // Replace the below condition with actual logic
-                                      return false;
-                                    }).toList();
+                                      false) // Replace the false condition with actual logic
+                                  .toList();
                           return buildListView(
                             filteredFollowers,
                             false,
@@ -134,6 +137,7 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                         loading: () =>
                             const Center(child: CircularProgressIndicator()),
                         error: (err, _) => Center(child: Text('Error: $err')),
+                        // Handle empty state
                       ),
                     ),
                   ],
@@ -163,9 +167,22 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                           final filteredTrainers =
                               selectedTrainerFilter == 'Following'
                                   ? followingTrainers
-                                  : followingTrainers.where((trainer) {
-                                      return !followingIds.contains(trainer.id);
-                                    }).toList();
+                                      .where((trainer) =>
+                                          followingIds.contains(trainer.id) &&
+                                          trainer.role == '1')
+                                      .toList()
+                                  : followingTrainers
+                                      .where((trainer) =>
+                                          trainer.role == '1' &&
+                                          // Filter based on followers
+                                          followersAsync.maybeWhen(
+                                            data: (followers) {
+                                              return followers.any((follower) =>
+                                                  follower.id == trainer.id);
+                                            },
+                                            orElse: () => false,
+                                          ))
+                                      .toList();
                           return buildListView(
                             filteredTrainers,
                             true,
@@ -178,6 +195,7 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                         loading: () =>
                             const Center(child: CircularProgressIndicator()),
                         error: (err, _) => Center(child: Text('Error: $err')),
+                        // Handle empty state
                       ),
                     ),
                   ],
@@ -278,6 +296,17 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                           ],
                         );
                       },
+                    ),
+                  ),
+                if (!isTrainerList && !isFollowing)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.green),
+                    onPressed: () => follow(user.id),
+                    child: const Text(
+                      "Follow",
+                      style: TextStyle(fontSize: 10),
                     ),
                   ),
               ],

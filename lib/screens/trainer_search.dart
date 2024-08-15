@@ -1,52 +1,120 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TrainerSearchScreen extends StatefulWidget {
-  const TrainerSearchScreen({super.key});
+import 'package:voltican_fitness/providers/search_provider.dart';
+
+// Replace StatefullWidget with ConsumerWidget to use Riverpod
+class TrainerSearchScreen extends ConsumerWidget {
+  TrainerSearchScreen({super.key});
+
+  final TextEditingController _searchController = TextEditingController();
 
   @override
-  _SearchScreenState createState() => _SearchScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final searchState = ref.watch(searchTrainersProvider);
 
-class _SearchScreenState extends State<TrainerSearchScreen> {
-  final images = [
-    "assets/images/pf.jpg",
-    "assets/images/pf2.jpg",
-    "assets/images/pf3.jpg",
-    "assets/images/pf4.jpg",
-    "assets/images/pf5.jpg",
-  ];
-
-  final trainers = [
-    'Albert M.',
-    'Ernest A.',
-    'Lucis M.',
-    'Mills A.',
-    'William A.',
-  ];
-  final emails = [
-    'albert.m@example.com',
-    'ernest.m@example.com.',
-    'lucy.m@example.com',
-    'mills.m@example.com',
-    'william.m@example.com',
-  ];
-
-  void _showSnackBarAndSendRequest(BuildContext context) {
-    const snackBar = SnackBar(
-      content: Text(
-        'Request sent successfully!',
+    return Scaffold(
+      appBar: AppBar(
+        leading: const SizedBox(),
+        title: const Text('Search Trainers'),
       ),
-      duration: Duration(seconds: 2),
-      backgroundColor: Colors.brown,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.search),
+                      hintText: 'Search trainers...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    onChanged: (query) {
+                      // Trigger search when the user types in the search field
+                      ref
+                          .read(searchTrainersProvider.notifier)
+                          .searchTrainers(query);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10),
+                IconButton(
+                  icon: const Icon(Icons.sort),
+                  onPressed: () {
+                    // Add your sorting logic here
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: searchState.when(
+                data: (trainers) => ListView.builder(
+                  itemCount: trainers.length,
+                  itemBuilder: (context, index) {
+                    final trainer = trainers[index];
+                    return GestureDetector(
+                      onTap: () {
+                        _showTrainerDetails(
+                          context,
+                          trainer.fullName,
+                          trainer.email,
+                          trainer.imageUrl ??
+                              'assets/images/default_avatar.png',
+                          ref,
+                        );
+                      },
+                      child: Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        elevation: 2.0,
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(16.0),
+                          leading: CircleAvatar(
+                            radius: 30,
+                            backgroundImage: trainer.imageUrl != null
+                                ? NetworkImage(trainer.imageUrl!)
+                                : const AssetImage(
+                                        'assets/images/default_avatar.png')
+                                    as ImageProvider,
+                          ),
+                          title: Text(
+                            trainer.fullName,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(trainer.email),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(child: Text('Error: $e')),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
-
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-    Navigator.of(context).pop();
   }
 
   void _showTrainerDetails(
-      BuildContext context, String name, String email, String image) {
+    BuildContext context,
+    String name,
+    String email,
+    String image,
+    WidgetRef ref,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -63,7 +131,10 @@ class _SearchScreenState extends State<TrainerSearchScreen> {
                     children: [
                       CircleAvatar(
                         radius: 40,
-                        backgroundImage: AssetImage(image),
+                        backgroundImage: image.isNotEmpty
+                            ? NetworkImage(image)
+                            : const AssetImage(
+                                'assets/images/default_avatar.png'),
                       ),
                       const Positioned(
                         top: 50,
@@ -85,8 +156,15 @@ class _SearchScreenState extends State<TrainerSearchScreen> {
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () {
-                      _showSnackBarAndSendRequest(context);
-                      // Add your request logic here
+                      ref.read(requestProvider.notifier).sendRequest("", "");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Request sent successfully!'),
+                          duration: Duration(seconds: 2),
+                          backgroundColor: Colors.brown,
+                        ),
+                      );
+                      Navigator.of(context).pop();
                     },
                     child: const Text("Send Request"),
                   ),
@@ -96,81 +174,6 @@ class _SearchScreenState extends State<TrainerSearchScreen> {
           ),
         );
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: const SizedBox(),
-        title: const Text('Search Trainers'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search),
-                      hintText: 'Search trainers...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                IconButton(
-                  icon: const Icon(Icons.sort),
-                  onPressed: () {
-                    // Add your sorting logic here
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      _showTrainerDetails(context, trainers[index],
-                          emails[index], images[index]);
-                    },
-                    child: Card(
-                      margin: const EdgeInsets.symmetric(vertical: 8.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      elevation: 2.0,
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(16.0),
-                        leading: CircleAvatar(
-                          radius: 30,
-                          backgroundImage: AssetImage(images[index]),
-                        ),
-                        title: Text(
-                          trainers[index],
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        subtitle: Text(emails[index]),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

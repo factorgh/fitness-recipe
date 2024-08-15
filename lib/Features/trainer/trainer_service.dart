@@ -75,4 +75,25 @@ class TrainerService {
       throw Exception('Failed to unfollow trainer');
     }
   }
+
+  Future<List<User>> searchTrainers(String query) async {
+    try {
+      final response = await client.dio
+          .get('/trainers/search', queryParameters: {'query': query});
+      return (response.data as List)
+          .map((trainerData) => User.fromJson(trainerData))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to search trainers');
+    }
+  }
+
+  Future<void> sendRequestToTrainer(String traineeId, String trainerId) async {
+    try {
+      await client.dio
+          .post('/trainers/$trainerId/request', data: {'traineeId': traineeId});
+    } catch (e) {
+      throw Exception('Failed to send request');
+    }
+  }
 }
