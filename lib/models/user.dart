@@ -8,14 +8,13 @@ class User {
   final String email;
   final String username;
   final String role;
-  final String? imageUrl; // Optional
+  final String? imageUrl;
   final String password;
-
   final List<Recipe> savedRecipes;
   final List<String> mealPlans;
   final List<String> following;
-  final List<String> followers; // Optional
-  final String? code; // Optional
+  final List<String> followers;
+  final String? code;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -25,16 +24,50 @@ class User {
     required this.email,
     required this.username,
     required this.role,
-    this.imageUrl, // Optional
+    this.imageUrl,
     required this.password,
     required this.savedRecipes,
     required this.mealPlans,
     required this.following,
-    this.followers = const [], // Optional
-    this.code, // Optional
+    this.followers = const [],
+    this.code,
     required this.createdAt,
     required this.updatedAt,
   });
+
+  User copyWith({
+    String? id,
+    String? fullName,
+    String? email,
+    String? username,
+    String? role,
+    String? imageUrl,
+    String? password,
+    List<Recipe>? savedRecipes,
+    List<String>? mealPlans,
+    List<String>? following,
+    List<String>? followers,
+    String? code,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return User(
+      id: id ?? this.id,
+      fullName: fullName ?? this.fullName,
+      email: email ?? this.email,
+      username: username ?? this.username,
+      role: role ?? this.role,
+      imageUrl: imageUrl ?? this.imageUrl,
+      password: password ?? this.password,
+      savedRecipes: savedRecipes ?? this.savedRecipes,
+      mealPlans: mealPlans ?? this.mealPlans,
+      following: following ?? this.following,
+      followers: followers ?? this.followers,
+      code: code ?? this.code,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -50,9 +83,9 @@ class User {
               .toList() ??
           [],
       following: List<String>.from(json['following'] ?? []),
-      followers: List<String>.from(json['followers'] ?? []), // Optional
+      followers: List<String>.from(json['followers'] ?? []),
       mealPlans: List<String>.from(json['mealPlans'] ?? []),
-      code: json['code'] as String?, // Optional
+      code: json['code'] as String?,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
@@ -74,8 +107,8 @@ class User {
       'savedRecipes': savedRecipes.map((recipe) => recipe.toString()).toList(),
       'mealPlans': mealPlans,
       'following': following,
-      'followers': followers, // Optional
-      'code': code, // Optional
+      'followers': followers,
+      'code': code,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };

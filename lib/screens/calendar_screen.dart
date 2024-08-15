@@ -1,35 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:table_calendar/table_calendar.dart';
+
+import 'package:voltican_fitness/providers/meal_plan_provider.dart';
+import 'package:voltican_fitness/providers/meal_plan_state.dart';
 import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
-
 import 'package:voltican_fitness/screens/meal_creation.dart';
+import 'package:voltican_fitness/widgets/calendar_item.dart';
 
-// import 'package:voltican_fitness/screens/recipe_grid_screen.dart';
-// import 'package:voltican_fitness/widgets/calendar_item.dart';
-
-class CalendarScreen extends StatefulWidget {
+class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});
 
   @override
-  State<CalendarScreen> createState() => _CalendarScreenState();
+  ConsumerState<CalendarScreen> createState() => _CalendarScreenState();
 }
 
-class _CalendarScreenState extends State<CalendarScreen> {
-  DateTime focusedDay = DateTime.now();
-  DateTime? selectedDay;
-
-  Map<String, List<Map<String, dynamic>>> selectedMeals = {};
-
-  void handleSelectionChange(
-      Map<String, List<Map<String, dynamic>>> newSelectedMeals) {
-    setState(() {
-      selectedMeals = newSelectedMeals;
-    });
-  }
-
+class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
+    DateTime focusedDay = DateTime.now();
+    DateTime? selectedDay;
+
+    // Watching the mealPlansProvider
+    final mealPlansState = ref.watch(mealPlansProvider);
+
+    // Handling different states of meal plans
+    final Widget mealPlansWidget;
+    if (mealPlansState is MealPlansLoading) {
+      mealPlansWidget = const CircularProgressIndicator();
+    } else if (mealPlansState is MealPlansError) {
+      mealPlansWidget = Text(mealPlansState.error);
+    } else if (mealPlansState is MealPlansLoaded) {
+      final mealPlans = mealPlansState.mealPlans;
+
+      // Get the first 3 meal plans or fewer if there are less than 3
+      final firstThreeMealPlans = mealPlans.take(3).toList();
+
+      mealPlansWidget = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+
+          const SizedBox(height: 10),
+          // Displaying the first 3 meal plans
+          for (var mealPlan in firstThreeMealPlans) ...[
+            CalendarItem(
+              titleIcon: Icons.restaurant_menu,
+              mealPlan: mealPlan, // Assuming meal plan has a name property
+            ),
+            const SizedBox(height: 20),
+          ],
+        ],
+      );
+    } else {
+      mealPlansWidget = const Text('No meal plans available.');
+    }
+
     return Scaffold(
         body: SafeArea(
             child: Container(
@@ -62,14 +89,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       'Add Meal Plan',
                       style: TextStyle(fontSize: 12),
                     )),
-                const SizedBox(
-                  width: 5,
-                ),
+                const SizedBox(width: 5),
               ],
             ),
-            const SizedBox(
-              height: 30,
-            ),
+            const SizedBox(height: 30),
             TableCalendar(
               firstDay: DateTime.utc(2001, 7, 20),
               focusedDay: focusedDay,
@@ -90,42 +113,34 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
             const SizedBox(height: 30),
             const Divider(color: Colors.black54, height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Latest plans",
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const AllMealPlan())),
+                  child: const Text(
+                    "View all Plans",
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
             SizedBox(
               width: double.maxFinite,
-              child: SingleChildScrollView(
-                  child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Today plans",
-                        style: TextStyle(fontSize: 20, color: Colors.black54),
-                      ),
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (context) => const AllMealPlan())),
-                        child: const Text(
-                          "View all Plans",
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                ],
-              )),
-            )
+              child: SingleChildScrollView(child: mealPlansWidget),
+            ),
           ],
         ),
       ),

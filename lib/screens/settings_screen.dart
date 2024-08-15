@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/account_screen.dart';
 import 'package:voltican_fitness/screens/general_screen.dart';
 import 'package:voltican_fitness/screens/login_screen.dart';
+
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/screens/profile_screen.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  Future<void> _logout() async {
+    ref.read(userProvider.notifier).clearUser();
+    // Optionally navigate to login or splash screen
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+    ); // Adjust route as necessary
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,18 +125,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          backgroundColor: Colors.red, // Background color
-          foregroundColor: Colors.white, // Text color
-        ),
-        child: const Text('Logout'),
-        onPressed: () {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
-          );
-        },
-      ),
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            backgroundColor: Colors.red, // Background color
+            foregroundColor: Colors.white, // Text color
+          ),
+          onPressed: _logout,
+          child: const Text('Logout')),
     );
   }
 }

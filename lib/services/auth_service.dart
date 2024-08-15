@@ -22,6 +22,7 @@ class AuthService {
     required String username,
     required String email,
     required String password,
+    required WidgetRef ref,
   }) async {
     User user = User(
         id: "",
@@ -46,6 +47,9 @@ class AuthService {
         context: context,
         onSuccess: () {
           showSnack(context, 'Account created successfully');
+
+          //  Get role from user
+          ref.read(userProvider.notifier).setUser(res.data.user);
 
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -80,9 +84,12 @@ class AuthService {
 
         showSnack(context, 'Signed in successfully');
 
+        //  Get role from user
+        final userRole = res.data['role'];
+
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (ctx) => const TabsScreen(userRole: '1'),
+            builder: (ctx) => TabsScreen(userRole: userRole),
           ),
         );
       },
@@ -108,6 +115,7 @@ class AuthService {
 
   Future<void> updateUser({
     required BuildContext context,
+    required WidgetRef ref,
     required String id,
     required String fullName,
     required String username,
@@ -127,6 +135,13 @@ class AuthService {
         response: res,
         context: context,
         onSuccess: () {
+          // Update the user in the state after a successful update
+          ref.read(userProvider.notifier).updateUser(
+                fullName: fullName,
+                username: username,
+                email: email,
+              );
+
           showSnack(context, 'User updated successfully');
         },
       );

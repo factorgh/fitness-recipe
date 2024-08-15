@@ -136,4 +136,6 @@ class Recipe {
         createdAt.hashCode ^
         updatedAt.hashCode;
   }
+
+  toMap() {}
 }

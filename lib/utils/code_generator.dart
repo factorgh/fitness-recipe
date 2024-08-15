@@ -1,12 +1,12 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
 import 'package:voltican_fitness/models/user.dart';
 
 class CodeGenerator {
   final Set<int> _generatedNumbers = {};
 
-  Strinde(String fullName) {
+  // Gen a unique code based on the user's full name
+  String generateCode(String fullName) {
     String firstLetter = fullName[0];
     String lastLetter = fullName[fullName.length - 1];
 
@@ -28,6 +28,7 @@ class CodeGenerator {
   }
 }
 
+// Generates and sends codes to backend for all trainers
 void generateAndSendCodes(List<User> trainers) {
   CodeGenerator codeGenerator = CodeGenerator();
 
@@ -38,53 +39,5 @@ void generateAndSendCodes(List<User> trainers) {
       print('Generated code for ${trainer.fullName}: $code');
       // Implement your backend call here
     }
-  }
-}
-
-void onProceed(
-  User user,
-  BuildContext context,
-) async {
-  if (user.role != "1") {
-    user.role = "1"; // Set the role to trainer
-  }
-
-  CodeGenerator codeGenerator = CodeGenerator();
-  String generatedCode = codeGenerator.generateCode(user.fullName);
-
-  // Create a payload to send to the backend
-  Map<String, dynamic> updatedUserData = {
-    "role": user.role,
-    "code": generatedCode,
-  };
-
-  // Send the updated data to the backend
-  bool isUpdated = await updateUserOnBackend(user.id, updatedUserData);
-
-  if (isUpdated) {
-    // Navigate to the home screen if the update is successful
-    Navigator.pushReplacementNamed(context, '/home');
-  } else {
-    // Handle error (e.g., show a snackbar or alert)
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Failed to update user. Please try again.')),
-    );
-  }
-}
-
-Future<bool> updateUserOnBackend(
-    String userId, Map<String, dynamic> data) async {
-  try {
-    // Assuming you have a Dio client set up for API requests
-    final response = await dio.put('/users/$userId', data: data);
-
-    if (response.statusCode == 200) {
-      return true;
-    } else {
-      return false;
-    }
-  } catch (error) {
-    // Handle error appropriately (e.g., log error or retry)
-    return false;
   }
 }

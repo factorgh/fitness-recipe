@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 
 class UpdateProfileScreen extends ConsumerStatefulWidget {
   const UpdateProfileScreen({super.key});
 
   @override
-  ConsumerState<UpdateProfileScreen> createState() =>
-      _UpdateProfileScreenState();
+  _UpdateProfileScreenState createState() => _UpdateProfileScreenState();
 }
 
 class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
@@ -21,43 +20,42 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
   void initState() {
     super.initState();
     final user = ref.read(userProvider);
-    _fullName = user!.fullName;
-    _username = user.username;
-    _email = user.email;
+    _fullName = user?.fullName ?? '';
+    _username = user?.username ?? '';
+    _email = user?.email ?? '';
   }
 
-  void _updateProfile() {
+  void _updateProfile() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      // Update user data in state provider
 
-      // Show success message or navigate away
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile updated successfully')),
-      );
+      final user = ref.read(userProvider);
+      if (user != null) {
+        await AuthService().updateUser(
+          context: context,
+          ref: ref,
+          id: user.id,
+          fullName: _fullName,
+          username: _username,
+          email: _email,
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Update Profile'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Update Profile')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextFormField(
                 initialValue: _fullName,
-                decoration: const InputDecoration(
-                  labelText: 'Full Name',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Full Name'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your full name';
@@ -68,13 +66,9 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
                   _fullName = value!;
                 },
               ),
-              const SizedBox(height: 16),
               TextFormField(
                 initialValue: _username,
-                decoration: const InputDecoration(
-                  labelText: 'Username',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Username'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your username';
@@ -85,22 +79,12 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
                   _username = value!;
                 },
               ),
-              const SizedBox(height: 16),
               TextFormField(
                 initialValue: _email,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(labelText: 'Email'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
-                  }
-                  // Basic email validation
-                  const emailRegex = r'^[^@]+@[^@]+\.[^@]+';
-                  if (!RegExp(emailRegex).hasMatch(value)) {
-                    return 'Please enter a valid email address';
                   }
                   return null;
                 },
@@ -108,7 +92,7 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
                   _email = value!;
                 },
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _updateProfile,
                 child: const Text('Update Profile'),

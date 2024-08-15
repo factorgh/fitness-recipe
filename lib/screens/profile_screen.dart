@@ -76,8 +76,6 @@ class _ProfileInfo extends StatelessWidget {
         _InfoField(label: 'Name', value: user.fullName),
         _InfoField(label: 'Email', value: user.email),
         _InfoField(label: 'Username', value: user.username),
-        const _InfoField(
-            label: 'Address', value: '123 Main Street, City, Country'),
       ],
     );
   }

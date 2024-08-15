@@ -49,13 +49,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       setState(() {
         _isLoading = false;
       });
-
-      // Uncomment and use this after successful login
-      // Navigator.of(context).pushReplacement(
-      //   MaterialPageRoute(
-      //     builder: (ctx) => const TabsScreen(userRole: 1),
-      //   ),
-      // );
     }
   }
 

@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/screens/code_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
+import 'package:voltican_fitness/utils/code_generator.dart';
 import 'package:voltican_fitness/widgets/role_widget.dart';
 
-class RoleScreen extends StatefulWidget {
+class RoleScreen extends ConsumerStatefulWidget {
   const RoleScreen({super.key});
 
   @override
-  State<RoleScreen> createState() => _RoleScreenState();
+  ConsumerState<RoleScreen> createState() => _RoleScreenState();
 }
 
-class _RoleScreenState extends State<RoleScreen> {
+class _RoleScreenState extends ConsumerState<RoleScreen> {
   String? selectedRole;
 
+  final CodeGenerator codeGenerator = CodeGenerator();
+
   void goToTabsScreen(BuildContext ctx) {
+// Check if it a trainer
+
+// Generate a code if it's a trainer
+    String generatedCode = codeGenerator.generateCode();
+
+// Perform update functionality here before navigating to the tabs screen
+
     Navigator.of(context).push(MaterialPageRoute(
       builder: (ctx) => selectedRole == 'Trainer'
           ? const TabsScreen(
