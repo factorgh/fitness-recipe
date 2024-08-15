@@ -207,7 +207,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 OutlinedButton(
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const MealCreationScreen()));
+                          builder: (context) =>
+                              MealCreationScreen(selectedDay: DateTime.now())));
                     },
                     child: const Text(
                       'Add Meal Plan',
@@ -228,7 +229,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
               selectedDayPredicate: (day) => isSameDay(day, selectedDay),
               onDaySelected: (DateTime focusDay, DateTime selectDay) {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const MealCreationScreen()));
+                    builder: (context) =>
+                        MealCreationScreen(selectedDay: selectDay)));
                 setState(
                   () {
                     focusedDay = focusDay;

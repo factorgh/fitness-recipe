@@ -15,7 +15,8 @@ import 'package:voltican_fitness/widgets/meal_period_selector.dart';
 import 'package:voltican_fitness/widgets/week_range_selector.dart';
 
 class MealCreationScreen extends ConsumerStatefulWidget {
-  const MealCreationScreen({super.key});
+  final DateTime selectedDay;
+  const MealCreationScreen({super.key, required this.selectedDay});
 
   @override
   _MealCreationScreenState createState() => _MealCreationScreenState();
@@ -86,15 +87,47 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
       setState(() {
         if (isStartDate) {
           _startDate = pickedDate;
+          // If the start date is updated, adjust the end date based on the current duration
+          if (_selectedDuration != 'Custom') {
+            _endDate = _calculateEndDate(_startDate!, _selectedDuration);
+          }
         } else {
           _endDate = pickedDate;
+          // Set the duration to 'Custom' if the end date is manually edited
+          _selectedDuration = 'Custom';
         }
       });
     }
   }
 
+  DateTime _calculateEndDate(DateTime startDate, String duration) {
+    Duration period;
+    switch (duration) {
+      case 'Week':
+        period = const Duration(days: 7);
+        break;
+      case 'Month':
+        period = const Duration(days: 30);
+        break;
+      case 'Quarter':
+        period = const Duration(days: 90);
+        break;
+      case 'Half-Year':
+        period = const Duration(days: 180);
+        break;
+      case 'Year':
+        period = const Duration(days: 365);
+        break;
+      default:
+        return startDate; // Default to startDate if duration is not recognized
+    }
+    return startDate.add(period);
+  }
+
   @override
   void initState() {
+    _startDate = widget.selectedDay;
+
     fetchAllUserRecipes();
     getTraineesFollowingTrainer();
     super.initState();
@@ -311,83 +344,99 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
               DropdownButtonFormField<String>(
                 value: _selectedDuration,
                 decoration: InputDecoration(
+                  labelText: 'Duration',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                items: [
+                items: <String>[
                   'Does Not Repeat',
                   'Week',
                   'Month',
                   'Quarter',
                   'Half-Year',
                   'Year',
-                  'Custom'
-                ]
-                    .map((duration) => DropdownMenuItem<String>(
-                          value: duration,
-                          child: Text(duration),
-                        ))
-                    .toList(),
-                onChanged: (value) {
+                  'Custom',
+                ].map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
                   setState(() {
-                    _selectedDuration = value!;
+                    _selectedDuration = newValue!;
+                    if (_selectedDuration != 'Custom') {
+                      if (_startDate != null) {
+                        _endDate =
+                            _calculateEndDate(_startDate!, _selectedDuration);
+                      }
+                    } else {
+                      _endDate =
+                          null; // Clear end date if duration is set to 'Custom'
+                    }
                   });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a duration';
-                  }
-                  return null;
                 },
               ),
               const SizedBox(height: 20),
-              if (_selectedDuration == 'Custom')
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Start Date', style: TextStyle(fontSize: 16)),
-                    const SizedBox(height: 10),
-                    GestureDetector(
-                      onTap: () => _selectDate(context, true),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 15),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Start Date',
+                            style: TextStyle(fontSize: 16)),
+                        const SizedBox(height: 10),
+                        GestureDetector(
+                          onTap: () => _selectDate(context, true),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 15),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              _startDate != null
+                                  ? DateFormat('yyyy-MM-dd').format(_startDate!)
+                                  : 'Select Start Date',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
                         ),
-                        child: Text(
-                          _startDate != null
-                              ? DateFormat('yyyy-MM-dd').format(_startDate!)
-                              : 'Select Start Date',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                    const Text('End Date', style: TextStyle(fontSize: 16)),
-                    const SizedBox(height: 10),
-                    GestureDetector(
-                      onTap: () => _selectDate(context, false),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 15),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(8),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('End Date', style: TextStyle(fontSize: 16)),
+                        const SizedBox(height: 10),
+                        GestureDetector(
+                          onTap: () => _selectDate(context, false),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 15),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              _endDate != null
+                                  ? DateFormat('yyyy-MM-dd').format(_endDate!)
+                                  : 'Select End Date',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
                         ),
-                        child: Text(
-                          _endDate != null
-                              ? DateFormat('yyyy-MM-dd').format(_endDate!)
-                              : 'Select End Date',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
+                  ),
+                ],
+              ),
               if (_selectedDuration == 'Custom') const SizedBox(height: 20),
               if (_selectedDuration == 'Custom')
                 const Text(

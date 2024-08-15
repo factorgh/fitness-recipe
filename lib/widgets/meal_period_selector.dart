@@ -85,7 +85,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       height: 180,
       margin: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.grey[200], // Board background color
+        color: Colors.white, // Board background color
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(

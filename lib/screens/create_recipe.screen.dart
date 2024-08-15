@@ -313,7 +313,9 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                           await _createRecipe(user!);
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => const MealCreationScreen(),
+                              builder: (context) => MealCreationScreen(
+                                selectedDay: DateTime.now(),
+                              ),
                             ),
                           );
                         }
