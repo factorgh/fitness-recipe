@@ -46,8 +46,8 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
     ];
     final recipes = [
       'Breakfast',
-      'Deserts',
       'Lunch',
+      'Snack',
       'Dinner',
       'Others',
     ];

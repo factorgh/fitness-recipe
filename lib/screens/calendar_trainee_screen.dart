@@ -25,9 +25,8 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
   void initState() {
     super.initState();
 
-    // Defer the call to after widget build
     Future.microtask(() {
-      final traineeId = ref.read(userProvider)?.id; // Using ref.read here
+      final traineeId = ref.read(userProvider)?.id;
       ref.read(mealPlansProvider.notifier).fetchMealPlansByTrainee(traineeId!);
     });
   }
@@ -57,7 +56,7 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
           for (var mealPlan in firstThreeMealPlans) ...[
             CalendarItem(
               titleIcon: Icons.restaurant_menu,
-              mealPlan: mealPlan, // Assuming meal plan has a name property
+              mealPlan: mealPlan,
             ),
             const SizedBox(height: 20),
           ],
@@ -78,17 +77,46 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 30),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'Good Morning ',
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,
                       color: Colors.black),
                 ),
-                SizedBox(width: 5),
+                const SizedBox(width: 5),
+                Row(
+                  children: [
+                    const SizedBox(width: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 10,
+                            backgroundColor: Colors.grey[300],
+                          ),
+                          const SizedBox(width: 5),
+                          const Text(
+                            'Trainee',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
             const SizedBox(height: 30),
@@ -113,7 +141,7 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Latest plans",
+                  "Current plans",
                   style: TextStyle(
                     fontSize: 20,
                     color: Colors.black,

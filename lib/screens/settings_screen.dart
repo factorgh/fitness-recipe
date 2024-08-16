@@ -1,5 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/account_screen.dart';
@@ -8,6 +11,7 @@ import 'package:voltican_fitness/screens/login_screen.dart';
 
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/screens/profile_screen.dart';
+import 'package:voltican_fitness/utils/show_snackbar.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -17,13 +21,17 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  void _logout() {
+  Future<void> _logout() async {
     ref.read(userProvider.notifier).clearUser();
 
-    // Optionally navigate to login or splash screen
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-    ); // Adjust route as necessary
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+
+    showSnack(context, "Logout sucessfully");
+
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => const LoginScreen()));
+    // ); // Adjust route as necessary
   }
 
   @override
