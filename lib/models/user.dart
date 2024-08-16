@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 
 import 'package:voltican_fitness/models/recipe.dart';
@@ -70,17 +72,20 @@ class User {
   }
 
   factory User.fromJson(Map<String, dynamic> json) {
+    print('Parsing User from JSON: $json'); // Log the JSON data
+
     return User(
       id: json['_id'] as String? ?? '',
       fullName: json['fullName'] as String? ?? '',
       email: json['email'] as String? ?? '',
       username: json['username'] as String? ?? '',
       role: json['role'] as String? ?? '',
-      imageUrl: json['imageUrl'] as String? ?? '',
+      imageUrl: json['imageUrl'] as String?,
       password: json['password'] as String? ?? '',
-      savedRecipes: (json['savedRecipes'] as List<dynamic>?)
-              ?.map((item) => Recipe.fromJson(item as Map<String, dynamic>))
-              .toList() ??
+      savedRecipes: (json['savedRecipes'] as List<dynamic>?)?.map((item) {
+            print('Parsing Recipe from JSON: $item'); // Log each recipe data
+            return Recipe.fromJson(item as Map<String, dynamic>);
+          }).toList() ??
           [],
       following: List<String>.from(json['following'] ?? []),
       followers: List<String>.from(json['followers'] ?? []),

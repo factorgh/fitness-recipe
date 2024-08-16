@@ -1,3 +1,7 @@
+// ignore_for_file: avoid_print
+
+import 'dart:convert';
+
 import 'package:voltican_fitness/classes/dio_client.dart';
 import 'package:voltican_fitness/models/user.dart';
 
@@ -78,12 +82,35 @@ class TrainerService {
 
   Future<List<User>> searchTrainers(String query) async {
     try {
-      final response = await client.dio
-          .get('/trainers/search', queryParameters: {'query': query});
-      return (response.data as List)
-          .map((trainerData) => User.fromJson(trainerData))
-          .toList();
-    } catch (e) {
+      final response = await client.dio.get(
+        '/users/trainers/search',
+        queryParameters: {'query': query},
+      );
+
+      // Decode the response data if it's a string
+      final responseData = response.data is String
+          ? json.decode(response.data) // Decode JSON string to a List
+          : response.data;
+
+      // Print the type and contents of responseData for debugging
+      print('Response Data Type: ${responseData.runtimeType}');
+      print('Response Data: $responseData');
+
+      if (responseData is List) {
+        return responseData.map((trainerData) {
+          // Print the type and contents of each trainerData for debugging
+          print('Trainer Data Type: ${trainerData.runtimeType}');
+          print('Trainer Data: $trainerData');
+          return User.fromJson(trainerData);
+        }).toList();
+      } else {
+        throw Exception(
+            'Unexpected response format: ${responseData.runtimeType}');
+      }
+    } catch (e, stackTrace) {
+      // Print the error and stack trace for debugging
+      print('Error searching trainers: $e');
+      print('Stack trace: $stackTrace');
       throw Exception('Failed to search trainers');
     }
   }

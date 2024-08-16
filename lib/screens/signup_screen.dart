@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 import 'package:voltican_fitness/widgets/or_divider.dart';
 import 'package:voltican_fitness/screens/login_screen.dart';
 
-class SignupScreen extends StatefulWidget {
+class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  ConsumerState<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   final AuthService authService = AuthService();
   final _emailController = TextEditingController();
@@ -46,6 +47,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
       try {
         await authService.signup(
+          ref: ref,
           context: context,
           fullName: _fullNameController.text.trim(),
           username: _usernameController.text.trim(),

@@ -49,7 +49,7 @@ class AuthService {
           showSnack(context, 'Account created successfully');
 
           //  Get role from user
-          ref.read(userProvider.notifier).setUser(res.data.user);
+          // ref.read(userProvider.notifier).setUser(res.data.user);
 
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -85,7 +85,7 @@ class AuthService {
         showSnack(context, 'Signed in successfully');
 
         //  Get role from user
-        final userRole = res.data['role'];
+        final userRole = res.data['user']['role'];
 
         Navigator.of(context).push(
           MaterialPageRoute(

@@ -1,18 +1,70 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/Features/trainer/trainer_service.dart'; // Import your service
+import 'package:voltican_fitness/models/user.dart'; // Import your model
 
-import 'package:voltican_fitness/providers/search_provider.dart';
-
-// Replace StatefullWidget with ConsumerWidget to use Riverpod
-class TrainerSearchScreen extends ConsumerWidget {
-  TrainerSearchScreen({super.key});
-
-  final TextEditingController _searchController = TextEditingController();
+class TrainerSearchScreen extends ConsumerStatefulWidget {
+  const TrainerSearchScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final searchState = ref.watch(searchTrainersProvider);
+  _TrainerSearchScreenState createState() => _TrainerSearchScreenState();
+}
 
+class _TrainerSearchScreenState extends ConsumerState<TrainerSearchScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
+  List<User> _trainers = [];
+  bool _isLoading = false;
+  String? _error;
+
+  final TrainerService _trainerService =
+      TrainerService(); // Instantiate your service directly
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    final query = _searchController.text;
+
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      _searchTrainers(query);
+    });
+  }
+
+  Future<void> _searchTrainers(String query) async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final trainers = await _trainerService.searchTrainers(query);
+      setState(() {
+        _trainers = trainers;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Failed to load trainers: $e';
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: const SizedBox(),
@@ -34,12 +86,6 @@ class TrainerSearchScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    onChanged: (query) {
-                      // Trigger search when the user types in the search field
-                      ref
-                          .read(searchTrainersProvider.notifier)
-                          .searchTrainers(query);
-                    },
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -53,54 +99,58 @@ class TrainerSearchScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: searchState.when(
-                data: (trainers) => ListView.builder(
-                  itemCount: trainers.length,
-                  itemBuilder: (context, index) {
-                    final trainer = trainers[index];
-                    return GestureDetector(
-                      onTap: () {
-                        _showTrainerDetails(
-                          context,
-                          trainer.fullName,
-                          trainer.email,
-                          trainer.imageUrl ??
-                              'assets/images/default_avatar.png',
-                          ref,
-                        );
-                      },
-                      child: Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        elevation: 2.0,
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(16.0),
-                          leading: CircleAvatar(
-                            radius: 30,
-                            backgroundImage: trainer.imageUrl != null
-                                ? NetworkImage(trainer.imageUrl!)
-                                : const AssetImage(
-                                        'assets/images/default_avatar.png')
-                                    as ImageProvider,
-                          ),
-                          title: Text(
-                            trainer.fullName,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _error != null
+                      ? Center(child: Text(_error!))
+                      : _trainers.isEmpty
+                          ? const Center(child: Text('No trainers found.'))
+                          : ListView.builder(
+                              itemCount: _trainers.length,
+                              itemBuilder: (context, index) {
+                                final trainer = _trainers[index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    _showTrainerDetails(
+                                      context,
+                                      trainer.fullName,
+                                      trainer.email,
+                                      trainer.imageUrl ??
+                                          'assets/images/default_avatar.png',
+                                    );
+                                  },
+                                  child: Card(
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    elevation: 2.0,
+                                    child: ListTile(
+                                      contentPadding:
+                                          const EdgeInsets.all(16.0),
+                                      leading: CircleAvatar(
+                                        radius: 30,
+                                        backgroundImage: trainer.imageUrl !=
+                                                null
+                                            ? NetworkImage(trainer.imageUrl!)
+                                            : const AssetImage(
+                                                    'assets/images/default_avatar.png')
+                                                as ImageProvider,
+                                      ),
+                                      title: Text(
+                                        trainer.fullName,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      subtitle: Text(trainer.email),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                          ),
-                          subtitle: Text(trainer.email),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Center(child: Text('Error: $e')),
-              ),
             ),
           ],
         ),
@@ -113,7 +163,6 @@ class TrainerSearchScreen extends ConsumerWidget {
     String name,
     String email,
     String image,
-    WidgetRef ref,
   ) {
     showDialog(
       context: context,
@@ -156,7 +205,7 @@ class TrainerSearchScreen extends ConsumerWidget {
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () {
-                      ref.read(requestProvider.notifier).sendRequest("", "");
+                      // Your request logic here
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Request sent successfully!'),

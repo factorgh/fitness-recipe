@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/code_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
 import 'package:voltican_fitness/utils/code_generator.dart';
@@ -18,10 +19,15 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
   final CodeGenerator codeGenerator = CodeGenerator();
 
   void goToTabsScreen(BuildContext ctx) {
+    final user = ref.read(userProvider);
 // Check if it a trainer
+    if (user?.role == "1") {
+      // Generate a code if it's a trainer
+      String generatedCode = codeGenerator.generateCode(user!.fullName);
+      print(generatedCode);
+    }
 
-// Generate a code if it's a trainer
-    String generatedCode = codeGenerator.generateCode();
+    // Perform update functionality here before navigating to the tabs screen
 
 // Perform update functionality here before navigating to the tabs screen
 
