@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/code_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
+import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/utils/code_generator.dart';
 import 'package:voltican_fitness/widgets/role_widget.dart';
 
@@ -15,19 +16,32 @@ class RoleScreen extends ConsumerStatefulWidget {
 
 class _RoleScreenState extends ConsumerState<RoleScreen> {
   String? selectedRole;
-
+  AuthService authService = AuthService();
   final CodeGenerator codeGenerator = CodeGenerator();
+
+  // initialize the user from the UserProvider
+  @override
+  void initState() {
+    authService.getMe(context: context, ref: ref);
+    super.initState();
+  }
 
   void goToTabsScreen(BuildContext ctx) {
     final user = ref.read(userProvider);
 // Check if it a trainer
-    if (user?.role == "1") {
+    if (selectedRole == 'Trainer') {
       // Generate a code if it's a trainer
       String generatedCode = codeGenerator.generateCode(user!.fullName);
       print(generatedCode);
-    }
 
-    // Perform update functionality here before navigating to the tabs screen
+      // Perform update functionality here before navigating to the tabs screen
+      authService.updateRoleAndCode(
+          context: context,
+          ref: ref,
+          code: generatedCode,
+          role: "1",
+          id: user.id);
+    }
 
 // Perform update functionality here before navigating to the tabs screen
 

@@ -45,7 +45,11 @@ class AuthService {
     httpErrorHandle(
         response: res,
         context: context,
-        onSuccess: () {
+        onSuccess: () async {
+          final token = res.data['token'];
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('auth_token', token);
+
           showSnack(context, 'Account created successfully');
 
           //  Get role from user
@@ -170,6 +174,37 @@ class AuthService {
     } catch (e) {
       print('Error deleting user: $e');
       showSnack(context, 'Failed to delete user');
+    }
+  }
+
+  Future<void> updateRoleAndCode({
+    required BuildContext context,
+    required WidgetRef ref,
+    required String code,
+    required String role,
+    required String id,
+  }) async {
+    try {
+      dio.Response res = await client.dio.put(
+        "/users/$id",
+        data: {
+          'role': role,
+          'code': code,
+        },
+      );
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          // Update the user in the state after a successful update
+
+          showSnack(context, 'Role updated successfully');
+        },
+      );
+    } catch (e) {
+      print('Error updating user: $e');
+      showSnack(context, 'Failed to update user');
     }
   }
 }

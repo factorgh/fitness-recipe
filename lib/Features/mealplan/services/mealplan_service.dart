@@ -60,4 +60,16 @@ class MealPlanService {
       throw Exception('Failed to fetch meal plans: $e');
     }
   }
+
+  Future<List<MealPlan>> fetchMealPlansByTrainee(String traineeId) async {
+    try {
+      final response =
+          await client.dio.get('/api/mealplans/trainee/$traineeId');
+      return (response.data as List)
+          .map((mealPlanData) => MealPlan.fromJson(mealPlanData))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to fetch meal plans');
+    }
+  }
 }

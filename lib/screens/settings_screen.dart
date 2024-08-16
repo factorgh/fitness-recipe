@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/account_screen.dart';
 import 'package:voltican_fitness/screens/general_screen.dart';
@@ -16,8 +17,9 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  Future<void> _logout() async {
+  void _logout() {
     ref.read(userProvider.notifier).clearUser();
+
     // Optionally navigate to login or splash screen
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => const LoginScreen()),

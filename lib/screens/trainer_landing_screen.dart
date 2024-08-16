@@ -77,20 +77,7 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
       // Handle category selection
     }
 
-    void handleRecipSelected(String category) {
-      // Handle category selection
-      // Navigator.push(
-      //     context,
-      //     MaterialPageRoute(
-      //         builder: (context) => const TrainerMealDetailScreen(
-      //               meal: Meal(
-      //                   id: 'm2',
-      //                   imageUrl:
-      //                       "https://cdn.pixabay.com/photo/2017/03/27/13/54/bread-2178874_640.jpg",
-      //                   ingredients: ["potatos", "fries"],
-      //                   title: "Sandwich and Fries"),
-      //             )));
-    }
+    void handleRecipSelected(String category) {}
 
     void handleTrainerSelected(String trainer) {
       // Handle category selection

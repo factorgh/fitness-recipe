@@ -29,7 +29,7 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(height: 20),
             _EditProfileButton(),
             const SizedBox(height: 50),
-            const CopyToClipboardWidget(textToCopy: '#FRALBERT ')
+            CopyToClipboardWidget(textToCopy: user.code!)
           ],
         ),
       ),

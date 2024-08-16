@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/widgets/recipe_advert_slider.dart';
 import 'package:voltican_fitness/widgets/todays_pick.dart';
 import 'package:voltican_fitness/widgets/trainers_slider.dart';
+import 'package:badges/badges.dart' as badges;
 
-class TraineeLandingScreen extends StatefulWidget {
+class TraineeLandingScreen extends ConsumerStatefulWidget {
   const TraineeLandingScreen({super.key});
 
   @override
   _TraineeLandingScreenState createState() => _TraineeLandingScreenState();
 }
 
-class _TraineeLandingScreenState extends State<TraineeLandingScreen> {
+class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
   @override
   void initState() {
     super.initState();
@@ -55,6 +58,7 @@ class _TraineeLandingScreenState extends State<TraineeLandingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userProvider);
     final meals = [
       'Breakfast',
       'Deserts',
@@ -104,13 +108,14 @@ class _TraineeLandingScreenState extends State<TraineeLandingScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     RichText(
-                      text: const TextSpan(
-                        text: 'Hello ',
-                        style: TextStyle(fontSize: 20, color: Colors.black),
+                      text: TextSpan(
+                        text: 'Hello, ',
+                        style:
+                            const TextStyle(fontSize: 20, color: Colors.black),
                         children: <TextSpan>[
                           TextSpan(
-                              text: ',Jennifer!',
-                              style: TextStyle(
+                              text: user?.username,
+                              style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 20,
                                   color: Colors.orangeAccent)),
@@ -119,24 +124,34 @@ class _TraineeLandingScreenState extends State<TraineeLandingScreen> {
                     ),
 
                     // right side of row
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => NotificationsScreen()));
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.circular(20),
+                    badges.Badge(
+                      position: badges.BadgePosition.topEnd(top: -2, end: 1),
+                      showBadge: true,
+                      badgeContent: const Text(
+                        "4",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      badgeAnimation: const badges.BadgeAnimation.slide(
+                        animationDuration: Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      ),
+                      badgeStyle: badges.BadgeStyle(
+                        shape: badges.BadgeShape.circle,
+                        badgeColor: Colors.blueGrey[900]!,
+                        padding: const EdgeInsets.all(6),
+                        borderRadius: BorderRadius.circular(8),
+                        elevation: 3,
+                      ),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.notifications,
+                          color: Colors.red,
+                          size: 25,
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(3.0),
-                          child: Icon(
-                            Icons.notifications,
-                            size: 20,
-                            color: Colors.white,
-                          ),
-                        ),
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => NotificationsScreen()));
+                        },
                       ),
                     )
                   ],
