@@ -1,79 +1,97 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:voltican_fitness/providers/meal_plan_provider.dart';
+import 'package:voltican_fitness/providers/meal_plan_state.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 
-import 'package:voltican_fitness/widgets/plan_item.dart';
+import 'package:voltican_fitness/screens/all_meal_plan_trainee.dart';
 
-class CalendarTraineeScreen extends StatefulWidget {
+import 'package:voltican_fitness/widgets/calendar_item.dart';
+
+class CalendarTraineeScreen extends ConsumerStatefulWidget {
   const CalendarTraineeScreen({super.key});
 
   @override
-  State<CalendarTraineeScreen> createState() => _CalendarScreenState();
+  ConsumerState<CalendarTraineeScreen> createState() =>
+      _CalendarTraineeScreenState();
 }
 
-class _CalendarScreenState extends State<CalendarTraineeScreen> {
+class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
   DateTime focusedDay = DateTime.now();
   DateTime? selectedDay;
 
   @override
+  void initState() {
+    super.initState();
+
+    // Defer the call to after widget build
+    Future.microtask(() {
+      final traineeId = ref.read(userProvider)?.id; // Using ref.read here
+      ref.read(mealPlansProvider.notifier).fetchMealPlansByTrainee(traineeId!);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Watching the mealPlansProvider
+    final mealPlansState = ref.watch(mealPlansProvider);
+
+    final Widget mealPlansWidget;
+    if (mealPlansState is MealPlansLoading) {
+      mealPlansWidget = const CircularProgressIndicator();
+    } else if (mealPlansState is MealPlansError) {
+      mealPlansWidget = Text(mealPlansState.error);
+    } else if (mealPlansState is MealPlansLoaded) {
+      final mealPlans = mealPlansState.mealPlans;
+
+      // Get the first 3 meal plans or fewer if there are less than 3
+      final firstThreeMealPlans = mealPlans.take(3).toList();
+
+      mealPlansWidget = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          const SizedBox(height: 10),
+          // Displaying the first 3 meal plans
+          for (var mealPlan in firstThreeMealPlans) ...[
+            CalendarItem(
+              titleIcon: Icons.restaurant_menu,
+              mealPlan: mealPlan, // Assuming meal plan has a name property
+            ),
+            const SizedBox(height: 20),
+          ],
+        ],
+      );
+    } else {
+      mealPlansWidget = const Text('No meal plans available.');
+    }
+
     return Scaffold(
         body: SafeArea(
             child: Container(
       width: double.maxFinite,
       height: double.maxFinite,
-      margin: const EdgeInsets.only(left: 20, right: 20),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 30),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Good Morning',
-                  style: TextStyle(fontSize: 22),
+                Text(
+                  'Good Morning ',
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black),
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black54),
-                        borderRadius: BorderRadius.circular(30),
-                        image: const DecorationImage(
-                            fit: BoxFit.cover,
-                            image:
-                                AssetImage("assets/images/onboarding_1.png")),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Text(
-                      'Trainee',
-                      style: TextStyle(fontSize: 13, color: Colors.black),
-                    ),
-                  ],
-                ),
+                SizedBox(width: 5),
               ],
             ),
-            const SizedBox(
-              height: 30,
-            ),
-            const Row(
-              children: [
-                SizedBox(
-                  width: 3,
-                ),
-                Spacer(),
-              ],
-            ),
+            const SizedBox(height: 30),
             TableCalendar(
               firstDay: DateTime.utc(2001, 7, 20),
               focusedDay: focusedDay,
@@ -91,27 +109,34 @@ class _CalendarScreenState extends State<CalendarTraineeScreen> {
             ),
             const SizedBox(height: 30),
             const Divider(color: Colors.black54, height: 10),
-            const SizedBox(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Latest plans",
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const AllMealPlanTrainee())),
+                  child: const Text(
+                    "View all Plans",
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
               width: double.maxFinite,
-              child: SingleChildScrollView(
-                  child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    "24 April, 2024",
-                    style: TextStyle(fontSize: 20, color: Colors.black54),
-                  ),
-                  PlanItem(),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  PlanItem(),
-                ],
-              )),
-            )
+              child: SingleChildScrollView(child: mealPlansWidget),
+            ),
           ],
         ),
       ),

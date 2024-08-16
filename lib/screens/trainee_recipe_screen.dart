@@ -87,17 +87,6 @@ class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
               ),
               Row(
                 children: [
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     Navigator.of(context).push(MaterialPageRoute(
-                  //         builder: (context) => const CreateRecipeScreen()));
-                  //   },
-                  //   child: const Icon(
-                  //     Icons.add,
-                  //     color: Colors.black,
-                  //     size: 25,
-                  //   ),
-                  // ),
                   const SizedBox(width: 10),
                   Container(
                     padding:

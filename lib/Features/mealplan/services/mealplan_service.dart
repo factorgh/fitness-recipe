@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:voltican_fitness/classes/dio_client.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 
@@ -63,8 +65,7 @@ class MealPlanService {
 
   Future<List<MealPlan>> fetchMealPlansByTrainee(String traineeId) async {
     try {
-      final response =
-          await client.dio.get('/api/mealplans/trainee/$traineeId');
+      final response = await client.dio.get('/meal-plans/trainee/$traineeId');
       return (response.data as List)
           .map((mealPlanData) => MealPlan.fromJson(mealPlanData))
           .toList();
