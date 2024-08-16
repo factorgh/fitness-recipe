@@ -100,7 +100,7 @@ class AuthService {
     );
   }
 
-  void getMe({
+  Future<void> getMe({
     required BuildContext context,
     required WidgetRef ref,
   }) async {

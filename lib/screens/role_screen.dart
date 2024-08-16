@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, avoid_print
+// ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,45 +18,48 @@ class RoleScreen extends ConsumerStatefulWidget {
 
 class _RoleScreenState extends ConsumerState<RoleScreen> {
   String? selectedRole;
-  final AuthService authService = AuthService();
+  AuthService authService = AuthService();
   final CodeGenerator codeGenerator = CodeGenerator();
 
+  // initialize the user from the UserProvider
   @override
   void initState() {
     super.initState();
-    authService.getMe(context: context, ref: ref);
+    _initialize();
   }
 
-  Future<void> goToTabsScreen(BuildContext ctx) async {
+  Future<void> _initialize() async {
+    await authService.getMe(context: context, ref: ref);
+  }
+
+  void goToTabsScreen(BuildContext ctx) {
     final user = ref.read(userProvider);
 
     if (user == null) {
-      // Handle the case when user is null
       return;
     }
-
+// Check if it a trainer
     if (selectedRole == 'Trainer') {
+      // Generate a code if it's a trainer!
       String generatedCode = codeGenerator.generateCode(user.fullName);
       print(generatedCode);
 
-      try {
-        await authService.updateRoleAndCode(
+      // Perform update functionality here before navigating to the tabs screen
+      authService.updateRoleAndCode(
           context: context,
           ref: ref,
           code: generatedCode,
           role: "1",
-          id: user.id,
-        );
-      } catch (e) {
-        // Handle the update error here
-        print('Failed to update role and code: $e');
-        return;
-      }
+          id: user.id);
     }
+
+// Perform update functionality here before navigating to the tabs screen
 
     Navigator.of(context).push(MaterialPageRoute(
       builder: (ctx) => selectedRole == 'Trainer'
-          ? const TabsScreen(userRole: '1')
+          ? const TabsScreen(
+              userRole: '1',
+            )
           : const CodeScreen(),
     ));
   }
@@ -110,7 +113,7 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
                         isSelected: selectedRole == 'Trainer',
                       ),
                     ),
-                    const SizedBox(width: 20),
+                    const SizedBox(height: 20),
                     GestureDetector(
                       onTap: () => _selectRole('Trainee'),
                       child: RoleItemWidget(
@@ -125,29 +128,29 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
               if (selectedRole != null)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 20),
-                  child: InkWell(
-                    onTap: () => goToTabsScreen(context),
-                    splashColor: Colors.purple,
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(8),
+                  child: SizedBox(
+                    width: double
+                        .infinity, // Ensures the button takes up the full width
+                    child: ElevatedButton(
+                      onPressed: () => goToTabsScreen(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red, // Background color
+                        foregroundColor: Colors.white, // Text color
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                      child: const Center(
-                        child: Text(
-                          'Proceed',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      child: const Text(
+                        'Proceed',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-                ),
+                )
             ],
           ),
         ),

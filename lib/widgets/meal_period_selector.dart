@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
@@ -38,12 +40,68 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
   }
 
   void _onRecipeTap(String recipeId, String mealPeriod) async {
+    // Determine the valid time range for the selected meal period
+    TimeOfDay startTime;
+    TimeOfDay endTime;
+
+    switch (mealPeriod) {
+      case 'Breakfast':
+        startTime = const TimeOfDay(hour: 0, minute: 0);
+        endTime = const TimeOfDay(hour: 11, minute: 59);
+        break;
+      case 'Lunch':
+        startTime = const TimeOfDay(hour: 12, minute: 0);
+        endTime = const TimeOfDay(hour: 17, minute: 59);
+        break;
+      case 'Dinner':
+        startTime = const TimeOfDay(hour: 18, minute: 0);
+        endTime = const TimeOfDay(hour: 23, minute: 59);
+        break;
+      case 'Snack':
+      default:
+        startTime = const TimeOfDay(hour: 0, minute: 0);
+        endTime = const TimeOfDay(hour: 23, minute: 59);
+        break;
+    }
+
     TimeOfDay? selectedTime = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: startTime,
+      helpText: 'Select Time for $mealPeriod',
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            alwaysUse24HourFormat: false,
+          ),
+          child: child!,
+        );
+      },
     );
 
-    if (selectedTime == null) return;
+    if (selectedTime == null) {
+      return; // User canceled the time picker
+    }
+
+    if (!_isTimeWithinRange(selectedTime, startTime, endTime)) {
+      // Show alert dialog if time is outside the allowed range
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Invalid Time for $mealPeriod'),
+            content: Text(
+                'Please select a time between ${startTime.format(context)} and ${endTime.format(context)} for $mealPeriod.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return; // Do not proceed if time is invalid
+    }
 
     DateTime allocatedTime = DateTime(
       DateTime.now().year,
@@ -54,8 +112,6 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     );
 
     setState(() {
-      // Recipe? selectedRecipe =
-      //     widget.recipes.firstWhere((recipe) => recipe.id == recipeId);
       RecipeAllocation allocation = RecipeAllocation(
         recipeId: recipeId,
         allocatedTime: allocatedTime,
@@ -68,6 +124,20 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       _selectedMeals[mealPeriod]!.add(allocation);
       widget.onSelectionChanged(_convertToRecipeAllocations());
     });
+  }
+
+  bool _isTimeWithinRange(
+      TimeOfDay selectedTime, TimeOfDay startTime, TimeOfDay endTime) {
+    final now = DateTime.now();
+    final selectedDateTime = DateTime(
+        now.year, now.month, now.day, selectedTime.hour, selectedTime.minute);
+    final startDateTime = DateTime(
+        now.year, now.month, now.day, startTime.hour, startTime.minute);
+    final endDateTime =
+        DateTime(now.year, now.month, now.day, endTime.hour, endTime.minute);
+
+    return selectedDateTime.isAfter(startDateTime) &&
+        selectedDateTime.isBefore(endDateTime);
   }
 
   void _removeRecipe(String mealPeriod, String recipeId) {

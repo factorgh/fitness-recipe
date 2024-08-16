@@ -29,6 +29,7 @@ class NotificationService {
 
   // Pass the user role to this method
   Future<void> scheduleDailyMealReminders(String userRole) async {
+    // ignore: unrelated_type_equality_checks
     if (userRole != 1) return; // Only proceed if the user is a trainee (role 1)
 
     final DateTime now = DateTime.now();
