@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:voltican_fitness/models/meal.dart';
@@ -80,9 +82,6 @@ class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
                 // Handle the submit action
                 String review = reviewController.text;
                 if (review.isNotEmpty) {
-                  // Perform the submit action
-                  // For example, you can call a function to handle the review submission
-                  // _submitReview(review);
                   print("Review submitted: $review");
                 }
                 Navigator.of(context).pop(); // Close the dialog

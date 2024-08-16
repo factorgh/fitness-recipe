@@ -433,18 +433,16 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                   ),
                 ],
               ),
-              if (_selectedDuration == 'Custom') const SizedBox(height: 20),
-              if (_selectedDuration == 'Custom')
-                const Text(
-                  "Select Meal Periods",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+              const SizedBox(height: 20),
+              const Text(
+                "Select Meal Periods",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 10),
-              if (_selectedDuration == 'Custom')
-                WeekRangeSelector(
-                  // Provide your selected days here
-                  onSelectionChanged: _onSelectionChanged,
-                ),
+              WeekRangeSelector(
+                // Provide your selected days here
+                onSelectionChanged: _onSelectionChanged,
+              ),
               const SizedBox(height: 20),
               MealPeriodSelector(
                 recipes: myRecipes, // Pass actual recipes here

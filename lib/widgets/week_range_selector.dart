@@ -11,13 +11,13 @@ class WeekRangeSelector extends StatefulWidget {
 
 class _WeekRangeSelectorState extends State<WeekRangeSelector> {
   final List<String> _daysOfWeek = [
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-    'Sat',
-    'Sun'
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday'
   ];
   final List<String> _selectedDays = [];
 
