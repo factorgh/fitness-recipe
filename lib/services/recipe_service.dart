@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'dart:io';
 
@@ -120,7 +120,8 @@ class RecipeService {
 
   Future<List<Recipe>> fetchSavedRecipes(String userId) async {
     try {
-      final response = await client.dio.get('/recipes/saved-recipes/$userId');
+      final response =
+          await client.dio.get('/recipes/user/$userId/saved-recipes/');
 
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;

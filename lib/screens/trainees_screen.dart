@@ -256,17 +256,6 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                     ],
                   ),
                 ),
-                if (!isFollowing)
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.green),
-                    onPressed: () => follow(trainee.id),
-                    child: const Text(
-                      "Follow",
-                      style: TextStyle(fontSize: 10),
-                    ),
-                  ),
                 if (isFollowing && removeTrainee != null)
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.grey),
@@ -352,6 +341,17 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                     ],
                   ),
                 ),
+                if (!isFollowing)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.green),
+                    onPressed: () => unfollow(trainer.id),
+                    child: const Text(
+                      "Unfollow",
+                      style: TextStyle(fontSize: 10),
+                    ),
+                  ),
                 if (isFollowing)
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(

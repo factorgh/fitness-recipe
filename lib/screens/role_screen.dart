@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
@@ -16,40 +18,45 @@ class RoleScreen extends ConsumerStatefulWidget {
 
 class _RoleScreenState extends ConsumerState<RoleScreen> {
   String? selectedRole;
-  AuthService authService = AuthService();
+  final AuthService authService = AuthService();
   final CodeGenerator codeGenerator = CodeGenerator();
 
-  // initialize the user from the UserProvider
   @override
   void initState() {
-    authService.getMe(context: context, ref: ref);
     super.initState();
+    authService.getMe(context: context, ref: ref);
   }
 
-  void goToTabsScreen(BuildContext ctx) {
+  Future<void> goToTabsScreen(BuildContext ctx) async {
     final user = ref.read(userProvider);
-// Check if it a trainer
+
+    if (user == null) {
+      // Handle the case when user is null
+      return;
+    }
+
     if (selectedRole == 'Trainer') {
-      // Generate a code if it's a trainer
-      String generatedCode = codeGenerator.generateCode(user!.fullName);
+      String generatedCode = codeGenerator.generateCode(user.fullName);
       print(generatedCode);
 
-      // Perform update functionality here before navigating to the tabs screen
-      authService.updateRoleAndCode(
+      try {
+        await authService.updateRoleAndCode(
           context: context,
           ref: ref,
           code: generatedCode,
           role: "1",
-          id: user.id);
+          id: user.id,
+        );
+      } catch (e) {
+        // Handle the update error here
+        print('Failed to update role and code: $e');
+        return;
+      }
     }
-
-// Perform update functionality here before navigating to the tabs screen
 
     Navigator.of(context).push(MaterialPageRoute(
       builder: (ctx) => selectedRole == 'Trainer'
-          ? const TabsScreen(
-              userRole: '1',
-            )
+          ? const TabsScreen(userRole: '1')
           : const CodeScreen(),
     ));
   }
@@ -103,7 +110,7 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
                         isSelected: selectedRole == 'Trainer',
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(width: 20),
                     GestureDetector(
                       onTap: () => _selectRole('Trainee'),
                       child: RoleItemWidget(

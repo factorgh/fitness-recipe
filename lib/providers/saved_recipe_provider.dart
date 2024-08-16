@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/providers/recipe_service_provider.dart';
@@ -12,11 +14,12 @@ class SavedRecipesNotifier extends StateNotifier<List<Recipe>> {
     try {
       await _recipeService.saveRecipe(userId, recipe.id!);
 
+      // Add recipe if not already present
       if (!state.any((r) => r.id == recipe.id)) {
         state = [...state, recipe];
       }
     } catch (e) {
-      throw Exception('Error saving recipe: $e');
+      print('Error saving recipe: $e');
     }
   }
 
@@ -25,7 +28,8 @@ class SavedRecipesNotifier extends StateNotifier<List<Recipe>> {
       final recipes = await _recipeService.fetchSavedRecipes(userId);
       state = recipes;
     } catch (e) {
-      throw Exception('Error loading saved recipes: $e');
+      print('Error loading saved recipes: $e');
+      state = []; // Clear state or provide a fallback
     }
   }
 
@@ -34,7 +38,8 @@ class SavedRecipesNotifier extends StateNotifier<List<Recipe>> {
       final recipes = await _recipeService.fetchRecipesByUser();
       state = recipes;
     } catch (e) {
-      throw Exception('Error loading user recipes: $e');
+      print('Error loading user recipes: $e');
+      state = []; // Clear state or provide a fallback
     }
   }
 
@@ -43,7 +48,7 @@ class SavedRecipesNotifier extends StateNotifier<List<Recipe>> {
       await _recipeService.deleteRecipe(recipeId);
       state = state.where((recipe) => recipe.id != recipeId).toList();
     } catch (e) {
-      throw Exception('Error deleting recipe: $e');
+      print('Error deleting recipe: $e');
     }
   }
 
@@ -64,7 +69,7 @@ class SavedRecipesNotifier extends StateNotifier<List<Recipe>> {
           .map((recipe) => recipe.id == recipeId ? updatedRecipe : recipe)
           .toList();
     } catch (e) {
-      throw Exception('Error updating recipe: $e');
+      print('Error updating recipe: $e');
     }
   }
 }
