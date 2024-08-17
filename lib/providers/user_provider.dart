@@ -24,6 +24,14 @@ class UserNotifier extends StateNotifier<User?> {
     }
   }
 
+  void updateImageUrl({
+    required String imageUrl,
+  }) {
+    if (state != null) {
+      state = state!.copyWith(imageUrl: imageUrl);
+    }
+  }
+
   // Clear user data (e.g., on logout)
   void clearUser() {
     state = null;

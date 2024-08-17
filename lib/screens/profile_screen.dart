@@ -1,17 +1,64 @@
+// ignore_for_file: avoid_print
+
+import 'dart:io';
+
+import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/update_profile_screen.dart';
 import 'package:voltican_fitness/widgets/copy_to_clipboard.dart';
 import 'package:voltican_fitness/widgets/status_toggle_button.dart';
 
-class ProfileScreen extends ConsumerWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  String? _imageUrl;
+
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageUrl = pickedFile.path;
+      });
+
+      // Upload the image to Cloudinary and update user profile
+      await _updateProfile(pickedFile);
+    }
+  }
+
+  Future<void> _updateProfile(XFile imageFile) async {
+    final cloudinary =
+        CloudinaryPublic('your-cloudinary-cloud-name', 'your-upload-preset');
+
+    // Upload image to Cloudinary
+    CloudinaryResponse uploadResult = await cloudinary.uploadFile(
+      CloudinaryFile.fromFile(imageFile.path, folder: 'voltican_fitness'),
+    );
+
+    final image = uploadResult.secureUrl;
+    print('Image URL: $image');
+
+    // Here you would typically update the user's profile with the new image URL.
+    ref.read(userProvider.notifier).updateImageUrl(imageUrl: image);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -21,7 +68,7 @@ class ProfileScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            _ProfileHeader(),
+            _ProfileHeader(imageUrl: _imageUrl, onEdit: _pickImage),
             const SizedBox(height: 20),
             _ProfileInfo(user: user!),
             const SizedBox(height: 20),
@@ -37,7 +84,17 @@ class ProfileScreen extends ConsumerWidget {
   }
 }
 
-class _ProfileHeader extends StatelessWidget {
+class _ProfileHeader extends StatefulWidget {
+  final String? imageUrl;
+  final VoidCallback onEdit;
+
+  const _ProfileHeader({this.imageUrl, required this.onEdit});
+
+  @override
+  __ProfileHeaderState createState() => __ProfileHeaderState();
+}
+
+class __ProfileHeaderState extends State<_ProfileHeader> {
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -45,17 +102,22 @@ class _ProfileHeader extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 60,
-            backgroundImage: const AssetImage(
-                'assets/images/pf2.jpg'), // Replace with your profile picture asset
+            backgroundImage: widget.imageUrl != null
+                ? FileImage(File(widget.imageUrl!))
+                : const AssetImage('assets/images/default_profile.png')
+                    as ImageProvider,
             backgroundColor: Colors.grey.shade200,
           ),
-          const Positioned(
+          Positioned(
             bottom: 0,
             right: 0,
-            child: CircleAvatar(
-              radius: 20,
-              backgroundColor: Colors.blue,
-              child: Icon(Icons.edit, color: Colors.white, size: 20),
+            child: GestureDetector(
+              onTap: widget.onEdit,
+              child: const CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.blue,
+                child: Icon(Icons.edit, color: Colors.white, size: 20),
+              ),
             ),
           ),
         ],
@@ -68,6 +130,7 @@ class _ProfileInfo extends StatelessWidget {
   final User user;
 
   const _ProfileInfo({required this.user});
+
   @override
   Widget build(BuildContext context) {
     return Column(
