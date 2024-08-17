@@ -177,19 +177,15 @@ class AuthService {
     }
   }
 
-  Future<void> updateRoleAndCode({
+  Future<void> updateRole({
     required BuildContext context,
-    required WidgetRef ref,
-    required String code,
     required String role,
-    required String id,
   }) async {
     try {
       dio.Response res = await client.dio.put(
-        "/users/$id",
+        "/users/user/role",
         data: {
           'role': role,
-          'code': code,
         },
       );
 
@@ -205,6 +201,26 @@ class AuthService {
     } catch (e) {
       print('Error updating user: $e');
       showSnack(context, 'Failed to update user');
+    }
+  }
+
+  Future<Map<String, dynamic>?> getUserByCode(String code) async {
+    try {
+      final response = await client.dio
+          .get('/trainer/code/$code/follow'); // Adjust the endpoint as needed
+
+      if (response.statusCode == 200) {
+        // Return the user data from the response
+        return response.data['user'];
+      } else {
+        // Handle non-200 responses
+        print('Failed to load user: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      // Handle exceptions
+      print('Error fetching user by code: $e');
+      return null;
     }
   }
 }

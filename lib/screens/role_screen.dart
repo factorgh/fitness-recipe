@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +21,6 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
   AuthService authService = AuthService();
   final CodeGenerator codeGenerator = CodeGenerator();
 
-  // initialize the user from the UserProvider
   @override
   void initState() {
     super.initState();
@@ -32,36 +31,24 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
     await authService.getMe(context: context, ref: ref);
   }
 
-  void goToTabsScreen(BuildContext ctx) {
-//     final user = ref.read(userProvider);
+  Future<void> goToTabsScreen(BuildContext ctx) async {
+    if (selectedRole == 'Trainer') {
+      // Perform update functionality here before navigating to the tabs screen
+      await authService.updateRole(
+        context: context,
+        role: "1",
+      );
 
-//     if (user == null) {
-//       return;
-//     }
-// // Check if it a trainer
-//     if (selectedRole == 'Trainer') {
-//       // Generate a code if it's a trainer!
-//       String generatedCode = codeGenerator.generateCode(user.fullName);
-//       print(generatedCode);
-
-//       // Perform update functionality here before navigating to the tabs screen
-//       authService.updateRoleAndCode(
-//           context: context,
-//           ref: ref,
-//           code: generatedCode,
-//           role: "1",
-//           id: user.id);
-//     }
-
-// Perform update functionality here before navigating to the tabs screen
-
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (ctx) => selectedRole == 'Trainer'
-          ? const TabsScreen(
-              userRole: '1',
-            )
-          : const CodeScreen(),
-    ));
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (ctx) => const TabsScreen(
+          userRole: '1',
+        ),
+      ));
+    } else if (selectedRole == 'Trainee') {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (ctx) => const CodeScreen(),
+      ));
+    }
   }
 
   void _selectRole(String role) {
@@ -113,7 +100,7 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
                         isSelected: selectedRole == 'Trainer',
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(width: 20),
                     GestureDetector(
                       onTap: () => _selectRole('Trainee'),
                       child: RoleItemWidget(
@@ -129,13 +116,12 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 20),
                   child: SizedBox(
-                    width: double
-                        .infinity, // Ensures the button takes up the full width
+                    width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () => goToTabsScreen(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red, // Background color
-                        foregroundColor: Colors.white, // Text color
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -150,7 +136,7 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
                       ),
                     ),
                   ),
-                )
+                ),
             ],
           ),
         ),
