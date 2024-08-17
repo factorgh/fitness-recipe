@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:voltican_fitness/classes/dio_client.dart';
 import 'package:voltican_fitness/models/user.dart';
 
@@ -121,6 +122,28 @@ class TrainerService {
           .post('/trainers/$trainerId/request', data: {'traineeId': traineeId});
     } catch (e) {
       throw Exception('Failed to send request');
+    }
+  }
+
+  Future<List<User>> fetchTraineeDetails(List<String> traineeIds) async {
+    try {
+      final response =
+          await client.dio.get('/users/mealplan/trainees/details', data: {
+        'traineeIds': traineeIds,
+      });
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data['trainees'];
+        return data.map((json) => User.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load trainee details');
+      }
+    } on DioException catch (e) {
+      // Handle Dio-specific exceptions
+      throw Exception('Dio error: ${e.message}');
+    } catch (e) {
+      // Handle general exceptions
+      throw Exception('Unexpected error: $e');
     }
   }
 }

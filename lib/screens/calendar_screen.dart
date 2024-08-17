@@ -28,7 +28,14 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     // Handling different states of meal plans
     final Widget mealPlansWidget;
     if (mealPlansState is MealPlansLoading) {
-      mealPlansWidget = const CircularProgressIndicator();
+      // ignore: prefer_const_constructors
+      mealPlansWidget = Container(
+        margin: const EdgeInsets.symmetric(vertical: 50),
+        child: const Center(
+            child: CircularProgressIndicator(
+          color: Colors.red,
+        )),
+      );
     } else if (mealPlansState is MealPlansError) {
       mealPlansWidget = Text(mealPlansState.error);
     } else if (mealPlansState is MealPlansLoaded) {
@@ -131,7 +138,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     "View all Plans",
                     style: TextStyle(
                         fontSize: 16,
-                        color: Colors.black,
+                        color: Colors.blue,
                         fontWeight: FontWeight.w500),
                   ),
                 ),

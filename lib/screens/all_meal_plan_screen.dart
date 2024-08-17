@@ -13,7 +13,7 @@ class AllMealPlan extends ConsumerStatefulWidget {
 }
 
 class _AllMealPlanState extends ConsumerState<AllMealPlan> {
-  DateTime? _selectedDate;
+  // DateTime? _selectedDate;
   String _selectedDuration = 'Does Not Repeat';
 
   @override
@@ -24,19 +24,19 @@ class _AllMealPlanState extends ConsumerState<AllMealPlan> {
     });
   }
 
-  Future<void> _pickDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (pickedDate != null && pickedDate != _selectedDate) {
-      setState(() {
-        _selectedDate = pickedDate;
-      });
-    }
-  }
+  // Future<void> _pickDate(BuildContext context) async {
+  //   final DateTime? pickedDate = await showDatePicker(
+  //     context: context,
+  //     initialDate: _selectedDate ?? DateTime.now(),
+  //     firstDate: DateTime(2000),
+  //     lastDate: DateTime(2101),
+  //   );
+  //   if (pickedDate != null && pickedDate != _selectedDate) {
+  //     setState(() {
+  //       _selectedDate = pickedDate;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

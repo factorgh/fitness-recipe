@@ -39,13 +39,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  void _getStarted(BuildContext ctx) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (ctx) => const SignupScreen(),
-      ),
-    );
-  }
+  // void _getStarted(BuildContext ctx) {
+  //   Navigator.of(context).push(
+  //     MaterialPageRoute(
+  //       builder: (ctx) => const SignupScreen(),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {

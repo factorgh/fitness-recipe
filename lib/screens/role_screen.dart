@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
+
 import 'package:voltican_fitness/screens/code_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
@@ -33,25 +33,25 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
   }
 
   void goToTabsScreen(BuildContext ctx) {
-    final user = ref.read(userProvider);
+//     final user = ref.read(userProvider);
 
-    if (user == null) {
-      return;
-    }
-// Check if it a trainer
-    if (selectedRole == 'Trainer') {
-      // Generate a code if it's a trainer!
-      String generatedCode = codeGenerator.generateCode(user.fullName);
-      print(generatedCode);
+//     if (user == null) {
+//       return;
+//     }
+// // Check if it a trainer
+//     if (selectedRole == 'Trainer') {
+//       // Generate a code if it's a trainer!
+//       String generatedCode = codeGenerator.generateCode(user.fullName);
+//       print(generatedCode);
 
-      // Perform update functionality here before navigating to the tabs screen
-      authService.updateRoleAndCode(
-          context: context,
-          ref: ref,
-          code: generatedCode,
-          role: "1",
-          id: user.id);
-    }
+//       // Perform update functionality here before navigating to the tabs screen
+//       authService.updateRoleAndCode(
+//           context: context,
+//           ref: ref,
+//           code: generatedCode,
+//           role: "1",
+//           id: user.id);
+//     }
 
 // Perform update functionality here before navigating to the tabs screen
 

@@ -11,13 +11,13 @@ class WeekRangeSelector extends StatefulWidget {
 
 class _WeekRangeSelectorState extends State<WeekRangeSelector> {
   final List<String> _daysOfWeek = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday'
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
+    'Sun'
   ];
   final List<String> _selectedDays = [];
 
@@ -52,6 +52,7 @@ class _WeekRangeSelectorState extends State<WeekRangeSelector> {
         ],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: _daysOfWeek.map((day) {
           bool isSelected = _selectedDays.contains(day);

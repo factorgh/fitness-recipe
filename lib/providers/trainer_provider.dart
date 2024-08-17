@@ -155,6 +155,16 @@ final traineesFollowingProvider = StateNotifierProvider.family<
     ..fetchTraineesFollowingTrainer(trainerId);
 });
 
+// Traineee Provider
+final traineeServiceProvider = Provider<TrainerService>((ref) {
+  return TrainerService();
+});
+
+final traineeDetailsProvider =
+    FutureProvider.family<List<User>, List<String>>((ref, traineeIds) async {
+  final service = ref.watch(traineeServiceProvider);
+  return await service.fetchTraineeDetails(traineeIds);
+});
 // Dropdown filter providers
 final trainerFilterProvider = StateProvider<String>((ref) => 'All');
 final traineeFilterProvider = StateProvider<String>((ref) => 'All');
