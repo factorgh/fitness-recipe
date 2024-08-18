@@ -2,15 +2,31 @@
 
 import 'package:voltican_fitness/classes/dio_client.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
+import 'package:voltican_fitness/services/noti_setup.dart';
 
 class MealPlanService {
   final DioClient client = DioClient();
+  // Create a new meal plan
   // Create a new meal plan
   Future<MealPlan> createMealPlan(MealPlan mealPlan) async {
     try {
       final response =
           await client.dio.post('/meal-plans', data: mealPlan.toJson());
-      return MealPlan.fromJson(response.data);
+
+      // Deserialize the response to a MealPlan object
+      MealPlan createdMealPlan = MealPlan.fromJson(response.data);
+
+      // Schedule notifications after successfully creating the meal plan
+      final notificationService = NotificationService();
+      await notificationService.scheduleMealPlanNotifications(
+        mealPlanId: createdMealPlan.id!,
+        creationDate: DateTime.now(),
+        days: createdMealPlan.days,
+        recipeAllocations: createdMealPlan.recipeAllocations,
+        trainees: createdMealPlan.trainees,
+      );
+
+      return createdMealPlan;
     } catch (e) {
       // Handle error
       throw Exception('Failed to create meal plan: $e');

@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'dart:io';
 
@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/update_profile_screen.dart';
+import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/widgets/copy_to_clipboard.dart';
 import 'package:voltican_fitness/widgets/status_toggle_button.dart';
 
@@ -21,6 +22,7 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String? _imageUrl;
+  AuthService authService = AuthService();
 
   final ImagePicker _picker = ImagePicker();
 
@@ -40,8 +42,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Future<void> _updateProfile(XFile imageFile) async {
-    final cloudinary =
-        CloudinaryPublic('your-cloudinary-cloud-name', 'your-upload-preset');
+    final cloudinary = CloudinaryPublic('daq5dsnqy', 'jqx9kpde');
 
     // Upload image to Cloudinary
     CloudinaryResponse uploadResult = await cloudinary.uploadFile(
@@ -52,7 +53,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     print('Image URL: $image');
 
     // Here you would typically update the user's profile with the new image URL.
-    ref.read(userProvider.notifier).updateImageUrl(imageUrl: image);
   }
 
   @override

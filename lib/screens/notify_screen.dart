@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class NotificationsScreen extends StatelessWidget {
   final List<NotificationItem> notifications = [
-    NotificationItem(
-      title: 'New Message from John',
-      description: 'Hey, are we still meeting today?',
-      timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-    ),
-    NotificationItem(
-      title: 'App Update Available',
-      description: 'Version 2.1.0 is now available.',
-      timestamp: DateTime.now().subtract(const Duration(hours: 1)),
-    ),
-    NotificationItem(
-      title: 'Reminder: Meeting at 3 PM',
-      description: 'Don\'t forget your meeting today.',
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    // Add more notifications here
+    // NotificationItem(
+    //   title: 'New Message from John',
+    //   description: 'Hey, are we still meeting today?',
+    //   timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
+    // ),
+    // NotificationItem(
+    //   title: 'App Update Available',
+    //   description: 'Version 2.1.0 is now available.',
+    //   timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+    // ),
+    // NotificationItem(
+    //   title: 'Reminder: Meeting at 3 PM',
+    //   description: 'Don\'t forget your meeting today.',
+    //   timestamp: DateTime.now().subtract(const Duration(days: 1)),
+    // ),
   ];
   NotificationsScreen({super.key});
 
@@ -25,23 +25,33 @@ class NotificationsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: const Text(
+          'Notifications',
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
         centerTitle: true,
       ),
       body: Column(
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
-                padding: EdgeInsets.only(top: 20, bottom: 10, left: 10),
-                child: Text(
-                  'New Alerts',
-                  style: TextStyle(color: Colors.lightBlue, fontSize: 20),
-                ),
+                padding: const EdgeInsets.only(top: 20, bottom: 10, left: 10),
+                child: notifications.isEmpty
+                    ? const Text(
+                        'No notifications available',
+                        style: TextStyle(color: Colors.red, fontSize: 15),
+                      )
+                    : const Text(
+                        'New Alerts',
+                        style: TextStyle(color: Colors.lightBlue, fontSize: 15),
+                      ),
               ),
             ],
           ),
+          if (notifications.isEmpty)
+            Lottie.asset("assets/animations/notify.json"),
           Expanded(
             child: ListView.builder(
               itemCount: notifications.length,

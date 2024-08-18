@@ -63,6 +63,7 @@ dependencies:
   timezone: ^0.9.4
   location: ^6.0.2
   workmanager: ^0.5.2
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:
@@ -139,6 +140,7 @@ flutter:
     - assets/images/role2.png
     - assets/images/default_profile.png
     - assets/animations/loader.json
+    - assets/animations/notify.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

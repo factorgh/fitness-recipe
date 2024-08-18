@@ -1,73 +1,87 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 
 class NotificationItem extends StatelessWidget {
   final String notiText;
   final String notiSubText;
   final IconData notiIcon;
-  const NotificationItem(
-      {super.key,
-      required this.notiIcon,
-      required this.notiText,
-      required this.notiSubText});
+  final String createdByUserId;
+
+  const NotificationItem({
+    super.key,
+    required this.notiIcon,
+    required this.notiText,
+    required this.notiSubText,
+    required this.createdByUserId,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(
-            bottom: BorderSide(color: Color.fromARGB(139, 183, 178, 172))),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
+    return InkWell(
+      onTap: () {
+        // Handle notification tap, e.g., navigate to a specific screen
+        print('Notification tapped by user: $createdByUserId');
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            bottom: BorderSide(color: Colors.grey.shade300),
+          ),
+        ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            InkWell(
-              onTap: () {},
-              child: Container(
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black54),
-                    borderRadius: BorderRadius.circular(30)),
-                child: const Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Icon(
-                    Icons.add_chart_sharp,
-                    size: 15,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 0,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  notiText,
-                  style: const TextStyle(color: Colors.black87),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Text(
-                  notiSubText,
-                  style: const TextStyle(color: Colors.black54),
-                ),
-              ],
-            ),
-            const SizedBox(
-              width: 20,
-            ),
             Container(
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.red,
+                border: Border.all(color: Colors.black54),
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
+              child: Icon(
+                notiIcon,
+                size: 20,
+                color: Colors.black87,
               ),
-            )
+            ),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    notiText,
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    notiSubText,
+                    style: const TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: Colors.redAccent,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: Colors.white,
+              ),
+            ),
           ],
         ),
       ),
