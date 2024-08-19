@@ -211,8 +211,8 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
       final mealPlan = MealPlan(
         name: _mealPlanNameController.text,
         duration: _selectedDuration,
-        startDate: _selectedDuration == 'Custom' ? _startDate : null,
-        endDate: _selectedDuration == 'Custom' ? _endDate : null,
+        startDate: _startDate,
+        endDate: _endDate,
         days: _weekDays,
         periods: [],
         recipeAllocations: _selectedRecipeAllocations,
@@ -252,7 +252,10 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Meal Plan'),
+        title: const Text(
+          'Create Meal Plan',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
         centerTitle: true,
       ),
       body: Padding(
@@ -457,7 +460,11 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     ? const CircularProgressIndicator(
                         color: Colors.white,
                       )
-                    : const Text('Complete Schedule'),
+                    : const Text(
+                        'Create',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 20),
+                      ),
               ),
               const SizedBox(height: 20),
             ],

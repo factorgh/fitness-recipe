@@ -14,31 +14,36 @@ class AllMealPlanTrainee extends ConsumerStatefulWidget {
 }
 
 class _AllMealPlanTraineeState extends ConsumerState<AllMealPlanTrainee> {
-  // DateTime? _selectedDate;
+  DateTime? _selectedDate;
   String _selectedDuration = 'Does Not Repeat';
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      final traineeId = ref.read(userProvider)!.id;
-      ref.read(mealPlansProvider.notifier).fetchMealPlansByTrainee(traineeId);
+
+    // Defer the call to after widget build
+    Future.microtask(() async {
+      final traineeId = ref.read(userProvider)?.id;
+      print(traineeId); // Using ref.read here
+      await ref
+          .read(mealPlansProvider.notifier)
+          .fetchMealPlansByTrainee(traineeId!);
     });
   }
 
-  // Future<void> _pickDate(BuildContext context) async {
-  //   final DateTime? pickedDate = await showDatePicker(
-  //     context: context,
-  //     initialDate: _selectedDate ?? DateTime.now(),
-  //     firstDate: DateTime(2000),
-  //     lastDate: DateTime(2101),
-  //   );
-  //   if (pickedDate != null && pickedDate != _selectedDate) {
-  //     setState(() {
-  //       _selectedDate = pickedDate;
-  //     });
-  //   }
-  // }
+  Future<void> _pickDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,8 +60,8 @@ class _AllMealPlanTraineeState extends ConsumerState<AllMealPlanTrainee> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'All Meal Plans',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+              'My Meal Plans',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
             ),
             SizedBox(height: 8),
           ],

@@ -4,26 +4,28 @@ import 'dart:io';
 
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/classes/dio_client.dart';
 import 'package:voltican_fitness/commons/constants/error_handling.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
+import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 
 class RecipeService {
   final DioClient client = DioClient();
 
-  Future<void> createRecipe({
-    required BuildContext context,
-    required String title,
-    required String description,
-    required List<String> ingredients,
-    required String instructions,
-    required String facts,
-    required File imageUrl,
-    required User createdBy,
-    required String period,
-  }) async {
+  Future<void> createRecipe(
+      {required BuildContext context,
+      required String title,
+      required String description,
+      required List<String> ingredients,
+      required String instructions,
+      required String facts,
+      required File imageUrl,
+      required User createdBy,
+      required String period,
+      required WidgetRef ref}) async {
     if (title.isEmpty ||
         description.isEmpty ||
         ingredients.isEmpty ||
@@ -67,6 +69,8 @@ class RecipeService {
           context: context,
           onSuccess: () {
             showSnack(context, 'Recipe created successfully!');
+            // Refresh or reload recipes here
+            ref.read(savedRecipesProvider.notifier).loadUserRecipes();
             Navigator.pop(context);
           });
     } catch (e) {

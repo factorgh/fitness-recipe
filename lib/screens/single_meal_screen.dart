@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
@@ -31,10 +33,17 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
     };
 
     for (final allocation in mealPlan.recipeAllocations) {
-      final recipe = allRecipes.firstWhere(
-        (recipe) => recipe.id == allocation.recipeId,
-      );
-      groupedRecipes[recipe.period]?.add(recipe);
+      try {
+        final recipe = allRecipes.firstWhere(
+          (recipe) => recipe.id == allocation.recipeId,
+        );
+        // Ensure the period exists in groupedRecipes
+        groupedRecipes[recipe.period]?.add(recipe);
+      } catch (e) {
+        // Handle cases where the recipe is not found
+        print('Recipe with ID ${allocation.recipeId} not found. Error: $e');
+        // Optionally, you could add error handling or a placeholder here if needed
+      }
     }
 
     return Scaffold(
@@ -52,7 +61,7 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
             _buildDetailCard("Meal Plan Name", mealPlan.name),
             _buildDetailCard("Duration Selected", mealPlan.duration),
             _buildDateRange(mealPlan.startDate, mealPlan.endDate),
-            _buildDaysForMeal(),
+            // _buildDaysForMeal(),
             _buildAllocatedMeals(groupedRecipes),
             _buildTraineeCard(context, traineeDetailsAsyncValue),
             const SizedBox(

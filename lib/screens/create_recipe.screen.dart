@@ -93,16 +93,16 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
 
     try {
       await recipeService.createRecipe(
-        context: context,
-        title: _mealNameController.text,
-        description: _descriptionController.text,
-        ingredients: _ingredientsController.text.split(","),
-        instructions: _instructionsController.text,
-        facts: _nutritionalFactsController.text,
-        imageUrl: _selectedImage!,
-        period: selectedMealPeriod!,
-        createdBy: user,
-      );
+          context: context,
+          title: _mealNameController.text,
+          description: _descriptionController.text,
+          ingredients: _ingredientsController.text.split(","),
+          instructions: _instructionsController.text,
+          facts: _nutritionalFactsController.text,
+          imageUrl: _selectedImage!,
+          period: selectedMealPeriod!,
+          createdBy: user,
+          ref: ref);
       setState(() {});
       // Optionally handle success (e.g., show a success message)
     } catch (e) {

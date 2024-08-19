@@ -112,15 +112,17 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                     RichText(
                       text: TextSpan(
                         text: 'Hello, ',
-                        style:
-                            const TextStyle(fontSize: 20, color: Colors.black),
+                        style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w700),
                         children: <TextSpan>[
                           TextSpan(
                               text: user?.username,
                               style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w400,
                                   fontSize: 20,
-                                  color: Colors.orangeAccent)),
+                                  color: Colors.grey)),
                         ],
                       ),
                     ),
@@ -130,7 +132,7 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                       position: badges.BadgePosition.topEnd(top: -2, end: 1),
                       showBadge: true,
                       badgeContent: const Text(
-                        "4",
+                        "0",
                         style: TextStyle(color: Colors.white),
                       ),
                       badgeAnimation: const badges.BadgeAnimation.slide(
@@ -192,7 +194,7 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
-                                      fontWeight: FontWeight.w500),
+                                      fontWeight: FontWeight.w900),
                                 ),
                                 Text(
                                   'Easier With AR',
@@ -246,7 +248,7 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                     const Text(
                       "Today's pick",
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
                     ),
                     Text(
                       "See All",
@@ -272,7 +274,7 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                     Text(
                       "Top Trainers",
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
@@ -296,9 +298,9 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                     Text(
                       "Latest Nutritional News",
                       style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.brown),
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ],
                 ),

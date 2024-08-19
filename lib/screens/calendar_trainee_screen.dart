@@ -81,7 +81,7 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Good Morning ',
+                  'Good Morning',
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,

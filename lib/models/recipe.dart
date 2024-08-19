@@ -1,25 +1,25 @@
 import 'package:flutter/foundation.dart';
+import 'package:voltican_fitness/models/user.dart';
 
 class Rating {
-  final String userId;
+  final User user; // Updated to hold a User object
   final int rating;
 
   Rating({
-    required this.userId,
+    required this.user,
     required this.rating,
   });
 
   factory Rating.fromJson(Map<String, dynamic> json) {
     return Rating(
-      userId:
-          json['user'] as String? ?? '', // Fallback to an empty string if null
+      user: User.fromJson(json['user'] as Map<String, dynamic>),
       rating: json['rating'] as int? ?? 0, // Fallback to 0 if null
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'user': userId,
+      'user': user.toJson(),
       'rating': rating,
     };
   }

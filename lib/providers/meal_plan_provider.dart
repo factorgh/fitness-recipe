@@ -87,6 +87,7 @@ class MealPlansNotifier extends StateNotifier<MealPlansState> {
     state = const MealPlansLoading();
     try {
       _allMealPlans = await _mealPlanService.fetchMealPlansByTrainee(traineeId);
+
       state = MealPlansLoaded(_allMealPlans);
     } catch (e) {
       state = MealPlansError('Failed to fetch meal plans: $e');

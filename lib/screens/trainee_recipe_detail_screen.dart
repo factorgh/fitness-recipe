@@ -7,91 +7,37 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
+
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 
-class TrainerMealDetailScreen extends ConsumerStatefulWidget {
-  const TrainerMealDetailScreen({super.key, required this.meal});
+class TraineeRecipeDetailScreen extends ConsumerStatefulWidget {
+  const TraineeRecipeDetailScreen({super.key, required this.meal});
   final Recipe meal;
 
   @override
-  ConsumerState<TrainerMealDetailScreen> createState() =>
-      _TrainerMealDetailScreenState();
+  ConsumerState<TraineeRecipeDetailScreen> createState() =>
+      _TraineeRecipeDetailScreenState();
 }
 
-class _TrainerMealDetailScreenState
-    extends ConsumerState<TrainerMealDetailScreen> {
+class _TraineeRecipeDetailScreenState
+    extends ConsumerState<TraineeRecipeDetailScreen> {
   double value = 3.8;
   bool isPrivate = false;
   bool isFollowing = false;
 
-  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // User must tap button to dismiss
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Confirm Delete',
-            style: TextStyle(color: Colors.black87),
-          ),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                  'Are you sure you want to delete this item?',
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                // Perform the delete action
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _showRatingDialog() async {
+  void _showCommentDialog() async {
     final TextEditingController commentController = TextEditingController();
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Rate and Comment'),
+          title: const Text('Leave a Comment'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              RatingStars(
-                value: value,
-                onValueChanged: (v) {
-                  setState(() {
-                    value = v;
-                  });
-                },
-                starCount: 5,
-                starSize: 30,
-                starSpacing: 2,
-                valueLabelVisibility: false,
-                maxValue: 5,
-                starOffColor: const Color(0xffe7e8ea),
-                starColor: Colors.yellow,
-              ),
-              const SizedBox(height: 10),
+              const Text('Please leave a comment about the recipe:'),
               TextField(
                 controller: commentController,
                 decoration: const InputDecoration(
@@ -106,13 +52,13 @@ class _TrainerMealDetailScreenState
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: const Text('Cancel'),
+              child: const Text('Skip'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 String comment = commentController.text;
                 if (comment.isNotEmpty) {
-                  // Handle comment submission here
+                  // For example, save the comment to your backend or local storage
                   showSnack(context, 'Comment submitted successfully');
                 }
                 Navigator.of(context).pop(); // Close the dialog
@@ -129,6 +75,23 @@ class _TrainerMealDetailScreenState
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
     return Scaffold(
+      // floatingActionButton: SpeedDial(
+      //   animatedIcon: AnimatedIcons.menu_close,
+      //   animatedIconTheme: const IconThemeData(size: 28.0),
+      //   backgroundColor: Colors.green[900],
+      //   visible: true,
+      //   curve: Curves.bounceInOut,
+      //   children: [
+      //     SpeedDialChild(
+      //       child: const Icon(Icons.bookmark_border_rounded),
+      //       backgroundColor: Colors.blue,
+      //       label: 'Save Recipe',
+      //       onTap: () async {
+
+      //       },
+      //     ),
+      //   ],
+      // ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -183,51 +146,6 @@ class _TrainerMealDetailScreenState
                     widget.meal.imageUrl,
                     fit: BoxFit.cover,
                   ),
-                  Positioned(
-                    right: 10,
-                    top: 40,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            isFollowing
-                                ? Icons.person_remove
-                                : Icons.person_add,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isFollowing = !isFollowing;
-                            });
-                          },
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.red, // background color
-                            backgroundColor: Colors.white, // text color
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isFollowing = !isFollowing;
-                            });
-                          },
-                          child: Text(isFollowing ? 'Following' : 'Follow'),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.share,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                          onPressed: () {
-                            // Add share functionality here
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -266,11 +184,12 @@ class _TrainerMealDetailScreenState
                                 onValueChanged: (v) {
                                   setState(() {
                                     value = v;
+                                    // Show the comment dialog after rating
+                                    _showCommentDialog();
                                   });
-                                  _showRatingDialog(); // Show rating dialog
                                 },
                                 starCount: 5,
-                                starSize: 30,
+                                starSize: 15,
                                 starSpacing: 2,
                                 valueLabelVisibility: false,
                                 maxValue: 5,
@@ -320,7 +239,6 @@ class _TrainerMealDetailScreenState
                             ],
                           ),
                           Spacer(),
-                          // Contact section goes here
                         ],
                       ),
                     ],
@@ -392,21 +310,7 @@ class _TrainerMealDetailScreenState
                   ),
                   const SizedBox(height: 30),
                   InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              EditRecipeScreen(recipe: widget.meal)));
-                    },
-                    splashColor: Colors.purple,
-                    child: const ButtonWidget(
-                        backColor: Colors.red,
-                        text: 'Edit and Save',
-                        textColor: Colors.white),
-                  ),
-                  const SizedBox(height: 10),
-                  InkWell(
                     onTap: () async {
-                      Navigator.of(context).pop();
                       await ref
                           .read(savedRecipesProvider.notifier)
                           .saveRecipe(user!.id, widget.meal);
@@ -418,7 +322,7 @@ class _TrainerMealDetailScreenState
                         text: 'Save',
                         textColor: Colors.white),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),

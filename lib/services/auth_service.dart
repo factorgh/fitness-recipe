@@ -88,9 +88,11 @@ class AuthService {
 
         showSnack(context, 'Signed in successfully');
 
-        // Set user in the user provider
-        ref.read(userProvider.notifier).setUser(res.data.user);
-        //  Get role from user
+        // Map response data to User model
+        User user = User.fromJson(res.data['user']);
+        ref.read(userProvider.notifier).setUser(user);
+
+        // Get role from user
         final userRole = res.data['user']['role'];
 
         Navigator.of(context).push(

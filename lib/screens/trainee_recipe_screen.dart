@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/providers/followed_user_provider.dart';
+// import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 
 import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/meal_detail_screen.dart';
+import 'package:voltican_fitness/screens/trainee_recipe_detail_screen.dart';
+
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/widgets/recipe_item.dart';
 import 'package:voltican_fitness/widgets/recipe_item_trainer.dart';
@@ -49,7 +51,7 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
 
   void selectMeal(BuildContext context, Recipe meal) {
     Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => MealDetailScreen(meal: meal),
+      builder: (context) => TraineeRecipeDetailScreen(meal: meal),
     ));
   }
 
@@ -90,6 +92,7 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
     final userId = ref.read(userProvider)?.id;
     // Replace with actual user ID
     final followedRecipes = ref.watch(followedUsersRecipesProvider(userId!));
+    // final savedRecipes = ref.watch(savedRecipesProvider.notifier).loadSavedRecipes(userId);
 
     return Container(
       width: double.infinity,
@@ -161,8 +164,6 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
                   error: (error, stack) => Center(child: Text('Error: $error')),
                   data: (recipes) => buildMealList(recipes),
                 ),
-                // Assuming you'll create a similar provider for saved recipes
-                // Here you'd consume that provider and display the recipes
                 buildRecipeTabContent(),
               ],
             ),
@@ -173,8 +174,6 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
   }
 
   Widget buildRecipeTabContent() {
-    // This would be similar to the logic used in buildMealList
-    // Replace this with your actual implementation for saved recipes
     final userRecipes =
         ref.read(userProvider)!.savedRecipes; // Replace with actual user ID
     return Padding(
