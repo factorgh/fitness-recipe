@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
-import 'dart:io';
-
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,8 +49,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     final image = uploadResult.secureUrl;
     print('Image URL: $image');
-
+    final userId = ref.read(userProvider)?.id;
+    await authService.updateImage(
+        context: context, imageUrl: image, id: userId!);
     // Here you would typically update the user's profile with the new image URL.
+    ref.read(userProvider.notifier).updateImageUrl(imageUrl: image);
   }
 
   @override
@@ -68,7 +69,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            _ProfileHeader(imageUrl: _imageUrl, onEdit: _pickImage),
+            _ProfileHeader(
+                imageUrl: user != null ? user.imageUrl : _imageUrl,
+                onEdit: _pickImage),
             const SizedBox(height: 20),
             _ProfileInfo(user: user!),
             const SizedBox(height: 20),
@@ -103,7 +106,7 @@ class __ProfileHeaderState extends State<_ProfileHeader> {
           CircleAvatar(
             radius: 60,
             backgroundImage: widget.imageUrl != null
-                ? FileImage(File(widget.imageUrl!))
+                ? NetworkImage(widget.imageUrl!)
                 : const AssetImage('assets/images/default_profile.png')
                     as ImageProvider,
             backgroundColor: Colors.grey.shade200,

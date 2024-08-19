@@ -1,27 +1,44 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: avoid_print
 
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/providers/followed_user_provider.dart';
+
+import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/meal_detail_screen.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/widgets/recipe_item.dart';
 import 'package:voltican_fitness/widgets/recipe_item_trainer.dart';
 
-class TraineeRecipeScreen extends StatefulWidget {
+class TraineeRecipeScreen extends ConsumerStatefulWidget {
   const TraineeRecipeScreen({super.key});
 
   @override
   _TraineeRecipeScreenState createState() => _TraineeRecipeScreenState();
 }
 
-class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
+class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  List<Recipe> userRecipes = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _fetchFollowedUsersRecipes();
+  }
+
+  void _fetchFollowedUsersRecipes() {
+    final user = ref.read(userProvider);
+    if (user == null) {
+      // Handle the null case, e.g., show an error or return early
+      print('Error: User is null');
+      return;
+    }
+
+    final userId = user.id; // Now you can safely access the id
+    ref.read(followedUsersRecipesProvider(userId).notifier).fetchRecipes();
   }
 
   @override
@@ -42,12 +59,12 @@ class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
     ));
   }
 
-  Widget buildMealList() {
+  Widget buildMealList(List<Recipe> recipes) {
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: userRecipes.length,
+      itemCount: recipes.length,
       itemBuilder: (context, index) => RecipeItem(
-        meal: userRecipes[index],
+        meal: recipes[index],
         selectMeal: (meal) {
           selectMeal(context, meal);
         },
@@ -55,12 +72,12 @@ class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
     );
   }
 
-  Widget buildRecipeList() {
+  Widget buildRecipeList(List<Recipe> recipes) {
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: userRecipes.length,
+      itemCount: recipes.length,
       itemBuilder: (context, index) => RecipeItemTrainer(
-        meal: userRecipes[index],
+        meal: recipes[index],
         selectMeal: (meal) {
           selectRecipe(context, meal);
         },
@@ -70,6 +87,10 @@ class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final userId = ref.read(userProvider)?.id;
+    // Replace with actual user ID
+    final followedRecipes = ref.watch(followedUsersRecipesProvider(userId!));
+
     return Container(
       width: double.infinity,
       height: double.maxFinite,
@@ -132,7 +153,16 @@ class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                buildTabContent(),
+                followedRecipes.when(
+                  loading: () => const Center(
+                      child: CircularProgressIndicator(
+                    color: Colors.red,
+                  )),
+                  error: (error, stack) => Center(child: Text('Error: $error')),
+                  data: (recipes) => buildMealList(recipes),
+                ),
+                // Assuming you'll create a similar provider for saved recipes
+                // Here you'd consume that provider and display the recipes
                 buildRecipeTabContent(),
               ],
             ),
@@ -142,26 +172,11 @@ class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
     );
   }
 
-  Widget buildTabContent() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(child: buildSearchBar()),
-              buildFilterIcon(),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Expanded(child: buildMealList()),
-        ],
-      ),
-    );
-  }
-
   Widget buildRecipeTabContent() {
+    // This would be similar to the logic used in buildMealList
+    // Replace this with your actual implementation for saved recipes
+    final userRecipes =
+        ref.read(userProvider)!.savedRecipes; // Replace with actual user ID
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Column(
@@ -174,7 +189,9 @@ class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
             ],
           ),
           const SizedBox(height: 10),
-          Expanded(child: buildRecipeList()),
+          Expanded(
+              child: buildRecipeList(
+                  userRecipes)), // Adjust this for saved recipes
         ],
       ),
     );

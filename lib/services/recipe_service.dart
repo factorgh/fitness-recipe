@@ -172,4 +172,16 @@ class RecipeService {
       throw Exception('Error updating recipe: $e');
     }
   }
+
+  Future<List<Recipe>> fetchFollowedUsersRecipes(String userId) async {
+    try {
+      final response =
+          await client.dio.get('/recipes/user/$userId/followed-recipes');
+      return (response.data as List)
+          .map((recipe) => Recipe.fromJson(recipe))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to fetch followed users\' recipes: $e');
+    }
+  }
 }

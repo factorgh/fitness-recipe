@@ -4,6 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:voltican_fitness/models/mealplan.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
@@ -74,6 +75,15 @@ class NotificationService {
       );
     } catch (e) {
       print('Error scheduling notification: $e');
+    }
+  }
+
+  Future<void> requestNotificationPermission() async {
+    final status = await Permission.notification.request();
+    if (status.isGranted) {
+      // Permission granted
+    } else {
+      // Permission denied
     }
   }
 

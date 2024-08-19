@@ -16,7 +16,8 @@ void main() async {
   final notificationService = NotificationService();
   await notificationService.init();
 
-  // Request exact alarm permission
+  // Request permissions
+  await notificationService.requestNotificationPermission();
 
   // Lock orientation to portrait
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

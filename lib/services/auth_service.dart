@@ -53,7 +53,7 @@ class AuthService {
           showSnack(context, 'Account created successfully');
 
           //  Get role from user
-          // ref.read(userProvider.notifier).setUser(res.data.user);
+          ref.read(userProvider.notifier).setUser(res.data.user);
 
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -88,6 +88,8 @@ class AuthService {
 
         showSnack(context, 'Signed in successfully');
 
+        // Set user in the user provider
+        ref.read(userProvider.notifier).setUser(res.data.user);
         //  Get role from user
         final userRole = res.data['user']['role'];
 
@@ -196,6 +198,34 @@ class AuthService {
           // Update the user in the state after a successful update
 
           showSnack(context, 'Role updated successfully');
+        },
+      );
+    } catch (e) {
+      print('Error updating user: $e');
+      showSnack(context, 'Failed to update user');
+    }
+  }
+
+  Future<void> updateImage({
+    required BuildContext context,
+    required String imageUrl,
+    required String id,
+  }) async {
+    try {
+      dio.Response res = await client.dio.put(
+        "/users/$id",
+        data: {
+          'imageUrl': imageUrl,
+        },
+      );
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          // Update the user in the state after a successful update
+
+          showSnack(context, 'Profile image updated !');
         },
       );
     } catch (e) {

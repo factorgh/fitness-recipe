@@ -106,19 +106,24 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
                       children: [
                         Row(
                           children: [
-                            const CircleAvatar(
-                              radius: 20,
-                              backgroundImage:
-                                  AssetImage('assets/images/pf2.jpg'),
-                            ),
+                            user == null
+                                ? const CircleAvatar(
+                                    radius: 20,
+                                    backgroundImage: AssetImage(
+                                        'assets/images/default_profile.png'))
+                                : CircleAvatar(
+                                    radius: 20,
+                                    backgroundImage:
+                                        NetworkImage(user.imageUrl ?? ''),
+                                  ),
                             const SizedBox(
-                              width: 3,
+                              width: 10,
                             ),
                             Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Hello, ${user?.fullName}',
+                                  'Hello, ${user?.username}',
                                   style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
@@ -137,11 +142,11 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
                               badges.BadgePosition.topEnd(top: -2, end: 1),
                           showBadge: true,
                           badgeContent: const Text(
-                            "4",
+                            "0",
                             style: TextStyle(color: Colors.white),
                           ),
                           badgeAnimation: const badges.BadgeAnimation.slide(
-                            animationDuration: Duration(milliseconds: 300),
+                            animationDuration: Duration(milliseconds: 800),
                             curve: Curves.easeInOut,
                           ),
                           badgeStyle: badges.BadgeStyle(

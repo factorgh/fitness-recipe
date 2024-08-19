@@ -7,7 +7,7 @@ class DioClient {
   final Dio _dio = Dio();
 
   DioClient() {
-    _dio.options.baseUrl = 'https://fitness-backend-zoty.onrender.com/api/v1';
+    _dio.options.baseUrl = 'https://fitnessapp.adroit360.com/api/v1';
     _dio.interceptors.add(_AuthInterceptor());
   }
 
