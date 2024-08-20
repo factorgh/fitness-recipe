@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -261,21 +262,23 @@ class _TrainerMealDetailScreenState
                               horizontal: 12, vertical: 5),
                           child: Column(
                             children: [
-                              RatingStars(
-                                value: value,
-                                onValueChanged: (v) {
-                                  setState(() {
-                                    value = v;
-                                  });
-                                  _showRatingDialog(); // Show rating dialog
+                              RatingBar.builder(
+                                initialRating: 3,
+                                minRating: 1,
+                                direction: Axis.horizontal,
+                                allowHalfRating: true,
+                                itemCount: 5,
+                                itemSize: 20,
+                                itemPadding:
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                itemBuilder: (context, _) => const Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
+                                ),
+                                onRatingUpdate: (rating) {
+                                  print(rating);
+                                  _showRatingDialog();
                                 },
-                                starCount: 5,
-                                starSize: 30,
-                                starSpacing: 2,
-                                valueLabelVisibility: false,
-                                maxValue: 5,
-                                starOffColor: const Color(0xffe7e8ea),
-                                starColor: Colors.yellow,
                               ),
                               const SizedBox(width: 10),
                               const Text("(32 Reviews)",

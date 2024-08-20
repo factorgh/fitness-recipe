@@ -83,16 +83,16 @@ class MealPlansNotifier extends StateNotifier<MealPlansState> {
     }
   }
 
-  Future<void> fetchMealPlansByTrainee(String traineeId) async {
-    state = const MealPlansLoading();
-    try {
-      _allMealPlans = await _mealPlanService.fetchMealPlansByTrainee(traineeId);
+  // Future<void> fetchMealPlansByTrainee(String traineeId) async {
+  //   state = const MealPlansLoading();
+  //   try {
+  //     _allMealPlans = await _mealPlanService.fetchMealPlansByTrainee(traineeId);
 
-      state = MealPlansLoaded(_allMealPlans);
-    } catch (e) {
-      state = MealPlansError('Failed to fetch meal plans: $e');
-    }
-  }
+  //     state = MealPlansLoaded(_allMealPlans);
+  //   } catch (e) {
+  //     state = MealPlansError('Failed to fetch meal plans: $e');
+  //   }
+  // }
 
   Future<void> addMealPlan(MealPlan mealPlan) async {
     try {

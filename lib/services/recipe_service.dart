@@ -188,4 +188,19 @@ class RecipeService {
       throw Exception('Failed to fetch followed users\' recipes: $e');
     }
   }
+
+  void rateRecipe({
+    required BuildContext context,
+    required String recipeId,
+    required double rating,
+  }) async {
+    final response = await client.dio
+        .get('/recipes/rate-recipe/recipe/$recipeId', data: {rating: rating});
+    httpErrorHandle(
+        response: response,
+        context: context,
+        onSuccess: () async {
+          showSnack(context, 'Rating submitted successfully!');
+        });
+  }
 }

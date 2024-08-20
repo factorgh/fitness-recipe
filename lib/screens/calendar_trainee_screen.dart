@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:voltican_fitness/providers/meal_plan_provider.dart';
+
 import 'package:voltican_fitness/providers/meal_plan_state.dart';
+import 'package:voltican_fitness/providers/trainee_mealplans_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 
 import 'package:voltican_fitness/screens/all_meal_plan_trainee.dart';
@@ -27,18 +28,24 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
 
     Future.microtask(() {
       final traineeId = ref.read(userProvider)?.id;
-      ref.read(mealPlansProvider.notifier).fetchMealPlansByTrainee(traineeId!);
+      ref
+          .read(traineeMealPlansProvider.notifier)
+          .fetchTraineeMealPlans(traineeId!);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     // Watching the mealPlansProvider
-    final mealPlansState = ref.watch(mealPlansProvider);
+    final mealPlansState = ref.watch(traineeMealPlansProvider);
 
     final Widget mealPlansWidget;
     if (mealPlansState is MealPlansLoading) {
-      mealPlansWidget = const CircularProgressIndicator();
+      mealPlansWidget = const Center(
+        child: CircularProgressIndicator(
+          color: Colors.red,
+        ),
+      );
     } else if (mealPlansState is MealPlansError) {
       mealPlansWidget = Text(mealPlansState.error);
     } else if (mealPlansState is MealPlansLoaded) {
