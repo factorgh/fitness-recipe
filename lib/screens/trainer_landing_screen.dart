@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:voltican_fitness/providers/user_provider.dart';
-
 import 'package:voltican_fitness/screens/notify_screen.dart';
-
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/widgets/category_slider.dart';
 import 'package:voltican_fitness/widgets/new_recipe_slider.dart';
@@ -21,10 +18,33 @@ class TrainerLandeingScreen extends ConsumerStatefulWidget {
 
 class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
   final AuthService authService = AuthService();
+  List<String> _topTrainers = [];
+  List<String> _trainerImages = [];
+
   @override
   void initState() {
     super.initState();
     authService.getMe(context: context, ref: ref);
+    _fetchTopTrainers();
+  }
+
+  void _fetchTopTrainers() {
+    authService.getTopTrainers(
+      context: context,
+      onSuccess: (trainers) {
+        setState(() {
+          _topTrainers = trainers
+              .map((trainer) => trainer['username'] as String)
+              .toList(); // Convert to List<String>
+
+          _trainerImages = trainers
+              .map((trainer) =>
+                  trainer['imageUrl'] as String? ??
+                  'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png')
+              .toList();
+        });
+      },
+    );
   }
 
   @override
@@ -51,36 +71,15 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
       'Dinner',
       'Others',
     ];
-    final trainers = [
-      'Albert M.',
-      'Ernest A.',
-      'Lucis M.',
-      'Mills A.',
-      'William A.',
-    ];
-    final images = [
-      "assets/images/pf.jpg",
-      "assets/images/pf2.jpg",
-      "assets/images/pf3.jpg",
-      "assets/images/pf4.jpg",
-      "assets/images/pf5.jpg",
-    ];
-    final emails = [
-      'albert.m@example.com',
-      'ernest.m@example.com.',
-      'lucy.m@example.com',
-      'mills.m@example.com',
-      'william.m@example.com',
-    ];
 
     void handleCategorySelected(String category) {
       // Handle category selection
     }
 
-    void handleRecipSelected(String category) {}
+    void handleRecipSelected(String recipe) {}
 
     void handleTrainerSelected(String trainer) {
-      // Handle category selection
+      // Handle trainer selection
     }
 
     return Scaffold(
@@ -93,7 +92,9 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
               height: 180,
               decoration: BoxDecoration(
                 color: Colors.red[400],
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(25),
+                    bottomRight: Radius.circular(25)),
                 border: Border.all(color: Colors.white, width: 2),
               ),
               child: Column(
@@ -113,8 +114,9 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
                                         'assets/images/default_profile.png'))
                                 : CircleAvatar(
                                     radius: 20,
-                                    backgroundImage:
-                                        NetworkImage(user.imageUrl ?? ''),
+                                    backgroundImage: NetworkImage(user
+                                            .imageUrl ??
+                                        'assets/images/default_profile.png'), // Use default image if null
                                   ),
                             const SizedBox(
                               width: 10,
@@ -259,10 +261,10 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
             ),
             // Trainers
             SliderTrainerLanding(
-              emails: emails,
-              recipes: trainers,
+              emails: const [],
+              recipes: _topTrainers, // Pass the names of top trainers
+              images: _trainerImages, // Pass the list of trainer images
               onTrainerSelected: handleTrainerSelected,
-              images: images,
             ),
           ],
         ),

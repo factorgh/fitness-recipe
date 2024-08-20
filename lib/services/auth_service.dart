@@ -255,4 +255,26 @@ class AuthService {
       return null;
     }
   }
+
+  // Get top trainers
+  Future<void> getTopTrainers({
+    required BuildContext context,
+    required Function(List<dynamic>) onSuccess,
+  }) async {
+    try {
+      final res = await client.dio.get('/users/trainers/top-rated-trainers');
+
+      if (res.statusCode == 200) {
+        List<dynamic> trainers = res.data;
+        print('Top trainers: $trainers');
+        onSuccess(trainers);
+      } else {
+        // Handle server errors or unexpected responses
+        showSnack(context, 'Failed to fetch top trainers');
+      }
+    } catch (e) {
+      print('Error fetching top trainers: $e');
+      showSnack(context, 'Failed to fetch top trainers');
+    }
+  }
 }

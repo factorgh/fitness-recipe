@@ -194,13 +194,25 @@ class RecipeService {
     required String recipeId,
     required double rating,
   }) async {
-    final response = await client.dio
-        .get('/recipes/rate-recipe/recipe/$recipeId', data: {rating: rating});
+    final response = await client.dio.post(
+        '/recipes/rate-recipe/recipe/$recipeId',
+        data: {'rating': rating});
     httpErrorHandle(
         response: response,
         context: context,
         onSuccess: () async {
           showSnack(context, 'Rating submitted successfully!');
         });
+  }
+
+  Future<List<Recipe>> getTopRatedRecipes(String userId) async {
+    try {
+      final response = await client.dio.get('/recipes/recipe/highest-rated');
+      return (response.data as List)
+          .map((recipe) => Recipe.fromJson(recipe))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to fetch top rated recipes : $e');
+    }
   }
 }

@@ -9,7 +9,6 @@ import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
-import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 
@@ -27,7 +26,6 @@ class _TrainerMealDetailScreenState
   double value = 3.8;
   bool isPrivate = false;
   bool isFollowing = false;
-  RecipeService recipeService = RecipeService();
 
   Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
@@ -278,10 +276,6 @@ class _TrainerMealDetailScreenState
                                   color: Colors.amber,
                                 ),
                                 onRatingUpdate: (rating) {
-                                  recipeService.rateRecipe(
-                                      context: context,
-                                      recipeId: widget.meal.id!,
-                                      rating: rating);
                                   print(rating);
                                   _showRatingDialog();
                                 },

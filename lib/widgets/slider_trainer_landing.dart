@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-// import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
 
+// import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
 class SliderTrainerLanding extends StatelessWidget {
   final List<String> recipes;
   final List<String> emails;
@@ -82,6 +82,10 @@ class SliderTrainerLanding extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (recipes.length != images.length) {
+      return const Center(child: Text('Data mismatch error'));
+    }
+
     return Container(
       height: 120, // Adjust height as needed
       padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -89,12 +93,14 @@ class SliderTrainerLanding extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: recipes.length,
         itemBuilder: (context, index) {
+          // Safeguard against index out of range
+          if (index >= recipes.length ||
+              index >= emails.length ||
+              index >= images.length) {
+            return const SizedBox.shrink(); // or return some error widget
+          }
           return _buildTrainerItem(
-              context,
-              recipes[index],
-              images[index],
-              emails[
-                  index]); // Add email data here if available for each trainer);
+              context, recipes[index], images[index], emails[index]);
         },
       ),
     );
@@ -102,7 +108,6 @@ class SliderTrainerLanding extends StatelessWidget {
 
   Widget _buildTrainerItem(
       BuildContext context, String trainer, String imagePath, String email) {
-    // Add email data here if available for each trainer) {
     return GestureDetector(
       onTap: () {
         // Navigator.push(context,
@@ -115,7 +120,7 @@ class SliderTrainerLanding extends StatelessWidget {
             CircleAvatar(
               radius: 40,
               backgroundColor: Colors.black12,
-              backgroundImage: AssetImage(imagePath),
+              backgroundImage: NetworkImage(imagePath),
             ),
             const SizedBox(
               height: 10,
