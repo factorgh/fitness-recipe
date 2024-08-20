@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element
+
 import 'package:flutter/material.dart';
 
 // import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
@@ -82,10 +84,6 @@ class SliderTrainerLanding extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (recipes.length != images.length) {
-      return const Center(child: Text('Data mismatch error'));
-    }
-
     return Container(
       height: 120, // Adjust height as needed
       padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -93,12 +91,6 @@ class SliderTrainerLanding extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: recipes.length,
         itemBuilder: (context, index) {
-          // Safeguard against index out of range
-          if (index >= recipes.length ||
-              index >= emails.length ||
-              index >= images.length) {
-            return const SizedBox.shrink(); // or return some error widget
-          }
           return _buildTrainerItem(
               context, recipes[index], images[index], emails[index]);
         },

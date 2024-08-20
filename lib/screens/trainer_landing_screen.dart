@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
+import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/widgets/category_slider.dart';
 import 'package:voltican_fitness/widgets/new_recipe_slider.dart';
 import 'package:voltican_fitness/widgets/slider_trainer_landing.dart';
@@ -20,12 +21,19 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
   final AuthService authService = AuthService();
   List<String> _topTrainers = [];
   List<String> _trainerImages = [];
+  List<String> _topTrainersEmail = [];
+
+  final RecipeService recipeService = RecipeService();
+  List<String> _topRecipesTitle = [];
+  List<String> _recipeImages = [];
+  List<String> _recipeOwnwer = [];
 
   @override
   void initState() {
     super.initState();
     authService.getMe(context: context, ref: ref);
     _fetchTopTrainers();
+    _fetchTopRecipes();
   }
 
   void _fetchTopTrainers() {
@@ -33,15 +41,33 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
       context: context,
       onSuccess: (trainers) {
         setState(() {
-          _topTrainers = trainers
-              .map((trainer) => trainer['username'] as String)
-              .toList(); // Convert to List<String>
+          _topTrainers =
+              trainers.map((trainer) => trainer['username'] as String).toList();
+          _topTrainersEmail =
+              trainers.map((trainer) => trainer['username'] as String).toList();
 
           _trainerImages = trainers
               .map((trainer) =>
                   trainer['imageUrl'] as String? ??
                   'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png')
               .toList();
+        });
+      },
+    );
+  }
+
+  void _fetchTopRecipes() {
+    recipeService.getTopRatedRecipes(
+      context: context,
+      onSuccess: (recipes) {
+        setState(() {
+          _topRecipesTitle =
+              recipes.map((recipe) => recipe['title'] as String).toList();
+          _recipeOwnwer = recipes
+              .map((recipe) => recipe['createdBy']['username'] as String)
+              .toList();
+          _recipeImages =
+              recipes.map((recipe) => recipe['imageUrl'] as String).toList();
         });
       },
     );
@@ -242,7 +268,11 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
             ),
             // New recipe slider
             NewRecipeSlider(
-                recipes: recipes, onCategorySelected: handleRecipSelected),
+                recipeTitles: _topRecipesTitle,
+                owners: _recipeOwnwer,
+                recipeImages: _recipeImages,
+                recipes: recipes,
+                onCategorySelected: handleRecipSelected),
             const SizedBox(
               height: 20,
             ),
@@ -261,7 +291,7 @@ class _TrainerLandeingScreenState extends ConsumerState<TrainerLandeingScreen> {
             ),
             // Trainers
             SliderTrainerLanding(
-              emails: const [],
+              emails: _topTrainersEmail,
               recipes: _topTrainers, // Pass the names of top trainers
               images: _trainerImages, // Pass the list of trainer images
               onTrainerSelected: handleTrainerSelected,

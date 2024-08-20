@@ -277,4 +277,19 @@ class AuthService {
       showSnack(context, 'Failed to fetch top trainers');
     }
   }
+
+  Future<Map<String, dynamic>> getUser(String userId) async {
+    try {
+      final response = await client.dio.get('/users/$userId');
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        throw Exception('Failed to load user');
+      }
+    } catch (e) {
+      // Handle other errors here
+      print('Error: $e');
+      throw Exception('Failed to load user');
+    }
+  }
 }

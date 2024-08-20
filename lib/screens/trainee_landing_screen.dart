@@ -6,7 +6,7 @@ import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/widgets/recipe_advert_slider.dart';
 import 'package:voltican_fitness/widgets/todays_pick.dart';
-import 'package:voltican_fitness/widgets/trainers_slider.dart';
+import 'package:voltican_fitness/widgets/slider_trainee_landing.dart';
 import 'package:badges/badges.dart' as badges;
 
 class TraineeLandingScreen extends ConsumerStatefulWidget {

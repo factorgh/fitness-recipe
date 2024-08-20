@@ -205,14 +205,24 @@ class RecipeService {
         });
   }
 
-  Future<List<Recipe>> getTopRatedRecipes(String userId) async {
+  Future<void> getTopRatedRecipes({
+    required BuildContext context,
+    required Function(List<dynamic>) onSuccess,
+  }) async {
     try {
-      final response = await client.dio.get('/recipes/recipe/highest-rated');
-      return (response.data as List)
-          .map((recipe) => Recipe.fromJson(recipe))
-          .toList();
+      final res = await client.dio.get('/recipes/recipe/highest-rated');
+
+      if (res.statusCode == 200) {
+        List<dynamic> recipes = res.data;
+        print('Top recipes: $recipes');
+        onSuccess(recipes);
+      } else {
+        // Handle server errors or unexpected responses
+        showSnack(context, 'Failed to fetch top trainers');
+      }
     } catch (e) {
-      throw Exception('Failed to fetch top rated recipes : $e');
+      print('Error fetching top trainers: $e');
+      showSnack(context, 'Failed to fetch top rated recipes');
     }
   }
 }

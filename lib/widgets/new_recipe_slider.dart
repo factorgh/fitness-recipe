@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 
 class NewRecipeSlider extends StatelessWidget {
   final List<String> recipes;
+  final List<String> owners; // Changed to List<String> for consistency
+  final List<String> recipeTitles;
+  final List<String> recipeImages;
   final Function(String) onCategorySelected;
 
   const NewRecipeSlider({
     super.key,
     required this.recipes,
+    required this.owners,
+    required this.recipeImages,
     required this.onCategorySelected,
+    required this.recipeTitles,
   });
 
   @override
@@ -17,20 +23,29 @@ class NewRecipeSlider extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: recipes.length,
+        itemCount: recipes.length, // Assumes all lists are the same length
         itemBuilder: (context, index) {
-          return _buildRecipeItem(context, recipes[index]);
+          // Check if index is within bounds for all lists
+          if (index < recipeImages.length &&
+              index < owners.length &&
+              index < recipeTitles.length) {
+            return _buildRecipeItem(context, recipes[index], owners[index],
+                recipeImages[index], recipeTitles[index]);
+          } else {
+            // Handle the case where index is out of bounds
+            return Container();
+          }
         },
       ),
     );
   }
 
-  Widget _buildRecipeItem(BuildContext context, String recipe) {
+  Widget _buildRecipeItem(BuildContext context, String recipe, String owner,
+      String recipeImage, String recipeTitle) {
     return GestureDetector(
       onTap: () => onCategorySelected(recipe),
       child: Container(
-        width: 330,
-        // Adjust width as needed
+        width: 330, // Adjust width as needed
         margin: const EdgeInsets.symmetric(horizontal: 10),
         child: Stack(
           children: [
@@ -38,8 +53,8 @@ class NewRecipeSlider extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                image: const DecorationImage(
-                  image: AssetImage("assets/recipe.jpg"),
+                image: DecorationImage(
+                  image: NetworkImage(recipeImage),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -111,16 +126,16 @@ class NewRecipeSlider extends StatelessWidget {
                 decoration: BoxDecoration(
                     color: Colors.white54,
                     borderRadius: BorderRadius.circular(20)),
-                child: const Row(
+                child: Row(
                   children: [
                     Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Burst Tomatoes and Basil",
-                            style: TextStyle(
+                            recipeTitle,
+                            style: const TextStyle(
                                 color: Colors.black87,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500),
@@ -128,30 +143,40 @@ class NewRecipeSlider extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.timer,
                                 color: Colors.amber,
                               ),
-                              Text(
+                              const Text(
                                 "35 min",
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500),
                               ),
-                              Text(
+                              const Text(
                                 ".",
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500),
                               ),
-                              SizedBox(
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              const Text(
+                                'by',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(
                                 width: 10,
                               ),
                               Text(
-                                "by Arlene Wills",
-                                style: TextStyle(
+                                owner,
+                                style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500),
