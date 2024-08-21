@@ -32,7 +32,7 @@ class TopTrainerSlider extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 40,
-                        backgroundImage: AssetImage(image),
+                        backgroundImage: NetworkImage(image),
                       ),
                       const Positioned(
                         top: 50,
@@ -111,7 +111,7 @@ class TopTrainerSlider extends StatelessWidget {
             CircleAvatar(
               radius: 40,
               backgroundColor: Colors.black12,
-              backgroundImage: AssetImage(imagePath),
+              backgroundImage: NetworkImage(imagePath),
             ),
             const SizedBox(
               height: 10,

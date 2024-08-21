@@ -7,22 +7,19 @@ import 'package:voltican_fitness/models/recipe.dart';
 
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
-import 'package:voltican_fitness/providers/trainer_provider.dart';
-import 'package:voltican_fitness/screens/meal_update_screen.dart';
+
 // Import trainee provider
 import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:intl/intl.dart';
 
-class SingleMealPlanDetailScreen extends ConsumerWidget {
+class SingleMealPlanScreenTrainee extends ConsumerWidget {
   final MealPlan mealPlan;
 
-  const SingleMealPlanDetailScreen({super.key, required this.mealPlan});
+  const SingleMealPlanScreenTrainee({super.key, required this.mealPlan});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final allRecipes = ref.watch(allRecipesProvider);
-    final traineeDetailsAsyncValue =
-        ref.watch(traineeDetailsProvider(mealPlan.trainees));
 
     // Group recipes by period
     final Map<String, List<Recipe>> groupedRecipes = {
@@ -63,30 +60,30 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
             _buildDateRange(mealPlan.startDate, mealPlan.endDate),
             // _buildDaysForMeal(),
             _buildAllocatedMeals(groupedRecipes),
-            _buildTraineeCard(context, traineeDetailsAsyncValue),
+            // _buildTraineeCard(context, traineeDetailsAsyncValue),
             const SizedBox(
               height: 30,
             ), // Trainee Card here
-            ElevatedButton(
-              onPressed: () {
-                // _showUpdateBottomSheet(context);
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) =>
-                        MealUpdateScreen(mealPlan: mealPlan)));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Update',
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     // _showUpdateBottomSheet(context);
+            //     Navigator.of(context).push(MaterialPageRoute(
+            //         builder: (context) =>
+            //             MealUpdateScreen(mealPlan: mealPlan)));
+            //   },
+            //   style: ElevatedButton.styleFrom(
+            //     backgroundColor: Colors.red,
+            //     foregroundColor: Colors.white,
+            //     padding: const EdgeInsets.symmetric(vertical: 16),
+            //     shape: RoundedRectangleBorder(
+            //       borderRadius: BorderRadius.circular(8),
+            //     ),
+            //   ),
+            //   child: const Text(
+            //     'Update',
+            //     style: TextStyle(fontSize: 18),
+            //   ),
+            // ),
           ],
         ),
       ),

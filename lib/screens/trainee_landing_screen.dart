@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
+import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/widgets/recipe_advert_slider.dart';
 import 'package:voltican_fitness/widgets/todays_pick.dart';
 import 'package:voltican_fitness/widgets/slider_trainee_landing.dart';
@@ -17,12 +18,37 @@ class TraineeLandingScreen extends ConsumerStatefulWidget {
 }
 
 class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
+  final AuthService authService = AuthService();
+  List<String> _topTrainers = [];
+  List<String> _trainerImages = [];
+  List<String> _topTrainersEmail = [];
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showBottomSheet(context);
+      _fetchTopTrainers();
     });
+  }
+
+  void _fetchTopTrainers() {
+    authService.getTopTrainers(
+      context: context,
+      onSuccess: (trainers) {
+        setState(() {
+          _topTrainers =
+              trainers.map((trainer) => trainer['username'] as String).toList();
+          _topTrainersEmail =
+              trainers.map((trainer) => trainer['username'] as String).toList();
+
+          _trainerImages = trainers
+              .map((trainer) =>
+                  trainer['imageUrl'] as String? ??
+                  'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png')
+              .toList();
+        });
+      },
+    );
   }
 
   void _showBottomSheet(BuildContext context) {
@@ -68,27 +94,27 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
       'Dinner',
       'Others',
     ];
-    final trainers = [
-      'Albert M.',
-      'Ernest A.',
-      'Lucis M.',
-      'Mills A.',
-      'William A.',
-    ];
-    final images = [
-      "assets/images/pf.jpg",
-      "assets/images/pf2.jpg",
-      "assets/images/pf3.jpg",
-      "assets/images/pf4.jpg",
-      "assets/images/pf5.jpg",
-    ];
-    final emails = [
-      'albert.m@example.com',
-      'ernest.m@example.com.',
-      'lucy.m@example.com',
-      'mills.m@example.com',
-      'william.m@example.com',
-    ];
+    // final trainers = [
+    //   'Albert M.',
+    //   'Ernest A.',
+    //   'Lucis M.',
+    //   'Mills A.',
+    //   'William A.',
+    // ];
+    // final images = [
+    //   "assets/images/pf.jpg",
+    //   "assets/images/pf2.jpg",
+    //   "assets/images/pf3.jpg",
+    //   "assets/images/pf4.jpg",
+    //   "assets/images/pf5.jpg",
+    // ];
+    // final emails = [
+    //   'albert.m@example.com',
+    //   'ernest.m@example.com.',
+    //   'lucy.m@example.com',
+    //   'mills.m@example.com',
+    //   'william.m@example.com',
+    // ];
 
     void handleTrainerSelected(String category) {
       // Handle category selection
@@ -282,10 +308,10 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
               // Trainers
 
               TopTrainerSlider(
-                recipes: trainers,
+                recipes: _topTrainers,
                 onTrainerSelected: handleTrainerSelected,
-                images: images,
-                emails: emails,
+                images: _trainerImages,
+                emails: _topTrainersEmail,
               ),
               const SizedBox(
                 height: 10,
