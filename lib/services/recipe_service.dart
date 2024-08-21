@@ -102,25 +102,25 @@ class RecipeService {
     return recipeList;
   }
 
-  Future<void> saveRecipe(String userId, String recipeId) async {
-    try {
-      final response = await client.dio.post(
-        '/recipes/save-recipe',
-        data: {
-          'userId': userId,
-          'recipeId': recipeId,
-        },
-      );
+  // Future<void> saveRecipe(String userId, String recipeId) async {
+  //   try {
+  //     final response = await client.dio.post(
+  //       '/recipes/save-recipe',
+  //       data: {
+  //         'userId': userId,
+  //         'recipeId': recipeId,
+  //       },
+  //     );
 
-      if (response.statusCode == 200) {
-        print('Recipe saved successfully');
-      } else {
-        print('Failed to save recipe');
-      }
-    } catch (e) {
-      print('Error saving recipe: $e');
-    }
-  }
+  //     if (response.statusCode == 200) {
+  //       print('Recipe saved successfully');
+  //     } else {
+  //       print('Failed to save recipe');
+  //     }
+  //   } catch (e) {
+  //     print('Error saving recipe: $e');
+  //   }
+  // }
 
   Future<List<Recipe>> fetchSavedRecipes(String userId) async {
     try {
@@ -223,6 +223,50 @@ class RecipeService {
     } catch (e) {
       print('Error fetching top trainers: $e');
       showSnack(context, 'Failed to fetch top rated recipes');
+    }
+  }
+
+// Save a recipe
+  Future<bool> saveRecipe(String userId, String recipeId) async {
+    try {
+      final response = await client.dio.post(
+        '/recipes/recipe/save',
+        data: {
+          'userId': userId,
+          'recipeId': recipeId,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return true; // Recipe saved successfully
+      } else {
+        return false; // Failed to save the recipe
+      }
+    } catch (e) {
+      print('Error saving recipe: $e');
+      return false;
+    }
+  }
+
+  // Remove a saved recipe
+  Future<bool> removeSavedRecipe(String userId, String recipeId) async {
+    try {
+      final response = await client.dio.post(
+        '/recipes/recipe/remove',
+        data: {
+          'userId': userId,
+          'recipeId': recipeId,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return true; // Recipe removed successfully
+      } else {
+        return false; // Failed to remove the recipe
+      }
+    } catch (e) {
+      print('Error removing recipe: $e');
+      return false;
     }
   }
 }

@@ -48,7 +48,7 @@ class FollowersNotifier
     try {
       await _trainerService.followTrainer(trainerId, trainerToFollowId);
       await fetchFollowers(
-          trainerId, 'All'); // Refresh followers list with default filter
+          trainerId, 'Followers'); // Refresh followers list with default filter
     } catch (e) {
       print('Failed to follow trainer: $e');
     }

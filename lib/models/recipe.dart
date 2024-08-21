@@ -11,8 +11,13 @@ class Rating {
   });
 
   factory Rating.fromJson(Map<String, dynamic> json) {
+    // Null check for 'user' field
+    final userJson = json['user'] as Map<String, dynamic>?;
+
     return Rating(
-      user: User.fromJson(json['user'] as Map<String, dynamic>),
+      user: userJson != null
+          ? User.fromJson(userJson)
+          : User.empty, // Handle null or provide a default User
       rating: json['rating'] as int? ?? 0, // Fallback to 0 if null
     );
   }

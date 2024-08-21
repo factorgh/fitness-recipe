@@ -61,7 +61,7 @@ class SavedRecipesNotifier extends StateNotifier<List<Recipe>> {
         'instructions': updatedRecipe.instructions,
         'facts': updatedRecipe.facts,
         'imageUrl': updatedRecipe.imageUrl,
-        // Include 'period' and 'createdBy' if necessary
+        'period': updatedRecipe.period,
       };
 
       await _recipeService.updateRecipe(recipeId, updatedRecipeData);

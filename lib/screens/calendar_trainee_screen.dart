@@ -1,12 +1,13 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:voltican_fitness/models/mealplan.dart';
 
 import 'package:voltican_fitness/providers/meal_plan_state.dart';
 import 'package:voltican_fitness/providers/trainee_mealplans_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
-
-import 'package:voltican_fitness/screens/all_meal_plan_trainee.dart';
 
 import 'package:voltican_fitness/widgets/calendar_item.dart';
 
@@ -22,55 +23,47 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
   DateTime focusedDay = DateTime.now();
   DateTime? selectedDay;
 
+  Map<DateTime, List<MealPlan>> mealPlansByDate = {};
+
   @override
   void initState() {
     super.initState();
 
     Future.microtask(() {
       final traineeId = ref.read(userProvider)?.id;
-      ref
-          .read(traineeMealPlansProvider.notifier)
-          .fetchTraineeMealPlans(traineeId!);
+      if (traineeId != null) {
+        ref
+            .read(traineeMealPlansProvider.notifier)
+            .fetchTraineeMealPlans(traineeId);
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Watching the mealPlansProvider
     final mealPlansState = ref.watch(traineeMealPlansProvider);
 
-    final Widget mealPlansWidget;
-    if (mealPlansState is MealPlansLoading) {
-      mealPlansWidget = const Center(
-        child: CircularProgressIndicator(
-          color: Colors.red,
-        ),
-      );
-    } else if (mealPlansState is MealPlansError) {
-      mealPlansWidget = Text(mealPlansState.error);
-    } else if (mealPlansState is MealPlansLoaded) {
+    if (mealPlansState is MealPlansLoaded) {
       final mealPlans = mealPlansState.mealPlans;
 
-      // Get the first 3 meal plans or fewer if there are less than 3
-      final firstThreeMealPlans = mealPlans.take(3).toList();
-
-      mealPlansWidget = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          const SizedBox(height: 10),
-          // Displaying the first 3 meal plans
-          for (var mealPlan in firstThreeMealPlans) ...[
-            CalendarItem(
-              titleIcon: Icons.restaurant_menu,
-              mealPlan: mealPlan,
-            ),
-            const SizedBox(height: 20),
-          ],
-        ],
-      );
-    } else {
-      mealPlansWidget = const Text('No meal plans available.');
+      // Populate mealPlansByDate map, filtering out plans with null dates
+      mealPlansByDate = {};
+      for (var mealPlan in mealPlans) {
+        if (mealPlan.startDate != null && mealPlan.endDate != null) {
+          DateTime currentDate = mealPlan.startDate!;
+          while (!currentDate.isAfter(mealPlan.endDate!)) {
+            if (!mealPlansByDate.containsKey(currentDate)) {
+              mealPlansByDate[currentDate] = [];
+            }
+            mealPlansByDate[currentDate]!.add(mealPlan);
+            currentDate = currentDate.add(const Duration(days: 1));
+          }
+        } else {
+          // Handle meal plans with null start or end dates if needed
+          // For example, you can log or display a message
+          print('Meal plan with null start or end date found: ${mealPlan.id}');
+        }
+      }
     }
 
     return Scaffold(
@@ -84,94 +77,67 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 30),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Good Morning',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black),
-                ),
-                const SizedBox(width: 5),
-                Row(
-                  children: [
-                    const SizedBox(width: 10),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 10,
-                            backgroundColor: Colors.grey[300],
-                          ),
-                          const SizedBox(width: 5),
-                          const Text(
-                            'Trainee',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 30),
             TableCalendar(
               firstDay: DateTime.utc(2001, 7, 20),
               focusedDay: focusedDay,
               lastDay: DateTime.utc(2040, 3, 20),
               selectedDayPredicate: (day) => isSameDay(day, selectedDay),
               onDaySelected: (DateTime focusDay, DateTime selectDay) {
-                setState(
-                  () {
-                    focusedDay = focusDay;
-                    selectedDay = selectDay;
-                  },
-                );
+                setState(() {
+                  focusedDay = focusDay;
+                  selectedDay = selectDay;
+                });
               },
               headerStyle: const HeaderStyle(formatButtonVisible: false),
+              calendarBuilders: CalendarBuilders(
+                // Highlight days with meal plans
+                defaultBuilder: (context, date, _) {
+                  if (mealPlansByDate.containsKey(date)) {
+                    return Container(
+                      margin: const EdgeInsets.all(4.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.red[300],
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: Text(
+                        '${date.day}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }
+                  return null;
+                },
+              ),
             ),
             const SizedBox(height: 30),
             const Divider(color: Colors.black54, height: 10),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Current plans",
+                Text(
+                  "Meal Plans for Selected Date",
                   style: TextStyle(
                     fontSize: 20,
                     color: Colors.black,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                GestureDetector(
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const AllMealPlanTrainee())),
-                  child: const Text(
-                    "View all Plans",
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500),
-                  ),
-                ),
               ],
             ),
-            SizedBox(
-              width: double.maxFinite,
-              child: SingleChildScrollView(child: mealPlansWidget),
-            ),
+            const SizedBox(height: 10),
+            if (selectedDay != null && mealPlansByDate[selectedDay!] != null)
+              ...mealPlansByDate[selectedDay!]!.map((mealPlan) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: CalendarItem(
+                    titleIcon: Icons.restaurant_menu,
+                    mealPlan: mealPlan,
+                  ),
+                );
+              }),
+            if (selectedDay != null && mealPlansByDate[selectedDay!] == null)
+              const Text('No meal plans for this day.')
           ],
         ),
       ),

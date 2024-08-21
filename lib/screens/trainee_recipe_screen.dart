@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/providers/followed_user_provider.dart';
+import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 // import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 
 import 'package:voltican_fitness/providers/user_provider.dart';
@@ -29,18 +30,27 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _fetchFollowedUsersRecipes();
+    _fetchSavedRecipes();
   }
 
   void _fetchFollowedUsersRecipes() {
     final user = ref.read(userProvider);
     if (user == null) {
-      // Handle the null case, e.g., show an error or return early
       print('Error: User is null');
       return;
     }
-
-    final userId = user.id; // Now you can safely access the id
+    final userId = user.id;
     ref.read(followedUsersRecipesProvider(userId).notifier).fetchRecipes();
+  }
+
+  void _fetchSavedRecipes() {
+    final user = ref.read(userProvider);
+    if (user == null) {
+      print('Error: User is null');
+      return;
+    }
+    final userId = user.id;
+    ref.read(savedRecipesProvider.notifier).loadSavedRecipes(userId);
   }
 
   @override
@@ -90,9 +100,8 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
   @override
   Widget build(BuildContext context) {
     final userId = ref.read(userProvider)?.id;
-    // Replace with actual user ID
     final followedRecipes = ref.watch(followedUsersRecipesProvider(userId!));
-    // final savedRecipes = ref.watch(savedRecipesProvider.notifier).loadSavedRecipes(userId);
+    final savedRecipes = ref.watch(savedRecipesProvider);
 
     return Container(
       width: double.infinity,
@@ -164,33 +173,14 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
                   error: (error, stack) => Center(child: Text('Error: $error')),
                   data: (recipes) => buildMealList(recipes),
                 ),
-                buildRecipeTabContent(),
+                savedRecipes.isEmpty
+                    ? const Center(
+                        child: Text('No saved recipes found.'),
+                      )
+                    : buildRecipeList(savedRecipes),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildRecipeTabContent() {
-    final userRecipes =
-        ref.read(userProvider)!.savedRecipes; // Replace with actual user ID
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(child: buildSearchBar()),
-              buildFilterIcon(),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-              child: buildRecipeList(
-                  userRecipes)), // Adjust this for saved recipes
         ],
       ),
     );

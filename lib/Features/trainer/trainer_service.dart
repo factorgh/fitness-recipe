@@ -146,4 +146,56 @@ class TrainerService {
       throw Exception('Unexpected error: $e');
     }
   }
+
+  Future<List<User>> getFollowersByRole(String trainerId, String role) async {
+    try {
+      final response =
+          await client.dio.get('/users/trainer/$trainerId/followers/$role');
+
+      if (response.statusCode == 200) {
+        // Assuming the response data is a list of followers
+        final List<dynamic> data = response.data;
+        return data.map((userData) => User.fromJson(userData)).toList();
+      } else {
+        throw Exception('Failed to load followers');
+      }
+    } catch (e) {
+      // Handle other errors here
+      print('Error in getFollowersByRole: $e');
+      throw Exception('Failed to load followers');
+    }
+  }
+
+  Future<List<User>> getAssignedTrainees(String trainerId) async {
+    try {
+      final response =
+          await client.dio.get('/users/meal-plans/trainees/assigned-trainees');
+
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((traineeData) => User.fromJson(traineeData))
+            .toList();
+      } else {
+        throw Exception('Failed to load assigned trainees');
+      }
+    } catch (e) {
+      print('Error in getAssignedTrainees: $e');
+      throw Exception('Failed to load assigned trainees');
+    }
+  }
+
+  Future<void> removeFollower(String followerId) async {
+    try {
+      final response = await client.dio.delete(
+        '/users/user/followers/$followerId',
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to remove follower');
+      }
+    } catch (e) {
+      print('Error in removeFollower: $e');
+      throw Exception('Failed to remove follower');
+    }
+  }
 }

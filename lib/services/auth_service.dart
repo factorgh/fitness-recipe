@@ -34,6 +34,7 @@ class AuthService {
         imageUrl: "",
         savedRecipes: [],
         following: [],
+        followers: [],
         mealPlans: [],
         createdAt: DateTime.now(),
         updatedAt: DateTime.now());
