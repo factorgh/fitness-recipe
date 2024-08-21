@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:voltican_fitness/models/user.dart';
 
 class Rating {
-  final User user; // Updated to hold a User object
+  final User user;
   final int rating;
 
   Rating({
@@ -11,14 +11,10 @@ class Rating {
   });
 
   factory Rating.fromJson(Map<String, dynamic> json) {
-    // Null check for 'user' field
     final userJson = json['user'] as Map<String, dynamic>?;
-
     return Rating(
-      user: userJson != null
-          ? User.fromJson(userJson)
-          : User.empty, // Handle null or provide a default User
-      rating: json['rating'] as int? ?? 0, // Fallback to 0 if null
+      user: userJson != null ? User.fromJson(userJson) : User.empty,
+      rating: json['rating'] as int? ?? 0,
     );
   }
 
@@ -103,6 +99,10 @@ class Recipe {
     return sum / ratings!.length;
   }
 
+  factory Recipe.fromMap(Map<String, dynamic> map) {
+    return Recipe.fromJson(map);
+  }
+
   @override
   String toString() {
     return 'Recipe(id: $id, title: $title, ingredients: $ingredients, instructions: $instructions, description: $description, facts: $facts, period: $period, imageUrl: $imageUrl, ratings: $ratings, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt)';
@@ -141,6 +141,4 @@ class Recipe {
         createdAt.hashCode ^
         updatedAt.hashCode;
   }
-
-  toMap() {}
 }

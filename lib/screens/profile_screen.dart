@@ -49,9 +49,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     final image = uploadResult.secureUrl;
     print('Image URL: $image');
+
     final userId = ref.read(userProvider)?.id;
+
+    if (userId == null) {
+      print('User ID is null, cannot update profile image.');
+      return;
+    }
+
     await authService.updateImage(
-        context: context, imageUrl: image, id: userId!);
+        context: context, imageUrl: image, id: userId);
+
     // Here you would typically update the user's profile with the new image URL.
     ref.read(userProvider.notifier).updateImageUrl(imageUrl: image);
   }
@@ -59,6 +67,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
+
+    if (user == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Profile'),
+          centerTitle: true,
+        ),
+        body: const Center(
+          child: Text('User data not found.'),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -70,16 +90,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         child: Column(
           children: [
             _ProfileHeader(
-                imageUrl: user != null ? user.imageUrl : _imageUrl,
-                onEdit: _pickImage),
+              imageUrl: user.imageUrl ?? _imageUrl,
+              onEdit: _pickImage,
+            ),
             const SizedBox(height: 20),
-            _ProfileInfo(user: user!),
+            _ProfileInfo(user: user),
             const SizedBox(height: 20),
             const StatusToggleButton(),
             const SizedBox(height: 20),
             _EditProfileButton(),
             const SizedBox(height: 50),
-            CopyToClipboardWidget(textToCopy: user.code!)
+            CopyToClipboardWidget(
+              textToCopy: user.code ?? 'No code available',
+            ),
           ],
         ),
       ),

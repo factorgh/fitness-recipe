@@ -72,6 +72,17 @@ class SavedRecipesNotifier extends StateNotifier<List<Recipe>> {
       print('Error updating recipe: $e');
     }
   }
+
+  Future<void> removeSavedRecipe(String userId, String recipeId) async {
+    try {
+      final success = await _recipeService.removeSavedRecipe(userId, recipeId);
+      if (success) {
+        state = state.where((recipe) => recipe.id != recipeId).toList();
+      }
+    } catch (e) {
+      print('Error removing saved recipe: $e');
+    }
+  }
 }
 
 // Provider for saved recipes

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class NewRecipeSlider extends StatelessWidget {
-  final List<String> recipes;
-  final List<String> owners; // Changed to List<String> for consistency
+  final List<Map<String, dynamic>> recipes; // Updated to List<Recipe>
+  final List<String> owners; // List of recipe owners
   final List<String> recipeTitles;
   final List<String> recipeImages;
-  final Function(String) onCategorySelected;
+  final Function(Map<String, dynamic>) onCategorySelected;
 
   const NewRecipeSlider({
     super.key,
@@ -29,8 +29,13 @@ class NewRecipeSlider extends StatelessWidget {
           if (index < recipeImages.length &&
               index < owners.length &&
               index < recipeTitles.length) {
-            return _buildRecipeItem(context, recipes[index], owners[index],
-                recipeImages[index], recipeTitles[index]);
+            return _buildRecipeItem(
+              context,
+              recipes[index],
+              owners[index],
+              recipeImages[index],
+              recipeTitles[index],
+            );
           } else {
             // Handle the case where index is out of bounds
             return Container();
@@ -40,8 +45,8 @@ class NewRecipeSlider extends StatelessWidget {
     );
   }
 
-  Widget _buildRecipeItem(BuildContext context, String recipe, String owner,
-      String recipeImage, String recipeTitle) {
+  Widget _buildRecipeItem(BuildContext context, Map<String, dynamic> recipe,
+      String owner, String recipeImage, String recipeTitle) {
     return GestureDetector(
       onTap: () => onCategorySelected(recipe),
       child: Container(
@@ -71,8 +76,9 @@ class NewRecipeSlider extends StatelessWidget {
                         height: 30,
                         width: 150,
                         decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20)),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                         child: const Center(
                           child: Row(
                             children: [
@@ -110,7 +116,7 @@ class NewRecipeSlider extends StatelessWidget {
                           child: Icon(Icons.favorite_border_outlined,
                               color: Colors.black12, size: 20),
                         ),
-                      )
+                      ),
                     ],
                   ),
                   // Short Description
@@ -124,8 +130,9 @@ class NewRecipeSlider extends StatelessWidget {
                 width: 330,
                 height: 50,
                 decoration: BoxDecoration(
-                    color: Colors.white54,
-                    borderRadius: BorderRadius.circular(20)),
+                  color: Colors.white54,
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: Row(
                   children: [
                     Padding(
@@ -136,9 +143,10 @@ class NewRecipeSlider extends StatelessWidget {
                           Text(
                             recipeTitle,
                             style: const TextStyle(
-                                color: Colors.black87,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
+                              color: Colors.black87,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -150,16 +158,18 @@ class NewRecipeSlider extends StatelessWidget {
                               const Text(
                                 "35 min",
                                 style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500),
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                               const Text(
                                 ".",
                                 style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500),
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                               const SizedBox(
                                 width: 10,
@@ -167,9 +177,10 @@ class NewRecipeSlider extends StatelessWidget {
                               const Text(
                                 'by',
                                 style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500),
+                                  color: Colors.black,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                               const SizedBox(
                                 width: 10,
@@ -177,15 +188,16 @@ class NewRecipeSlider extends StatelessWidget {
                               Text(
                                 owner,
                                 style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500),
+                                  color: Colors.black,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
-                          )
+                          ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

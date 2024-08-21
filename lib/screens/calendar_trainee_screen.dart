@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
-
 import 'package:voltican_fitness/providers/meal_plan_state.dart';
 import 'package:voltican_fitness/providers/trainee_mealplans_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
-
 import 'package:voltican_fitness/widgets/calendar_item_trainee.dart';
 
 class CalendarTraineeScreen extends ConsumerStatefulWidget {
@@ -28,28 +26,28 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
 
   // Predefined list of colors to assign to meal plans
   final List<Color> availableColors = [
-    Colors.red[300]!,
-    Colors.blue[300]!,
-    Colors.green[300]!,
-    Colors.orange[300]!,
-    Colors.purple[300]!,
-    Colors.yellow[300]!,
-    Colors.teal[300]!,
-    Colors.pink[300]!,
-    Colors.brown[300]!,
-    Colors.cyan[300]!,
-    Colors.indigo[300]!,
-    Colors.lime[300]!,
-    Colors.amber[300]!,
-    Colors.deepOrange[300]!,
-    Colors.deepPurple[300]!,
+    const Color(0xFFB71C1C), // Deep Red
+    const Color(0xFF0D47A1), // Deep Blue
+    const Color(0xFF1B5E20), // Deep Green
+    const Color(0xFFEF6C00), // Deep Orange
+    const Color(0xFF4A148C), // Deep Purple
+    const Color(0xFFF57F00), // Deep Yellow
+    const Color(0xFF004D40), // Deep Teal
+    const Color(0xFFC51162), // Deep Pink
+    const Color(0xFF3E2723), // Deep Brown
+    const Color(0xFF006064), // Deep Cyan
+    const Color(0xFF283593), // Deep Indigo
+    const Color(0xFF9E9D24), // Deep Lime
+    const Color(0xFFFF6F00), // Deep Amber
+    const Color(0xFFBF360C), // Deep Deep Orange
+    const Color(0xFF4A148C), // Deep Deep Purple
   ];
 
   @override
   void initState() {
     super.initState();
 
-    // Set the selectedDay to the current date initially
+    focusedDay = DateTime.now();
     selectedDay = DateTime.now();
 
     Future.microtask(() {
@@ -98,6 +96,7 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
     return Scaffold(
         appBar: AppBar(
           leading: const SizedBox(),
+          centerTitle: true,
           title: const Text(
             'Meal Plan Calendar',
             style: TextStyle(fontWeight: FontWeight.w800),
@@ -112,7 +111,6 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 30),
                 TableCalendar(
                   firstDay: DateTime.utc(2001, 7, 20),
                   focusedDay: focusedDay,
@@ -126,27 +124,88 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
                   },
                   headerStyle: const HeaderStyle(formatButtonVisible: false),
                   calendarBuilders: CalendarBuilders(
-                    // Highlight days with meal plans
                     defaultBuilder: (context, date, _) {
-                      if (mealPlansByDate.containsKey(date)) {
-                        // Get the first meal plan for that date and use its color
-                        MealPlan mealPlan = mealPlansByDate[date]!.first;
-                        Color mealPlanColor = mealPlanColors[mealPlan]!;
+                      final bool hasMealPlans =
+                          mealPlansByDate.containsKey(date);
+                      final Color dotColor = hasMealPlans
+                          ? mealPlanColors[mealPlansByDate[date]!.first]!
+                          : Colors.transparent;
 
-                        return Container(
-                          margin: const EdgeInsets.all(4.0),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: mealPlanColor,
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          child: Text(
-                            '${date.day}',
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        );
-                      }
-                      return null;
+                      return Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: date == DateTime.now()
+                              ? Colors.blueAccent.withOpacity(
+                                  0.3) // Background color for the current day
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              child: Center(
+                                child: Text(
+                                  '${date.day}',
+                                  style: TextStyle(
+                                    color: date == focusedDay
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // Only show the dot if the day has meal plans and is not the selected day
+                            if (hasMealPlans && date != selectedDay)
+                              Positioned(
+                                top: 8,
+                                left: 0,
+                                right: 0,
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: Container(
+                                    width: 6,
+                                    height: 6,
+                                    decoration: BoxDecoration(
+                                      color: dotColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    },
+                    selectedBuilder: (context, date, _) {
+                      return Container(
+                        margin: const EdgeInsets.all(4.0),
+                        decoration: BoxDecoration(
+                          color: date == selectedDay
+                              ? Colors.blueAccent.withOpacity(
+                                  0.2) // Background color for the selected day
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                        alignment: Alignment.center,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              child: Center(
+                                child: Text(
+                                  '${date.day}',
+                                  style: TextStyle(
+                                    color: date == focusedDay
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // No dot shown on the selected day
+                          ],
+                        ),
+                      );
                     },
                   ),
                 ),

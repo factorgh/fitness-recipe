@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
 import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/providers/user_recipes.dart';
 import 'package:voltican_fitness/screens/create_recipe.screen.dart';
 import 'package:voltican_fitness/screens/meal_detail_screen.dart';
@@ -34,9 +35,8 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
     // Load all necessary data using the providers
     Future.microtask(() {
       ref.read(userRecipesProvider.notifier).loadUserRecipes();
-      ref
-          .read(savedRecipesProvider.notifier)
-          .loadSavedRecipes('userId'); // Replace 'userId' with actual ID
+      final user = ref.read(userProvider);
+      ref.read(savedRecipesProvider.notifier).loadSavedRecipes(user!.id);
       ref
           .read(allRecipesProvider.notifier)
           .loadAllRecipes(context); // Load all recipes here

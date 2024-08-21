@@ -1,12 +1,14 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print, unused_element
 
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/services/recipe_service.dart';
 
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/button.dart';
@@ -25,6 +27,7 @@ class _TraineeRecipeDetailScreenState
   double value = 3.8;
   bool isPrivate = false;
   bool isFollowing = false;
+  RecipeService recipeService = RecipeService();
 
   void _showCommentDialog() async {
     final TextEditingController commentController = TextEditingController();
@@ -59,6 +62,66 @@ class _TraineeRecipeDetailScreenState
                 String comment = commentController.text;
                 if (comment.isNotEmpty) {
                   // For example, save the comment to your backend or local storage
+                  showSnack(context, 'Comment submitted successfully');
+                }
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showRatingDialog() async {
+    final TextEditingController commentController = TextEditingController();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Rate and Comment'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RatingStars(
+                value: value,
+                onValueChanged: (v) {
+                  setState(() {
+                    value = v;
+                  });
+                },
+                starCount: 5,
+                starSize: 15,
+                starSpacing: 2,
+                valueLabelVisibility: false,
+                maxValue: 5,
+                starOffColor: const Color(0xffe7e8ea),
+                starColor: Colors.yellow,
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: commentController,
+                decoration: const InputDecoration(
+                  hintText: 'Write your comment here',
+                ),
+                maxLines: 3,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String comment = commentController.text;
+                if (comment.isNotEmpty) {
+                  // Handle comment submission here
                   showSnack(context, 'Comment submitted successfully');
                 }
                 Navigator.of(context).pop(); // Close the dialog
@@ -179,25 +242,30 @@ class _TraineeRecipeDetailScreenState
                               horizontal: 12, vertical: 5),
                           child: Column(
                             children: [
-                              RatingStars(
-                                value: value,
-                                onValueChanged: (v) {
-                                  setState(() {
-                                    value = v;
-                                    // Show the comment dialog after rating
-                                    _showCommentDialog();
-                                  });
+                              RatingBar.builder(
+                                initialRating: 3,
+                                minRating: 1,
+                                direction: Axis.horizontal,
+                                allowHalfRating: true,
+                                itemCount: 5,
+                                itemSize: 15,
+                                itemPadding:
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                itemBuilder: (context, _) => const Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
+                                ),
+                                onRatingUpdate: (rating) {
+                                  recipeService.rateRecipe(
+                                      context: context,
+                                      recipeId: widget.meal.id!,
+                                      rating: rating);
+                                  print(rating);
+                                  _showRatingDialog();
                                 },
-                                starCount: 5,
-                                starSize: 15,
-                                starSpacing: 2,
-                                valueLabelVisibility: false,
-                                maxValue: 5,
-                                starOffColor: const Color(0xffe7e8ea),
-                                starColor: Colors.yellow,
                               ),
                               const SizedBox(width: 10),
-                              const Text("(32 Reviews)",
+                              const Text("(No Reviews)",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 12)),
@@ -276,17 +344,57 @@ class _TraineeRecipeDetailScreenState
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: 100, // Set a specific height
-                    child: ListView.builder(
-                      itemCount: widget.meal.ingredients.length,
-                      itemBuilder: (context, index) {
-                        final List<String> ingredientsList =
-                            widget.meal.ingredients;
-                        return ListTile(
-                          title: Text(ingredientsList[index]),
-                        );
-                      },
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      height: 100, // Set a specific height
+                      child: ListView.builder(
+                        itemCount: widget.meal.ingredients.length,
+                        itemBuilder: (context, index) {
+                          final List<String> ingredientsList =
+                              widget.meal.ingredients;
+                          return Container(
+                            margin: const EdgeInsets.only(
+                                bottom: 8.0), // Space between items
+                            padding: const EdgeInsets.all(
+                                12.0), // Padding inside each item
+                            decoration: BoxDecoration(
+                              color: Colors.white, // Background color
+                              borderRadius:
+                                  BorderRadius.circular(8.0), // Rounded corners
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 3), // Shadow position
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons
+                                      .check_circle_outline, // Icon to indicate completion or presence
+                                  color: Colors.green,
+                                ),
+                                const SizedBox(
+                                    width: 12.0), // Space between icon and text
+                                Expanded(
+                                  child: Text(
+                                    ingredientsList[index],
+                                    style: const TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -307,6 +415,26 @@ class _TraineeRecipeDetailScreenState
                   const SizedBox(height: 10),
                   Text(
                     widget.meal.instructions,
+                  ),
+                  // Nutritional facts
+                  const SizedBox(height: 30),
+                  const Row(
+                    children: [
+                      Icon(
+                        Icons.fact_check,
+                        size: 25,
+                        color: Colors.orange,
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        'Nutritional Facts',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    widget.meal.facts,
                   ),
                   const SizedBox(height: 30),
                   InkWell(

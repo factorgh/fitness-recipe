@@ -8,9 +8,9 @@ import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 // import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 
 import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/screens/saved_trainer_meal_details.dart';
 import 'package:voltican_fitness/screens/trainee_recipe_detail_screen.dart';
 
-import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/widgets/recipe_item.dart';
 import 'package:voltican_fitness/widgets/recipe_item_trainer.dart';
 
@@ -67,7 +67,7 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
 
   void selectRecipe(BuildContext context, Recipe meal) {
     Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => TrainerMealDetailScreen(meal: meal),
+      builder: (context) => SavedTrainerMealDetailScreen(meal: meal),
     ));
   }
 

@@ -214,18 +214,18 @@ class _TrainerMealDetailScreenState
                               isFollowing = !isFollowing;
                             });
                           },
-                          child: Text(isFollowing ? 'Following' : 'Follow'),
+                          child: Text(isFollowing ? 'Unfollow' : 'Follow'),
                         ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.share,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                          onPressed: () {
-                            // Add share functionality here
-                          },
-                        ),
+                        // IconButton(
+                        //   icon: const Icon(
+                        //     Icons.share,
+                        //     color: Colors.white,
+                        //     size: 30,
+                        //   ),
+                        //   onPressed: () {
+                        //     // Add share functionality here
+                        //   },
+                        // ),
                       ],
                     ),
                   ),
@@ -361,17 +361,56 @@ class _TrainerMealDetailScreenState
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: 100, // Set a specific height
-                    child: ListView.builder(
-                      itemCount: widget.meal.ingredients.length,
-                      itemBuilder: (context, index) {
-                        final List<String> ingredientsList =
-                            widget.meal.ingredients;
-                        return ListTile(
-                          title: Text(ingredientsList[index]),
-                        );
-                      },
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      height: 100, // Set a specific height
+                      child: ListView.builder(
+                        itemCount: widget.meal.ingredients.length,
+                        itemBuilder: (context, index) {
+                          final List<String> ingredientsList =
+                              widget.meal.ingredients;
+                          return Container(
+                            margin: const EdgeInsets.only(
+                                bottom: 8.0), // Space between items
+                            padding: const EdgeInsets.all(
+                                12.0), // Padding inside each item
+                            decoration: BoxDecoration(
+                              color: Colors.white, // Background color
+                              borderRadius:
+                                  BorderRadius.circular(8.0), // Rounded corners
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 3), // Shadow position
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons
+                                      .check_circle_outline, // Icon to indicate completion or presence
+                                  color: Colors.green,
+                                ),
+                                const SizedBox(
+                                    width: 12.0), // Space between icon and text
+                                Expanded(
+                                  child: Text(
+                                    ingredientsList[index],
+                                    style: const TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -392,6 +431,26 @@ class _TrainerMealDetailScreenState
                   const SizedBox(height: 10),
                   Text(
                     widget.meal.instructions,
+                  ),
+                  // Nutritional facts
+                  const SizedBox(height: 30),
+                  const Row(
+                    children: [
+                      Icon(
+                        Icons.fact_check,
+                        size: 25,
+                        color: Colors.orange,
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        'Nutritional Facts',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    widget.meal.facts,
                   ),
                   const SizedBox(height: 30),
                   InkWell(

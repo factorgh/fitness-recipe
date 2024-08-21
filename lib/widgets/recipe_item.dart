@@ -56,19 +56,19 @@ class RecipeItem extends StatelessWidget {
                       color: Colors.orangeAccent,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           width: 5,
                         ),
                         Text(
-                          '4.5',
-                          style: TextStyle(color: Colors.white),
+                          meal.averageRating.toStringAsFixed(1),
+                          style: const TextStyle(color: Colors.white),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 15,
                         ),
-                        Icon(Icons.star, color: Colors.white, size: 15)
+                        const Icon(Icons.star, color: Colors.white, size: 15)
                       ],
                     ),
                   ),

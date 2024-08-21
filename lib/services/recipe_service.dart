@@ -269,4 +269,22 @@ class RecipeService {
       return false;
     }
   }
+
+  Future<List<Recipe>> fetchRecipesByMealPeriod(String mealPeriod) async {
+    try {
+      final response = await client.dio.get(
+        '/recipes/recipe/mealPeriod',
+        data: {'mealPeriod': mealPeriod},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((json) => Recipe.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load recipes');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
 }

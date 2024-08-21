@@ -6,7 +6,7 @@ import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/widgets/recipe_advert_slider.dart';
-import 'package:voltican_fitness/widgets/todays_pick.dart';
+
 import 'package:voltican_fitness/widgets/slider_trainee_landing.dart';
 import 'package:badges/badges.dart' as badges;
 
@@ -87,13 +87,13 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
-    final meals = [
-      'Breakfast',
-      'Deserts',
-      'Lunch',
-      'Dinner',
-      'Others',
-    ];
+    // final meals = [
+    //   'Breakfast',
+    //   'Deserts',
+    //   'Lunch',
+    //   'Dinner',
+    //   'Others',
+    // ];
     // final trainers = [
     //   'Albert M.',
     //   'Ernest A.',
@@ -146,7 +146,7 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                           TextSpan(
                               text: user?.username,
                               style: const TextStyle(
-                                  fontWeight: FontWeight.w400,
+                                  fontWeight: FontWeight.w700,
                                   fontSize: 20,
                                   color: Colors.grey)),
                         ],
@@ -196,7 +196,7 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                 child: Stack(
                   children: [
                     Container(
-                      height: 160,
+                      height: 200,
                       width: 360,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
@@ -263,32 +263,28 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
 
               // End of second row
 
-              const SizedBox(
-                height: 15,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Today's pick",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-                    ),
-                    Text(
-                      "See All",
-                      style: TextStyle(
-                          color: Colors.red[600], fontWeight: FontWeight.w500),
-                    )
-                  ],
-                ),
-              ),
+              //   padding: const EdgeInsets.symmetric(horizontal: 20),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //     children: [
+              //       const Text(
+              //         "Today's pick",
+              //         style:
+              //             TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              //       ),
+              //       Text(
+              //         "See All",
+              //         style: TextStyle(
+              //             color: Colors.red[600], fontWeight: FontWeight.w500),
+              //       )
+              //     ],
+              //   ),
+              // ),
               const SizedBox(
                 height: 10,
               ),
-              TodaysPickSlider(
-                  recipes: meals, onCategorySelected: handleCategorySelected),
+              // TodaysPickSlider(
+              //     recipes: meals, onCategorySelected: handleCategorySelected),
               const SizedBox(
                 height: 20,
               ),
