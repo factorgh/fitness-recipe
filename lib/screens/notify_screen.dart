@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:voltican_fitness/models/notification.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/screens/notification_detail_screen.dart';
 import 'package:voltican_fitness/services/notifications_service.dart';
 import 'package:voltican_fitness/utils/socket_io_setup.dart';
 import 'package:voltican_fitness/widgets/notification_item.dart';
@@ -113,14 +114,29 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 //   },
                 // );
                 return NotificationItem(
-                    notiIcon: Icons.notifications,
-                    notiText: notification.message,
-                    createdAt: notification.createdAt,
-                    isRead: notification.isRead,
-                    notificationId: notification.id,
-                    onNotificationTap: (message) async {
-                      print(message);
-                    });
+                  notiIcon: Icons.notifications,
+                  notiText: notification.message,
+                  createdAt: notification.createdAt,
+                  isRead: notification.isRead,
+                  notificationId: notification.id,
+                  onNotificationTap: (message) async {
+                    // Assume this is inside your NotificationItem onTap method
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NotificationDetailsPage(
+                          type: notification.type,
+                          notiText: notification.message,
+                          createdAt: notification.createdAt,
+                          createdBy:
+                              'Trainer', // You can dynamically pass this value
+                          isRead: notification.isRead,
+                        ),
+                      ),
+                    );
+                  },
+                );
               },
             );
           }
