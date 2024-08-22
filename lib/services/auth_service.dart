@@ -279,11 +279,17 @@ class AuthService {
     }
   }
 
-  Future<Map<String, dynamic>> getUser(String userId) async {
+  Future<void> getUser({
+    required Function(User) onSuccess,
+    required String userId,
+  }) async {
     try {
       final response = await client.dio.get('/users/$userId');
       if (response.statusCode == 200) {
-        return response.data;
+        // Convert the response data to a User object
+        User user = User.fromJson(response.data);
+        print('User: $user}');
+        onSuccess(user);
       } else {
         throw Exception('Failed to load user');
       }

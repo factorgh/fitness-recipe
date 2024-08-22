@@ -7,8 +7,8 @@ import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/widgets/recipe_advert_slider.dart';
 
-import 'package:voltican_fitness/widgets/slider_trainee_landing.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:voltican_fitness/widgets/slider_trainer_landing.dart';
 
 class TraineeLandingScreen extends ConsumerStatefulWidget {
   const TraineeLandingScreen({super.key});
@@ -22,6 +22,7 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
   List<String> _topTrainers = [];
   List<String> _trainerImages = [];
   List<String> _topTrainersEmail = [];
+  List<String> _topTrainerIds = [];
   @override
   void initState() {
     super.initState();
@@ -40,7 +41,8 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
               trainers.map((trainer) => trainer['username'] as String).toList();
           _topTrainersEmail =
               trainers.map((trainer) => trainer['username'] as String).toList();
-
+          _topTrainerIds =
+              trainers.map((trainer) => trainer['_id'] as String).toList();
           _trainerImages = trainers
               .map((trainer) =>
                   trainer['imageUrl'] as String? ??
@@ -304,12 +306,20 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
               ),
               // Trainers
 
-              TopTrainerSlider(
-                recipes: _topTrainers,
-                onTrainerSelected: handleTrainerSelected,
-                images: _trainerImages,
+              SliderTrainerLanding(
+                ids: _topTrainerIds,
                 emails: _topTrainersEmail,
+                recipes: _topTrainers, // Pass the names of top trainers
+                images: _trainerImages, // Pass the list of trainer images
+                onTrainerSelected: handleTrainerSelected,
               ),
+              // TopTrainerSlider(
+              //   ids:
+              //   recipes: _topTrainers,
+              //   onTrainerSelected: handleTrainerSelected,
+              //   images: _trainerImages,
+              //   emails: _topTrainersEmail,
+              // ),
               const SizedBox(
                 height: 10,
               ),

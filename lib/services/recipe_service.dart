@@ -291,7 +291,7 @@ class RecipeService {
   Future<void> getRecipesByUser({
     required String userId,
     required BuildContext context,
-    required Function(List<dynamic>) onSuccess,
+    required Function(List<Recipe>) onSuccess,
   }) async {
     try {
       final res = await client.dio.get(
@@ -299,8 +299,10 @@ class RecipeService {
       );
 
       if (res.statusCode == 200) {
-        // Directly handle the response data
-        List<dynamic> recipes = res.data;
+        // Parse the JSON data
+        List<dynamic> jsonList = res.data;
+        List<Recipe> recipes =
+            jsonList.map((json) => Recipe.fromJson(json)).toList();
         print('Recipes for user $userId: $recipes');
         onSuccess(recipes);
       } else {

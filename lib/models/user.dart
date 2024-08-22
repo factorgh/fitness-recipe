@@ -35,13 +35,13 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['_id'] as String,
-      fullName: json['fullName'] as String,
-      username: json['username'] as String,
-      password: json['password'] as String,
-      email: json['email'] as String,
+      id: json['_id'] as String? ?? '',
+      fullName: json['fullName'] as String? ?? '',
+      username: json['username'] as String? ?? '',
+      password: json['password'] as String? ?? '',
+      email: json['email'] as String? ?? '',
       imageUrl: json['imageUrl'] as String?,
-      role: json['role'] as String,
+      role: json['role'] as String? ?? '',
       savedRecipes: List<String>.from(json['savedRecipes'] ?? []),
       mealPlans: List<String>.from(json['mealPlans'] ?? []),
       following: List<String>.from(json['following'] ?? []),

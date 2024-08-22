@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:dio/dio.dart';
 import 'package:voltican_fitness/classes/dio_client.dart';
 import 'package:voltican_fitness/models/notification.dart';
@@ -8,9 +10,12 @@ class NotificationServiceSub {
 
   Future<List<AppNotification>> getNotifications(String userId) async {
     try {
-      final response = await client.dio.get('/notifications/$userId');
+      final response =
+          await client.dio.get('/notifications/notifications/$userId');
       final List<dynamic> data = response.data;
-      return data.map((json) => AppNotification.fromMap(json)).toList();
+      List<AppNotification> notifications =
+          data.map((json) => AppNotification.fromJson(json)).toList();
+      return notifications;
     } on DioException catch (e) {
       // Handle error
       print(e);

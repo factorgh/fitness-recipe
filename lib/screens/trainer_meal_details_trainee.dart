@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
+
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 
@@ -453,19 +453,7 @@ class _TrainerMealDetailScreenState
                     widget.meal.facts,
                   ),
                   const SizedBox(height: 30),
-                  InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              EditRecipeScreen(recipe: widget.meal)));
-                    },
-                    splashColor: Colors.purple,
-                    child: const ButtonWidget(
-                        backColor: Colors.red,
-                        text: 'Edit and Save',
-                        textColor: Colors.white),
-                  ),
-                  const SizedBox(height: 10),
+
                   InkWell(
                     onTap: () async {
                       Navigator.of(context).pop();

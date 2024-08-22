@@ -206,37 +206,37 @@ class _TrainerMealDetailScreenState
                     widget.meal.imageUrl,
                     fit: BoxFit.cover,
                   ),
-                  user!.role != '0'
-                      ? Positioned(
-                          right: 10,
-                          top: 40,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  isFollowing
-                                      ? Icons.person_remove
-                                      : Icons.person_add,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
-                                onPressed: _toggleFollow,
-                              ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor:
-                                      Colors.red, // background color
-                                  backgroundColor: Colors.white, // text color
-                                ),
-                                onPressed: _toggleFollow,
-                                child:
-                                    Text(isFollowing ? 'Unfollow' : 'Follow'),
-                              ),
-                            ],
-                          ),
-                        )
-                      : const SizedBox(),
+                  // user!.role != '0'
+                  //     ? Positioned(
+                  //         right: 10,
+                  //         top: 40,
+                  //         child: Column(
+                  //           crossAxisAlignment: CrossAxisAlignment.end,
+                  //           children: [
+                  //             IconButton(
+                  //               icon: Icon(
+                  //                 isFollowing
+                  //                     ? Icons.person_remove
+                  //                     : Icons.person_add,
+                  //                 color: Colors.white,
+                  //                 size: 30,
+                  //               ),
+                  //               onPressed: _toggleFollow,
+                  //             ),
+                  //             ElevatedButton(
+                  //               style: ElevatedButton.styleFrom(
+                  //                 foregroundColor:
+                  //                     Colors.red, // background color
+                  //                 backgroundColor: Colors.white, // text color
+                  //               ),
+                  //               onPressed: _toggleFollow,
+                  //               child:
+                  //                   Text(isFollowing ? 'Unfollow' : 'Follow'),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       )
+                  //     : const SizedBox(),
                 ],
               ),
             ),
@@ -465,7 +465,7 @@ class _TrainerMealDetailScreenState
                     widget.meal.facts,
                   ),
                   const SizedBox(height: 30),
-                  user.role != '0'
+                  user?.role != '0'
                       ? InkWell(
                           onTap: () {
                             Navigator.of(context).push(MaterialPageRoute(
@@ -485,7 +485,7 @@ class _TrainerMealDetailScreenState
                       Navigator.of(context).pop();
                       await ref
                           .read(savedRecipesProvider.notifier)
-                          .saveRecipe(user.id, widget.meal);
+                          .saveRecipe(user!.id, widget.meal);
                       showSnack(context, 'Recipe has been saved successfully');
                     },
                     splashColor: Colors.purple,

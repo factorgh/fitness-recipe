@@ -8,7 +8,7 @@ class SocketService {
 
   void initSocket() {
     _socket = IO.io(
-        'https://fitnessapp.adroit360.com',
+        'https://fitnessapp.adroit360.com/api/v1/notifications/notifications',
         IO.OptionBuilder()
             .setTransports(['websocket']) // for Flutter or Dart VM
             .build());

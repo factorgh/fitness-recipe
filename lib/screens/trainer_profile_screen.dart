@@ -5,18 +5,21 @@ import 'dart:core';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/trainer_provider.dart';
-
 import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/top_trainer_details.dart';
 
+import 'package:voltican_fitness/screens/trainer_meal_details_trainee.dart';
+
+import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
-
-import 'package:voltican_fitness/widgets/top_trainer_item.dart';
+import 'package:voltican_fitness/widgets/recipe_item.dart';
 
 class TrainerProfileScreen extends ConsumerStatefulWidget {
   final String userId;
+
   const TrainerProfileScreen({
     required this.userId,
     super.key,
@@ -28,18 +31,29 @@ class TrainerProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
-  List<Map<String, dynamic>> userRecipes = [];
-  RecipeService recipeService = RecipeService();
-  List<String> _ownerImage = [];
-  List<String> _ownerEmail = [];
-  List<String> _ownerUsername = [];
-  List<String> _ownerIds = [];
+  List<Recipe> userRecipes = [];
+  final RecipeService recipeService = RecipeService();
+  final AuthService authService = AuthService();
+  User? user; // Allow user to be null
+
   final alerts = NativeAlerts();
 
   @override
   void initState() {
     super.initState();
+    _fetchUser();
     _fetchUserRecipes();
+  }
+
+  void _fetchUser() {
+    authService.getUser(
+      userId: widget.userId,
+      onSuccess: (fetchedUser) {
+        setState(() {
+          user = fetchedUser;
+        });
+      },
+    );
   }
 
   void _fetchUserRecipes() {
@@ -48,39 +62,25 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
       context: context,
       onSuccess: (recipes) {
         setState(() {
-          _ownerImage = recipes
-              .map((recipe) =>
-                  recipe['createdBy']['imageUrl'] as String? ??
-                  'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png')
-              .toList();
-          _ownerUsername = recipes
-              .map((recipe) => recipe['createdBy']['username'] as String)
-              .toList();
-          _ownerIds = recipes
-              .map((recipe) => recipe['createdBy']['_id'] as String)
-              .toList();
-          _ownerEmail = recipes
-              .map((recipe) => recipe['createdBy']['email'] as String)
-              .toList();
-          userRecipes =
-              recipes.map((recipe) => recipe as Map<String, dynamic>).toList();
+          userRecipes = recipes.map((recipe) => recipe).toList();
         });
       },
     );
   }
 
-  void selectMeal(BuildContext context, Map<String, dynamic> meal) {
+  void selectMeal(BuildContext context, Recipe meal) {
     Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => TopTrainerDetailsScreen(meal: meal),
+      builder: (context) => TrainerMealDetailScreen(meal: meal),
     ));
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.read(userProvider);
-    final followersNotifier = ref.read(
-        followersProvider(_ownerIds.isNotEmpty ? _ownerIds[0] : '').notifier);
+    final followersNotifier = ref.watch(
+        followersProvider(widget.userId.isNotEmpty ? widget.userId : '')
+            .notifier);
 
+    final me = ref.read(userProvider);
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
@@ -94,10 +94,9 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
           style: TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
-      body: _ownerImage.isNotEmpty &&
-              _ownerUsername.isNotEmpty &&
-              _ownerEmail.isNotEmpty
-          ? Column(
+      body: user == null
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(10),
@@ -106,7 +105,11 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                       CircleAvatar(
                         radius: 50,
                         backgroundImage:
-                            CachedNetworkImageProvider(_ownerImage[0]),
+                            user!.imageUrl != null && user!.imageUrl!.isNotEmpty
+                                ? CachedNetworkImageProvider(user!.imageUrl!)
+                                : const AssetImage(
+                                        'assets/images/default_avatar.png')
+                                    as ImageProvider,
                       ),
                       const SizedBox(width: 20),
                       Column(
@@ -114,56 +117,49 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                         children: [
                           const SizedBox(height: 10),
                           Text(
-                            _ownerUsername[0],
+                            user!.fullName,
                             style: const TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.w500),
                           ),
                           Text(
-                            _ownerEmail[0],
+                            user!.email,
                             style: const TextStyle(
                                 fontSize: 12, fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(height: 5),
-                          user!.role == "1"
-                              ? ElevatedButton(
-                                  onPressed: () {
-                                    followersNotifier.followTrainer(
-                                        user.id, _ownerIds[0], context);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.greenAccent[50],
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Follow',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                )
-                              : ElevatedButton(
-                                  onPressed: () {
-                                    print('Request button pressed');
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.lightBlue,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Send a request',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                )
+                          ElevatedButton(
+                            onPressed: () {
+                              if (me.role == "1") {
+                                // Handle follow action
+                                followersNotifier.followTrainer(
+                                    me.id, widget.userId, context);
+                              } else if (me.role == "0") {
+                                // Handle send request action
+                                alerts.showSuccessAlert(
+                                    context, "Request sent successfully");
+                                print('Request button pressed');
+                                // You can call any method or show a dialog as needed
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: me!.role == "1"
+                                  ? Colors.greenAccent[50]
+                                  : Colors.lightBlue,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            child: Text(
+                              me.role == "1" ? 'Follow' : 'Send a request',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w800,
+                                color: user!.role == "1"
+                                    ? Colors.black
+                                    : Colors.white,
+                              ),
+                            ),
+                          )
                         ],
                       ),
                     ],
@@ -175,24 +171,25 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                 ),
                 const SizedBox(height: 20),
                 Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(8.0),
-                    itemCount: userRecipes.length,
-                    itemBuilder: (context, index) => TrainerRecipeItem(
-                      recipe: userRecipes[index],
-                      selectMeal: (recipe) {
-                        selectMeal(context, recipe);
-                      },
-                    ),
-                  ),
+                  child: userRecipes.isNotEmpty
+                      ? ListView.builder(
+                          padding: const EdgeInsets.all(8.0),
+                          itemCount: userRecipes.length,
+                          itemBuilder: (context, index) => RecipeItem(
+                            meal: userRecipes[index],
+                            selectMeal: (meal) {
+                              selectMeal(context, meal);
+                            },
+                          ),
+                        )
+                      : const Center(
+                          child: Text(
+                            'No recipes found for this trainer.',
+                            style: TextStyle(fontSize: 18, color: Colors.grey),
+                          ),
+                        ),
                 ),
               ],
-            )
-          : const Center(
-              child: Text(
-                'No recipes found for this trainer.',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
-              ),
             ),
     );
   }
