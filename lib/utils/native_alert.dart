@@ -60,7 +60,7 @@ class _AnimatedNativeAlertState extends State<AnimatedNativeAlert>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 300),
     );
     _scaleAnimation =
         CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);
@@ -140,7 +140,10 @@ class NativeAlert extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8.0),
                 ),
               ),
-              child: const Text('OK'),
+              child: const Text(
+                'OK',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),

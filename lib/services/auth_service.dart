@@ -87,8 +87,6 @@ class AuthService {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
 
-        showSnack(context, 'Signed in successfully');
-
         // Map response data to User model
         User user = User.fromJson(res.data['user']);
         ref.read(userProvider.notifier).setUser(user);

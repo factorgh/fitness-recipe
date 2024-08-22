@@ -34,13 +34,13 @@ class AppNotification {
 
   factory AppNotification.fromMap(Map<String, dynamic> map) {
     return AppNotification(
-      id: map['id'] as String,
-      userId: map['userId'] as String,
-      createdBy: map['createdBy'] as String,
-      message: map['message'] as String,
-      type: map['type'] as String,
-      isRead: map['isRead'] as bool,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
+      id: map['id'] != null ? map['id'] as String : '',
+      userId: map['userId'] != null ? map['userId'] as String : '',
+      createdBy: map['createdBy'] != null ? map['createdBy'] as String : '',
+      message: map['message'] != null ? map['message'] as String : '',
+      type: map['type'] != null ? map['type'] as String : '',
+      isRead: map['isRead'] ?? false,
+      createdAt: DateTime.parse(map['createdAt'] as String),
     );
   }
 

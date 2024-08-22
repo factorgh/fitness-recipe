@@ -17,6 +17,9 @@ void httpErrorHandle({
     case 400:
       showSnack(context, jsonDecode(response.data)['message']);
       break;
+    case 404:
+      showSnack(context, jsonDecode(response.data)['message']);
+      break;
     case 500:
       showSnack(context, jsonDecode(response.data)['message']);
       break;
