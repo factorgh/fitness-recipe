@@ -13,13 +13,31 @@ class NotificationServiceSub {
       final response =
           await client.dio.get('/notifications/notifications/$userId');
       final List<dynamic> data = response.data;
-      List<AppNotification> notifications =
-          data.map((json) => AppNotification.fromJson(json)).toList();
+
+      print('Received Data: $data');
+
+      // Check if the data is a List and contains expected data
+      List<AppNotification> notifications = data.map((json) {
+        print('Parsing JSON: $json');
+
+        // Add a check for the type of json
+        if (json is Map<String, dynamic>) {
+          return AppNotification.fromMap(json);
+        } else {
+          throw Exception('Unexpected data format');
+        }
+      }).toList();
+
+      print("------notifications for map--------$notifications");
       return notifications;
     } on DioException catch (e) {
       // Handle error
-      print(e);
-      throw Exception('Failed to fetch notifications:');
+      print('DioException: $e');
+      throw Exception('Failed to fetch notifications: $e');
+    } catch (e) {
+      // Handle other errors
+      print('Error: $e');
+      throw Exception('Failed to fetch notifications: $e');
     }
   }
 

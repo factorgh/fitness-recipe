@@ -25,7 +25,8 @@ class SocketService {
   void listenForNotifications(
       String userId, Function(AppNotification) onNotification) {
     _socket?.on('notification-$userId', (data) {
-      final notification = AppNotification.fromMap(data);
+      print('Received socket data: $data');
+      final notification = AppNotification.fromJson(data);
       onNotification(notification);
     });
   }
