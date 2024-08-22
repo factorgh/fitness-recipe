@@ -6,6 +6,7 @@ import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/socket_io_setup.dart';
 import 'package:voltican_fitness/widgets/category_slider.dart';
 import 'package:voltican_fitness/widgets/new_recipe_slider.dart';
 import 'package:voltican_fitness/widgets/slider_trainer_landing.dart';
@@ -31,6 +32,8 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
   List<String> _recipeImages = [];
   List<String> _recipeOwner = [];
   List<Map<String, dynamic>> _recipes = [];
+  late SocketService _socketService;
+  int _notificationCount = 0;
 
   @override
   void initState() {
@@ -38,6 +41,28 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
     authService.getMe(context: context, ref: ref);
     _fetchTopTrainers();
     _fetchTopRecipes();
+    _socketService = SocketService();
+    _socketService.initSocket();
+    _listenForNotifications();
+  }
+
+  void _listenForNotifications() {
+    _socketService.listenForNotifications(ref.read(userProvider)!.id,
+        (notification) {
+      _incrementNotificationCount();
+    });
+  }
+
+  void _incrementNotificationCount() {
+    setState(() {
+      _notificationCount++;
+    });
+  }
+
+  void _resetNotificationCount() {
+    setState(() {
+      _notificationCount = 0;
+    });
   }
 
   void _fetchTopTrainers() {
@@ -169,16 +194,17 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                               ),
                             ],
                           ),
+                          // right side of row
                           badges.Badge(
                             position:
                                 badges.BadgePosition.topEnd(top: -2, end: 1),
-                            showBadge: true,
-                            badgeContent: const Text(
-                              "0",
-                              style: TextStyle(color: Colors.white),
+                            showBadge: _notificationCount > 0,
+                            badgeContent: Text(
+                              "$_notificationCount",
+                              style: const TextStyle(color: Colors.white),
                             ),
                             badgeAnimation: const badges.BadgeAnimation.slide(
-                              animationDuration: Duration(milliseconds: 800),
+                              animationDuration: Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
                             ),
                             badgeStyle: badges.BadgeStyle(
@@ -191,10 +217,11 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                             child: IconButton(
                               icon: const Icon(
                                 Icons.notifications,
-                                color: Colors.white,
+                                color: Colors.red,
                                 size: 25,
                               ),
                               onPressed: () {
+                                _resetNotificationCount();
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) =>
                                         const NotificationsScreen()));

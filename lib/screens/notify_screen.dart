@@ -81,38 +81,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               itemCount: notifications.length,
               itemBuilder: (context, index) {
                 final notification = notifications[index];
-                // return ListTile(
-                //   contentPadding:
-                //       const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                //   leading: const Icon(Icons.notifications, color: Colors.blue),
-                //   title: Text(
-                //     notification.message,
-                //     style: const TextStyle(
-                //         fontWeight: FontWeight.bold, fontSize: 16),
-                //   ),
-                //   subtitle: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       Text(notification.createdAt.toString()),
-                //       const SizedBox(height: 4),
-                //       Text(
-                //         _formatTimestamp(notification.createdAt),
-                //         style:
-                //             const TextStyle(color: Colors.grey, fontSize: 12),
-                //       ),
-                //     ],
-                //   ),
-                //   tileColor:
-                //       notification.isRead ? Colors.grey[200] : Colors.white,
-                //   onTap: () async {
-                //     await _notificationService
-                //         .markNotificationAsRead(notification.id);
-                //     setState(() {
-                //       _notificationsFuture = _notificationService
-                //           .getNotifications(ref.read(userProvider)!.id);
-                //     });
-                //   },
-                // );
+
                 return NotificationItem(
                   notiIcon: Icons.notifications,
                   notiText: notification.message,

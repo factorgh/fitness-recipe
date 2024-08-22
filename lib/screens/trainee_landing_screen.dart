@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
+import 'package:voltican_fitness/utils/socket_io_setup.dart';
 import 'package:voltican_fitness/widgets/recipe_advert_slider.dart';
 
 import 'package:badges/badges.dart' as badges;
@@ -23,12 +24,37 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
   List<String> _trainerImages = [];
   List<String> _topTrainersEmail = [];
   List<String> _topTrainerIds = [];
+  late SocketService _socketService;
+  int _notificationCount = 0;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showBottomSheet(context);
       _fetchTopTrainers();
+      _socketService = SocketService();
+      _socketService.initSocket();
+      _listenForNotifications();
+    });
+  }
+
+  void _listenForNotifications() {
+    _socketService.listenForNotifications(ref.read(userProvider)!.id,
+        (notification) {
+      _incrementNotificationCount();
+    });
+  }
+
+  void _incrementNotificationCount() {
+    setState(() {
+      _notificationCount++;
+    });
+  }
+
+  void _resetNotificationCount() {
+    setState(() {
+      _notificationCount = 0;
     });
   }
 
@@ -89,34 +115,6 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
-    // final meals = [
-    //   'Breakfast',
-    //   'Deserts',
-    //   'Lunch',
-    //   'Dinner',
-    //   'Others',
-    // ];
-    // final trainers = [
-    //   'Albert M.',
-    //   'Ernest A.',
-    //   'Lucis M.',
-    //   'Mills A.',
-    //   'William A.',
-    // ];
-    // final images = [
-    //   "assets/images/pf.jpg",
-    //   "assets/images/pf2.jpg",
-    //   "assets/images/pf3.jpg",
-    //   "assets/images/pf4.jpg",
-    //   "assets/images/pf5.jpg",
-    // ];
-    // final emails = [
-    //   'albert.m@example.com',
-    //   'ernest.m@example.com.',
-    //   'lucy.m@example.com',
-    //   'mills.m@example.com',
-    //   'william.m@example.com',
-    // ];
 
     void handleTrainerSelected(String category) {
       // Handle category selection
@@ -158,10 +156,10 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                     // right side of row
                     badges.Badge(
                       position: badges.BadgePosition.topEnd(top: -2, end: 1),
-                      showBadge: true,
-                      badgeContent: const Text(
-                        "0",
-                        style: TextStyle(color: Colors.white),
+                      showBadge: _notificationCount > 0,
+                      badgeContent: Text(
+                        "$_notificationCount",
+                        style: const TextStyle(color: Colors.white),
                       ),
                       badgeAnimation: const badges.BadgeAnimation.slide(
                         animationDuration: Duration(milliseconds: 300),
@@ -181,6 +179,7 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                           size: 25,
                         ),
                         onPressed: () {
+                          _resetNotificationCount();
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) =>
                                   const NotificationsScreen()));
