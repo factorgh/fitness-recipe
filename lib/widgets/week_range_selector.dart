@@ -26,9 +26,6 @@ class _WeekRangeSelectorState extends State<WeekRangeSelector> {
       if (_selectedDays.contains(day)) {
         _selectedDays.remove(day);
       } else {
-        if (_selectedDays.length == 2) {
-          _selectedDays.clear();
-        }
         _selectedDays.add(day);
       }
       widget.onSelectionChanged(_selectedDays);

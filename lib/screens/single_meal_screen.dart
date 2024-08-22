@@ -61,7 +61,7 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
             _buildDetailCard("Meal Plan Name", mealPlan.name),
             _buildDetailCard("Duration Selected", mealPlan.duration),
             _buildDateRange(mealPlan.startDate, mealPlan.endDate),
-            // _buildDaysForMeal(),
+            _buildDaysForMeal(),
             _buildAllocatedMeals(groupedRecipes),
             _buildTraineeCard(context, traineeDetailsAsyncValue),
             const SizedBox(
@@ -227,7 +227,8 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
 
   Widget _buildDaysForMeal() {
     if (mealPlan.days.isNotEmpty) {
-      String dayRange = "${mealPlan.days.first} to ${mealPlan.days.last}";
+      // Join all the days with a comma to display them in a single line
+      String daysText = mealPlan.days.join(', ');
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,7 +238,7 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                dayRange,
+                daysText,
                 style: const TextStyle(color: Colors.black45, fontSize: 16),
               ),
             ),

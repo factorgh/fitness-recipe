@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/Features/mealplan/services/mealplan_service.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
@@ -31,9 +32,10 @@ class MealPlanNotifier extends StateNotifier<MealPlan?> {
     }
   }
 
-  Future<void> createMealPlan(MealPlan mealPlan) async {
+  Future<void> createMealPlan(MealPlan mealPlan, BuildContext context) async {
     try {
-      final newMealPlan = await _mealPlanService.createMealPlan(mealPlan);
+      final newMealPlan =
+          await _mealPlanService.createMealPlan(mealPlan, context);
       state = newMealPlan; // Update state with newly created meal plan
     } catch (e) {
       print('Failed to create meal plan: $e');
@@ -94,9 +96,10 @@ class MealPlansNotifier extends StateNotifier<MealPlansState> {
   //   }
   // }
 
-  Future<void> addMealPlan(MealPlan mealPlan) async {
+  Future<void> addMealPlan(MealPlan mealPlan, BuildContext context) async {
     try {
-      final newMealPlan = await _mealPlanService.createMealPlan(mealPlan);
+      final newMealPlan =
+          await _mealPlanService.createMealPlan(mealPlan, context);
       if (state is MealPlansLoaded) {
         _allMealPlans = [..._allMealPlans, newMealPlan];
         filterByDuration('Does Not Repeat'); // Reset filter after adding

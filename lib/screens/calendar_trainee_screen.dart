@@ -23,6 +23,7 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
 
   Map<DateTime, List<MealPlan>> mealPlansByDate = {};
   Map<MealPlan, Color> mealPlanColors = {};
+  bool isFocused = false;
 
   // Predefined list of colors to assign to meal plans
   final List<Color> availableColors = [
@@ -120,6 +121,7 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
                     setState(() {
                       focusedDay = focusDay;
                       selectedDay = selectDay;
+                      isFocused = true;
                     });
                   },
                   headerStyle: const HeaderStyle(formatButtonVisible: false),
@@ -231,6 +233,7 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: CalendarItemTrainee(
+                        isFocused: isFocused,
                         titleIcon: Icons.restaurant_menu,
                         mealPlan: mealPlan,
                         borderColor: mealPlanColors[mealPlan]!,

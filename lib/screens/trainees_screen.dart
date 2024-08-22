@@ -326,7 +326,9 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                             TextButton(
                               onPressed: () {
                                 removeTrainee(trainee.id);
+
                                 Navigator.of(context).pop();
+                                setState(() {});
                               },
                               child: const Text('Remove'),
                             ),
@@ -403,6 +405,7 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                     icon: const Icon(Icons.person_remove, color: Colors.red),
                     onPressed: () {
                       unfollow(trainer.id);
+                      setState(() {});
                     },
                   ),
                 if (!isFollowingView && removeFollower != null)

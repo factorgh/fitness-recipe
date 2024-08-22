@@ -143,7 +143,7 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                                       radius: 20,
                                       backgroundImage: NetworkImage(user
                                               .imageUrl ??
-                                          'assets/images/default_profile.png'),
+                                          'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png'),
                                     ),
                               const SizedBox(
                                 width: 10,

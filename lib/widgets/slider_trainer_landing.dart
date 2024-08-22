@@ -1,6 +1,7 @@
 // ignore_for_file: unused_element
 
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
 
 // import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
 class SliderTrainerLanding extends StatelessWidget {
@@ -102,8 +103,8 @@ class SliderTrainerLanding extends StatelessWidget {
       BuildContext context, String trainer, String imagePath, String email) {
     return GestureDetector(
       onTap: () {
-        // Navigator.push(context,
-        //     MaterialPageRoute(builder: (context) => TrainerProfileScreen(user:)));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => TrainerProfileScreen()));
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 5),

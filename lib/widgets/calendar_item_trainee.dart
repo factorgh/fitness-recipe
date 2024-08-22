@@ -11,13 +11,15 @@ import 'package:intl/intl.dart'; // Import intl package for date formatting
 class CalendarItemTrainee extends ConsumerWidget {
   final MealPlan mealPlan;
   final IconData titleIcon;
-  final Color borderColor; // Add a color property for the border
+  final Color borderColor;
+  final bool isFocused;
 
   const CalendarItemTrainee({
     super.key,
     required this.mealPlan,
     required this.titleIcon,
-    required this.borderColor, // Initialize the color property
+    required this.borderColor,
+    required this.isFocused, // Initialize the color property
   });
 
   Future<void> _showDeleteConfirmationDialog(
@@ -80,6 +82,7 @@ class CalendarItemTrainee extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ExpansionTile(
+            initiallyExpanded: isFocused ? true : false,
             leading: Icon(titleIcon),
             title: Text(mealPlan.name),
             trailing: const Icon(Icons.arrow_drop_down),

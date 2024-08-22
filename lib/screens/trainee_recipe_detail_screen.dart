@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:flutter_rating_stars/flutter_rating_stars.dart';
+// import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:voltican_fitness/models/recipe.dart';
@@ -28,6 +28,22 @@ class _TraineeRecipeDetailScreenState
   bool isPrivate = false;
   bool isFollowing = false;
   RecipeService recipeService = RecipeService();
+
+  @override
+  void initState() {
+    _fetchSavedRecipes();
+    super.initState();
+  }
+
+  void _fetchSavedRecipes() {
+    final user = ref.read(userProvider);
+    if (user == null) {
+      print('Error: User is null');
+      return;
+    }
+    final userId = user.id;
+    ref.read(savedRecipesProvider.notifier).loadSavedRecipes(userId);
+  }
 
   void _showCommentDialog() async {
     final TextEditingController commentController = TextEditingController();
@@ -81,30 +97,34 @@ class _TraineeRecipeDetailScreenState
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Rate and Comment'),
+          title: const Center(
+              child: Text(
+            'Leave your Review',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+          )),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              RatingStars(
-                value: value,
-                onValueChanged: (v) {
-                  setState(() {
-                    value = v;
-                  });
-                },
-                starCount: 5,
-                starSize: 15,
-                starSpacing: 2,
-                valueLabelVisibility: false,
-                maxValue: 5,
-                starOffColor: const Color(0xffe7e8ea),
-                starColor: Colors.yellow,
-              ),
+              // RatingStars(
+              //   value: value,
+              //   onValueChanged: (v) {
+              //     setState(() {
+              //       value = v;
+              //     });
+              //   },
+              //   starCount: 5,
+              //   starSize: 15,
+              //   starSpacing: 2,
+              //   valueLabelVisibility: false,
+              //   maxValue: 5,
+              //   starOffColor: const Color(0xffe7e8ea),
+              //   starColor: Colors.yellow,
+              // ),
               const SizedBox(height: 10),
               TextField(
                 controller: commentController,
                 decoration: const InputDecoration(
-                  hintText: 'Write your comment here',
+                  hintText: 'Write your review here',
                 ),
                 maxLines: 3,
               ),
@@ -115,18 +135,27 @@ class _TraineeRecipeDetailScreenState
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: const Text('Cancel'),
+              child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Skip')),
             ),
+            const Spacer(),
             TextButton(
               onPressed: () {
                 String comment = commentController.text;
                 if (comment.isNotEmpty) {
                   // Handle comment submission here
-                  showSnack(context, 'Comment submitted successfully');
+                  showSnack(context, 'Review submitted successfully');
                 }
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: const Text('Submit'),
+              child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Post')),
             ),
           ],
         );
@@ -137,6 +166,7 @@ class _TraineeRecipeDetailScreenState
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
+    final savedRecipes = ref.watch(savedRecipesProvider);
     return Scaffold(
       // floatingActionButton: SpeedDial(
       //   animatedIcon: AnimatedIcons.menu_close,
@@ -439,6 +469,12 @@ class _TraineeRecipeDetailScreenState
                   const SizedBox(height: 30),
                   InkWell(
                     onTap: () async {
+                      // Check if recipe is already saved
+                      if (savedRecipes.contains(widget.meal)) {
+                        showSnack(context, 'Recipe is already saved');
+                        return;
+                      }
+
                       await ref
                           .read(savedRecipesProvider.notifier)
                           .saveRecipe(user!.id, widget.meal);

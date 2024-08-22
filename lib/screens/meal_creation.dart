@@ -214,37 +214,38 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         startDate: _startDate,
         endDate: _endDate,
         days: _weekDays,
-        periods: [],
+        periods: [], // Add appropriate periods
         recipeAllocations: _selectedRecipeAllocations,
         trainees: _selectedTrainees.map((trainee) => trainee.id).toList(),
         createdBy: user!.id,
       );
 
+      setState(() {
+        _isLoading = true;
+      });
+
       try {
-        setState(() {
-          _isLoading = true;
-        });
-        await ref.read(mealPlanProvider.notifier).createMealPlan(mealPlan);
-        showSnack(context, 'Meal plan created successfully');
-        setState(() {
-          _isLoading = false;
-          Navigator.pop(context);
-        });
+        await ref
+            .read(mealPlanProvider.notifier)
+            .createMealPlan(mealPlan, context);
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            Navigator.pop(context);
+          });
+        }
       } catch (e) {
-        setState(() {
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to create meal plan: $e')),
-        );
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     } else {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all required fields')),
-      );
+      showSnack(context, 'Please fill in all required fields');
     }
   }
 

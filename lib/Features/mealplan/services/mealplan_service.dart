@@ -1,14 +1,19 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, use_build_context_synchronously
 
+import 'package:flutter/material.dart';
 import 'package:voltican_fitness/classes/dio_client.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/services/noti_setup.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
+import 'package:voltican_fitness/utils/show_snackbar.dart';
 
 class MealPlanService {
   final DioClient client = DioClient();
+  final alerts = NativeAlerts();
+
   // Create a new meal plan
-  // Create a new meal plan
-  Future<MealPlan> createMealPlan(MealPlan mealPlan) async {
+  Future<MealPlan> createMealPlan(
+      MealPlan mealPlan, BuildContext context) async {
     try {
       final response =
           await client.dio.post('/meal-plans', data: mealPlan.toJson());
@@ -26,9 +31,22 @@ class MealPlanService {
         trainees: createdMealPlan.trainees,
       );
 
+      // Show success alert
+
+      alerts.showSuccessAlert(context, 'Meal plan created successfully!');
+
       return createdMealPlan;
     } catch (e) {
-      // Handle error
+      // Log the error (you can also use any logging library)
+      debugPrint('Error creating meal plan: $e');
+      Navigator.pop(context); // Navigate back to the previous screen
+      // Show error alert
+      showSnack(context,
+          'Failed to create meal plan. Please check days or duration or trainees on plan to avoid conflicts.');
+      alerts.showErrorAlert(context,
+          'Failed to create meal plan. Please check days or duration or trainees on plan to avoid conflicts.');
+
+      // Re-throw the error if you want to handle it further up the call stack
       throw Exception('Failed to create meal plan: $e');
     }
   }
