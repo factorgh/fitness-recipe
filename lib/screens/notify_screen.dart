@@ -119,19 +119,4 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     _socketService.dispose();
     super.dispose();
   }
-
-  // String _formatTimestamp(DateTime timestamp) {
-  //   final now = DateTime.now();
-  //   final difference = now.difference(timestamp);
-
-  //   if (difference.inDays > 1) {
-  //     return '${timestamp.month}/${timestamp.day}/${timestamp.year}';
-  //   } else if (difference.inHours > 1) {
-  //     return '${difference.inHours} hours ago';
-  //   } else if (difference.inMinutes > 1) {
-  //     return '${difference.inMinutes} minutes ago';
-  //   } else {
-  //     return 'Just now';
-  //   }
-  // }
 }

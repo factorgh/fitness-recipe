@@ -1,10 +1,11 @@
-// ignore_for_file: avoid_print, use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:voltican_fitness/models/user.dart';
+import 'package:voltican_fitness/providers/trainer_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/update_profile_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
@@ -22,8 +23,9 @@ class TraineeProfileScreen extends ConsumerStatefulWidget {
 class _TraineeProfileScreenState extends ConsumerState<TraineeProfileScreen> {
   String? _imageUrl;
   AuthService authService = AuthService();
-
   final ImagePicker _picker = ImagePicker();
+  String? trainerName;
+  String? trainerId;
 
   Future<void> _pickImage() async {
     final XFile? pickedFile = await _picker.pickImage(
@@ -58,6 +60,28 @@ class _TraineeProfileScreenState extends ConsumerState<TraineeProfileScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _fetchTrainerName();
+  }
+
+  Future<void> _fetchTrainerName() async {
+    final user = ref.read(userProvider);
+    if (user != null) {
+      final followingTrainersAsyncValue =
+          ref.read(followingTrainersProvider(user.id));
+      followingTrainersAsyncValue.whenData((trainers) {
+        if (trainers.isNotEmpty) {
+          setState(() {
+            trainerName = trainers.first.fullName;
+            trainerId = trainers.first.id;
+          });
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
     return Scaffold(
@@ -78,7 +102,10 @@ class _TraineeProfileScreenState extends ConsumerState<TraineeProfileScreen> {
               const SizedBox(height: 20),
               _EditProfileButton(),
               const SizedBox(height: 50),
-              const TrainerCodeWidget(),
+              TrainerCodeWidget(
+                trainerId: trainerId ?? '',
+                trainerName: trainerName ?? 'No trainer available',
+              ),
             ],
           ),
         ),

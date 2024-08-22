@@ -1,22 +1,31 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/providers/trainer_provider.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/code_screen.dart';
 
-class TrainerCodeWidget extends StatefulWidget {
-  const TrainerCodeWidget({super.key});
+class TrainerCodeWidget extends ConsumerStatefulWidget {
+  final String trainerName;
+  final String trainerId;
+  const TrainerCodeWidget(
+      {super.key, required this.trainerName, required this.trainerId});
 
   @override
   _TrainerCodeWidgetState createState() => _TrainerCodeWidgetState();
 }
 
-class _TrainerCodeWidgetState extends State<TrainerCodeWidget> {
-  void _showConfirmationDialog() {
+class _TrainerCodeWidgetState extends ConsumerState<TrainerCodeWidget> {
+  void _showConfirmationDialog(String trainerToUnfollowId) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Change Trainer"),
           content: const Text(
-              "Do you want to change your trainer?.Changing trainer will log you out of the current trainers account"),
+            "Do you want to change your trainer? Changing trainer will log you out of the current trainer's account.",
+          ),
           actions: <Widget>[
             TextButton(
               child: const Text("Cancel"),
@@ -26,7 +35,20 @@ class _TrainerCodeWidgetState extends State<TrainerCodeWidget> {
             ),
             TextButton(
               child: const Text("OK"),
-              onPressed: () {
+              onPressed: () async {
+                // Perform the unfollow operation
+                final trainerId =
+                    ref.read(userProvider)!.id; // Get the current trainer's ID
+                await ref
+                    .read(followingTrainersProvider(trainerId).notifier)
+                    .unfollowTrainer(trainerId, trainerToUnfollowId);
+
+                // Optionally, you might want to fetch the updated list of following trainers
+                await ref
+                    .read(followingTrainersProvider(trainerId).notifier)
+                    .fetchFollowingTrainers(trainerId);
+
+                // Navigate to the CodeScreen
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
@@ -47,19 +69,19 @@ class _TrainerCodeWidgetState extends State<TrainerCodeWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Text(
+              const Text(
                 "Trainer Name",
                 style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                     fontSize: 16),
               ),
-              Spacer(),
+              const Spacer(),
               Text(
-                "Ernest Mensah",
-                style: TextStyle(
+                widget.trainerName,
+                style: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.w400,
                     fontSize: 16),
@@ -71,7 +93,7 @@ class _TrainerCodeWidgetState extends State<TrainerCodeWidget> {
           ),
           GestureDetector(
             onTap: () {
-              _showConfirmationDialog();
+              _showConfirmationDialog(widget.trainerId);
             },
             child: const Text(
               "Change Your Trainer",

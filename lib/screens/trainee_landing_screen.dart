@@ -263,25 +263,6 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                 ),
               ),
 
-              // End of second row
-
-              //   padding: const EdgeInsets.symmetric(horizontal: 20),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //     children: [
-              //       const Text(
-              //         "Today's pick",
-              //         style:
-              //             TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-              //       ),
-              //       Text(
-              //         "See All",
-              //         style: TextStyle(
-              //             color: Colors.red[600], fontWeight: FontWeight.w500),
-              //       )
-              //     ],
-              //   ),
-              // ),
               const SizedBox(
                 height: 10,
               ),
