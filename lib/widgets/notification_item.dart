@@ -1,32 +1,33 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
 
 class NotificationItem extends StatelessWidget {
   final String notiText;
-  final String notiSubText;
+  final DateTime createdAt;
+  final bool isRead;
   final IconData notiIcon;
-  final String createdByUserId;
+  final String notificationId;
+  final Future<void> Function(String id) onNotificationTap;
 
   const NotificationItem({
     super.key,
     required this.notiIcon,
     required this.notiText,
-    required this.notiSubText,
-    required this.createdByUserId,
+    required this.createdAt,
+    required this.isRead,
+    required this.notificationId,
+    required this.onNotificationTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        // Handle notification tap, e.g., navigate to a specific screen
-        print('Notification tapped by user: $createdByUserId');
+      onTap: () async {
+        await onNotificationTap(notificationId);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isRead ? Colors.grey[200] : Colors.white,
           border: Border(
             bottom: BorderSide(color: Colors.grey.shade300),
           ),
@@ -60,7 +61,7 @@ class NotificationItem extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    notiSubText,
+                    _formatTimestamp(createdAt),
                     style: const TextStyle(
                       color: Colors.black54,
                       fontSize: 14,
@@ -86,5 +87,20 @@ class NotificationItem extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _formatTimestamp(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inDays > 1) {
+      return '${timestamp.month}/${timestamp.day}/${timestamp.year}';
+    } else if (difference.inHours > 1) {
+      return '${difference.inHours} hours ago';
+    } else if (difference.inMinutes > 1) {
+      return '${difference.inMinutes} minutes ago';
+    } else {
+      return 'Just now';
+    }
   }
 }

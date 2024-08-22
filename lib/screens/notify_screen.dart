@@ -7,6 +7,7 @@ import 'package:voltican_fitness/models/notification.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/services/notifications_service.dart';
 import 'package:voltican_fitness/utils/socket_io_setup.dart';
+import 'package:voltican_fitness/widgets/notification_item.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
@@ -79,38 +80,47 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               itemCount: notifications.length,
               itemBuilder: (context, index) {
                 final notification = notifications[index];
-                return ListTile(
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                  leading: const Icon(Icons.notifications, color: Colors.blue),
-                  title: Text(
-                    notification.message,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(notification.createdAt.toString()),
-                      const SizedBox(height: 4),
-                      Text(
-                        _formatTimestamp(notification.createdAt),
-                        style:
-                            const TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                  tileColor:
-                      notification.isRead ? Colors.grey[200] : Colors.white,
-                  onTap: () async {
-                    await _notificationService
-                        .markNotificationAsRead(notification.id);
-                    setState(() {
-                      _notificationsFuture = _notificationService
-                          .getNotifications(ref.read(userProvider)!.id);
+                // return ListTile(
+                //   contentPadding:
+                //       const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                //   leading: const Icon(Icons.notifications, color: Colors.blue),
+                //   title: Text(
+                //     notification.message,
+                //     style: const TextStyle(
+                //         fontWeight: FontWeight.bold, fontSize: 16),
+                //   ),
+                //   subtitle: Column(
+                //     crossAxisAlignment: CrossAxisAlignment.start,
+                //     children: [
+                //       Text(notification.createdAt.toString()),
+                //       const SizedBox(height: 4),
+                //       Text(
+                //         _formatTimestamp(notification.createdAt),
+                //         style:
+                //             const TextStyle(color: Colors.grey, fontSize: 12),
+                //       ),
+                //     ],
+                //   ),
+                //   tileColor:
+                //       notification.isRead ? Colors.grey[200] : Colors.white,
+                //   onTap: () async {
+                //     await _notificationService
+                //         .markNotificationAsRead(notification.id);
+                //     setState(() {
+                //       _notificationsFuture = _notificationService
+                //           .getNotifications(ref.read(userProvider)!.id);
+                //     });
+                //   },
+                // );
+                return NotificationItem(
+                    notiIcon: Icons.notifications,
+                    notiText: notification.message,
+                    createdAt: notification.createdAt,
+                    isRead: notification.isRead,
+                    notificationId: notification.id,
+                    onNotificationTap: (message) async {
+                      print(message);
                     });
-                  },
-                );
               },
             );
           }
@@ -125,18 +135,18 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     super.dispose();
   }
 
-  String _formatTimestamp(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
+  // String _formatTimestamp(DateTime timestamp) {
+  //   final now = DateTime.now();
+  //   final difference = now.difference(timestamp);
 
-    if (difference.inDays > 1) {
-      return '${timestamp.month}/${timestamp.day}/${timestamp.year}';
-    } else if (difference.inHours > 1) {
-      return '${difference.inHours} hours ago';
-    } else if (difference.inMinutes > 1) {
-      return '${difference.inMinutes} minutes ago';
-    } else {
-      return 'Just now';
-    }
-  }
+  //   if (difference.inDays > 1) {
+  //     return '${timestamp.month}/${timestamp.day}/${timestamp.year}';
+  //   } else if (difference.inHours > 1) {
+  //     return '${difference.inHours} hours ago';
+  //   } else if (difference.inMinutes > 1) {
+  //     return '${difference.inMinutes} minutes ago';
+  //   } else {
+  //     return 'Just now';
+  //   }
+  // }
 }
