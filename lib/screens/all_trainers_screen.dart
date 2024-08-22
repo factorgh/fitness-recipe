@@ -86,7 +86,9 @@ class AllTrainersScreen extends ConsumerWidget {
             GestureDetector(
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => TrainerProfileScreen()));
+                    builder: (context) => const TrainerProfileScreen(
+                          userId: '',
+                        )));
               },
               child: Card(
                 margin:
@@ -116,7 +118,9 @@ class AllTrainersScreen extends ConsumerWidget {
             GestureDetector(
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => TrainerProfileScreen()));
+                    builder: (context) => const TrainerProfileScreen(
+                          userId: '',
+                        )));
               },
               child: Card(
                 margin:

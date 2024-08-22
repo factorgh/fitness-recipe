@@ -65,6 +65,7 @@ dependencies:
   workmanager: ^0.5.2
   permission_handler: ^11.3.1
   flutter_rating_bar: ^4.0.1
+  socket_io_client: ^2.0.3+1
 
 dev_dependencies:
   flutter_test:

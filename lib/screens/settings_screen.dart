@@ -100,7 +100,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => NotificationsScreen()),
+          MaterialPageRoute(builder: (context) => const NotificationsScreen()),
         );
       },
       child: const Card(

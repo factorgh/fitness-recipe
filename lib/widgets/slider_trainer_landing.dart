@@ -8,6 +8,7 @@ class SliderTrainerLanding extends StatelessWidget {
   final List<String> recipes;
   final List<String> emails;
   final List<String> images;
+  final List<String> ids;
   final Function(String) onTrainerSelected;
 
   const SliderTrainerLanding({
@@ -15,6 +16,7 @@ class SliderTrainerLanding extends StatelessWidget {
     required this.recipes,
     required this.emails,
     required this.images,
+    required this.ids,
     required this.onTrainerSelected,
   });
 
@@ -92,19 +94,23 @@ class SliderTrainerLanding extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: recipes.length,
         itemBuilder: (context, index) {
-          return _buildTrainerItem(
-              context, recipes[index], images[index], emails[index]);
+          return _buildTrainerItem(context, recipes[index], images[index],
+              emails[index], ids[index]);
         },
       ),
     );
   }
 
-  Widget _buildTrainerItem(
-      BuildContext context, String trainer, String imagePath, String email) {
+  Widget _buildTrainerItem(BuildContext context, String trainer,
+      String imagePath, String email, String id) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => TrainerProfileScreen()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => TrainerProfileScreen(
+                      userId: id,
+                    )));
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 5),

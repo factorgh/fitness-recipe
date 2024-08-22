@@ -287,4 +287,29 @@ class RecipeService {
       throw Exception('Error: $e');
     }
   }
+
+  Future<void> getRecipesByUser({
+    required String userId,
+    required BuildContext context,
+    required Function(List<dynamic>) onSuccess,
+  }) async {
+    try {
+      final res = await client.dio.get(
+        '/recipes/top-trainers/recipe/$userId',
+      );
+
+      if (res.statusCode == 200) {
+        // Directly handle the response data
+        List<dynamic> recipes = res.data;
+        print('Recipes for user $userId: $recipes');
+        onSuccess(recipes);
+      } else {
+        // Handle server errors or unexpected responses
+        showSnack(context, 'Failed to fetch recipes for user');
+      }
+    } catch (e) {
+      print('Error fetching recipes for user: $e');
+      showSnack(context, 'Failed to fetch recipes for user');
+    }
+  }
 }

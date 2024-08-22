@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
 import 'package:voltican_fitness/models/user.dart';
@@ -44,9 +45,11 @@ class FollowersNotifier
     }
   }
 
-  Future<void> followTrainer(String trainerId, String trainerToFollowId) async {
+  Future<void> followTrainer(
+      String trainerId, String trainerToFollowId, BuildContext context) async {
     try {
-      await _trainerService.followTrainer(trainerId, trainerToFollowId);
+      await _trainerService.followTrainer(
+          trainerId, trainerToFollowId, context);
       await fetchFollowers(
           trainerId, 'Followers'); // Refresh followers list with default filter
     } catch (e) {
@@ -84,9 +87,11 @@ class FollowingTrainersNotifier extends StateNotifier<AsyncValue<List<User>>> {
     }
   }
 
-  Future<void> followTrainer(String trainerId, String trainerToFollowId) async {
+  Future<void> followTrainer(
+      String trainerId, String trainerToFollowId, BuildContext context) async {
     try {
-      await _trainerService.followTrainer(trainerId, trainerToFollowId);
+      await _trainerService.followTrainer(
+          trainerId, trainerToFollowId, context);
       await fetchFollowingTrainers(
           trainerId); // Refresh following trainers list
     } catch (e) {

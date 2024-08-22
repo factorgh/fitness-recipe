@@ -180,7 +180,8 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                         ),
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => NotificationsScreen()));
+                              builder: (context) =>
+                                  const NotificationsScreen()));
                         },
                       ),
                     )

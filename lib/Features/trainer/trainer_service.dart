@@ -1,13 +1,16 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:voltican_fitness/classes/dio_client.dart';
 import 'package:voltican_fitness/models/user.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
 
 class TrainerService {
   final DioClient client = DioClient();
+  final alerts = NativeAlerts();
 
   Future<List<User>> getFollowers(String trainerId) async {
     try {
@@ -51,12 +54,19 @@ class TrainerService {
     }
   }
 
-  Future<void> followTrainer(String trainerId, String trainerToFollowId) async {
+  Future<void> followTrainer(
+      String trainerId, String trainerToFollowId, BuildContext context) async {
     try {
-      await client.dio.post('/users/follow', data: {
-        'userId': trainerId,
-        'followId': trainerToFollowId,
+      final res = await client.dio.post('/users/follow', data: {
+        'currentUserId': trainerId,
+        'userIdToFollow': trainerToFollowId,
       });
+      if (res.statusCode == 200) {
+        // Show success alert before navigating
+        alerts.showSuccessAlert(context, 'User followed');
+      } else {
+        alerts.showErrorAlert(context, "Already following user");
+      }
     } catch (e) {
       print('Error in followTrainer: $e');
       throw Exception('Failed to follow trainer');

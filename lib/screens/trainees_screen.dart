@@ -63,14 +63,14 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
         ref.watch(followingTrainersProvider(trainerId));
     final followingIds = ref.watch(followingIdsProvider);
 
-    void followTrainer(String trainerToFollowId) {
-      ref
-          .read(followersProvider(trainerId).notifier)
-          .followTrainer(trainerId, trainerToFollowId);
-      ref
-          .read(followingIdsProvider.notifier)
-          .update((state) => [...state, trainerToFollowId]);
-    }
+    // void followTrainer(String trainerToFollowId, BuildContext context) {
+    //   ref
+    //       .read(followersProvider(trainerId).notifier)
+    //       .followTrainer(trainerId, trainerToFollowId, context);
+    //   ref
+    //       .read(followingIdsProvider.notifier)
+    //       .update((state) => [...state, trainerToFollowId]);
+    // }
 
     void unfollowTrainer(String trainerToUnfollowId) {
       ref
@@ -149,7 +149,6 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                                 return buildTraineesListView(
                                   trainees,
                                   followingIds,
-                                  followTrainer,
                                   unfollowTrainer,
                                   removeTrainee,
                                   assignedTrainees: [],
@@ -170,7 +169,6 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                                 return buildTraineesListView(
                                   assignedTrainees,
                                   followingIds,
-                                  followTrainer,
                                   unfollowTrainer,
                                   removeTrainee,
                                   assignedTrainees: assignedTrainees,
@@ -210,7 +208,6 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                                 return buildTrainersListView(
                                   followingTrainers,
                                   followingIds,
-                                  followTrainer,
                                   unfollowTrainer,
                                   isFollowingView: true,
                                 );
@@ -226,7 +223,6 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                                 return buildTrainersListView(
                                   trainers,
                                   followingIds,
-                                  followTrainer,
                                   unfollowTrainer,
                                   removeFollower: removeFollower,
                                 );
@@ -250,7 +246,6 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
   Widget buildTraineesListView(
     List<User> trainees,
     List<String> followingIds,
-    Function(String) follow,
     Function(String) unfollow,
     Function(String)? removeTrainee, {
     required List<User> assignedTrainees,
@@ -348,7 +343,6 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
   Widget buildTrainersListView(
     List<User> trainers,
     List<String> followingIds,
-    Function(String) follow,
     Function(String) unfollow, {
     bool isFollowingView = false,
     Function(String)? removeFollower,

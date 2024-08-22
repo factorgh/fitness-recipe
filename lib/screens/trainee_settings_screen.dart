@@ -80,7 +80,7 @@ class _TraineeSettingsScreenState extends State<TraineeSettingsScreen> {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => NotificationsScreen()),
+          MaterialPageRoute(builder: (context) => const NotificationsScreen()),
         );
       },
       child: const Card(

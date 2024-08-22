@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 
 class NativeAlerts {
   void showSuccessAlert(BuildContext context, String message) {
-    _showAnimatedAlert(context, 'Success', message, true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showAnimatedAlert(context, 'Success', message, true);
+    });
   }
 
   void showErrorAlert(BuildContext context, String message) {
-    _showAnimatedAlert(context, 'Error', message, false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showAnimatedAlert(context, 'Error', message, false);
+    });
   }
 
   void _showAnimatedAlert(
@@ -56,7 +60,7 @@ class _AnimatedNativeAlertState extends State<AnimatedNativeAlert>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 500),
     );
     _scaleAnimation =
         CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);

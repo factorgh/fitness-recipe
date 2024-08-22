@@ -10,8 +10,6 @@ import 'package:voltican_fitness/utils/show_snackbar.dart';
 class MealPlanService {
   final DioClient client = DioClient();
   final alerts = NativeAlerts();
-
-  // Create a new meal plan
   Future<MealPlan> createMealPlan(
       MealPlan mealPlan, BuildContext context) async {
     try {
@@ -32,19 +30,30 @@ class MealPlanService {
       );
 
       // Show success alert
-
-      alerts.showSuccessAlert(context, 'Meal plan created successfully!');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        alerts.showSuccessAlert(context, 'Meal plan created successfully!');
+        Navigator.pop(context);
+      });
 
       return createdMealPlan;
     } catch (e) {
       // Log the error (you can also use any logging library)
       debugPrint('Error creating meal plan: $e');
-      Navigator.pop(context); // Navigate back to the previous screen
+
       // Show error alert
-      showSnack(context,
-          'Failed to create meal plan. Please check days or duration or trainees on plan to avoid conflicts.');
-      alerts.showErrorAlert(context,
-          'Failed to create meal plan. Please check days or duration or trainees on plan to avoid conflicts.');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        alerts.showErrorAlert(
+          context,
+          'Failed to create meal plan. Please check days or duration or trainees on plan to avoid conflicts.',
+        );
+        Navigator.pop(context);
+      });
+
+      // Show error snackbar as fallback
+      showSnack(
+        context,
+        'Failed to create meal plan. Please check days or duration or trainees on plan to avoid conflicts.',
+      );
 
       // Re-throw the error if you want to handle it further up the call stack
       throw Exception('Failed to create meal plan: $e');

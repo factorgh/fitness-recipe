@@ -23,6 +23,7 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
   final AuthService authService = AuthService();
   List<String> _topTrainers = [];
   List<String> _trainerImages = [];
+  List<String> _topTrainerIds = [];
   List<String> _topTrainersEmail = [];
 
   final RecipeService recipeService = RecipeService();
@@ -48,6 +49,8 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
               trainers.map((trainer) => trainer['username'] as String).toList();
           _topTrainersEmail =
               trainers.map((trainer) => trainer['email'] as String).toList();
+          _topTrainerIds =
+              trainers.map((trainer) => trainer['_id'] as String).toList();
 
           _trainerImages = trainers
               .map((trainer) =>
@@ -194,7 +197,7 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                               onPressed: () {
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) =>
-                                        NotificationsScreen()));
+                                        const NotificationsScreen()));
                               },
                             ),
                           )
@@ -299,6 +302,7 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
               ),
               // Trainers
               SliderTrainerLanding(
+                ids: _topTrainerIds,
                 emails: _topTrainersEmail,
                 recipes: _topTrainers, // Pass the names of top trainers
                 images: _trainerImages, // Pass the list of trainer images
