@@ -1,7 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+// ignore_for_file: avoid_print
 
-class NotificationDetailsPage extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/screens/all_meal_plan_trainee.dart';
+
+class NotificationDetailsPage extends ConsumerWidget {
   final String notiText;
   final DateTime createdAt;
   final String createdBy;
@@ -18,7 +23,8 @@ class NotificationDetailsPage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.read(userProvider);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -32,6 +38,20 @@ class NotificationDetailsPage extends StatelessWidget {
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+              onPressed: () {
+                if (user?.role == "0") {
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AllMealPlanTrainee()));
+                } else {
+                  print("print for traibner nav");
+                }
+              },
+              icon: const Icon(Icons.view_agenda_outlined))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),

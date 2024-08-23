@@ -1,8 +1,9 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'dart:core';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
@@ -13,6 +14,7 @@ import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details_trainee.dart';
 
 import 'package:voltican_fitness/services/auth_service.dart';
+import 'package:voltican_fitness/services/email_service.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/widgets/recipe_item.dart';
@@ -35,6 +37,7 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
   final RecipeService recipeService = RecipeService();
   final AuthService authService = AuthService();
   User? user; // Allow user to be null
+  final EmailService emailService = EmailService();
 
   final alerts = NativeAlerts();
   bool isLoading = false; // Add a loading state variable
@@ -136,20 +139,32 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                                       isLoading = true;
                                     });
 
-                                    if (me?.role == "1") {
-                                      // Handle follow action
-                                      await followersNotifier.followTrainer(
-                                          me!.id, widget.userId, context);
-                                    } else if (me!.role == "0") {
-                                      // Handle send request action
-                                      alerts.showSuccessAlert(
-                                          context, "Request sent successfully");
-                                      print('Request button pressed');
+                                    try {
+                                      if (me?.role == "1") {
+                                        // Handle follow action
+                                        await followersNotifier.followTrainer(
+                                            me!.id, widget.userId, context);
+                                      } else if (me!.role == "0") {
+                                        // Handle send request action
+                                        await emailService.sendEmail(
+                                            'jimew84359@apifan.com', me.email);
+                                        alerts.showSuccessAlert(context,
+                                            "Request sent successfully");
+                                        print('Request button pressed');
+                                      }
+                                    } catch (error) {
+                                      if (error is DioException) {
+                                        alerts.showErrorAlert(context,
+                                            "Specific error occurred: ${error.message}");
+                                      } else {
+                                        alerts.showErrorAlert(context,
+                                            "Failed to send request. Please try again.");
+                                      }
+                                    } finally {
+                                      setState(() {
+                                        isLoading = false;
+                                      });
                                     }
-
-                                    setState(() {
-                                      isLoading = false;
-                                    });
                                   },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: me?.role == "1"

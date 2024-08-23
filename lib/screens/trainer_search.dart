@@ -2,7 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/Features/trainer/trainer_service.dart'; // Import your service
-import 'package:voltican_fitness/models/user.dart'; // Import your model
+import 'package:voltican_fitness/models/user.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/services/email_service.dart';
+import 'package:voltican_fitness/utils/native_alert.dart'; // Import your model
 
 class TrainerSearchScreen extends ConsumerStatefulWidget {
   const TrainerSearchScreen({super.key});
@@ -206,14 +209,11 @@ class _TrainerSearchScreenState extends ConsumerState<TrainerSearchScreen> {
                   ElevatedButton(
                     onPressed: () {
                       // Your request logic here
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Request sent successfully!'),
-                          duration: Duration(seconds: 2),
-                          backgroundColor: Colors.brown,
-                        ),
-                      );
+                      EmailService()
+                          .sendEmail(ref.read(userProvider)!.id, email);
                       Navigator.of(context).pop();
+                      NativeAlerts().showSuccessAlert(
+                          context, "Request sent successfully");
                     },
                     child: const Text("Send Request"),
                   ),
