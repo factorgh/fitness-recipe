@@ -50,7 +50,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           username: _usernameController.text.trim(),
           password: _passwordController.text.trim(),
         );
-        alerts.showSuccessAlert(context, "LoggedIn successfully");
+        // alerts.showSuccessAlert(context, "LoggedIn successfully");
       } catch (e) {
         // Handle the error, e.g., show a snackbar or dialog with the error message
         alerts.showErrorAlert(context,

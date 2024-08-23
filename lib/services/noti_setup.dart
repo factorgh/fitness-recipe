@@ -10,14 +10,69 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
+  // Future<void> init() async {
+  //   tz.initializeTimeZones();
+
+  //   const AndroidInitializationSettings initializationSettingsAndroid =
+  //       AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  //   const InitializationSettings initializationSettings =
+  //       InitializationSettings(android: initializationSettingsAndroid);
+
+  //   await _flutterLocalNotificationsPlugin.initialize(
+  //     initializationSettings,
+  //     // onSelectNotification: (String? payload) async {
+  //     //   if (payload != null) {
+  //     //     print('Notification payload: $payload');
+  //     //     // Navigate to a specific screen or perform any action
+  //     //     // Example: Navigator.of(context).pushNamed('/meal-details', arguments: payload);
+  //     //   }
+  //     // },
+  //   );
+
+  //   // Define notification channel for Android
+  //   const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  //     'mealplanid', // ID of the channel
+  //     'Meal Plan Notifications', // Name of the channel
+  //     description: 'Notifications for meal plans',
+  //     importance: Importance.max,
+  //     sound: RawResourceAndroidNotificationSound('notification_sound'),
+  //   );
+
+  //   await _flutterLocalNotificationsPlugin
+  //       .resolvePlatformSpecificImplementation<
+  //           AndroidFlutterLocalNotificationsPlugin>()
+  //       ?.createNotificationChannel(channel);
+  // }
+
   Future<void> init() async {
     tz.initializeTimeZones();
 
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
+    // Updated iOS Initialization settings using DarwinInitializationSettings
+    final DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
+            requestSoundPermission: true,
+            requestBadgePermission: true,
+            requestAlertPermission: true,
+            onDidReceiveLocalNotification: (
+              int id,
+              String? title,
+              String? body,
+              String? payload,
+            ) async {
+              // Handle when a notification is received while the app is in the foreground
+            });
+
+    // Combine Android and iOS settings
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS:
+          initializationSettingsIOS, // Using DarwinInitializationSettings for iOS
+    );
 
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
