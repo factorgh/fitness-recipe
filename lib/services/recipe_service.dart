@@ -102,26 +102,6 @@ class RecipeService {
     return recipeList;
   }
 
-  // Future<void> saveRecipe(String userId, String recipeId) async {
-  //   try {
-  //     final response = await client.dio.post(
-  //       '/recipes/save-recipe',
-  //       data: {
-  //         'userId': userId,
-  //         'recipeId': recipeId,
-  //       },
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       print('Recipe saved successfully');
-  //     } else {
-  //       print('Failed to save recipe');
-  //     }
-  //   } catch (e) {
-  //     print('Error saving recipe: $e');
-  //   }
-  // }
-
   Future<List<Recipe>> fetchSavedRecipes(String userId) async {
     try {
       final response =
@@ -207,21 +187,28 @@ class RecipeService {
 
   Future<void> getTopRatedRecipes({
     required BuildContext context,
-    required Function(List<dynamic>) onSuccess,
+    required Function(List<Recipe>) onSuccess,
   }) async {
     try {
       final res = await client.dio.get('/recipes/recipe/highest-rated');
 
       if (res.statusCode == 200) {
-        List<dynamic> recipes = res.data;
-        print('Top recipes: $recipes');
+        // Assuming res.data is a List of Maps
+        List<dynamic> recipesData = res.data;
+        print('Top recipes data: $recipesData');
+
+        // Convert dynamic data to List<Recipe>
+        List<Recipe> recipes =
+            recipesData.map((data) => Recipe.fromMap(data)).toList();
+
+        // Call onSuccess with the List<Recipe>
         onSuccess(recipes);
       } else {
         // Handle server errors or unexpected responses
-        showSnack(context, 'Failed to fetch top trainers');
+        showSnack(context, 'Failed to fetch top rated recipes');
       }
     } catch (e) {
-      print('Error fetching top trainers: $e');
+      print('Error fetching top rated recipes: $e');
       showSnack(context, 'Failed to fetch top rated recipes');
     }
   }

@@ -28,10 +28,8 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
   List<String> _topTrainersEmail = [];
 
   final RecipeService recipeService = RecipeService();
-  List<String> _topRecipesTitle = [];
-  List<String> _recipeImages = [];
-  List<String> _recipeOwner = [];
-  List<Map<String, dynamic>> _recipes = [];
+
+  List<Recipe> _recipes = [];
   late SocketService _socketService;
   int _notificationCount = 0;
 
@@ -92,16 +90,7 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
       context: context,
       onSuccess: (recipes) {
         setState(() {
-          _topRecipesTitle =
-              recipes.map((recipe) => recipe['title'] as String).toList();
-          _recipeOwner = recipes
-              .map((recipe) => recipe['createdBy']['username'] as String)
-              .toList();
-          _recipeImages =
-              recipes.map((recipe) => recipe['imageUrl'] as String).toList();
-
-          _recipes =
-              recipes.map((recipe) => recipe as Map<String, dynamic>).toList();
+          _recipes = recipes.map((recipe) => recipe).toList();
         });
       },
     );
@@ -126,11 +115,12 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
     void handleCategorySelected(String category) {
       // Handle category selection
     }
-    void handleRecipeSelected(Map<String, dynamic> recipeMap) {
-      final Recipe recipe = Recipe.fromMap(recipeMap);
-      Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => TrainerMealDetailScreen(meal: recipe),
-      ));
+    void handleRecipeSelected(Recipe recipe) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => TrainerMealDetailScreen(meal: recipe),
+        ),
+      );
     }
 
     void handleTrainerSelected(String trainer) {
@@ -304,9 +294,6 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
               ),
               // New recipe slider
               NewRecipeSlider(
-                recipeTitles: _topRecipesTitle,
-                owners: _recipeOwner,
-                recipeImages: _recipeImages,
                 recipes: _recipes,
                 onCategorySelected: handleRecipeSelected,
               ),

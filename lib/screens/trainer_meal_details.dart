@@ -2,14 +2,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
+import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 
@@ -28,11 +30,34 @@ class _TrainerMealDetailScreenState
   bool isPrivate = false;
   bool isFollowing = false;
   RecipeService recipeService = RecipeService();
+  User? owner;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUser();
+  }
+
+  void _fetchUser() {
+    try {
+      AuthService().getUser(
+        userId: widget.meal.createdBy,
+        onSuccess: (fetchedUser) {
+          setState(() {
+            owner = fetchedUser;
+          });
+        },
+      );
+    } catch (e) {
+      // Handle unexpected errors here
+      showSnack(context, 'An unexpected error occurred');
+    }
+  }
 
   Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // User must tap button to dismiss
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(
@@ -42,9 +67,7 @@ class _TrainerMealDetailScreenState
           content: const SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(
-                  'Are you sure you want to delete this item?',
-                ),
+                Text('Are you sure you want to delete this item?'),
               ],
             ),
           ),
@@ -52,7 +75,7 @@ class _TrainerMealDetailScreenState
             TextButton(
               child: const Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
             ),
             TextButton(
@@ -79,20 +102,23 @@ class _TrainerMealDetailScreenState
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              RatingStars(
-                value: value,
-                onValueChanged: (v) {
+              RatingBar.builder(
+                initialRating: value,
+                minRating: 1,
+                direction: Axis.horizontal,
+                allowHalfRating: true,
+                itemCount: 5,
+                itemSize: 30,
+                itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                itemBuilder: (context, _) => const Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onRatingUpdate: (rating) {
                   setState(() {
-                    value = v;
+                    value = rating;
                   });
                 },
-                starCount: 5,
-                starSize: 30,
-                starSpacing: 2,
-                valueLabelVisibility: false,
-                maxValue: 5,
-                starOffColor: const Color(0xffe7e8ea),
-                starColor: Colors.yellow,
               ),
               const SizedBox(height: 10),
               TextField(
@@ -107,7 +133,7 @@ class _TrainerMealDetailScreenState
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: const Text('Cancel'),
             ),
@@ -118,7 +144,7 @@ class _TrainerMealDetailScreenState
                   // Handle comment submission here
                   showSnack(context, 'Comment submitted successfully');
                 }
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: const Text('Submit'),
             ),
@@ -133,18 +159,12 @@ class _TrainerMealDetailScreenState
       isFollowing = !isFollowing;
     });
 
-    // Show the snack bar with the appropriate message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isFollowing
-              ? 'You are now following trainer'
-              : 'You have unfollowed trainer.',
-          style: const TextStyle(color: Colors.white),
-        ),
-        backgroundColor: isFollowing ? Colors.green : Colors.red,
-        duration: const Duration(seconds: 2),
-      ),
+    // Show alert if the user is following
+    NativeAlerts().showSuccessAlert(
+      context,
+      isFollowing
+          ? 'You are now following the trainer'
+          : 'You have unfollowed the trainer.',
     );
   }
 
@@ -168,13 +188,14 @@ class _TrainerMealDetailScreenState
                   ),
                   color: Colors.white,
                 ),
-                child: Container(
-                  width: 30,
-                  height: 5,
-                  margin: const EdgeInsets.symmetric(horizontal: 150),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.black26,
+                child: Center(
+                  child: Container(
+                    width: 30,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.black26,
+                    ),
                   ),
                 ),
               ),
@@ -194,8 +215,11 @@ class _TrainerMealDetailScreenState
                 ),
                 width: 20,
                 height: 20,
-                child: const Icon(Icons.arrow_back_outlined,
-                    size: 30, color: Colors.white),
+                child: const Icon(
+                  Icons.arrow_back_outlined,
+                  size: 30,
+                  color: Colors.white,
+                ),
               ),
             ),
             flexibleSpace: FlexibleSpaceBar(
@@ -206,37 +230,36 @@ class _TrainerMealDetailScreenState
                     widget.meal.imageUrl,
                     fit: BoxFit.cover,
                   ),
-                  // user!.role != '0'
-                  //     ? Positioned(
-                  //         right: 10,
-                  //         top: 40,
-                  //         child: Column(
-                  //           crossAxisAlignment: CrossAxisAlignment.end,
-                  //           children: [
-                  //             IconButton(
-                  //               icon: Icon(
-                  //                 isFollowing
-                  //                     ? Icons.person_remove
-                  //                     : Icons.person_add,
-                  //                 color: Colors.white,
-                  //                 size: 30,
-                  //               ),
-                  //               onPressed: _toggleFollow,
-                  //             ),
-                  //             ElevatedButton(
-                  //               style: ElevatedButton.styleFrom(
-                  //                 foregroundColor:
-                  //                     Colors.red, // background color
-                  //                 backgroundColor: Colors.white, // text color
-                  //               ),
-                  //               onPressed: _toggleFollow,
-                  //               child:
-                  //                   Text(isFollowing ? 'Unfollow' : 'Follow'),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       )
-                  //     : const SizedBox(),
+                  user!.role != '0'
+                      ? Positioned(
+                          right: 10,
+                          top: 40,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  isFollowing
+                                      ? Icons.person_remove
+                                      : Icons.person_add,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
+                                onPressed: _toggleFollow,
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.red,
+                                  backgroundColor: Colors.white,
+                                ),
+                                onPressed: _toggleFollow,
+                                child:
+                                    Text(isFollowing ? 'Unfollow' : 'Follow'),
+                              ),
+                            ],
+                          ),
+                        )
+                      : const SizedBox(),
                 ],
               ),
             ),
@@ -271,7 +294,7 @@ class _TrainerMealDetailScreenState
                           child: Column(
                             children: [
                               RatingBar.builder(
-                                initialRating: 3,
+                                initialRating: value,
                                 minRating: 1,
                                 direction: Axis.horizontal,
                                 allowHalfRating: true,
@@ -288,7 +311,6 @@ class _TrainerMealDetailScreenState
                                       context: context,
                                       recipeId: widget.meal.id!,
                                       rating: rating);
-                                  print(rating);
                                   _showRatingDialog();
                                 },
                               ),
@@ -304,42 +326,55 @@ class _TrainerMealDetailScreenState
                     ],
                   ),
                   const SizedBox(height: 10),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Recipe by",
-                        style: TextStyle(fontWeight: FontWeight.w500),
-                      ),
-                      SizedBox(height: 5),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundImage:
-                                AssetImage('assets/images/pf2.jpg'),
-                          ),
-                          SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Dianne Russell",
-                                style: TextStyle(fontWeight: FontWeight.w500),
-                              ),
-                              Text(
-                                "Dian",
-                                style: TextStyle(fontWeight: FontWeight.w400),
-                              ),
-                            ],
-                          ),
-                          Spacer(),
-                          // Contact section goes here
-                        ],
-                      ),
-                    ],
-                  ),
+                  owner != null
+                      ? owner!.imageUrl != null
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Recipe by",
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                                const SizedBox(height: 5),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage:
+                                          NetworkImage(owner!.imageUrl!),
+                                      onBackgroundImageError:
+                                          (error, stackTrace) {
+                                        // Handle image loading errors here
+                                      },
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          owner!.username,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                        Text(
+                                          owner!.role == '0'
+                                              ? 'Trainer'
+                                              : 'User',
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
+                                    const Spacer(),
+                                    // Contact section goes here
+                                  ],
+                                ),
+                              ],
+                            )
+                          : const SizedBox()
+                      : const SizedBox(),
                   const SizedBox(height: 30),
                   const Text(
                     'Description',
@@ -376,39 +411,34 @@ class _TrainerMealDetailScreenState
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SizedBox(
-                      height: 100, // Set a specific height
+                      height: 100,
                       child: ListView.builder(
                         itemCount: widget.meal.ingredients.length,
                         itemBuilder: (context, index) {
                           final List<String> ingredientsList =
                               widget.meal.ingredients;
                           return Container(
-                            margin: const EdgeInsets.only(
-                                bottom: 8.0), // Space between items
-                            padding: const EdgeInsets.all(
-                                12.0), // Padding inside each item
+                            margin: const EdgeInsets.only(bottom: 8.0),
+                            padding: const EdgeInsets.all(12.0),
                             decoration: BoxDecoration(
-                              color: Colors.white, // Background color
-                              borderRadius:
-                                  BorderRadius.circular(8.0), // Rounded corners
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8.0),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.grey.withOpacity(0.2),
                                   spreadRadius: 2,
                                   blurRadius: 5,
-                                  offset: const Offset(0, 3), // Shadow position
+                                  offset: const Offset(0, 3),
                                 ),
                               ],
                             ),
                             child: Row(
                               children: [
                                 const Icon(
-                                  Icons
-                                      .check_circle_outline, // Icon to indicate completion or presence
+                                  Icons.check_circle_outline,
                                   color: Colors.green,
                                 ),
-                                const SizedBox(
-                                    width: 12.0), // Space between icon and text
+                                const SizedBox(width: 12.0),
                                 Expanded(
                                   child: Text(
                                     ingredientsList[index],
@@ -444,7 +474,6 @@ class _TrainerMealDetailScreenState
                   Text(
                     widget.meal.instructions,
                   ),
-                  // Nutritional facts
                   const SizedBox(height: 30),
                   const Row(
                     children: [
@@ -465,7 +494,7 @@ class _TrainerMealDetailScreenState
                     widget.meal.facts,
                   ),
                   const SizedBox(height: 30),
-                  user?.role != '0'
+                  user.role != '0'
                       ? InkWell(
                           onTap: () {
                             Navigator.of(context).push(MaterialPageRoute(
@@ -485,8 +514,9 @@ class _TrainerMealDetailScreenState
                       Navigator.of(context).pop();
                       await ref
                           .read(savedRecipesProvider.notifier)
-                          .saveRecipe(user!.id, widget.meal);
-                      showSnack(context, 'Recipe has been saved successfully');
+                          .saveRecipe(user.id, widget.meal);
+                      NativeAlerts().showSuccessAlert(
+                          context, "Recipe saved successfully");
                     },
                     splashColor: Colors.purple,
                     child: const ButtonWidget(

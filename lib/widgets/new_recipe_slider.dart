@@ -1,20 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/services/auth_service.dart';
 
-class NewRecipeSlider extends StatelessWidget {
-  final List<Map<String, dynamic>> recipes; // Updated to List<Recipe>
-  final List<String> owners; // List of recipe owners
-  final List<String> recipeTitles;
-  final List<String> recipeImages;
-  final Function(Map<String, dynamic>) onCategorySelected;
+class NewRecipeSlider extends StatefulWidget {
+  final List<Recipe> recipes; // Updated to List<Recipe>
+  final Function(Recipe) onCategorySelected;
 
   const NewRecipeSlider({
     super.key,
     required this.recipes,
-    required this.owners,
-    required this.recipeImages,
     required this.onCategorySelected,
-    required this.recipeTitles,
   });
+
+  @override
+  State<NewRecipeSlider> createState() => _NewRecipeSliderState();
+}
+
+class _NewRecipeSliderState extends State<NewRecipeSlider> {
+  final AuthService authService = AuthService();
+  Map<String, String> userNames = {}; // Store user names by user ID
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsers();
+  }
+
+  void _fetchUsers() {
+    // Extract unique user IDs from recipes
+    final userIds = widget.recipes.map((recipe) => recipe.createdBy).toSet();
+
+    for (String userId in userIds) {
+      authService.getUser(
+        userId: userId,
+        onSuccess: (fetchedUser) {
+          setState(() {
+            userNames[userId] = fetchedUser.username;
+          });
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,32 +49,22 @@ class NewRecipeSlider extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: recipes.length, // Assumes all lists are the same length
+        itemCount: widget.recipes.length,
         itemBuilder: (context, index) {
-          // Check if index is within bounds for all lists
-          if (index < recipeImages.length &&
-              index < owners.length &&
-              index < recipeTitles.length) {
-            return _buildRecipeItem(
-              context,
-              recipes[index],
-              owners[index],
-              recipeImages[index],
-              recipeTitles[index],
-            );
-          } else {
-            // Handle the case where index is out of bounds
-            return Container();
-          }
+          return _buildRecipeItem(
+            context,
+            widget.recipes[index],
+          );
         },
       ),
     );
   }
 
-  Widget _buildRecipeItem(BuildContext context, Map<String, dynamic> recipe,
-      String owner, String recipeImage, String recipeTitle) {
+  Widget _buildRecipeItem(BuildContext context, Recipe recipe) {
+    final userName = userNames[recipe.createdBy] ?? 'Unknown';
+
     return GestureDetector(
-      onTap: () => onCategorySelected(recipe),
+      onTap: () => widget.onCategorySelected(recipe),
       child: Container(
         width: 330, // Adjust width as needed
         margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -59,7 +75,7 @@ class NewRecipeSlider extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 image: DecorationImage(
-                  image: NetworkImage(recipeImage),
+                  image: NetworkImage(recipe.imageUrl), // Use recipe.imageUrl
                   fit: BoxFit.cover,
                 ),
               ),
@@ -79,20 +95,18 @@ class NewRecipeSlider extends StatelessWidget {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Row(
                             children: [
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Icon(
+                              const SizedBox(width: 5),
+                              const Icon(
                                 Icons.star,
                                 size: 20,
                                 color: Colors.amber,
                               ),
                               Text(
-                                '4.5 (1k+ Reviews)',
-                                style: TextStyle(
+                                '${recipe.averageRating} (1k+ Reviews)',
+                                style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -102,9 +116,7 @@ class NewRecipeSlider extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        width: 120,
-                      ),
+                      const SizedBox(width: 120),
                       // Add Favorite Icon
                       Container(
                         decoration: BoxDecoration(
@@ -119,16 +131,15 @@ class NewRecipeSlider extends StatelessWidget {
                       ),
                     ],
                   ),
-                  // Short Description
                 ],
               ),
             ),
             Positioned(
-              top: 130,
               bottom: 0,
+              left: 0,
+              right: 0,
               child: Container(
-                width: 330,
-                height: 50,
+                height: 70,
                 decoration: BoxDecoration(
                   color: Colors.white54,
                   borderRadius: BorderRadius.circular(20),
@@ -141,7 +152,7 @@ class NewRecipeSlider extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            recipeTitle,
+                            recipe.title, // Use recipe.title
                             style: const TextStyle(
                               color: Colors.black87,
                               fontSize: 16,
@@ -156,7 +167,7 @@ class NewRecipeSlider extends StatelessWidget {
                                 color: Colors.amber,
                               ),
                               const Text(
-                                "35 min",
+                                "35 min", // Use recipe.duration
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 13,
@@ -171,9 +182,7 @@ class NewRecipeSlider extends StatelessWidget {
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              const SizedBox(
-                                width: 10,
-                              ),
+                              const SizedBox(width: 10),
                               const Text(
                                 'by',
                                 style: TextStyle(
@@ -182,11 +191,9 @@ class NewRecipeSlider extends StatelessWidget {
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              const SizedBox(
-                                width: 10,
-                              ),
+                              const SizedBox(width: 10),
                               Text(
-                                owner,
+                                userName, // Use fetched user name
                                 style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 13,
