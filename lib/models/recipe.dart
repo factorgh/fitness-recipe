@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/foundation.dart';
 import 'package:voltican_fitness/models/user.dart';
 
@@ -61,10 +63,12 @@ class Recipe {
     required this.createdAt,
     required this.updatedAt,
   });
-
   factory Recipe.fromJson(Map<String, dynamic> json) {
+    print('JSON received: $json');
+    print('ID: ${json['_id']}'); // Debug the _id specifically
+
     return Recipe(
-      id: json['_id'] as String? ?? '',
+      id: json['_id']?.toString(),
       title: json['title'] as String? ?? '',
       ingredients: List<String>.from(json['ingredients'] ?? []),
       instructions: json['instructions'] as String? ?? '',

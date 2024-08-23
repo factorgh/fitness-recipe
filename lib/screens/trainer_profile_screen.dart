@@ -3,7 +3,7 @@
 import 'dart:core';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
@@ -40,7 +40,8 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
   final EmailService emailService = EmailService();
 
   final alerts = NativeAlerts();
-  bool isLoading = false; // Add a loading state variable
+  bool isLoading = false;
+  bool isFollowing = false;
 
   @override
   void initState() {
@@ -137,6 +138,7 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                                 : () async {
                                     setState(() {
                                       isLoading = true;
+                                      isFollowing = true;
                                     });
 
                                     try {
@@ -147,19 +149,19 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                                       } else if (me!.role == "0") {
                                         // Handle send request action
                                         await emailService.sendEmail(
-                                            'jimew84359@apifan.com', me.email);
+                                            user!.email, me.email);
                                         alerts.showSuccessAlert(context,
                                             "Request sent successfully");
                                         print('Request button pressed');
                                       }
                                     } catch (error) {
-                                      if (error is DioException) {
-                                        alerts.showErrorAlert(context,
-                                            "Specific error occurred: ${error.message}");
-                                      } else {
-                                        alerts.showErrorAlert(context,
-                                            "Failed to send request. Please try again.");
-                                      }
+                                      // if (error is DioException) {
+                                      //   alerts.showErrorAlert(context,
+                                      //       "Specific error occurred: ${error.message}");
+                                      // } else {
+                                      //   alerts.showErrorAlert(context,
+                                      //       "Failed to send request. Please try again.");
+                                      // }
                                     } finally {
                                       setState(() {
                                         isLoading = false;
@@ -185,7 +187,9 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                                   )
                                 : Text(
                                     me?.role == "1"
-                                        ? 'Follow'
+                                        ? isFollowing
+                                            ? 'Following'
+                                            : "Follow"
                                         : 'Send a request',
                                     style: TextStyle(
                                       fontSize: 15,

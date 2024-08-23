@@ -105,7 +105,7 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
                                 color: Colors.amber,
                               ),
                               Text(
-                                '${recipe.averageRating} (1k+ Reviews)',
+                                '${recipe.averageRating.toStringAsFixed(1)} (1k+ Reviews)',
                                 style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 12,

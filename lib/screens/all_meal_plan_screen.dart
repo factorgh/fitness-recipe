@@ -24,20 +24,6 @@ class _AllMealPlanState extends ConsumerState<AllMealPlan> {
     });
   }
 
-  // Future<void> _pickDate(BuildContext context) async {
-  //   final DateTime? pickedDate = await showDatePicker(
-  //     context: context,
-  //     initialDate: _selectedDate ?? DateTime.now(),
-  //     firstDate: DateTime(2000),
-  //     lastDate: DateTime(2101),
-  //   );
-  //   if (pickedDate != null && pickedDate != _selectedDate) {
-  //     setState(() {
-  //       _selectedDate = pickedDate;
-  //     });
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     final mealPlansState = ref.watch(mealPlansProvider);
@@ -98,7 +84,7 @@ class _AllMealPlanState extends ConsumerState<AllMealPlan> {
         child: mealPlansState is MealPlansLoading
             ? const Center(child: CircularProgressIndicator())
             : mealPlansState is MealPlansError
-                ? Center(child: Text((mealPlansState).error))
+                ? const Center(child: Text("No meal plans available"))
                 : mealPlansState is MealPlansLoaded
                     ? mealPlansState.mealPlans.isEmpty
                         ? const Center(child: Text('No meal plans available.'))

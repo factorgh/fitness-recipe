@@ -49,19 +49,18 @@ class AuthService {
         context: context,
         onSuccess: () async {
           final token = res.data['token'];
+          final user = res.data['user'];
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('auth_token', token);
 
-          showSnack(context, 'Account created successfully');
-
-          //  Get role from user
-          ref.read(userProvider.notifier).setUser(res.data.user);
-
+          NativeAlerts().showSuccessAlert(context, "User created successfully");
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (ctx) => const RoleScreen(),
             ),
           );
+          //  Get role from user
+          ref.read(userProvider.notifier).setUser(user);
         });
   }
 

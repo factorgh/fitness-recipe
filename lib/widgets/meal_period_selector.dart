@@ -121,7 +121,14 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
         _selectedMeals[mealPeriod] = [];
       }
 
-      _selectedMeals[mealPeriod]!.add(allocation);
+      if (mealPeriod == 'Snack') {
+        // Allow multiple snacks
+        _selectedMeals[mealPeriod]!.add(allocation);
+      } else {
+        // Replace existing selection for Breakfast, Lunch, or Dinner
+        _selectedMeals[mealPeriod] = [allocation];
+      }
+
       widget.onSelectionChanged(_convertToRecipeAllocations());
     });
   }

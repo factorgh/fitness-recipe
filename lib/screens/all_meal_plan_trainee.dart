@@ -28,19 +28,6 @@ class _AllMealPlanTraineeState extends ConsumerState<AllMealPlanTrainee> {
     });
   }
 
-  // Future<void> _pickDate(BuildContext context) async {
-  //   final DateTime? pickedDate = await showDatePicker(
-  //     context: context,
-  //     initialDate: _selectedDate ?? DateTime.now(),
-  //     firstDate: DateTime(2000),
-  //     lastDate: DateTime(2101),
-  //   );
-  //   if (pickedDate != null && pickedDate != _selectedDate) {
-  //     setState(() {
-  //       _selectedDate = pickedDate;
-  //     });
-  //   }
-  // }
   @override
   Widget build(BuildContext context) {
     final mealPlansState = ref.watch(traineeMealPlansProvider);
@@ -63,36 +50,6 @@ class _AllMealPlanTraineeState extends ConsumerState<AllMealPlanTrainee> {
           ],
         ),
         actions: const [
-          // DropdownButton<String>(
-          //   elevation: 3,
-          //   style: const TextStyle(
-          //       fontSize: 12,
-          //       color: Colors.orange,
-          //       fontWeight: FontWeight.w500),
-          //   value: _selectedDuration,
-          //   items: [
-          //     'Does Not Repeat',
-          //     'Week',
-          //     'Month',
-          //     'Quarter',
-          //     'Half-Year',
-          //     'Year',
-          //     'Custom'
-          //   ]
-          //       .map((duration) => DropdownMenuItem<String>(
-          //             value: duration,
-          //             child: Text(duration),
-          //           ))
-          //       .toList(),
-          //   onChanged: (value) {
-          //     setState(() {
-          //       _selectedDuration = value!;
-          //       ref
-          //           .read(traineeMealPlansProvider.notifier)
-          //           .filterByDuration(_selectedDuration);
-          //     });
-          //   },
-          // ),
           SizedBox(width: 10),
         ],
       ),
@@ -101,7 +58,7 @@ class _AllMealPlanTraineeState extends ConsumerState<AllMealPlanTrainee> {
         child: mealPlansState is MealPlansLoading
             ? const Center(child: CircularProgressIndicator())
             : mealPlansState is MealPlansError
-                ? Center(child: Text((mealPlansState).error))
+                ? const Center(child: Text("No meal plans available"))
                 : mealPlansState is MealPlansLoaded
                     ? mealPlansState.mealPlans.isEmpty
                         ? const Center(child: Text('No meal plans available.'))
