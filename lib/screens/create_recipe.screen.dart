@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 
@@ -93,16 +94,18 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
 
     try {
       await recipeService.createRecipe(
-          context: context,
-          title: _mealNameController.text,
-          description: _descriptionController.text,
-          ingredients: _ingredientsController.text.split(","),
-          instructions: _instructionsController.text,
-          facts: _nutritionalFactsController.text,
-          imageUrl: _selectedImage!,
-          period: selectedMealPeriod!,
-          createdBy: user,
-          ref: ref);
+          context,
+          Recipe(
+              title: _mealNameController.text,
+              ingredients: _ingredientsController.text.split(","),
+              instructions: _instructionsController.text,
+              description: _descriptionController.text,
+              facts: _nutritionalFactsController.text,
+              period: selectedMealPeriod!,
+              imageUrl: _selectedImage!.path,
+              createdBy: user.id,
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now()));
       setState(() {});
       // Optionally handle success (e.g., show a success message)
     } catch (e) {

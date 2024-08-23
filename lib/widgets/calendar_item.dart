@@ -52,8 +52,11 @@ class CalendarItem extends ConsumerWidget {
                 final mealPlanId = mealPlan.id;
                 final notifier = ref.read(mealPlanProvider.notifier);
                 await notifier.deleteMealPlan(mealPlanId!);
-                await Future.delayed(const Duration(milliseconds: 500));
                 Navigator.of(context).pop();
+                Future.delayed(Duration.zero, () {
+                  ref.read(mealPlansProvider.notifier).fetchAllMealPlans();
+                });
+
                 showSnack(context, "Meal Plan deleted successfully!");
               },
             ),

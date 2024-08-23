@@ -82,7 +82,6 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
   void _updateSortOption(String option) {
     setState(() {
       _sortOption = option;
-      // Trigger a sort operation based on the selected option if needed
     });
   }
 

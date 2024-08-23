@@ -1,37 +1,28 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
 
-import 'dart:io';
-
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:voltican_fitness/classes/dio_client.dart';
 import 'package:voltican_fitness/commons/constants/error_handling.dart';
 import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/models/user.dart';
-import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
+
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 
 class RecipeService {
   final DioClient client = DioClient();
 
   Future<void> createRecipe(
-      {required BuildContext context,
-      required String title,
-      required String description,
-      required List<String> ingredients,
-      required String instructions,
-      required String facts,
-      required File imageUrl,
-      required User createdBy,
-      required String period,
-      required WidgetRef ref}) async {
-    if (title.isEmpty ||
-        description.isEmpty ||
-        ingredients.isEmpty ||
-        instructions.isEmpty ||
-        facts.isEmpty ||
-        imageUrl.path.isEmpty) {
+    BuildContext context,
+    Recipe recipe,
+  ) async {
+    if (recipe.title.isEmpty ||
+        recipe.description.isEmpty ||
+        recipe.ingredients.isEmpty ||
+        recipe.instructions.isEmpty ||
+        recipe.facts.isEmpty ||
+        recipe.imageUrl.isEmpty ||
+        recipe.createdBy.isEmpty) {
       showSnack(
           context, 'Please fill all required fields and upload an image.');
       return;
@@ -42,35 +33,34 @@ class RecipeService {
       final cloudinary = CloudinaryPublic('daq5dsnqy', 'jqx9kpde');
       // Upload image to Cloudinary
       CloudinaryResponse uploadResult = await cloudinary.uploadFile(
-          CloudinaryFile.fromFile(imageUrl.path, folder: 'voltican_fitness'));
+          CloudinaryFile.fromFile(recipe.imageUrl, folder: 'voltican_fitness'));
       final image = uploadResult.secureUrl;
       print('Image URL: $image');
 
       // Create new recipe object
-      final recipe = Recipe(
-          title: title,
-          description: description,
-          ingredients: ingredients,
-          instructions: instructions,
-          facts: facts,
+      final myRecipe = Recipe(
+          title: recipe.title,
+          description: recipe.description,
+          ingredients: recipe.ingredients,
+          instructions: recipe.instructions,
+          facts: recipe.facts,
           imageUrl: image,
-          createdBy: createdBy.id,
-          period: period,
+          createdBy: recipe.createdBy,
+          period: recipe.period,
           ratings: [],
           createdAt: DateTime.now(),
           updatedAt: DateTime.now());
 
-      print('Recipe: $recipe');
+      print('Recipe: $myRecipe');
       // Save recipe to DB
-      final res = await client.dio.post('/recipes', data: recipe.toJson());
+      final res = await client.dio.post('/recipes', data: myRecipe.toJson());
 
       httpErrorHandle(
           response: res,
           context: context,
           onSuccess: () {
             showSnack(context, 'Recipe created successfully!');
-            // Refresh or reload recipes here
-            ref.read(savedRecipesProvider.notifier).loadUserRecipes();
+
             Navigator.pop(context);
           });
     } catch (e) {

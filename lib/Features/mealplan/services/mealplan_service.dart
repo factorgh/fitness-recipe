@@ -5,7 +5,6 @@ import 'package:voltican_fitness/classes/dio_client.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/services/noti_setup.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
-import 'package:voltican_fitness/utils/show_snackbar.dart';
 
 class MealPlanService {
   final DioClient client = DioClient();
@@ -35,7 +34,8 @@ class MealPlanService {
         recipeAllocations: createdMealPlan.recipeAllocations,
         trainees: createdMealPlan.trainees,
       );
-      showSnack(context, "Meal plan created successfully");
+      NativeAlerts()
+          .showSuccessAlert(context, "Meal plan created successfully");
 
       return createdMealPlan;
     } catch (e) {
@@ -43,7 +43,7 @@ class MealPlanService {
       debugPrint('Error creating meal plan: $e');
 
       // Display a snackbar with a user-friendly error message
-      showSnack(context,
+      NativeAlerts().showErrorAlert(context,
           'Failed to create meal plan. Please check days or duration or trainees on plan to avoid conflicts.');
       // Re-throw the error if you want to handle it further up the call stack
       throw Exception('Failed to create meal plan: $e');

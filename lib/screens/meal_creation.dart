@@ -10,6 +10,7 @@ import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
 import 'package:voltican_fitness/widgets/week_range_selector.dart';
@@ -207,7 +208,10 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
   Future<void> _completeSchedule() async {
     final user = ref.read(userProvider);
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate() &&
+        _selectedRecipeAllocations.isNotEmpty &&
+        _selectedTrainees.isNotEmpty &&
+        _weekDays.isNotEmpty) {
       final mealPlan = MealPlan(
         name: _mealPlanNameController.text,
         duration: _selectedDuration,
@@ -234,6 +238,10 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
             Navigator.pop(context);
           });
         }
+
+        Future.delayed(Duration.zero, () {
+          ref.read(mealPlansProvider.notifier).fetchAllMealPlans();
+        });
       } catch (e) {
         if (mounted) {
           setState(() {
@@ -245,7 +253,8 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
       setState(() {
         _isLoading = false;
       });
-      showSnack(context, 'Please fill in all required fields');
+      NativeAlerts()
+          .showErrorAlert(context, 'Please fill in all required fields');
     }
   }
 

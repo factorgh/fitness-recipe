@@ -13,13 +13,12 @@ class AllMealPlan extends ConsumerStatefulWidget {
 }
 
 class _AllMealPlanState extends ConsumerState<AllMealPlan> {
-  // DateTime? _selectedDate;
   String _selectedDuration = 'Does Not Repeat';
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(mealPlansProvider.notifier).fetchAllMealPlans();
     });
   }
@@ -46,34 +45,38 @@ class _AllMealPlanState extends ConsumerState<AllMealPlan> {
           ],
         ),
         actions: [
-          DropdownButton<String>(
-            elevation: 3,
-            style: const TextStyle(
-                fontSize: 12,
-                color: Colors.orange,
-                fontWeight: FontWeight.w500),
-            value: _selectedDuration,
-            items: [
-              'Does Not Repeat',
-              'Week',
-              'Month',
-              'Quarter',
-              'Half-Year',
-              'Year',
-              'Custom'
-            ]
-                .map((duration) => DropdownMenuItem<String>(
-                      value: duration,
-                      child: Text(duration),
-                    ))
-                .toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedDuration = value!;
-                ref
-                    .read(mealPlansProvider.notifier)
-                    .filterByDuration(_selectedDuration);
-              });
+          Consumer(
+            builder: (context, ref, child) {
+              return DropdownButton<String>(
+                elevation: 3,
+                style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.orange,
+                    fontWeight: FontWeight.w500),
+                value: _selectedDuration,
+                items: [
+                  'Does Not Repeat',
+                  'Week',
+                  'Month',
+                  'Quarter',
+                  'Half-Year',
+                  'Year',
+                  'Custom'
+                ]
+                    .map((duration) => DropdownMenuItem<String>(
+                          value: duration,
+                          child: Text(duration),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedDuration = value!;
+                    ref
+                        .read(mealPlansProvider.notifier)
+                        .filterByDuration(_selectedDuration);
+                  });
+                },
+              );
             },
           ),
           const SizedBox(width: 10),
@@ -84,18 +87,20 @@ class _AllMealPlanState extends ConsumerState<AllMealPlan> {
         child: mealPlansState is MealPlansLoading
             ? const Center(child: CircularProgressIndicator())
             : mealPlansState is MealPlansError
-                ? const Center(child: Text("No meal plans available"))
+                ? const Center(
+                    child:
+                        Text("Error: There was an error fetching meal plans"))
                 : mealPlansState is MealPlansLoaded
                     ? mealPlansState.mealPlans.isEmpty
                         ? const Center(child: Text('No meal plans available.'))
                         : ListView.builder(
-                            itemCount: (mealPlansState).mealPlans.length,
+                            itemCount: mealPlansState.mealPlans.length,
                             itemBuilder: (context, index) {
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 12.0),
                                 child: CalendarItem(
                                   titleIcon: Icons.restaurant_menu,
-                                  mealPlan: (mealPlansState).mealPlans[index],
+                                  mealPlan: mealPlansState.mealPlans[index],
                                 ),
                               );
                             },
