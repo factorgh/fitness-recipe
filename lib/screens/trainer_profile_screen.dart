@@ -37,6 +37,7 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
   User? user; // Allow user to be null
 
   final alerts = NativeAlerts();
+  bool isLoading = false; // Add a loading state variable
 
   @override
   void initState() {
@@ -128,38 +129,58 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                           ),
                           const SizedBox(height: 5),
                           ElevatedButton(
-                            onPressed: () {
-                              if (me.role == "1") {
-                                // Handle follow action
-                                followersNotifier.followTrainer(
-                                    me.id, widget.userId, context);
-                              } else if (me.role == "0") {
-                                // Handle send request action
-                                alerts.showSuccessAlert(
-                                    context, "Request sent successfully");
-                                print('Request button pressed');
-                                // You can call any method or show a dialog as needed
-                              }
-                            },
+                            onPressed: isLoading
+                                ? null
+                                : () async {
+                                    setState(() {
+                                      isLoading = true;
+                                    });
+
+                                    if (me?.role == "1") {
+                                      // Handle follow action
+                                      await followersNotifier.followTrainer(
+                                          me!.id, widget.userId, context);
+                                    } else if (me!.role == "0") {
+                                      // Handle send request action
+                                      alerts.showSuccessAlert(
+                                          context, "Request sent successfully");
+                                      print('Request button pressed');
+                                    }
+
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: me!.role == "1"
+                              backgroundColor: me?.role == "1"
                                   ? Colors.greenAccent[50]
                                   : Colors.lightBlue,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                             ),
-                            child: Text(
-                              me.role == "1" ? 'Follow' : 'Send a request',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w800,
-                                color: user!.role == "1"
-                                    ? Colors.black
-                                    : Colors.white,
-                              ),
-                            ),
-                          )
+                            child: isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.0,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    me?.role == "1"
+                                        ? 'Follow'
+                                        : 'Send a request',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w800,
+                                      color: me?.role == "1"
+                                          ? Colors.black
+                                          : Colors.white,
+                                    ),
+                                  ),
+                          ),
                         ],
                       ),
                     ],

@@ -65,10 +65,12 @@ class TrainerService {
         // Show success alert before navigating
         alerts.showSuccessAlert(context, 'User followed');
       } else {
-        alerts.showErrorAlert(context, "Already following user");
+        alerts.showErrorAlert(context, 'Already following user');
       }
     } catch (e) {
+      alerts.showErrorAlert(context, 'Already following user');
       print('Error in followTrainer: $e');
+
       throw Exception('Failed to follow trainer');
     }
   }

@@ -37,13 +37,11 @@ class _TrainerCodeWidgetState extends ConsumerState<TrainerCodeWidget> {
               child: const Text("OK"),
               onPressed: () async {
                 // Perform the unfollow operation
-                final trainerId =
-                    ref.read(userProvider)!.id; // Get the current trainer's ID
+                final trainerId = ref.read(userProvider)!.id;
                 await ref
                     .read(followingTrainersProvider(trainerId).notifier)
                     .unfollowTrainer(trainerId, trainerToUnfollowId);
 
-                // Optionally, you might want to fetch the updated list of following trainers
                 await ref
                     .read(followingTrainersProvider(trainerId).notifier)
                     .fetchFollowingTrainers(trainerId);

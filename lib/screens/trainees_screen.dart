@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: unused_result
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,15 +63,6 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
         ref.watch(followingTrainersProvider(trainerId));
     final followingIds = ref.watch(followingIdsProvider);
 
-    // void followTrainer(String trainerToFollowId, BuildContext context) {
-    //   ref
-    //       .read(followersProvider(trainerId).notifier)
-    //       .followTrainer(trainerId, trainerToFollowId, context);
-    //   ref
-    //       .read(followingIdsProvider.notifier)
-    //       .update((state) => [...state, trainerToFollowId]);
-    // }
-
     void unfollowTrainer(String trainerToUnfollowId) {
       ref
           .read(followersProvider(trainerId).notifier)
@@ -81,16 +72,13 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
     }
 
     void removeFollower(String followerId) {
-      final trainerId = ref.read(userProvider)!.id;
       ref
           .read(followersRole1Provider(trainerId).notifier)
           .removeFollower(followerId);
-      print('Remove follower: $followerId');
     }
 
     void removeTrainee(String traineeId) {
       // Implement your logic to remove the trainee
-      print('Remove trainee: $traineeId');
     }
 
     return Scaffold(
@@ -138,47 +126,53 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                       ),
                     ),
                     Expanded(
-                      child: selectedTraineeFilter == 'All'
-                          ? followersAsync.when(
-                              data: (followers) {
-                                final trainees = followers['trainees'] ?? [];
-                                if (trainees.isEmpty) {
-                                  return const Center(
-                                      child: Text('No trainees found'));
-                                }
-                                return buildTraineesListView(
-                                  trainees,
-                                  followingIds,
-                                  unfollowTrainer,
-                                  removeTrainee,
-                                  assignedTrainees: [],
-                                );
-                              },
-                              loading: () => const Center(
-                                  child: CircularProgressIndicator()),
-                              error: (err, _) =>
-                                  Center(child: Text('Error: $err')),
-                            )
-                          : assignedTraineesAsync.when(
-                              data: (assignedTrainees) {
-                                if (assignedTrainees.isEmpty) {
-                                  return const Center(
-                                      child:
-                                          Text('No assigned trainees found'));
-                                }
-                                return buildTraineesListView(
-                                  assignedTrainees,
-                                  followingIds,
-                                  unfollowTrainer,
-                                  removeTrainee,
-                                  assignedTrainees: assignedTrainees,
-                                );
-                              },
-                              loading: () => const Center(
-                                  child: CircularProgressIndicator()),
-                              error: (err, _) =>
-                                  Center(child: Text('Error: $err')),
-                            ),
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          ref.refresh(followersProvider(trainerId));
+                          ref.refresh(assignedTraineesProvider(trainerId));
+                        },
+                        child: selectedTraineeFilter == 'All'
+                            ? followersAsync.when(
+                                data: (followers) {
+                                  final trainees = followers['trainees'] ?? [];
+                                  if (trainees.isEmpty) {
+                                    return const Center(
+                                        child: Text('No trainees found'));
+                                  }
+                                  return buildTraineesListView(
+                                    trainees,
+                                    followingIds,
+                                    unfollowTrainer,
+                                    removeTrainee,
+                                    assignedTrainees: [],
+                                  );
+                                },
+                                loading: () => const Center(
+                                    child: CircularProgressIndicator()),
+                                error: (err, _) =>
+                                    Center(child: Text('Error: $err')),
+                              )
+                            : assignedTraineesAsync.when(
+                                data: (assignedTrainees) {
+                                  if (assignedTrainees.isEmpty) {
+                                    return const Center(
+                                        child:
+                                            Text('No assigned trainees found'));
+                                  }
+                                  return buildTraineesListView(
+                                    assignedTrainees,
+                                    followingIds,
+                                    unfollowTrainer,
+                                    removeTrainee,
+                                    assignedTrainees: assignedTrainees,
+                                  );
+                                },
+                                loading: () => const Center(
+                                    child: CircularProgressIndicator()),
+                                error: (err, _) =>
+                                    Center(child: Text('Error: $err')),
+                              ),
+                      ),
                     ),
                   ],
                 ),
@@ -202,36 +196,42 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                       ),
                     ),
                     Expanded(
-                      child: selectedTrainerFilter == 'Following'
-                          ? followingTrainersAsync.when(
-                              data: (followingTrainers) {
-                                return buildTrainersListView(
-                                  followingTrainers,
-                                  followingIds,
-                                  unfollowTrainer,
-                                  isFollowingView: true,
-                                );
-                              },
-                              loading: () => const Center(
-                                  child: CircularProgressIndicator()),
-                              error: (err, _) =>
-                                  Center(child: Text('Error: $err')),
-                            )
-                          : followersAsync.when(
-                              data: (followers) {
-                                final trainers = followers['trainers'] ?? [];
-                                return buildTrainersListView(
-                                  trainers,
-                                  followingIds,
-                                  unfollowTrainer,
-                                  removeFollower: removeFollower,
-                                );
-                              },
-                              loading: () => const Center(
-                                  child: CircularProgressIndicator()),
-                              error: (err, _) =>
-                                  Center(child: Text('Error: $err')),
-                            ),
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          ref.refresh(followersProvider(trainerId));
+                          ref.refresh(followingTrainersProvider(trainerId));
+                        },
+                        child: selectedTrainerFilter == 'Following'
+                            ? followingTrainersAsync.when(
+                                data: (followingTrainers) {
+                                  return buildTrainersListView(
+                                    followingTrainers,
+                                    followingIds,
+                                    unfollowTrainer,
+                                    isFollowingView: true,
+                                  );
+                                },
+                                loading: () => const Center(
+                                    child: CircularProgressIndicator()),
+                                error: (err, _) =>
+                                    Center(child: Text('Error: $err')),
+                              )
+                            : followersAsync.when(
+                                data: (followers) {
+                                  final trainers = followers['trainers'] ?? [];
+                                  return buildTrainersListView(
+                                    trainers,
+                                    followingIds,
+                                    unfollowTrainer,
+                                    removeFollower: removeFollower,
+                                  );
+                                },
+                                loading: () => const Center(
+                                    child: CircularProgressIndicator()),
+                                error: (err, _) =>
+                                    Center(child: Text('Error: $err')),
+                              ),
+                      ),
                     ),
                   ],
                 ),
@@ -315,15 +315,15 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                               'Are you sure you want to remove this trainee?'),
                           actions: [
                             TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Close the dialog
+                              },
                               child: const Text('Cancel'),
                             ),
                             TextButton(
                               onPressed: () {
-                                removeTrainee(trainee.id);
-
                                 Navigator.of(context).pop();
-                                setState(() {});
+                                removeTrainee(trainee.id);
                               },
                               child: const Text('Remove'),
                             ),
@@ -343,20 +343,18 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
   Widget buildTrainersListView(
     List<User> trainers,
     List<String> followingIds,
-    Function(String) unfollow, {
-    bool isFollowingView = false,
+    Function(String) unfollowTrainer, {
     Function(String)? removeFollower,
+    bool isFollowingView = false,
   }) {
     return ListView.builder(
       itemCount: trainers.length,
       itemBuilder: (context, index) {
         final trainer = trainers[index];
-        // final isFollowing = followingIds.contains(trainer.id);
+        final isFollowing = followingIds.contains(trainer.id);
 
         return Card(
-          color: isFollowingView
-              ? Colors.green.shade100
-              : Colors.white, // Change color for following trainers
+          color: isFollowing ? Colors.green.shade100 : Colors.white,
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -396,13 +394,37 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                 ),
                 if (isFollowingView)
                   IconButton(
-                    icon: const Icon(Icons.person_remove, color: Colors.red),
+                    icon: const Icon(Icons.delete, color: Colors.grey),
                     onPressed: () {
-                      unfollow(trainer.id);
-                      setState(() {});
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Unfollow Trainer'),
+                            content: const Text(
+                                'Are you sure you want to unfollow this trainer?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pop(); // Close the dialog
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  unfollowTrainer(trainer.id);
+                                },
+                                child: const Text('Unfollow'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
-                  ),
-                if (!isFollowingView && removeFollower != null)
+                  )
+                else if (removeFollower != null)
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.grey),
                     onPressed: () {
@@ -415,13 +437,16 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                                 'Are you sure you want to remove this follower?'),
                             actions: [
                               TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pop(); // Close the dialog
+                                },
                                 child: const Text('Cancel'),
                               ),
                               TextButton(
                                 onPressed: () {
-                                  removeFollower(trainer.id);
                                   Navigator.of(context).pop();
+                                  removeFollower(trainer.id);
                                 },
                                 child: const Text('Remove'),
                               ),

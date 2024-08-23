@@ -34,13 +34,19 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
 
     // Load all necessary data using the providers
     Future.microtask(() {
-      ref.read(userRecipesProvider.notifier).loadUserRecipes();
-      final user = ref.read(userProvider);
-      ref.read(savedRecipesProvider.notifier).loadSavedRecipes(user!.id);
-      ref
-          .read(allRecipesProvider.notifier)
-          .loadAllRecipes(context); // Load all recipes here
+      _loadData();
     });
+  }
+
+  Future<void> _loadData() async {
+    final user = ref.read(userProvider);
+    ref.read(userRecipesProvider.notifier).loadUserRecipes();
+    ref.read(savedRecipesProvider.notifier).loadSavedRecipes(user!.id);
+    ref.read(allRecipesProvider.notifier).loadAllRecipes(context);
+  }
+
+  Future<void> _handleRefresh() async {
+    await _loadData();
   }
 
   @override
@@ -98,12 +104,12 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
       case 'Z-A':
         recipes.sort((a, b) => b.title.compareTo(a.title));
         break;
-      // case 'Most Rated':
-      //   recipes.sort((a, b) => b.ratings.compareTo(a.ratings));
-      //   break;
-      // case 'Least Rated':
-      //   recipes.sort((a, b) => a.ratings.compareTo(b.ratings));
-      //   break;
+      case 'Most Rated':
+        recipes.sort((a, b) => b.averageRating.compareTo(a.averageRating));
+        break;
+      case 'Least Rated':
+        recipes.sort((a, b) => a.averageRating.compareTo(b.averageRating));
+        break;
       case 'Most Recent':
         recipes.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         break;
@@ -234,10 +240,21 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                _buildUserRecipesTab(_sortRecipes(_filterRecipes(userRecipes))),
-                _buildSavedRecipesTab(
-                    _sortRecipes(_filterRecipes(savedRecipes))),
-                _buildAllRecipesTab(_sortRecipes(_filterRecipes(allRecipes))),
+                RefreshIndicator(
+                  onRefresh: _handleRefresh,
+                  child: _buildUserRecipesTab(
+                      _sortRecipes(_filterRecipes(userRecipes))),
+                ),
+                RefreshIndicator(
+                  onRefresh: _handleRefresh,
+                  child: _buildSavedRecipesTab(
+                      _sortRecipes(_filterRecipes(savedRecipes))),
+                ),
+                RefreshIndicator(
+                  onRefresh: _handleRefresh,
+                  child: _buildAllRecipesTab(
+                      _sortRecipes(_filterRecipes(allRecipes))),
+                ),
               ],
             ),
           ),

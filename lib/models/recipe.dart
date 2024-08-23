@@ -3,7 +3,7 @@ import 'package:voltican_fitness/models/user.dart';
 
 class Rating {
   final User user;
-  final int rating;
+  final double rating;
 
   Rating({
     required this.user,
@@ -12,9 +12,16 @@ class Rating {
 
   factory Rating.fromJson(Map<String, dynamic> json) {
     final userJson = json['user'] as Map<String, dynamic>?;
+    final ratingValue = json['rating'];
+
+    // Handle case where rating can be either int or double
+    final rating = ratingValue is int
+        ? ratingValue.toDouble()
+        : ratingValue as double? ?? 0.0;
+
     return Rating(
       user: userJson != null ? User.fromJson(userJson) : User.empty,
-      rating: json['rating'] as int? ?? 0,
+      rating: rating,
     );
   }
 

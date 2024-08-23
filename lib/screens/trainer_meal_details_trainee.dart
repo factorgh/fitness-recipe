@@ -184,51 +184,6 @@ class _TrainerMealDetailScreenState
                     widget.meal.imageUrl,
                     fit: BoxFit.cover,
                   ),
-                  Positioned(
-                    right: 10,
-                    top: 40,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            isFollowing
-                                ? Icons.person_remove
-                                : Icons.person_add,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isFollowing = !isFollowing;
-                            });
-                          },
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.red, // background color
-                            backgroundColor: Colors.white, // text color
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isFollowing = !isFollowing;
-                            });
-                          },
-                          child: Text(isFollowing ? 'Unfollow' : 'Follow'),
-                        ),
-                        // IconButton(
-                        //   icon: const Icon(
-                        //     Icons.share,
-                        //     color: Colors.white,
-                        //     size: 30,
-                        //   ),
-                        //   onPressed: () {
-                        //     // Add share functionality here
-                        //   },
-                        // ),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),

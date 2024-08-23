@@ -60,7 +60,7 @@ class _AnimatedNativeAlertState extends State<AnimatedNativeAlert>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 100),
     );
     _scaleAnimation =
         CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);

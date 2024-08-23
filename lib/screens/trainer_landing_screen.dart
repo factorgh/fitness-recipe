@@ -217,7 +217,7 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                             child: IconButton(
                               icon: const Icon(
                                 Icons.notifications,
-                                color: Colors.red,
+                                color: Colors.white,
                                 size: 25,
                               ),
                               onPressed: () {

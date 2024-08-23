@@ -11,6 +11,7 @@ import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/role_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 
 class AuthService {
@@ -94,6 +95,7 @@ class AuthService {
         // Get role from user
         final userRole = res.data['user']['role'];
 
+        NativeAlerts().showSuccessAlert(context, "loggedIn Successfully");
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (ctx) => TabsScreen(userRole: userRole),

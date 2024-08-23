@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, unused_element
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,7 +31,6 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showBottomSheet(context);
       _fetchTopTrainers();
       _socketService = SocketService();
       _socketService.initSocket();
