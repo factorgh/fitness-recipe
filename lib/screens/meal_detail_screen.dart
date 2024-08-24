@@ -5,7 +5,8 @@ import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
+import 'package:voltican_fitness/providers/user_recipes.dart';
+
 import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
 import 'package:voltican_fitness/widgets/button.dart';
@@ -54,10 +55,12 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
               onPressed: () async {
                 Navigator.of(context).pop();
                 await ref
-                    .read(savedRecipesProvider.notifier)
+                    .read(userRecipesProvider.notifier)
                     .deleteRecipe(widget.meal.id!);
-
                 Navigator.of(context).pop();
+                await Future.delayed(Duration.zero, () {
+                  ref.read(userRecipesProvider.notifier).loadUserRecipes();
+                });
               },
             ),
           ],

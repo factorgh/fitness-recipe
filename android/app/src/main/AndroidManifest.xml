@@ -7,8 +7,10 @@
     <application
         android:label="Fitness Recipe"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon">
-
+        android:icon="@mipmap/launcher_icon" 
+        
+         android:enableOnBackInvokedCallback="true">
+        
         <activity
             android:name=".MainActivity"
             android:exported="true"

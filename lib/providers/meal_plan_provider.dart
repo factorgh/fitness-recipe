@@ -46,7 +46,9 @@ class MealPlanNotifier extends StateNotifier<MealPlan?> {
     try {
       final updatedMealPlan =
           await _mealPlanService.updateMealPlan(id, mealPlan);
-      state = updatedMealPlan; // Update state with updated meal plan
+      state = updatedMealPlan;
+      await _mealPlanService
+          .fetchAllMealPlans(); // Update state with updated meal plan
     } catch (e) {
       print('Failed to update meal plan: $e');
     }

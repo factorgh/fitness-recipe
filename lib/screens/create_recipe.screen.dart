@@ -6,7 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
+
 import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/providers/user_recipes.dart';
 
 import 'package:voltican_fitness/screens/meal_creation.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
@@ -107,6 +109,9 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
               createdAt: DateTime.now(),
               updatedAt: DateTime.now()));
       setState(() {});
+      await Future.delayed(Duration.zero, () {
+        ref.read(userRecipesProvider.notifier).loadUserRecipes();
+      });
       // Optionally handle success (e.g., show a success message)
     } catch (e) {
       // Handle any errors (e.g., show an error message)

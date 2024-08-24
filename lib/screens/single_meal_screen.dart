@@ -289,68 +289,11 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
     );
   }
 
-  // void _showTraineeList(BuildContext context, List<User> trainees) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return Padding(
-  //         padding: const EdgeInsets.all(16.0),
-  //         child: ListView.builder(
-  //           itemCount: trainees.length,
-  //           itemBuilder: (context, index) {
-  //             final trainee = trainees[index];
-  //             return Card(
-  //               elevation: 2,
-  //               margin: const EdgeInsets.symmetric(vertical: 8),
-  //               child: ListTile(
-  //                 leading: CircleAvatar(
-  //                   backgroundImage: trainee.imageUrl != null
-  //                       ? NetworkImage(trainee.imageUrl!)
-  //                       : const AssetImage('assets/images/default_profile.png')
-  //                           as ImageProvider,
-  //                 ),
-  //                 title: Text(trainee.username),
-  //               ),
-  //             );
-  //           },
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
   String _formatTime(DateTime time) {
     return time.hour > 12
         ? '${time.hour - 12}:${time.minute.toString().padLeft(2, '0')} PM'
         : '${time.hour}:${time.minute.toString().padLeft(2, '0')} AM';
   }
-
-  // void _showUpdateBottomSheet(BuildContext context) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return Padding(
-  //         padding: const EdgeInsets.all(16.0),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             const Text(
-  //               'Update Meal Plan',
-  //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-  //             ),
-  //             const SizedBox(height: 20),
-  //             // Your bottom sheet content here
-  //             ElevatedButton(
-  //               onPressed: () {
-  //                 Navigator.pop(context);
-  //               },
-  //               child: const Text('Close'),
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
 }
 
 void _showTraineeList(BuildContext context, List<User> trainees) {

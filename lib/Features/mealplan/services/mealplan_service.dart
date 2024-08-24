@@ -61,14 +61,18 @@ class MealPlanService {
     }
   }
 
-  // Update an existing meal plan
-  Future<MealPlan> updateMealPlan(String id, MealPlan mealPlan) async {
+  Future<MealPlan> updateMealPlan(String mealPlanId, MealPlan mealPlan) async {
     try {
-      final response =
-          await client.dio.put('/meal-plans/$id', data: mealPlan.toJson());
-      return MealPlan.fromJson(response.data);
+      final response = await client.dio
+          .put('/meal-plans/$mealPlanId', data: mealPlan.toJson());
+
+      if (response.statusCode == 200) {
+        return MealPlan.fromJson(response.data);
+      } else {
+        throw Exception(
+            'Failed to update meal plan: ${response.statusCode} ${response.statusMessage}');
+      }
     } catch (e) {
-      // Handle error
       throw Exception('Failed to update meal plan: $e');
     }
   }

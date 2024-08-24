@@ -5,6 +5,7 @@ import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/providers/recipe_service_provider.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 
+// StateNotifier for managing saved recipes
 class SavedRecipesNotifier extends StateNotifier<List<Recipe>> {
   final RecipeService _recipeService;
 
@@ -33,46 +34,6 @@ class SavedRecipesNotifier extends StateNotifier<List<Recipe>> {
     }
   }
 
-  Future<void> loadUserRecipes() async {
-    try {
-      final recipes = await _recipeService.fetchRecipesByUser();
-      state = recipes;
-    } catch (e) {
-      print('Error loading user recipes: $e');
-      state = []; // Clear state or provide a fallback
-    }
-  }
-
-  Future<void> deleteRecipe(String recipeId) async {
-    try {
-      await _recipeService.deleteRecipe(recipeId);
-      state = state.where((recipe) => recipe.id != recipeId).toList();
-    } catch (e) {
-      print('Error deleting recipe: $e');
-    }
-  }
-
-  Future<void> updateRecipe(String recipeId, Recipe updatedRecipe) async {
-    try {
-      final updatedRecipeData = {
-        'title': updatedRecipe.title,
-        'description': updatedRecipe.description,
-        'ingredients': updatedRecipe.ingredients,
-        'instructions': updatedRecipe.instructions,
-        'facts': updatedRecipe.facts,
-        'imageUrl': updatedRecipe.imageUrl,
-        'period': updatedRecipe.period,
-      };
-
-      await _recipeService.updateRecipe(recipeId, updatedRecipeData);
-      state = state
-          .map((recipe) => recipe.id == recipeId ? updatedRecipe : recipe)
-          .toList();
-    } catch (e) {
-      print('Error updating recipe: $e');
-    }
-  }
-
   Future<void> removeSavedRecipe(String userId, String recipeId) async {
     try {
       final success = await _recipeService.removeSavedRecipe(userId, recipeId);
@@ -85,7 +46,9 @@ class SavedRecipesNotifier extends StateNotifier<List<Recipe>> {
   }
 }
 
-// Provider for saved recipes
+// StateNotifier for managing user recipes
+
+// Providers for recipes
 final savedRecipesProvider =
     StateNotifierProvider<SavedRecipesNotifier, List<Recipe>>((ref) {
   return SavedRecipesNotifier(ref.read(recipeServiceProvider));

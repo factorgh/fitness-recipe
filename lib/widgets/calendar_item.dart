@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 // Make sure to import the provider file
@@ -71,6 +72,13 @@ class CalendarItem extends ConsumerWidget {
     final traineeDetailsAsyncValue =
         ref.watch(traineeDetailsProvider(mealPlan.trainees));
 
+    final startDate = mealPlan.startDate != null
+        ? DateFormat('MMM d, yyyy').format(mealPlan.startDate!)
+        : 'Start Date Not Available';
+    final endDate = mealPlan.endDate != null
+        ? DateFormat('MMM d, yyyy').format(mealPlan.endDate!)
+        : 'End Date Not Available';
+
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black38),
@@ -92,6 +100,18 @@ class CalendarItem extends ConsumerWidget {
                   const SizedBox(width: 20),
                   Text(mealPlan.duration),
                 ],
+              ),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 15),
+                    const Icon(Icons.date_range),
+                    const SizedBox(width: 8),
+                    Text('$startDate - $endDate'),
+                  ],
+                ),
               ),
               const SizedBox(height: 20),
               const Row(

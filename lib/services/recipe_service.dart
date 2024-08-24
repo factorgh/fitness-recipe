@@ -53,6 +53,7 @@ class RecipeService {
 
       print('Recipe: $myRecipe');
       // Save recipe to DB
+      print('Data for creating: ${myRecipe.toJson()}');
       final res = await client.dio.post('/recipes', data: myRecipe.toJson());
 
       httpErrorHandle(

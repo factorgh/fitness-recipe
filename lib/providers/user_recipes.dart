@@ -1,5 +1,7 @@
 // provider.dart
 
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
@@ -37,8 +39,37 @@ class UserRecipesNotifier extends StateNotifier<List<Recipe>> {
         state = [...state, recipe];
       }
     } catch (e) {
-      // ignore: avoid_print
       print('Error saving recipe: $e');
+    }
+  }
+
+  Future<void> updateRecipe(String recipeId, Recipe updatedRecipe) async {
+    try {
+      final updatedRecipeData = {
+        'title': updatedRecipe.title,
+        'description': updatedRecipe.description,
+        'ingredients': updatedRecipe.ingredients,
+        'instructions': updatedRecipe.instructions,
+        'facts': updatedRecipe.facts,
+        'imageUrl': updatedRecipe.imageUrl,
+        'period': updatedRecipe.period,
+      };
+
+      await _recipeService.updateRecipe(recipeId, updatedRecipeData);
+      state = state
+          .map((recipe) => recipe.id == recipeId ? updatedRecipe : recipe)
+          .toList();
+    } catch (e) {
+      print('Error updating recipe: $e');
+    }
+  }
+
+  Future<void> deleteRecipe(String recipeId) async {
+    try {
+      await _recipeService.deleteRecipe(recipeId);
+      state = state.where((recipe) => recipe.id != recipeId).toList();
+    } catch (e) {
+      print('Error deleting recipe: $e');
     }
   }
 }
