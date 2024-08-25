@@ -96,6 +96,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
           .updateRecipe(widget.recipe.id as String, updatedRecipe);
 
       Navigator.of(context).pop();
+      Navigator.of(context).pop();
     } catch (e) {
       // Handle errors if needed
       ScaffoldMessenger.of(context).showSnackBar(

@@ -98,33 +98,19 @@ class _TrainerMealDetailScreenState
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Rate and Comment'),
+          title: const Center(
+              child: Text(
+            'Leave your Review',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+          )),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              RatingBar.builder(
-                initialRating: value,
-                minRating: 1,
-                direction: Axis.horizontal,
-                allowHalfRating: true,
-                itemCount: 5,
-                itemSize: 30,
-                itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-                itemBuilder: (context, _) => const Icon(
-                  Icons.star,
-                  color: Colors.amber,
-                ),
-                onRatingUpdate: (rating) {
-                  setState(() {
-                    value = rating;
-                  });
-                },
-              ),
               const SizedBox(height: 10),
               TextField(
                 controller: commentController,
                 decoration: const InputDecoration(
-                  hintText: 'Write your comment here',
+                  hintText: 'Write your review here',
                 ),
                 maxLines: 3,
               ),
@@ -133,20 +119,29 @@ class _TrainerMealDetailScreenState
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Close the dialog
               },
-              child: const Text('Cancel'),
+              child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Skip')),
             ),
+            const Spacer(),
             TextButton(
               onPressed: () {
                 String comment = commentController.text;
                 if (comment.isNotEmpty) {
                   // Handle comment submission here
-                  showSnack(context, 'Comment submitted successfully');
+                  showSnack(context, 'Review submitted successfully');
                 }
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Close the dialog
               },
-              child: const Text('Submit'),
+              child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Post')),
             ),
           ],
         );
@@ -411,47 +406,28 @@ class _TrainerMealDetailScreenState
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SizedBox(
-                      height: 100,
-                      child: ListView.builder(
-                        itemCount: widget.meal.ingredients.length,
-                        itemBuilder: (context, index) {
-                          final List<String> ingredientsList =
-                              widget.meal.ingredients;
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 8.0),
-                            padding: const EdgeInsets.all(12.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.check_circle_outline,
-                                  color: Colors.green,
-                                ),
-                                const SizedBox(width: 12.0),
-                                Expanded(
-                                  child: Text(
-                                    ingredientsList[index],
-                                    style: const TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                      height: 100, // Adjust the height based on your needs
+                      child: Column(
+                        children: widget.meal.ingredients.map((ingredient) {
+                          return Row(
+                            children: [
+                              const Icon(
+                                Icons.check_circle_outline,
+                                color: Colors.green,
+                              ),
+                              const SizedBox(width: 12.0),
+                              Expanded(
+                                child: Text(
+                                  ingredient,
+                                  style: const TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           );
-                        },
+                        }).toList(),
                       ),
                     ),
                   ),
@@ -471,8 +447,11 @@ class _TrainerMealDetailScreenState
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    widget.meal.instructions,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      widget.meal.instructions,
+                    ),
                   ),
                   const SizedBox(height: 30),
                   const Row(

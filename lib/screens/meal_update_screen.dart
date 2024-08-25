@@ -9,7 +9,10 @@ import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
+
+import 'package:voltican_fitness/screens/calendar_screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
 import 'package:voltican_fitness/widgets/week_range_selector.dart';
@@ -186,18 +189,23 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
         await ref
             .read(mealPlansProvider.notifier)
             .updateMealPlan(widget.mealPlan.id!, mealUpdate);
-        showSnack(context, 'Meal plan updated successfully');
+        NativeAlerts()
+            .showSuccessAlert(context, 'Meal plan updated successfully');
         setState(() {
           _isLoading = false;
-          Navigator.pop(context);
         });
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const CalendarScreen()),
+          (Route<dynamic> route) =>
+              false, // This will remove all previous routes
+        );
       } catch (e) {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update meal plan: $e')),
-        );
+        NativeAlerts()
+            .showErrorAlert(context, 'Failed to update meal plan: $e');
       }
     } else {
       setState(() {
@@ -408,18 +416,27 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.white),
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  10), // Set to 0 for a perfect rectangle
+                            ),
+                          ),
                           onPressed: _completeSchedule,
                           child: _isLoading
                               ? const CircularProgressIndicator(
                                   color: Colors.white,
+                                  strokeWidth: 2,
                                 )
-                              : const Text(
-                                  'Save Meal Plan',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 20),
+                              : const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Save Meal Plan',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 20),
+                                  ),
                                 ),
                         ),
                       ),

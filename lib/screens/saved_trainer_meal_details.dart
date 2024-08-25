@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:voltican_fitness/models/recipe.dart';
@@ -11,6 +10,7 @@ import 'package:voltican_fitness/providers/user_provider.dart';
 
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 
@@ -81,30 +81,19 @@ class _TrainerMealDetailScreenState
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Rate and Comment'),
+          title: const Center(
+              child: Text(
+            'Leave your Review',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+          )),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              RatingStars(
-                value: value,
-                onValueChanged: (v) {
-                  setState(() {
-                    value = v;
-                  });
-                },
-                starCount: 5,
-                starSize: 30,
-                starSpacing: 2,
-                valueLabelVisibility: false,
-                maxValue: 5,
-                starOffColor: const Color(0xffe7e8ea),
-                starColor: Colors.yellow,
-              ),
               const SizedBox(height: 10),
               TextField(
                 controller: commentController,
                 decoration: const InputDecoration(
-                  hintText: 'Write your comment here',
+                  hintText: 'Write your review here',
                 ),
                 maxLines: 3,
               ),
@@ -115,18 +104,27 @@ class _TrainerMealDetailScreenState
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: const Text('Cancel'),
+              child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Skip')),
             ),
+            const Spacer(),
             TextButton(
               onPressed: () {
                 String comment = commentController.text;
                 if (comment.isNotEmpty) {
                   // Handle comment submission here
-                  showSnack(context, 'Comment submitted successfully');
+                  showSnack(context, 'Review submitted successfully');
                 }
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: const Text('Submit'),
+              child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Post')),
             ),
           ],
         );
@@ -138,31 +136,6 @@ class _TrainerMealDetailScreenState
   Widget build(BuildContext context) {
     final user = ref.read(userProvider);
     return Scaffold(
-      // floatingActionButton: SpeedDial(
-      //   animatedIcon: AnimatedIcons.menu_close,
-      //   animatedIconTheme: const IconThemeData(size: 28.0),
-      //   backgroundColor: Colors.green[900],
-      //   visible: true,
-      //   curve: Curves.bounceInOut,
-      //   children: [
-      //     SpeedDialChild(
-      //       child: const Icon(Icons.accessibility),
-      //       backgroundColor: Colors.blue,
-      //       label: 'Accessibility',
-      //       onTap: () {
-      //         print('Accessibility tapped');
-      //       },
-      //     ),
-      //     SpeedDialChild(
-      //       child: const Icon(Icons.add),
-      //       backgroundColor: Colors.red,
-      //       label: 'Add',
-      //       onTap: () {
-      //         print('Add tapped');
-      //       },
-      //     ),
-      //   ],
-      // ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -217,55 +190,6 @@ class _TrainerMealDetailScreenState
                     widget.meal.imageUrl,
                     fit: BoxFit.cover,
                   ),
-                  // user!.role == "1"
-                  //     ? Positioned(
-                  //         right: 10,
-                  //         top: 40,
-                  //         child: Column(
-                  //           crossAxisAlignment: CrossAxisAlignment.end,
-                  //           children: [
-                  //             IconButton(
-                  //               icon: Icon(
-                  //                 isFollowing
-                  //                     ? Icons.person_remove
-                  //                     : Icons.person_add,
-                  //                 color: Colors.white,
-                  //                 size: 30,
-                  //               ),
-                  //               onPressed: () {
-                  //                 setState(() {
-                  //                   isFollowing = !isFollowing;
-                  //                 });
-                  //               },
-                  //             ),
-                  //             ElevatedButton(
-                  //               style: ElevatedButton.styleFrom(
-                  //                 foregroundColor:
-                  //                     Colors.red, // background color
-                  //                 backgroundColor: Colors.white, // text color
-                  //               ),
-                  //               onPressed: () {
-                  //                 setState(() {
-                  //                   isFollowing = !isFollowing;
-                  //                 });
-                  //               },
-                  //               child:
-                  //                   Text(isFollowing ? 'Following' : 'Follow'),
-                  //             ),
-                  //             IconButton(
-                  //               icon: const Icon(
-                  //                 Icons.share,
-                  //                 color: Colors.white,
-                  //                 size: 30,
-                  //               ),
-                  //               onPressed: () {
-                  //                 // Add share functionality here
-                  //               },
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       )
-                  //     : const SizedBox()
                 ],
               ),
             ),
@@ -404,54 +328,27 @@ class _TrainerMealDetailScreenState
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                      height: 100, // Set a specific height
-                      child: ListView.builder(
-                        itemCount: widget.meal.ingredients.length,
-                        itemBuilder: (context, index) {
-                          final List<String> ingredientsList =
-                              widget.meal.ingredients;
-                          return Container(
-                            margin: const EdgeInsets.only(
-                                bottom: 8.0), // Space between items
-                            padding: const EdgeInsets.all(
-                                12.0), // Padding inside each item
-                            decoration: BoxDecoration(
-                              color: Colors.white, // Background color
-                              borderRadius:
-                                  BorderRadius.circular(8.0), // Rounded corners
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3), // Shadow position
-                                ),
-                              ],
+                    child: Column(
+                      children: widget.meal.ingredients.map((ingredient) {
+                        return Row(
+                          children: [
+                            const Icon(
+                              Icons.check_circle_outline,
+                              color: Colors.green,
                             ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons
-                                      .check_circle_outline, // Icon to indicate completion or presence
-                                  color: Colors.green,
+                            const SizedBox(width: 12.0),
+                            Expanded(
+                              child: Text(
+                                ingredient,
+                                style: const TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                const SizedBox(
-                                    width: 12.0), // Space between icon and text
-                                Expanded(
-                                  child: Text(
-                                    ingredientsList[index],
-                                    style: const TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                          );
-                        },
-                      ),
+                          ],
+                        );
+                      }).toList(),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -470,8 +367,11 @@ class _TrainerMealDetailScreenState
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    widget.meal.instructions,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      widget.meal.instructions,
+                    ),
                   ),
                   // Nutritional facts
                   const SizedBox(height: 30),
@@ -504,7 +404,7 @@ class _TrainerMealDetailScreenState
                           splashColor: Colors.purple,
                           child: const ButtonWidget(
                               backColor: Colors.red,
-                              text: 'Edit and Assign',
+                              text: 'Edit',
                               textColor: Colors.white),
                         )
                       : const SizedBox(),
@@ -516,7 +416,8 @@ class _TrainerMealDetailScreenState
                           .read(savedRecipesProvider.notifier)
                           .removeSavedRecipe(user!.id, widget.meal.id!);
 
-                      showSnack(context, 'Saved recipe removed successfully');
+                      NativeAlerts().showSuccessAlert(
+                          context, 'Saved recipe removed successfully');
                       Navigator.of(context).pop();
 
                       // Navigator.of(context).push(MaterialPageRoute(

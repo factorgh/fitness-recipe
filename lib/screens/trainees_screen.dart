@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/assigned_trainees_provider.dart';
-import 'package:voltican_fitness/providers/followers_provider.dart';
+
 import 'package:voltican_fitness/providers/trainer_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 
@@ -66,19 +66,27 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
     void unfollowTrainer(String trainerToUnfollowId) {
       ref
           .read(followersProvider(trainerId).notifier)
-          .unfollowTrainer(trainerId, trainerToUnfollowId);
-      ref.read(followingIdsProvider.notifier).update(
-          (state) => state.where((id) => id != trainerToUnfollowId).toList());
+          .unfollowTrainer(trainerId, trainerToUnfollowId)
+          .then((_) {
+        ref.refresh(followingTrainersProvider(trainerId));
+        ref.refresh(followersProvider(trainerId));
+        ref.refresh(followingIdsProvider);
+      });
     }
 
     void removeFollower(String followerId) {
       ref
-          .read(followersRole1Provider(trainerId).notifier)
-          .removeFollower(followerId);
+          .read(followersProvider(trainerId).notifier)
+          .removeFollower(trainerId, followerId)
+          .then((_) {
+        ref.refresh(followersProvider(trainerId));
+        ref.refresh(followingTrainersProvider(trainerId));
+      });
     }
 
     void removeTrainee(String traineeId) {
-      // Implement your logic to remove the trainee
+      // Implement your logic to remove the trainee and refresh the assignedTraineesProvider
+      ref.refresh(assignedTraineesProvider(trainerId));
     }
 
     return Scaffold(
@@ -415,6 +423,7 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   unfollowTrainer(trainer.id);
+                                  setState(() {});
                                 },
                                 child: const Text('Unfollow'),
                               ),
@@ -447,6 +456,7 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   removeFollower(trainer.id);
+                                  setState(() {});
                                 },
                                 child: const Text('Remove'),
                               ),

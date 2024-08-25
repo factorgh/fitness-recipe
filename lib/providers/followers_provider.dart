@@ -54,7 +54,7 @@ class FollowersRole1Notifier extends StateNotifier<AsyncValue<List<User>>> {
     try {
       await _trainerService.removeFollower(followerId);
 
-      fetchFollowers(); // Refresh followers list with default filter
+      await fetchFollowers(); // Refresh followers list with default filter
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current);
     }

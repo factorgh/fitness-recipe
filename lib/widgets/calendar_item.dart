@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
-// Make sure to import the provider file
 import 'package:voltican_fitness/providers/trainer_provider.dart';
+// Make sure to import the provider file
 import 'package:voltican_fitness/screens/single_meal_screen.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 

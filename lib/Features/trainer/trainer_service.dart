@@ -64,9 +64,7 @@ class TrainerService {
       if (res.statusCode == 200) {
         // // Show success alert before navigating
         // alerts.showSuccessAlert(context, 'User followed');
-      } else {
-        // alerts.showErrorAlert(context, 'Already following user');
-      }
+      } else {}
     } catch (e) {
       // alerts.showErrorAlert(context, 'Already following user');
       print('Error in followTrainer: $e');

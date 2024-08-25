@@ -29,6 +29,7 @@ class _AllMealPlanState extends ConsumerState<AllMealPlan> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: 100.0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

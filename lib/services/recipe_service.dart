@@ -66,7 +66,6 @@ class RecipeService {
           });
     } catch (e) {
       print('Error: ${e.toString()}');
-      showSnack(context, 'Error adding recipe: ${e.toString()}');
     }
   }
 
