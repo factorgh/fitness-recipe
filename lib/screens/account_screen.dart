@@ -1,33 +1,44 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: use_build_context_synchronously
 
-class AccountScreen extends StatefulWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/services/auth_service.dart';
+
+class AccountScreen extends ConsumerStatefulWidget {
   const AccountScreen({super.key});
 
   @override
   _AccountScreenState createState() => _AccountScreenState();
 }
 
-class _AccountScreenState extends State<AccountScreen> {
+class _AccountScreenState extends ConsumerState<AccountScreen> {
+  final AuthService authService = AuthService();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _newPasswordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.read(userProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Account Management'),
+        title: const Text(
+          'Account Management',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         centerTitle: true,
       ),
       body: Padding(
@@ -75,26 +86,20 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            _buildTextField(
-              controller: _confirmPasswordController,
-              label: 'Confirm New Password',
-              icon: Icons.lock,
-              obscureText: _obscurePassword,
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
-              ),
-            ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () {
-                // Add your change password logic here
+              onPressed: () async {
+                setState(() {
+                  _isLoading = true;
+                });
+                await authService.changePassword(
+                    context: context,
+                    email: _emailController.text.trim(),
+                    oldPassword: _passwordController.text.trim(),
+                    newPassword: _newPasswordController.text.trim());
+                setState(() {
+                  _isLoading = false;
+                });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
@@ -102,15 +107,50 @@ class _AccountScreenState extends State<AccountScreen> {
                 textStyle:
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              child: const Text(
-                'Change Password',
-                style: TextStyle(color: Colors.white),
-              ),
+              child: _isLoading
+                  ? const CircularProgressIndicator(
+                      color: Colors.white,
+                    )
+                  : const Text(
+                      'Change Password',
+                      style: TextStyle(color: Colors.white),
+                    ),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () {
-                // Add your change password logic here
+              onPressed: () async {
+                // Show confirmation dialog before deleting
+                bool? confirmDelete = await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Confirm Delete'),
+                      content: const Text(
+                          'Are you sure you want to delete your account? This action cannot be undone.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pop(false); // Return false when canceled
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pop(true); // Return true when confirmed
+                          },
+                          child: const Text('Delete'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+
+                // If the user confirmed, proceed with deletion
+                if (confirmDelete == true) {
+                  await authService.deleteUser(context: context, id: user!.id);
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,

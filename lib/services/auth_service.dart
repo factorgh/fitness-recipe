@@ -10,6 +10,7 @@ import 'package:voltican_fitness/commons/constants/error_handling.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/role_screen.dart';
+import 'package:voltican_fitness/screens/signup_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
@@ -172,7 +173,10 @@ class AuthService {
         response: res,
         context: context,
         onSuccess: () {
-          showSnack(context, 'User deleted successfully');
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const SignupScreen()));
+          NativeAlerts()
+              .showSuccessAlert(context, "Account deleted successfully");
         },
       );
     } catch (e) {
@@ -236,7 +240,7 @@ class AuthService {
     }
   }
 
-  Future<Map<String, dynamic>?> getUserByCode(String code) async {
+  Future<User?> getUserByCode(String code) async {
     try {
       final response = await client.dio
           .get('/trainer/code/$code/follow'); // Adjust the endpoint as needed
@@ -296,6 +300,32 @@ class AuthService {
       // Handle other errors here
       print('Error: $e');
       throw Exception('Failed to load user');
+    }
+  }
+
+  Future<void> changePassword(
+      {required BuildContext context,
+      required String email,
+      required String oldPassword,
+      required String newPassword,
+      re}) async {
+    try {
+      dio.Response res = await client.dio.post(
+        "/users/change-password",
+        data: {
+          'email': email,
+          'oldPassword': oldPassword,
+          'newPassword': newPassword,
+        },
+      );
+
+      if (res.statusCode == 200) {
+        NativeAlerts()
+            .showSuccessAlert(context, "Password updated successfully");
+      }
+    } catch (e) {
+      NativeAlerts().showSuccessAlert(context, "Password updating failed");
+      print('Error updating password: $e');
     }
   }
 }

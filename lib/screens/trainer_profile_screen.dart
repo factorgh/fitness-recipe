@@ -42,6 +42,7 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
   final alerts = NativeAlerts();
   bool isLoading = false;
   bool isFollowing = false;
+  bool sent = false;
 
   @override
   void initState() {
@@ -113,7 +114,7 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                             user!.imageUrl != null && user!.imageUrl!.isNotEmpty
                                 ? CachedNetworkImageProvider(user!.imageUrl!)
                                 : const AssetImage(
-                                        'assets/images/default_avatar.png')
+                                        'assets/images/default_profile.png')
                                     as ImageProvider,
                       ),
                       const SizedBox(width: 20),
@@ -139,6 +140,7 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                                     setState(() {
                                       isLoading = true;
                                       isFollowing = true;
+                                      sent = true;
                                     });
 
                                     try {
@@ -190,7 +192,9 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                                         ? isFollowing
                                             ? 'Following'
                                             : "Follow"
-                                        : 'Send a request',
+                                        : sent
+                                            ? "Request sent "
+                                            : "Send a request",
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w800,
