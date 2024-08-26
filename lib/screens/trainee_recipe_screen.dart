@@ -167,11 +167,18 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
               children: [
                 followedRecipes.when(
                   loading: () => const Center(
-                      child: CircularProgressIndicator(
-                    color: Colors.red,
-                  )),
-                  error: (error, stack) => Center(child: Text('Error: $error')),
-                  data: (recipes) => buildMealList(recipes),
+                    child: CircularProgressIndicator(
+                      color: Colors.red,
+                    ),
+                  ),
+                  error: (error, stack) => Center(
+                    child: Text('Error: $error'),
+                  ),
+                  data: (recipes) => recipes.isEmpty
+                      ? const Center(
+                          child: Text('No followed recipes found.'),
+                        )
+                      : buildMealList(recipes),
                 ),
                 savedRecipes.isEmpty
                     ? const Center(

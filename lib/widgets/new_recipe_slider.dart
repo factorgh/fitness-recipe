@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
@@ -26,12 +28,17 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
     _fetchUsers();
   }
 
-  void _fetchUsers() {
-    // Extract unique user IDs from recipes
-    final userIds = widget.recipes.map((recipe) => recipe.createdBy).toSet();
+  void _fetchUsers() async {
+    final userIds = widget.recipes.map((recipe) {
+      print(
+          '---------------------------------------Recipe ID: $recipe'); // Debugging line
+      return recipe.createdBy;
+    }).toSet();
 
-    for (String userId in userIds) {
-      authService.getUser(
+    print(
+        '-------------------------------------------Fetching users with IDs: $userIds'); // Debugging line
+    final futures = userIds.map((userId) {
+      return authService.getUser(
         userId: userId,
         onSuccess: (fetchedUser) {
           setState(() {
@@ -39,7 +46,9 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
           });
         },
       );
-    }
+    }).toList();
+
+    await Future.wait(futures);
   }
 
   @override

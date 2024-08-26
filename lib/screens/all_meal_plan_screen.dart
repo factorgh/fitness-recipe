@@ -88,9 +88,7 @@ class _AllMealPlanState extends ConsumerState<AllMealPlan> {
         child: mealPlansState is MealPlansLoading
             ? const Center(child: CircularProgressIndicator())
             : mealPlansState is MealPlansError
-                ? const Center(
-                    child:
-                        Text("Error: There was an error fetching meal plans"))
+                ? const Center(child: Text('No meal plans available.'))
                 : mealPlansState is MealPlansLoaded
                     ? mealPlansState.mealPlans.isEmpty
                         ? const Center(child: Text('No meal plans available.'))

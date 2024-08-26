@@ -36,6 +36,7 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
       if (selectedRole == 'Trainer') {
         // Perform update functionality here before navigating to the tabs screen
         await authService.updateRole(
+          ref: ref,
           context: context,
           role: "1",
         );

@@ -145,11 +145,6 @@ class AuthService {
         context: context,
         onSuccess: () {
           // Update the user in the state after a successful update
-          ref.read(userProvider.notifier).updateUser(
-                fullName: fullName,
-                username: username,
-                email: email,
-              );
 
           showSnack(context, 'User updated successfully');
         },
@@ -188,6 +183,7 @@ class AuthService {
   Future<void> updateRole({
     required BuildContext context,
     required String role,
+    required WidgetRef ref,
   }) async {
     try {
       dio.Response res = await client.dio.put(
@@ -201,9 +197,12 @@ class AuthService {
         response: res,
         context: context,
         onSuccess: () {
+          // Convert the response data to a User object
+          User updatedUser = User.fromJson(res.data);
           // Update the user in the state after a successful update
-
-          showSnack(context, 'Role updated successfully');
+          ref.read(userProvider.notifier).setUser(updatedUser);
+          NativeAlerts().showSuccessAlert(context,
+              'Welcome ${updatedUser.username}.We\'re excited to have you on board! Explore the app to discover amazing features and content tailored just for you');
         },
       );
     } catch (e) {
@@ -240,14 +239,15 @@ class AuthService {
     }
   }
 
-  Future<User?> getUserByCode(String code) async {
+  Future<Map<String, dynamic>?> getUserByCode(String code) async {
     try {
-      final response = await client.dio
-          .get('/trainer/code/$code/follow'); // Adjust the endpoint as needed
+      final response = await client.dio.get(
+        '/users/trainer/code/$code/follow', // Adjust the endpoint as needed
+      );
 
       if (response.statusCode == 200) {
         // Return the user data from the response
-        return response.data['user'];
+        return response.data as Map<String, dynamic>;
       } else {
         // Handle non-200 responses
         print('Failed to load user: ${response.statusCode}');
@@ -288,17 +288,22 @@ class AuthService {
   }) async {
     try {
       final response = await client.dio.get('/users/$userId');
+
+      print('Response status code: ${response.statusCode}');
+      print('Response data: ${response.data}');
+
       if (response.statusCode == 200) {
         // Convert the response data to a User object
         User user = User.fromJson(response.data);
-        print('User: $user}');
+        print('Fetched User: $user');
         onSuccess(user);
       } else {
+        print('Failed to load user: ${response.statusCode}');
         throw Exception('Failed to load user');
       }
     } catch (e) {
       // Handle other errors here
-      print('Error: $e');
+      print('Error fetching user: $e');
       throw Exception('Failed to load user');
     }
   }

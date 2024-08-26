@@ -28,7 +28,6 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
   List<String> _topTrainersEmail = [];
 
   final RecipeService recipeService = RecipeService();
-
   List<Recipe> _recipes = [];
   late SocketService _socketService;
   int _notificationCount = 0;
@@ -45,10 +44,12 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
   }
 
   void _listenForNotifications() {
-    _socketService.listenForNotifications(ref.read(userProvider)!.id,
-        (notification) {
-      _incrementNotificationCount();
-    });
+    final user = ref.read(userProvider);
+    if (user != null) {
+      _socketService.listenForNotifications(user.id, (notification) {
+        _incrementNotificationCount();
+      });
+    }
   }
 
   void _incrementNotificationCount() {
@@ -115,6 +116,7 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
     void handleCategorySelected(String category) {
       // Handle category selection
     }
+
     void handleRecipeSelected(Recipe recipe) {
       Navigator.of(context).push(
         MaterialPageRoute(
@@ -152,17 +154,13 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                         children: [
                           Row(
                             children: [
-                              user == null
-                                  ? const CircleAvatar(
-                                      radius: 20,
-                                      backgroundImage: AssetImage(
-                                          'assets/images/default_profile.png'))
-                                  : CircleAvatar(
-                                      radius: 20,
-                                      backgroundImage: NetworkImage(user
-                                              .imageUrl ??
-                                          'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png'),
-                                    ),
+                              CircleAvatar(
+                                radius: 20,
+                                backgroundImage: NetworkImage(
+                                  user?.imageUrl ??
+                                      'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png',
+                                ),
+                              ),
                               const SizedBox(
                                 width: 10,
                               ),
@@ -170,11 +168,12 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Hello, ${user?.username}',
+                                    'Hello, ${user?.username ?? ''}',
                                     style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                   const Text(
                                     'Check amazing recipes..',
@@ -217,7 +216,7 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                                         const NotificationsScreen()));
                               },
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),

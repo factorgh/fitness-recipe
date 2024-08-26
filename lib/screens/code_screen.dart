@@ -1,78 +1,150 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/login_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
+import 'package:voltican_fitness/services/auth_service.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
 
-class CodeScreen extends StatefulWidget {
+class CodeScreen extends ConsumerStatefulWidget {
   const CodeScreen({super.key});
 
   @override
-  State<CodeScreen> createState() => _CodeScreenState();
+  ConsumerState<CodeScreen> createState() => _CodeScreenState();
 }
 
-class _CodeScreenState extends State<CodeScreen> {
-  // Show snack bar logic before navigating to tab screen
-  void _showSnackBarAndNavigate(BuildContext context) {
-    const snackBar = SnackBar(
-      content: Text(
-        'Trainer confirmation successful!',
-      ),
-      duration: Duration(seconds: 2),
-      backgroundColor: Colors.blue,
-    );
+class _CodeScreenState extends ConsumerState<CodeScreen> {
+  final AuthService _authService = AuthService();
+  final TextEditingController _codeController = TextEditingController();
+  Map<String, dynamic>? user;
+  bool isLoading = false;
 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  @override
+  void dispose() {
+    _codeController.dispose();
+    super.dispose();
+  }
 
-    // Wait for the duration of the SnackBar before navigating
+  Future<void> getUserByCode(BuildContext context, String code) async {
+    setState(() {
+      isLoading = true;
+    });
 
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const TabsScreen(userRole: '0')),
-    );
+    try {
+      final userData = await _authService.getUserByCode(code);
+
+      if (userData != null) {
+        setState(() {
+          user = userData;
+        });
+        _showTrainerDetails(context);
+      } else {
+        NativeAlerts().showErrorAlert(context, 'Trainer does not exist');
+      }
+    } catch (e) {
+      print('Error fetching user by code: $e');
+      NativeAlerts().showErrorAlert(context, 'An error occurred');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void _showTrainerDetails(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          contentPadding: EdgeInsets.zero,
-          content: Container(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(
-                  height: 10,
-                ),
-                const CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.black12,
-                  backgroundImage: AssetImage("assets/images/pf2.jpg"),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Text(
-                  "Albert M.",
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                OutlinedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _showSnackBarAndNavigate(context);
-                  },
-                  child: const Text(
-                    "Confirm trainer",
+    if (user != null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            contentPadding: EdgeInsets.zero,
+            content: Container(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 10),
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Colors.black12,
+                    backgroundImage: NetworkImage(
+                      user!['imageUrl'] ??
+                          'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png',
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 10),
+                  Text(
+                    user!['fullName'] ?? 'Unknown',
+                    style: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  OutlinedButton(
+                    onPressed: () async {
+                      print(
+                        ref.read(userProvider)!.id,
+                      );
+                      print(
+                        user!["_id"],
+                      );
+                      try {
+                        await TrainerService().followTrainer(
+                          ref.read(userProvider)!.id,
+                          user!["_id"],
+                          context,
+                        );
+                        Navigator.pop(context);
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const TabsScreen(userRole: '0'),
+                          ),
+                        );
+                        NativeAlerts().showSuccessAlert(context,
+                            "Welcome to fitness recipe .We are excited to have you on board! Explore the app to discover amazing features and content tailored just for you");
+                        // Show welcome message)
+                      } catch (e) {
+                        print('Error following trainer: $e');
+                        Navigator.pop(context); // Close dialog on error
+                        NativeAlerts().showErrorAlert(
+                            context, 'Failed to follow trainer');
+                      }
+                    },
+                    child: const Text("Confirm trainer"),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> _logout() async {
+    try {
+      // Clear token from SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove('auth_token'); // Remove the auth token
+
+      // Navigate to LoginScreen
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+
+      // Optionally show a success alert after navigating
+      Future.delayed(const Duration(milliseconds: 500), () {
+        NativeAlerts().showSuccessAlert(context, "Logged out successfully");
+      });
+    } catch (e) {
+      // Handle any potential errors
+      print('Error logging out: $e');
+      NativeAlerts().showErrorAlert(context, 'Failed to log out');
+    }
   }
 
   @override
@@ -84,17 +156,12 @@ class _CodeScreenState extends State<CodeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 30,
-              ),
+              const SizedBox(height: 30),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const LoginScreen()));
-                    },
+                    onTap: _logout,
                     child: const Icon(
                       Icons.logout,
                       size: 20,
@@ -116,12 +183,11 @@ class _CodeScreenState extends State<CodeScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: TextField(
+                      controller: _codeController,
                       decoration: InputDecoration(
                         labelText: 'Enter your code',
                         border: OutlineInputBorder(
@@ -130,20 +196,25 @@ class _CodeScreenState extends State<CodeScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        _showTrainerDetails(context);
+                        if (_codeController.text.trim().isNotEmpty) {
+                          getUserByCode(context, _codeController.text.trim());
+                        } else {
+                          NativeAlerts()
+                              .showErrorAlert(context, 'Please enter a code');
+                        }
                       },
-                      child: const Text("Confirm code"),
+                      child: isLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : const Text("Confirm code"),
                     ),
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ],
