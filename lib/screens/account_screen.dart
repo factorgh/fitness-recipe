@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
 
 class AccountScreen extends ConsumerStatefulWidget {
   const AccountScreen({super.key});
@@ -19,7 +20,20 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
   final _newPasswordController = TextEditingController();
 
   bool _obscurePassword = true;
+  bool _obscureNewPassword = true;
+
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = ref.read(
+        userProvider); // Use read to get the current user without causing a rebuild
+    if (user != null) {
+      _emailController.text =
+          user.email; // Initialize the email field with the user's email
+    }
+  }
 
   @override
   void dispose() {
@@ -32,7 +46,9 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.read(userProvider);
+    final user =
+        ref.watch(userProvider); // Watch for changes in the userProvider
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -73,14 +89,14 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               controller: _newPasswordController,
               label: 'New Password',
               icon: Icons.lock,
-              obscureText: _obscurePassword,
+              obscureText: _obscureNewPassword,
               suffixIcon: IconButton(
                 icon: Icon(
-                  _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                  _obscureNewPassword ? Icons.visibility : Icons.visibility_off,
                 ),
                 onPressed: () {
                   setState(() {
-                    _obscurePassword = !_obscurePassword;
+                    _obscureNewPassword = !_obscureNewPassword;
                   });
                 },
               ),
@@ -149,7 +165,11 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
 
                 // If the user confirmed, proceed with deletion
                 if (confirmDelete == true) {
-                  await authService.deleteUser(context: context, id: user!.id);
+                  if (user != null) {
+                    await authService.deleteUser(context: context, id: user.id);
+                  } else {
+                    NativeAlerts().showErrorAlert(context, 'User not found');
+                  }
                 }
               },
               style: ElevatedButton.styleFrom(

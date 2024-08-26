@@ -3,7 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/providers/followed_user_provider.dart';
+import 'package:voltican_fitness/providers/all_recipes_provider.dart';
+
 import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 // import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 
@@ -24,6 +25,7 @@ class TraineeRecipeScreen extends ConsumerStatefulWidget {
 class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -34,13 +36,7 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
   }
 
   void _fetchFollowedUsersRecipes() {
-    final user = ref.read(userProvider);
-    if (user == null) {
-      print('Error: User is null');
-      return;
-    }
-    final userId = user.id;
-    ref.read(followedUsersRecipesProvider(userId).notifier).fetchRecipes();
+    ref.read(allRecipesProvider.notifier).loadAllRecipes(context);
   }
 
   void _fetchSavedRecipes() {
@@ -97,11 +93,26 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
     );
   }
 
+  void _updateSearchQuery(String newQuery) {
+    setState(() {
+      _searchQuery = newQuery;
+    });
+  }
+
+  List<Recipe> _filterRecipes(List<Recipe> recipes) {
+    if (_searchQuery.isEmpty) {
+      return recipes;
+    }
+    return recipes
+        .where((recipe) =>
+            recipe.title.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final userId = ref.read(userProvider)?.id;
-    final followedRecipes = ref.watch(followedUsersRecipesProvider(userId!));
     final savedRecipes = ref.watch(savedRecipesProvider);
+    final allRecipes = ref.watch(allRecipesProvider);
 
     return Container(
       width: double.infinity,
@@ -149,7 +160,18 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
+          TextField(
+            onChanged: _updateSearchQuery,
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.search),
+              hintText: 'Search Recipes...',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
           TabBar(
             controller: _tabController,
             indicatorColor: Colors.red,
@@ -165,26 +187,18 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                followedRecipes.when(
-                  loading: () => const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.red,
-                    ),
-                  ),
-                  error: (error, stack) => const Center(
-                    child: Text('No followed recipes found.'),
-                  ),
-                  data: (recipes) => recipes.isEmpty
-                      ? const Center(
-                          child: Text('No followed recipes found.'),
-                        )
-                      : buildMealList(recipes),
-                ),
+                // Showing all recipes in the "Explore" tab
+                allRecipes.isEmpty
+                    ? const Center(
+                        child: Text('No followed recipes found.'),
+                      )
+                    : buildMealList(_filterRecipes(allRecipes)),
+                // Showing saved recipes in the "Saved Recipe" tab
                 savedRecipes.isEmpty
                     ? const Center(
                         child: Text('No saved recipes found.'),
                       )
-                    : buildRecipeList(savedRecipes),
+                    : buildRecipeList(_filterRecipes(savedRecipes)),
               ],
             ),
           ),
@@ -208,6 +222,7 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
         ],
       ),
       child: TextField(
+        onChanged: _updateSearchQuery,
         decoration: InputDecoration(
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 20, vertical: 15),

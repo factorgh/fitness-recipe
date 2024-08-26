@@ -352,7 +352,7 @@ class AuthService {
             .showSuccessAlert(context, "Password updated successfully");
       }
     } catch (e) {
-      NativeAlerts().showSuccessAlert(context, "Password updating failed");
+      NativeAlerts().showErrorAlert(context, "Password updating failed");
       print('Error updating password: $e');
     }
   }

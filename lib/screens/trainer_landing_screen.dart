@@ -155,7 +155,7 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                           Row(
                             children: [
                               CircleAvatar(
-                                radius: 20,
+                                radius: 30,
                                 backgroundImage: NetworkImage(
                                   user?.imageUrl ??
                                       'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png',
@@ -170,14 +170,17 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                                   Text(
                                     'Hello, ${user?.username ?? ''}',
                                     style: const TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 30,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
                                   ),
                                   const Text(
-                                    'Check amazing recipes..',
-                                    style: TextStyle(color: Colors.white),
+                                    'Check amazing recipes and \nassign amzing meal plans..',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontStyle: FontStyle.italic,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -207,7 +210,7 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                               icon: const Icon(
                                 Icons.notifications,
                                 color: Colors.white,
-                                size: 25,
+                                size: 30,
                               ),
                               onPressed: () {
                                 _resetNotificationCount();
@@ -222,22 +225,6 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                     ),
                     const SizedBox(
                       height: 30,
-                    ),
-                    Container(
-                      height: 50,
-                      width: 280,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15)),
-                      child: const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: TextField(
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              icon: Icon(Icons.search),
-                              label: Text("Search recipes..")),
-                        ),
-                      ),
                     ),
                   ],
                 ),

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/providers/recipe_service_provider.dart';
@@ -16,6 +17,15 @@ class FollowedUsersRecipesNotifier
   Future<void> fetchRecipes() async {
     try {
       final recipes = await _recipeService.fetchFollowedUsersRecipes(_userId);
+      state = AsyncValue.data(recipes);
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+
+  Future<void> fetchAllRecipes(BuildContext context) async {
+    try {
+      final recipes = await _recipeService.fetchAllRecipes(context);
       state = AsyncValue.data(recipes);
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current);
