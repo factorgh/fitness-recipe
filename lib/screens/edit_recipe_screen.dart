@@ -465,12 +465,9 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
                     text: widget.recipe.id != null
                         ? 'Save Recipe'
                         : 'Create Recipe',
-                    onPressed: user != null
-                        ? () => user.id == widget.recipe.createdBy
-                            ? _saveRecipe()
-                            : _createRecipe(user)
-                        : null,
-                  ),
+                    onPressed: () => user!.id == widget.recipe.createdBy
+                        ? _saveRecipe()
+                        : _createRecipe(user)),
           ],
         ),
       ),

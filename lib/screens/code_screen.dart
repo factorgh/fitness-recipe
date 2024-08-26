@@ -72,13 +72,13 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
                     radius: 40,
                     backgroundColor: Colors.black12,
                     backgroundImage: NetworkImage(
-                      user!['imageUrl'] ??
+                      user?['imageUrl'] ??
                           'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png',
                     ),
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    user!['fullName'] ?? 'Unknown',
+                    user?['fullName'] ?? 'Unknown',
                     style: const TextStyle(
                         fontSize: 13, fontWeight: FontWeight.bold),
                   ),
@@ -86,21 +86,26 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
                   OutlinedButton(
                     onPressed: () async {
                       try {
-                        await TrainerService().followTrainer(
-                          ref.read(userProvider)!.id,
-                          user!["_id"],
-                          context,
-                        );
-                        Navigator.pop(context);
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const TabsScreen(userRole: '0'),
-                          ),
-                        );
-                        NativeAlerts().showSuccessAlert(context,
-                            "Welcome to fitness recipe .We are excited to have you on board! Explore the app to discover amazing features and content tailored just for you");
-                        // Show welcome message)
+                        final userId = ref.read(userProvider)?.id;
+                        if (userId != null && user?["_id"] != null) {
+                          await TrainerService().followTrainer(
+                            userId,
+                            user!["_id"],
+                            context,
+                          );
+                          Navigator.pop(context);
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const TabsScreen(userRole: '0'),
+                            ),
+                          );
+                          NativeAlerts().showSuccessAlert(context,
+                              "Welcome to fitness recipe. We are excited to have you on board! Explore the app to discover amazing features and content tailored just for you");
+                        } else {
+                          NativeAlerts().showErrorAlert(
+                              context, 'Failed to retrieve user details');
+                        }
                       } catch (e) {
                         print('Error following trainer: $e');
                         Navigator.pop(context); // Close dialog on error
@@ -121,21 +126,17 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
 
   Future<void> _logout() async {
     try {
-      // Clear token from SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.remove('auth_token'); // Remove the auth token
 
-      // Navigate to LoginScreen
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
 
-      // Optionally show a success alert after navigating
       Future.delayed(const Duration(milliseconds: 500), () {
         NativeAlerts().showSuccessAlert(context, "Logged out successfully");
       });
     } catch (e) {
-      // Handle any potential errors
       print('Error logging out: $e');
       NativeAlerts().showErrorAlert(context, 'Failed to log out');
     }
