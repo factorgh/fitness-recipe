@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
+import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/providers/user_recipes.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
@@ -24,6 +25,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
   File? _selectedImage;
   String? selectedMealPeriod;
   bool _isLoading = false;
+  String? cldImage;
 
   final List<String> mealPeriods = [
     'Breakfast',
@@ -51,7 +53,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
     _instructionsController.text = widget.recipe.instructions;
     _nutritionalFactsController.text = widget.recipe.facts;
     if (widget.recipe.imageUrl.isNotEmpty) {
-      _selectedImage = File(widget.recipe.imageUrl);
+      cldImage = widget.recipe.imageUrl;
     }
     selectedMealPeriod = widget.recipe.period;
   }
@@ -152,6 +154,10 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
           updatedAt: DateTime.now(),
         ),
       );
+      ref
+          .read(savedRecipesProvider.notifier)
+          .removeSavedRecipe(user.id, widget.recipe.id!);
+
       await ref.read(userRecipesProvider.notifier).loadUserRecipes();
       Navigator.of(context).pop(); // Navigate back after saving
     } catch (e) {
@@ -196,7 +202,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
       content = ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Image.network(
-          widget.recipe.imageUrl,
+          cldImage!,
           fit: BoxFit.cover,
           width: double.infinity,
           height: 200,
