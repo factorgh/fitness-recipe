@@ -26,43 +26,66 @@ class AuthService {
     required String password,
     required WidgetRef ref,
   }) async {
+    // Create a new user object to send to the server
     User user = User(
-        id: "",
-        fullName: fullName,
-        email: email,
-        username: username,
-        role: '0',
-        password: password,
-        imageUrl: "",
-        savedRecipes: [],
-        following: [],
-        followers: [],
-        mealPlans: [],
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now());
-    dio.Response res = await client.dio.post(
-      "/users/register",
-      data: user.toJson(),
+      id: "",
+      fullName: fullName,
+      email: email,
+      username: username,
+      role: '0',
+      password: password,
+      imageUrl: "",
+      savedRecipes: [],
+      following: [],
+      followers: [],
+      mealPlans: [],
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
 
-    httpErrorHandle(
+    try {
+      // Send the user data to the server
+      dio.Response res = await client.dio.post(
+        "/users/register",
+        data: user.toJson(),
+      );
+
+      // Handle HTTP error
+      httpErrorHandle(
         response: res,
         context: context,
         onSuccess: () async {
+          // Extract token and user data from response
           final token = res.data['token'];
-          final user = res.data['user'];
+          final userData = res.data['user'];
+
+          // Convert userData to a User object
+          final User newUser = User.fromJson(userData);
+
+          // Save the token in shared preferences
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('auth_token', token);
 
+          // Show success alert
           NativeAlerts().showSuccessAlert(context, "User created successfully");
+
+          // Navigate to the RoleScreen
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (ctx) => const RoleScreen(),
             ),
           );
-          //  Get role from user
-          ref.read(userProvider.notifier).setUser(user);
-        });
+
+          // Set the user in the provider
+          ref.read(userProvider.notifier).setUser(newUser);
+        },
+      );
+    } catch (e) {
+      // Handle exceptions
+      print('Error: ${e.toString()}');
+      NativeAlerts()
+          .showErrorAlert(context, 'Signup failed. Please try again.');
+    }
   }
 
   Future<void> signIn({
