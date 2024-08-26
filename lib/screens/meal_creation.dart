@@ -259,6 +259,10 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     }
   }
 
+  void createPlan() {
+    _completeSchedule();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -267,28 +271,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
           'Create Meal Plan',
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
-        actions: [
-          OutlinedButton(
-              onPressed: () {
-                final mealPlan = MealPlan(
-                  name: _mealPlanNameController.text,
-                  duration: _selectedDuration,
-                  startDate: _startDate,
-                  endDate: _endDate,
-                  days: _weekDays,
-                  periods: [], // Add appropriate periods
-                  recipeAllocations: _selectedRecipeAllocations,
-                  trainees:
-                      _selectedTrainees.map((trainee) => trainee.id).toList(),
-                  createdBy: ref.read(userProvider)!.id,
-                );
-                showMealPlanPreviewBottomSheet(context, mealPlan);
-              },
-              child: const Text('Preview')),
-          const SizedBox(
-            width: 5,
-          )
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -491,13 +473,27 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     ),
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white),
-                onPressed: _completeSchedule,
+                onPressed: () {
+                  final mealPlan = MealPlan(
+                    name: _mealPlanNameController.text,
+                    duration: _selectedDuration,
+                    startDate: _startDate,
+                    endDate: _endDate,
+                    days: _weekDays,
+                    periods: [], // Add appropriate periods
+                    recipeAllocations: _selectedRecipeAllocations,
+                    trainees:
+                        _selectedTrainees.map((trainee) => trainee.id).toList(),
+                    createdBy: ref.read(userProvider)!.id,
+                  );
+                  showMealPlanPreviewBottomSheet(context, mealPlan, createPlan);
+                },
                 child: _isLoading
                     ? const CircularProgressIndicator(
                         color: Colors.white,
                       )
                     : const Text(
-                        'Create',
+                        'Preview',
                         style: TextStyle(
                             fontWeight: FontWeight.w500, fontSize: 20),
                       ),

@@ -10,21 +10,25 @@ import 'package:voltican_fitness/providers/trainer_provider.dart';
 import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
 
-void showMealPlanPreviewBottomSheet(BuildContext context, MealPlan mealPlan) {
+void showMealPlanPreviewBottomSheet(
+    BuildContext context, MealPlan mealPlan, Function createPlan) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (context) {
-      return MealPlanPreviewBottomSheet(mealPlan: mealPlan);
+      return MealPlanPreviewBottomSheet(
+          mealPlan: mealPlan, createPlan: createPlan);
     },
   );
 }
 
 class MealPlanPreviewBottomSheet extends ConsumerWidget {
   final MealPlan mealPlan;
+  final Function createPlan;
 
-  const MealPlanPreviewBottomSheet({super.key, required this.mealPlan});
+  const MealPlanPreviewBottomSheet(
+      {super.key, required this.mealPlan, required this.createPlan});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -103,6 +107,21 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
                         _buildAllocatedMeals(groupedRecipes),
                         _buildTraineeCard(context, traineeDetailsAsyncValue),
                         const SizedBox(height: 30),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  )),
+                              onPressed: () {
+                                createPlan();
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Create plan')),
+                        )
                       ],
                     ),
                   ),
