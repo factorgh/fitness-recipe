@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/Features/trainer/trainer_service.dart'; // Import your service
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
 import 'package:voltican_fitness/services/email_service.dart';
 import 'package:voltican_fitness/utils/native_alert.dart'; // Import your model
 
@@ -114,13 +115,13 @@ class _TrainerSearchScreenState extends ConsumerState<TrainerSearchScreen> {
                                 final trainer = _trainers[index];
                                 return GestureDetector(
                                   onTap: () {
-                                    _showTrainerDetails(
-                                      context,
-                                      trainer.fullName,
-                                      trainer.email,
-                                      trainer.imageUrl ??
-                                          'assets/images/default_avatar.png',
-                                    );
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                TrainerProfileScreen(
+                                                  userId: trainer.id,
+                                                )));
                                   },
                                   child: Card(
                                     margin: const EdgeInsets.symmetric(
