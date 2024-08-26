@@ -65,7 +65,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           for (var mealPlan in firstThreeMealPlans) ...[
             CalendarItem(
               titleIcon: Icons.restaurant_menu,
-              mealPlan: mealPlan, // Assuming meal plan has a name property
+              mealPlan: mealPlan,
             ),
             const SizedBox(height: 20),
           ],

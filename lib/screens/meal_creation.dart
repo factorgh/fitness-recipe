@@ -9,6 +9,7 @@ import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/screens/meal_plan_preview_screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
@@ -266,7 +267,28 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
           'Create Meal Plan',
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
-        centerTitle: true,
+        actions: [
+          OutlinedButton(
+              onPressed: () {
+                final mealPlan = MealPlan(
+                  name: _mealPlanNameController.text,
+                  duration: _selectedDuration,
+                  startDate: _startDate,
+                  endDate: _endDate,
+                  days: _weekDays,
+                  periods: [], // Add appropriate periods
+                  recipeAllocations: _selectedRecipeAllocations,
+                  trainees:
+                      _selectedTrainees.map((trainee) => trainee.id).toList(),
+                  createdBy: ref.read(userProvider)!.id,
+                );
+                showMealPlanPreviewBottomSheet(context, mealPlan);
+              },
+              child: const Text('Preview')),
+          const SizedBox(
+            width: 5,
+          )
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -464,7 +486,11 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red, foregroundColor: Colors.white),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white),
                 onPressed: _completeSchedule,
                 child: _isLoading
                     ? const CircularProgressIndicator(
