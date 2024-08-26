@@ -113,27 +113,6 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
   }
 
   Future<void> _createRecipe(User user) async {
-    // if (_selectedImage == null || selectedMealPeriod == null) {
-    //   showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return AlertDialog(
-    //         title: const Text('Error'),
-    //         content: const Text('Please fill in all required fields.'),
-    //         actions: [
-    //           TextButton(
-    //             onPressed: () {
-    //               Navigator.of(context).pop();
-    //             },
-    //             child: const Text('Ok'),
-    //           ),
-    //         ],
-    //       );
-    //     },
-    //   );
-    //   return;
-    // }
-
     setState(() {
       _isLoading = true;
     });

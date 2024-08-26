@@ -16,6 +16,7 @@ class RecipeService {
     BuildContext context,
     Recipe recipe,
   ) async {
+    // Validate required fields
     if (recipe.title.isEmpty ||
         recipe.description.isEmpty ||
         recipe.ingredients.isEmpty ||
@@ -28,23 +29,30 @@ class RecipeService {
       return;
     }
 
-    try {
-      // Get Cloudinary instance
-      final cloudinary = CloudinaryPublic('daq5dsnqy', 'jqx9kpde');
-      // Upload image to Cloudinary
-      CloudinaryResponse uploadResult = await cloudinary.uploadFile(
-          CloudinaryFile.fromFile(recipe.imageUrl, folder: 'voltican_fitness'));
-      final image = uploadResult.secureUrl;
-      print('Image URL: $image');
+    String imageUrlToUse = '';
 
-      // Create new recipe object
+    try {
+      if (recipe.imageUrl.startsWith("https:")) {
+        // Image URL is already valid
+        imageUrlToUse = recipe.imageUrl;
+      } else {
+        // Image URL is not valid, so upload it
+        final cloudinary = CloudinaryPublic('daq5dsnqy', 'jqx9kpde');
+        CloudinaryResponse uploadResult = await cloudinary.uploadFile(
+            CloudinaryFile.fromFile(recipe.imageUrl,
+                folder: 'voltican_fitness'));
+        imageUrlToUse = uploadResult.secureUrl;
+        print('Uploaded Image URL: $imageUrlToUse');
+      }
+
+      // Create new recipe object with the final image URL
       final myRecipe = Recipe(
           title: recipe.title,
           description: recipe.description,
           ingredients: recipe.ingredients,
           instructions: recipe.instructions,
           facts: recipe.facts,
-          imageUrl: image,
+          imageUrl: imageUrlToUse,
           createdBy: recipe.createdBy,
           period: recipe.period,
           ratings: [],
@@ -52,20 +60,22 @@ class RecipeService {
           updatedAt: DateTime.now());
 
       print('Recipe: $myRecipe');
+
       // Save recipe to DB
       print('Data for creating: ${myRecipe.toJson()}');
       final res = await client.dio.post('/recipes', data: myRecipe.toJson());
 
+      // Handle response
       httpErrorHandle(
           response: res,
           context: context,
           onSuccess: () {
             showSnack(context, 'Recipe created successfully!');
-
             Navigator.pop(context);
           });
     } catch (e) {
       print('Error: ${e.toString()}');
+      showSnack(context, 'Failed to create recipe. Please try again.');
     }
   }
 
