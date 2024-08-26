@@ -32,6 +32,14 @@ class _WeekRangeSelectorState extends State<WeekRangeSelector> {
     _selectedDays = widget.initialSelectedDays ?? [];
   }
 
+  @override
+  void didUpdateWidget(covariant WeekRangeSelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialSelectedDays != oldWidget.initialSelectedDays) {
+      _selectedDays = widget.initialSelectedDays ?? [];
+    }
+  }
+
   void _onDayTap(String day) {
     setState(() {
       if (_selectedDays.contains(day)) {

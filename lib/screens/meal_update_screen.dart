@@ -9,8 +9,8 @@ import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
 
-import 'package:voltican_fitness/screens/calendar_screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
@@ -101,6 +101,8 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
     _endDate = mealPlan.endDate;
     _weekDays = List<String>.from(mealPlan.days);
     _selectedRecipeAllocations.addAll(mealPlan.recipeAllocations);
+    print(
+        '----------------Prepopulated-----------------------------$_weekDays');
 
     List<User> selectedTrainees = [];
 
@@ -194,11 +196,9 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
         setState(() {
           _isLoading = false;
         });
-        Navigator.pushAndRemoveUntil(
+        Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const CalendarScreen()),
-          (Route<dynamic> route) =>
-              false, // This will remove all previous routes
+          MaterialPageRoute(builder: (context) => const AllMealPlan()),
         );
       } catch (e) {
         setState(() {
@@ -278,7 +278,8 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Update Meal Plan'),
+        title: const Text('Update Meal Plan',
+            style: TextStyle(fontWeight: FontWeight.w800)),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -309,7 +310,7 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                           DropdownMenuItem(
                               value: 'Does Not Repeat',
                               child: Text('Does Not Repeat')),
-                          DropdownMenuItem(value: 'Week', child: Text('Weekl')),
+                          DropdownMenuItem(value: 'Week', child: Text('Week')),
                           DropdownMenuItem(
                               value: 'Month', child: Text('Month')),
                           DropdownMenuItem(
