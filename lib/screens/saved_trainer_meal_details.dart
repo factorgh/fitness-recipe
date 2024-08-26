@@ -5,10 +5,12 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
+import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
@@ -29,6 +31,29 @@ class _TrainerMealDetailScreenState
   bool isPrivate = false;
   bool isFollowing = false;
   RecipeService recipeService = RecipeService();
+  User? owner;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUser();
+  }
+
+  void _fetchUser() {
+    try {
+      AuthService().getUser(
+        userId: widget.meal.createdBy,
+        onSuccess: (fetchedUser) {
+          setState(() {
+            owner = fetchedUser;
+          });
+        },
+      );
+    } catch (e) {
+      // Handle unexpected errors here
+      showSnack(context, 'An unexpected error occurred');
+    }
+  }
 
   Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
@@ -257,42 +282,48 @@ class _TrainerMealDetailScreenState
                     ],
                   ),
                   const SizedBox(height: 10),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Recipe by",
-                        style: TextStyle(fontWeight: FontWeight.w500),
-                      ),
-                      SizedBox(height: 5),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundImage:
-                                AssetImage('assets/images/pf2.jpg'),
-                          ),
-                          SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Dianne Russell",
-                                style: TextStyle(fontWeight: FontWeight.w500),
-                              ),
-                              Text(
-                                "Dian",
-                                style: TextStyle(fontWeight: FontWeight.w400),
-                              ),
-                            ],
-                          ),
-                          Spacer(),
-                          // Contact section goes here
-                        ],
-                      ),
-                    ],
-                  ),
+                  owner != null
+                      ? owner!.imageUrl != null
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Recipe by",
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                                const SizedBox(height: 5),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage:
+                                          NetworkImage(owner!.imageUrl!),
+                                      onBackgroundImageError:
+                                          (error, stackTrace) {
+                                        // Handle image loading errors here
+                                      },
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          owner!.username,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ],
+                                    ),
+                                    const Spacer(),
+                                    // Contact section goes here
+                                  ],
+                                ),
+                              ],
+                            )
+                          : const SizedBox()
+                      : const SizedBox(),
                   const SizedBox(height: 30),
                   const Text(
                     'Description',

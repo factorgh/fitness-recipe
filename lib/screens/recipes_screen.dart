@@ -25,7 +25,7 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String _searchQuery = '';
-  String _sortOption = 'Default'; // Default sort option
+  String _sortOption = 'A-Z'; // Set default sort option to A-Z
 
   @override
   void initState() {
@@ -116,7 +116,6 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
         recipes.sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
         break;
       default:
-        // Default sorting, if needed
         break;
     }
     return recipes;

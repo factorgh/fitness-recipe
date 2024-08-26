@@ -232,24 +232,27 @@ class _TrainerMealDetailScreenState
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              IconButton(
-                                icon: Icon(
-                                  isFollowing
-                                      ? Icons.person_remove
-                                      : Icons.person_add,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
-                                onPressed: _toggleFollow,
-                              ),
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.red,
                                   backgroundColor: Colors.white,
                                 ),
                                 onPressed: _toggleFollow,
-                                child:
+                                child: Row(
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(
+                                        isFollowing
+                                            ? Icons.person_remove
+                                            : Icons.person_add,
+                                        color: Colors.black,
+                                        size: 30,
+                                      ),
+                                      onPressed: _toggleFollow,
+                                    ),
                                     Text(isFollowing ? 'Unfollow' : 'Follow'),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -352,13 +355,6 @@ class _TrainerMealDetailScreenState
                                           owner!.username,
                                           style: const TextStyle(
                                               fontWeight: FontWeight.w500),
-                                        ),
-                                        Text(
-                                          owner!.role == '0'
-                                              ? 'Trainer'
-                                              : 'User',
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.w400),
                                         ),
                                       ],
                                     ),
