@@ -85,12 +85,6 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
                   const SizedBox(height: 10),
                   OutlinedButton(
                     onPressed: () async {
-                      print(
-                        ref.read(userProvider)!.id,
-                      );
-                      print(
-                        user!["_id"],
-                      );
                       try {
                         await TrainerService().followTrainer(
                           ref.read(userProvider)!.id,

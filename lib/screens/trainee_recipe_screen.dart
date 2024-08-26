@@ -171,8 +171,8 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
                       color: Colors.red,
                     ),
                   ),
-                  error: (error, stack) => Center(
-                    child: Text('Error: $error'),
+                  error: (error, stack) => const Center(
+                    child: Text('No followed recipes found.'),
                   ),
                   data: (recipes) => recipes.isEmpty
                       ? const Center(
