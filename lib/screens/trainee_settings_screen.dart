@@ -1,18 +1,36 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/account_screen.dart';
 import 'package:voltican_fitness/screens/general_screen.dart';
 import 'package:voltican_fitness/screens/login_screen.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/screens/trainee_profile_screen.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
 
-class TraineeSettingsScreen extends StatefulWidget {
+class TraineeSettingsScreen extends ConsumerStatefulWidget {
   const TraineeSettingsScreen({super.key});
 
   @override
-  State<TraineeSettingsScreen> createState() => _TraineeSettingsScreenState();
+  ConsumerState<TraineeSettingsScreen> createState() =>
+      _TraineeSettingsScreenState();
 }
 
-class _TraineeSettingsScreenState extends State<TraineeSettingsScreen> {
+class _TraineeSettingsScreenState extends ConsumerState<TraineeSettingsScreen> {
+  Future<void> _logout() async {
+    ref.read(userProvider.notifier).clearUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('auth_token', '');
+
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => const LoginScreen()));
+    NativeAlerts().showSuccessAlert(context, "Logged Out successfully");
+    // ); // Adjust route as necessary
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,12 +137,8 @@ class _TraineeSettingsScreenState extends State<TraineeSettingsScreen> {
           backgroundColor: Colors.red, // Background color
           foregroundColor: Colors.white, // Text color
         ),
+        onPressed: _logout,
         child: const Text('Logout'),
-        onPressed: () {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
-          );
-        },
       ),
     );
   }
