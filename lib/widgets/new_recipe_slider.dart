@@ -30,13 +30,9 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
 
   void _fetchUsers() async {
     final userIds = widget.recipes.map((recipe) {
-      print(
-          '---------------------------------------Recipe ID: $recipe'); // Debugging line
       return recipe.createdBy;
     }).toSet();
 
-    print(
-        '-------------------------------------------Fetching users with IDs: $userIds'); // Debugging line
     final futures = userIds.map((userId) {
       return authService.getUser(
         userId: userId,
@@ -53,24 +49,39 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 200, // Adjust height as needed
-      padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: widget.recipes.length,
-        itemBuilder: (context, index) {
-          return _buildRecipeItem(
-            context,
-            widget.recipes[index],
+    return widget.recipes.isEmpty
+        ? SizedBox(
+            height: 150,
+            child: Center(
+              child: Text(
+                'No recipes available',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+          )
+        : Container(
+            height: 200, // Adjust height as needed
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: widget.recipes.length,
+              itemBuilder: (context, index) {
+                return _buildRecipeItem(
+                  context,
+                  widget.recipes[index],
+                );
+              },
+            ),
           );
-        },
-      ),
-    );
   }
 
   Widget _buildRecipeItem(BuildContext context, Recipe recipe) {
     final userName = userNames[recipe.createdBy] ?? 'Unknown';
+    print(userName);
 
     return GestureDetector(
       onTap: () => widget.onCategorySelected(recipe),
@@ -84,7 +95,7 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 image: DecorationImage(
-                  image: NetworkImage(recipe.imageUrl), // Use recipe.imageUrl
+                  image: NetworkImage(recipe.imageUrl),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -161,21 +172,21 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            recipe.title, // Use recipe.title
+                            recipe.title,
                             style: const TextStyle(
                               color: Colors.black87,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          Row(
+                          const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.timer,
                                 color: Colors.amber,
                               ),
-                              const Text(
+                              Text(
                                 "35 min", // Use recipe.duration
                                 style: TextStyle(
                                   color: Colors.white,
@@ -183,7 +194,7 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              const Text(
+                              Text(
                                 ".",
                                 style: TextStyle(
                                   color: Colors.white,
@@ -191,24 +202,7 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                'by',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                userName, // Use fetched user name
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
+                              SizedBox(width: 10),
                             ],
                           ),
                         ],
