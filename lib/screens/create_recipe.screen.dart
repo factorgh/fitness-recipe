@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -29,6 +29,8 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
   File? _selectedImage;
 
   String? selectedMealPeriod;
+  bool isPrivate = false;
+  String? status;
 
   final List<String> mealPeriods = [
     'Breakfast',
@@ -103,6 +105,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
               instructions: _instructionsController.text,
               description: _descriptionController.text,
               facts: _nutritionalFactsController.text,
+              status: status!,
               period: selectedMealPeriod!,
               imageUrl: _selectedImage!.path,
               createdBy: user.id,
@@ -221,10 +224,11 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
               const SizedBox(height: 10),
               _buildMultilineTextField(
                 controller: _ingredientsController,
-                hintText: 'Which ingredients were used in this recipe?',
+                hintText:
+                    'Which ingredients were used in this recipe?..Example 2 cups of rice,1 teaspoon of salt,..',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter the ingredients';
+                    return 'Please enter the ingredients .';
                   }
                   return null;
                 },
@@ -289,6 +293,32 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                   'Selected recipe category: $selectedMealPeriod',
                   style: const TextStyle(fontSize: 16),
                 ),
+
+              const SizedBox(height: 20),
+              // Swictch for recipe status
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isPrivate ? 'Public' : 'Private',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Switch(
+                    value: isPrivate,
+                    onChanged: (value) {
+                      setState(() {
+                        isPrivate = value;
+                        status = isPrivate ? 'public' : 'private';
+                      });
+
+                      print(status);
+                    },
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),

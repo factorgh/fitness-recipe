@@ -21,6 +21,7 @@ class RecipeService {
         recipe.ingredients.isEmpty ||
         recipe.instructions.isEmpty ||
         recipe.facts.isEmpty ||
+        recipe.status.isEmpty ||
         recipe.imageUrl.isEmpty ||
         recipe.createdBy.isEmpty) {
       showSnack(
@@ -44,6 +45,7 @@ class RecipeService {
           ingredients: recipe.ingredients,
           instructions: recipe.instructions,
           facts: recipe.facts,
+          status: recipe.status,
           imageUrl: image,
           createdBy: recipe.createdBy,
           period: recipe.period,
@@ -198,7 +200,6 @@ class RecipeService {
         showSnack(context, 'Failed to fetch top rated recipes');
       }
     } catch (e) {
-      print('Error fetching top rated recipes: $e');
       showSnack(context, 'Failed to fetch top rated recipes');
     }
   }

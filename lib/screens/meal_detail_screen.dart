@@ -8,7 +8,7 @@ import 'package:voltican_fitness/providers/user_recipes.dart';
 
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
 import 'package:voltican_fitness/screens/meal_creation.dart';
-import 'package:voltican_fitness/utils/native_alert.dart';
+
 import 'package:voltican_fitness/widgets/button.dart';
 
 class MealDetailScreen extends ConsumerStatefulWidget {
@@ -172,7 +172,6 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-
                   const SizedBox(height: 20),
                   const Text(
                     'Description',
@@ -186,32 +185,17 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        isPrivate ? 'Private' : 'Public',
-                        style: const TextStyle(fontSize: 16),
+                      const Text(
+                        'Status',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w500),
                       ),
-                      Switch(
-                        value: isPrivate,
-                        onChanged: (value) {
-                          setState(() {
-                            isPrivate = value;
-                          });
-
-                          if (value) {
-                            // Show alert dialog when changing from Public to Private
-                            NativeAlerts().showSuccessAlert(context,
-                                'Your settings have changed from Public to Private');
-                            // Show alert dialog when changing from Private to
-                          } else {
-                            NativeAlerts().showSuccessAlert(context,
-                                'Your settings have changed from Private to Public.');
-                            // Show alert dialog when changing from Private to Public
-                          }
-                        },
+                      Text(
+                        widget.meal.status,
+                        style: const TextStyle(fontSize: 16),
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 20),
                   const Row(
                     children: [
@@ -223,7 +207,8 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                       SizedBox(width: 5),
                       Text(
                         'Ingredients',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -253,7 +238,6 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                       }).toList(),
                     ),
                   ),
-
                   const SizedBox(height: 30),
                   const Row(
                     children: [
@@ -265,7 +249,8 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                       SizedBox(width: 5),
                       Text(
                         'Instructions',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -276,7 +261,7 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                       widget.meal.instructions,
                     ),
                   ),
-                  // Nutitional Info  const SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   const Row(
                     children: [
                       Icon(
@@ -287,7 +272,8 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                       SizedBox(width: 5),
                       Text(
                         'Nutritional facts',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),

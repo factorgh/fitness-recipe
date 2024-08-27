@@ -42,6 +42,7 @@ class Recipe {
   final String instructions;
   final String description;
   final String facts;
+  final String status;
   final String period;
   final String imageUrl;
   final List<Rating>? ratings;
@@ -56,6 +57,7 @@ class Recipe {
     required this.instructions,
     required this.description,
     required this.facts,
+    required this.status,
     required this.period,
     required this.imageUrl,
     this.ratings,
@@ -74,6 +76,7 @@ class Recipe {
       instructions: json['instructions'] as String? ?? '',
       description: json['description'] as String? ?? '',
       facts: json['facts'] as String? ?? '',
+      status: json['status'] as String? ?? '',
       period: json['period'] as String? ?? '',
       imageUrl: json['imageUrl'] as String? ?? '',
       ratings: (json['ratings'] as List? ?? [])
@@ -95,6 +98,7 @@ class Recipe {
       'instructions': instructions,
       'description': description,
       'facts': facts,
+      'status': status,
       'period': period,
       'imageUrl': imageUrl,
       'ratings': ratings?.map((rating) => rating.toJson()).toList() ?? [],
@@ -129,6 +133,7 @@ class Recipe {
         other.instructions == instructions &&
         other.description == description &&
         other.facts == facts &&
+        other.status == status &&
         other.period == period &&
         other.imageUrl == imageUrl &&
         listEquals(other.ratings, ratings) &&
@@ -145,6 +150,7 @@ class Recipe {
         instructions.hashCode ^
         description.hashCode ^
         facts.hashCode ^
+        status.hashCode ^
         period.hashCode ^
         imageUrl.hashCode ^
         ratings.hashCode ^

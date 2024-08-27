@@ -26,6 +26,8 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
   String? selectedMealPeriod;
   bool _isLoading = false;
   String? cldImage;
+  String? status;
+  bool isPrivate = false;
 
   final List<String> mealPeriods = [
     'Breakfast',
@@ -56,6 +58,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
       cldImage = widget.recipe.imageUrl;
     }
     selectedMealPeriod = widget.recipe.period;
+    status = widget.recipe.status;
   }
 
   Future<void> _takePicture() async {
@@ -86,6 +89,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
         ingredients: _ingredientsController.text.split(","),
         instructions: _instructionsController.text,
         facts: _nutritionalFactsController.text,
+        status: status!,
         imageUrl: _selectedImage != null
             ? await _uploadImage()
             : widget.recipe.imageUrl,
@@ -125,6 +129,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
           ingredients: _ingredientsController.text.split(","),
           instructions: _instructionsController.text,
           description: _descriptionController.text,
+          status: status!,
           facts: _nutritionalFactsController.text,
           period: selectedMealPeriod!,
           imageUrl: _selectedImage!.path,
@@ -432,6 +437,30 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
                 });
               },
               hint: const Text('Select meal period'),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  isPrivate ? 'Public' : 'Private',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Switch(
+                  value: isPrivate,
+                  onChanged: (value) {
+                    setState(() {
+                      isPrivate = value;
+                      status = isPrivate ? 'public' : 'private';
+                    });
+
+                    print(status);
+                  },
+                ),
+              ],
             ),
             const SizedBox(height: 30),
             _isLoading

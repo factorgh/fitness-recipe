@@ -64,26 +64,6 @@ class SingleMealPlanScreenTrainee extends ConsumerWidget {
             const SizedBox(
               height: 30,
             ), // Trainee Card here
-            // ElevatedButton(
-            //   onPressed: () {
-            //     // _showUpdateBottomSheet(context);
-            //     Navigator.of(context).push(MaterialPageRoute(
-            //         builder: (context) =>
-            //             MealUpdateScreen(mealPlan: mealPlan)));
-            //   },
-            //   style: ElevatedButton.styleFrom(
-            //     backgroundColor: Colors.red,
-            //     foregroundColor: Colors.white,
-            //     padding: const EdgeInsets.symmetric(vertical: 16),
-            //     shape: RoundedRectangleBorder(
-            //       borderRadius: BorderRadius.circular(8),
-            //     ),
-            //   ),
-            //   child: const Text(
-            //     'Update',
-            //     style: TextStyle(fontSize: 18),
-            //   ),
-            // ),
           ],
         ),
       ),
