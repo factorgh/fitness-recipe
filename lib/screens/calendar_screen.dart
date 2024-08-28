@@ -18,6 +18,14 @@ class CalendarScreen extends ConsumerStatefulWidget {
 
 class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(mealPlansProvider.notifier).fetchAllMealPlans();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     DateTime focusedDay = DateTime.now();
     DateTime? selectedDay;
@@ -37,7 +45,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         )),
       );
     } else if (mealPlansState is MealPlansError) {
-      mealPlansWidget = Text(mealPlansState.error);
+      mealPlansWidget = const Padding(
+        padding: EdgeInsets.symmetric(vertical: 30),
+        child: Center(child: Text("No meal plans available")),
+      );
     } else if (mealPlansState is MealPlansLoaded) {
       final mealPlans = mealPlansState.mealPlans;
 
@@ -54,7 +65,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           for (var mealPlan in firstThreeMealPlans) ...[
             CalendarItem(
               titleIcon: Icons.restaurant_menu,
-              mealPlan: mealPlan, // Assuming meal plan has a name property
+              mealPlan: mealPlan,
             ),
             const SizedBox(height: 20),
           ],

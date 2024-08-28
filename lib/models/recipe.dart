@@ -1,25 +1,35 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/foundation.dart';
+import 'package:voltican_fitness/models/user.dart';
 
 class Rating {
-  final String userId;
-  final int rating;
+  final User user;
+  final double rating;
 
   Rating({
-    required this.userId,
+    required this.user,
     required this.rating,
   });
 
   factory Rating.fromJson(Map<String, dynamic> json) {
+    final userJson = json['user'] as Map<String, dynamic>?;
+    final ratingValue = json['rating'];
+
+    // Handle case where rating can be either int or double
+    final rating = ratingValue is int
+        ? ratingValue.toDouble()
+        : ratingValue as double? ?? 0.0;
+
     return Rating(
-      userId:
-          json['user'] as String? ?? '', // Fallback to an empty string if null
-      rating: json['rating'] as int? ?? 0, // Fallback to 0 if null
+      user: userJson != null ? User.fromJson(userJson) : User.empty,
+      rating: rating,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'user': userId,
+      'user': user.toJson(),
       'rating': rating,
     };
   }
@@ -32,6 +42,7 @@ class Recipe {
   final String instructions;
   final String description;
   final String facts;
+  final String status;
   final String period;
   final String imageUrl;
   final List<Rating>? ratings;
@@ -46,6 +57,7 @@ class Recipe {
     required this.instructions,
     required this.description,
     required this.facts,
+    required this.status,
     required this.period,
     required this.imageUrl,
     this.ratings,
@@ -53,15 +65,18 @@ class Recipe {
     required this.createdAt,
     required this.updatedAt,
   });
-
   factory Recipe.fromJson(Map<String, dynamic> json) {
+    print('JSON received: $json');
+    print('ID: ${json['_id']}'); // Debug the _id specifically
+
     return Recipe(
-      id: json['_id'] as String? ?? '',
+      id: json['_id']?.toString(),
       title: json['title'] as String? ?? '',
       ingredients: List<String>.from(json['ingredients'] ?? []),
       instructions: json['instructions'] as String? ?? '',
       description: json['description'] as String? ?? '',
       facts: json['facts'] as String? ?? '',
+      status: json['status'] as String? ?? '',
       period: json['period'] as String? ?? '',
       imageUrl: json['imageUrl'] as String? ?? '',
       ratings: (json['ratings'] as List? ?? [])
@@ -83,6 +98,7 @@ class Recipe {
       'instructions': instructions,
       'description': description,
       'facts': facts,
+      'status': status,
       'period': period,
       'imageUrl': imageUrl,
       'ratings': ratings?.map((rating) => rating.toJson()).toList() ?? [],
@@ -96,6 +112,10 @@ class Recipe {
     if (ratings == null || ratings!.isEmpty) return 0;
     final sum = ratings!.map((rating) => rating.rating).reduce((a, b) => a + b);
     return sum / ratings!.length;
+  }
+
+  factory Recipe.fromMap(Map<String, dynamic> map) {
+    return Recipe.fromJson(map);
   }
 
   @override
@@ -113,6 +133,7 @@ class Recipe {
         other.instructions == instructions &&
         other.description == description &&
         other.facts == facts &&
+        other.status == status &&
         other.period == period &&
         other.imageUrl == imageUrl &&
         listEquals(other.ratings, ratings) &&
@@ -129,6 +150,7 @@ class Recipe {
         instructions.hashCode ^
         description.hashCode ^
         facts.hashCode ^
+        status.hashCode ^
         period.hashCode ^
         imageUrl.hashCode ^
         ratings.hashCode ^
@@ -136,6 +158,4 @@ class Recipe {
         createdAt.hashCode ^
         updatedAt.hashCode;
   }
-
-  toMap() {}
 }

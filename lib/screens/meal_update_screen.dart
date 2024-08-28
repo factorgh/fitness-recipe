@@ -9,7 +9,10 @@ import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
+
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
 import 'package:voltican_fitness/widgets/week_range_selector.dart';
@@ -48,10 +51,16 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
     super.initState();
 
     // Prepopulate form with passed MealPlan object
-    _prepopulateForm(widget.mealPlan);
+    fetchInitialData();
 
     fetchAllUserRecipes();
     getTraineesFollowingTrainer();
+  }
+
+  Future<void> fetchInitialData() async {
+    await getTraineesFollowingTrainer();
+    _prepopulateForm(widget.mealPlan);
+    fetchAllUserRecipes();
   }
 
   @override
@@ -90,8 +99,10 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
     _selectedDuration = mealPlan.duration;
     _startDate = mealPlan.startDate;
     _endDate = mealPlan.endDate;
-    _weekDays = mealPlan.days;
+    _weekDays = List<String>.from(mealPlan.days);
     _selectedRecipeAllocations.addAll(mealPlan.recipeAllocations);
+    print(
+        '----------------Prepopulated-----------------------------$_weekDays');
 
     List<User> selectedTrainees = [];
 
@@ -164,8 +175,8 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
         id: widget.mealPlan.id, // Use the ID from the passed MealPlan object
         name: _mealPlanNameController.text,
         duration: _selectedDuration,
-        startDate: _selectedDuration == 'Custom' ? _startDate : null,
-        endDate: _selectedDuration == 'Custom' ? _endDate : null,
+        startDate: _startDate,
+        endDate: _endDate,
         days: _weekDays,
         periods: [],
         recipeAllocations: _selectedRecipeAllocations,
@@ -178,20 +189,23 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
           _isLoading = true;
         });
         await ref
-            .read(mealPlanProvider.notifier)
+            .read(mealPlansProvider.notifier)
             .updateMealPlan(widget.mealPlan.id!, mealUpdate);
-        showSnack(context, 'Meal plan updated successfully');
+        NativeAlerts()
+            .showSuccessAlert(context, 'Meal plan updated successfully');
         setState(() {
           _isLoading = false;
-          Navigator.pop(context);
         });
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const AllMealPlan()),
+        );
       } catch (e) {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update meal plan: $e')),
-        );
+        NativeAlerts()
+            .showErrorAlert(context, 'Failed to update meal plan: $e');
       }
     } else {
       setState(() {
@@ -264,13 +278,8 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Update Meal Plan'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _completeSchedule,
-          ),
-        ],
+        title: const Text('Update Meal Plan',
+            style: TextStyle(fontWeight: FontWeight.w800)),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -301,16 +310,14 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                           DropdownMenuItem(
                               value: 'Does Not Repeat',
                               child: Text('Does Not Repeat')),
+                          DropdownMenuItem(value: 'Week', child: Text('Week')),
                           DropdownMenuItem(
-                              value: 'Week', child: Text('Weekly')),
+                              value: 'Month', child: Text('Month')),
                           DropdownMenuItem(
-                              value: 'Month', child: Text('Monthly')),
+                              value: 'Quarter', child: Text('Quarter')),
                           DropdownMenuItem(
-                              value: 'Quarter', child: Text('Quarterly')),
-                          DropdownMenuItem(
-                              value: 'Half-Year', child: Text('Half-Yearly')),
-                          DropdownMenuItem(
-                              value: 'Year', child: Text('Yearly')),
+                              value: 'Half-Year', child: Text('Half-Year')),
+                          DropdownMenuItem(value: 'Year', child: Text('Year')),
                           DropdownMenuItem(
                               value: 'Custom', child: Text('Custom')),
                         ],
@@ -328,32 +335,30 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                           labelText: 'Duration',
                         ),
                       ),
-                      if (_selectedDuration == 'Custom') ...[
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextButton(
-                                onPressed: () => _selectDate(context, true),
-                                child: Text(_startDate == null
-                                    ? 'Select Start Date'
-                                    : DateFormat('dd MMMM, yyyy')
-                                        .format(_startDate!)),
-                              ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () => _selectDate(context, true),
+                              child: Text(_startDate == null
+                                  ? 'Select Start Date'
+                                  : DateFormat('dd MMMM, yyyy')
+                                      .format(_startDate!)),
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: TextButton(
-                                onPressed: () => _selectDate(context, false),
-                                child: Text(_endDate == null
-                                    ? 'Select End Date'
-                                    : DateFormat('dd MMMM, yyyy')
-                                        .format(_endDate!)),
-                              ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () => _selectDate(context, false),
+                              child: Text(_endDate == null
+                                  ? 'Select End Date'
+                                  : DateFormat('dd MMMM, yyyy')
+                                      .format(_endDate!)),
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 16),
                       MealPeriodSelector(
                         onSelectionChanged: (allocations) {
@@ -367,17 +372,12 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                       ),
                       const SizedBox(height: 16),
                       WeekRangeSelector(
+                        initialSelectedDays:
+                            _weekDays, // Prepopulate with selected days
                         onSelectionChanged: (selectedDays) {
-                          if (selectedDays.isEmpty) {
-                            setState(() {
-                              _weekDays = selectedDays;
-                            });
-                          } else if (selectedDays.isNotEmpty) {
-                            setState(() {
-                              _weekDays.clear();
-                              _weekDays.addAll(selectedDays);
-                            });
-                          }
+                          setState(() {
+                            _weekDays = selectedDays;
+                          });
                         },
                       ),
                       const SizedBox(height: 16),
@@ -413,10 +413,35 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                           ),
                         ),
                       const SizedBox(height: 32),
-                      ElevatedButton(
-                        onPressed: _completeSchedule,
-                        child: const Text('Save Meal Plan'),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  10), // Set to 0 for a perfect rectangle
+                            ),
+                          ),
+                          onPressed: _completeSchedule,
+                          child: _isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                )
+                              : const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Save Meal Plan',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 20),
+                                  ),
+                                ),
+                        ),
                       ),
+                      const SizedBox(height: 32),
                     ],
                   ),
                 ),

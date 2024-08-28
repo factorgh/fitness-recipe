@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CopyToClipboardWidget extends StatelessWidget {
   final String textToCopy;
 
   const CopyToClipboardWidget({super.key, required this.textToCopy});
+
+  Future<void> shareText(String text) async {
+    final Uri uri = Uri(
+      scheme: 'mailto',
+      query: 'body=$text', // You can add 'subject=YourSubject&' if needed.
+    );
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      throw 'Could not launch $uri';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +59,22 @@ class CopyToClipboardWidget extends StatelessWidget {
                     );
                   },
                 ),
-                IconButton(onPressed: () {}, icon: const Icon(Icons.share))
+                IconButton(
+                    onPressed: () {
+                      String playStoreUrl =
+                          'https://play.google.com/store/apps/details?id=com.your.package.name';
+
+                      if (textToCopy.isEmpty) {
+                        return; // Fallback value.
+                      }
+                      String message =
+                          'TrainerCode: $textToCopy - App Info: Fitness Recipe v1.0.\n'
+                          'Paste link to your recipe app on Google Play Store or App Store.\n'
+                          '$playStoreUrl';
+
+                      shareText(message);
+                    },
+                    icon: const Icon(Icons.share))
               ],
             ),
           ],

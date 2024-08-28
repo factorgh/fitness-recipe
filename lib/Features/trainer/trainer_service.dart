@@ -1,13 +1,16 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:voltican_fitness/classes/dio_client.dart';
 import 'package:voltican_fitness/models/user.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
 
 class TrainerService {
   final DioClient client = DioClient();
+  final alerts = NativeAlerts();
 
   Future<List<User>> getFollowers(String trainerId) async {
     try {
@@ -51,14 +54,21 @@ class TrainerService {
     }
   }
 
-  Future<void> followTrainer(String trainerId, String trainerToFollowId) async {
+  Future<void> followTrainer(
+      String trainerId, String trainerToFollowId, BuildContext context) async {
     try {
-      await client.dio.post('/users/follow', data: {
-        'userId': trainerId,
-        'followId': trainerToFollowId,
+      final res = await client.dio.post('/users/follow', data: {
+        'currentUserId': trainerId,
+        'userIdToFollow': trainerToFollowId,
       });
+      if (res.statusCode == 200) {
+        // // Show success alert before navigating
+        // alerts.showSuccessAlert(context, 'User followed');
+      } else {}
     } catch (e) {
+      // alerts.showErrorAlert(context, 'Already following user');
       print('Error in followTrainer: $e');
+
       throw Exception('Failed to follow trainer');
     }
   }
@@ -140,10 +150,63 @@ class TrainerService {
       }
     } on DioException catch (e) {
       // Handle Dio-specific exceptions
-      throw Exception('Dio error: ${e.message}');
+      print(e);
+      throw Exception('Dio error:');
     } catch (e) {
       // Handle general exceptions
-      throw Exception('Unexpected error: $e');
+      throw Exception('Unexpected error: ');
+    }
+  }
+
+  Future<List<User>> getFollowersByRole(String trainerId, String role) async {
+    try {
+      final response =
+          await client.dio.get('/users/trainer/$trainerId/followers/$role');
+
+      if (response.statusCode == 200) {
+        // Assuming the response data is a list of followers
+        final List<dynamic> data = response.data;
+        return data.map((userData) => User.fromJson(userData)).toList();
+      } else {
+        throw Exception('Failed to load followers');
+      }
+    } catch (e) {
+      // Handle other errors here
+      print('Error in getFollowersByRole: $e');
+      throw Exception('Failed to load followers');
+    }
+  }
+
+  Future<List<User>> getAssignedTrainees(String trainerId) async {
+    try {
+      final response =
+          await client.dio.get('/users/meal-plans/trainees/assigned-trainees');
+
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((traineeData) => User.fromJson(traineeData))
+            .toList();
+      } else {
+        throw Exception('Failed to load assigned trainees');
+      }
+    } catch (e) {
+      print('Error in getAssignedTrainees: $e');
+      throw Exception('Failed to load assigned trainees');
+    }
+  }
+
+  Future<void> removeFollower(String followerId) async {
+    try {
+      final response = await client.dio.delete(
+        '/users/user/followers/$followerId',
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to remove follower');
+      }
+    } catch (e) {
+      print('Error in removeFollower: $e');
+      throw Exception('Failed to remove follower');
     }
   }
 }

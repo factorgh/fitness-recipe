@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
 import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/providers/user_recipes.dart';
 import 'package:voltican_fitness/screens/create_recipe.screen.dart';
 import 'package:voltican_fitness/screens/meal_detail_screen.dart';
@@ -24,7 +25,7 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String _searchQuery = '';
-  String _sortOption = 'Default'; // Default sort option
+  String _sortOption = 'A-Z'; // Set default sort option to A-Z
 
   @override
   void initState() {
@@ -33,14 +34,19 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
 
     // Load all necessary data using the providers
     Future.microtask(() {
-      ref.read(userRecipesProvider.notifier).loadUserRecipes();
-      ref
-          .read(savedRecipesProvider.notifier)
-          .loadSavedRecipes('userId'); // Replace 'userId' with actual ID
-      ref
-          .read(allRecipesProvider.notifier)
-          .loadAllRecipes(context); // Load all recipes here
+      _loadData();
     });
+  }
+
+  Future<void> _loadData() async {
+    final user = ref.read(userProvider);
+    ref.read(userRecipesProvider.notifier).loadUserRecipes();
+    ref.read(savedRecipesProvider.notifier).loadSavedRecipes(user!.id);
+    ref.read(allRecipesProvider.notifier).loadAllRecipes(context);
+  }
+
+  Future<void> _handleRefresh() async {
+    await _loadData();
   }
 
   @override
@@ -76,7 +82,6 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
   void _updateSortOption(String option) {
     setState(() {
       _sortOption = option;
-      // Trigger a sort operation based on the selected option if needed
     });
   }
 
@@ -98,12 +103,12 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
       case 'Z-A':
         recipes.sort((a, b) => b.title.compareTo(a.title));
         break;
-      // case 'Most Rated':
-      //   recipes.sort((a, b) => b.ratings.compareTo(a.ratings));
-      //   break;
-      // case 'Least Rated':
-      //   recipes.sort((a, b) => a.ratings.compareTo(b.ratings));
-      //   break;
+      case 'Most Rated':
+        recipes.sort((a, b) => b.averageRating.compareTo(a.averageRating));
+        break;
+      case 'Least Rated':
+        recipes.sort((a, b) => a.averageRating.compareTo(b.averageRating));
+        break;
       case 'Most Recent':
         recipes.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         break;
@@ -111,7 +116,6 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
         recipes.sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
         break;
       default:
-        // Default sorting, if needed
         break;
     }
     return recipes;
@@ -234,10 +238,21 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                _buildUserRecipesTab(_sortRecipes(_filterRecipes(userRecipes))),
-                _buildSavedRecipesTab(
-                    _sortRecipes(_filterRecipes(savedRecipes))),
-                _buildAllRecipesTab(_sortRecipes(_filterRecipes(allRecipes))),
+                RefreshIndicator(
+                  onRefresh: _handleRefresh,
+                  child: _buildUserRecipesTab(
+                      _sortRecipes(_filterRecipes(userRecipes))),
+                ),
+                RefreshIndicator(
+                  onRefresh: _handleRefresh,
+                  child: _buildSavedRecipesTab(
+                      _sortRecipes(_filterRecipes(savedRecipes))),
+                ),
+                RefreshIndicator(
+                  onRefresh: _handleRefresh,
+                  child: _buildAllRecipesTab(
+                      _sortRecipes(_filterRecipes(allRecipes))),
+                ),
               ],
             ),
           ),

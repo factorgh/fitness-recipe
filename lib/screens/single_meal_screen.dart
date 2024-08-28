@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print, unused_element
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
@@ -31,10 +33,17 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
     };
 
     for (final allocation in mealPlan.recipeAllocations) {
-      final recipe = allRecipes.firstWhere(
-        (recipe) => recipe.id == allocation.recipeId,
-      );
-      groupedRecipes[recipe.period]?.add(recipe);
+      try {
+        final recipe = allRecipes.firstWhere(
+          (recipe) => recipe.id == allocation.recipeId,
+        );
+        // Ensure the period exists in groupedRecipes
+        groupedRecipes[recipe.period]?.add(recipe);
+      } catch (e) {
+        // Handle cases where the recipe is not found
+        print('Recipe with ID ${allocation.recipeId} not found. Error: $e');
+        // Optionally, you could add error handling or a placeholder here if needed
+      }
     }
 
     return Scaffold(
@@ -218,7 +227,8 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
 
   Widget _buildDaysForMeal() {
     if (mealPlan.days.isNotEmpty) {
-      String dayRange = "${mealPlan.days.first} to ${mealPlan.days.last}";
+      // Join all the days with a comma to display them in a single line
+      String daysText = mealPlan.days.join(', ');
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,7 +238,7 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                dayRange,
+                daysText,
                 style: const TextStyle(color: Colors.black45, fontSize: 16),
               ),
             ),
@@ -279,68 +289,11 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
     );
   }
 
-  // void _showTraineeList(BuildContext context, List<User> trainees) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return Padding(
-  //         padding: const EdgeInsets.all(16.0),
-  //         child: ListView.builder(
-  //           itemCount: trainees.length,
-  //           itemBuilder: (context, index) {
-  //             final trainee = trainees[index];
-  //             return Card(
-  //               elevation: 2,
-  //               margin: const EdgeInsets.symmetric(vertical: 8),
-  //               child: ListTile(
-  //                 leading: CircleAvatar(
-  //                   backgroundImage: trainee.imageUrl != null
-  //                       ? NetworkImage(trainee.imageUrl!)
-  //                       : const AssetImage('assets/images/default_profile.png')
-  //                           as ImageProvider,
-  //                 ),
-  //                 title: Text(trainee.username),
-  //               ),
-  //             );
-  //           },
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
   String _formatTime(DateTime time) {
     return time.hour > 12
         ? '${time.hour - 12}:${time.minute.toString().padLeft(2, '0')} PM'
         : '${time.hour}:${time.minute.toString().padLeft(2, '0')} AM';
   }
-
-  // void _showUpdateBottomSheet(BuildContext context) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return Padding(
-  //         padding: const EdgeInsets.all(16.0),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             const Text(
-  //               'Update Meal Plan',
-  //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-  //             ),
-  //             const SizedBox(height: 20),
-  //             // Your bottom sheet content here
-  //             ElevatedButton(
-  //               onPressed: () {
-  //                 Navigator.pop(context);
-  //               },
-  //               child: const Text('Close'),
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
 }
 
 void _showTraineeList(BuildContext context, List<User> trainees) {

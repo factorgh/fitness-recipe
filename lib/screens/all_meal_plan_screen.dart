@@ -13,30 +13,15 @@ class AllMealPlan extends ConsumerStatefulWidget {
 }
 
 class _AllMealPlanState extends ConsumerState<AllMealPlan> {
-  // DateTime? _selectedDate;
   String _selectedDuration = 'Does Not Repeat';
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(mealPlansProvider.notifier).fetchAllMealPlans();
     });
   }
-
-  // Future<void> _pickDate(BuildContext context) async {
-  //   final DateTime? pickedDate = await showDatePicker(
-  //     context: context,
-  //     initialDate: _selectedDate ?? DateTime.now(),
-  //     firstDate: DateTime(2000),
-  //     lastDate: DateTime(2101),
-  //   );
-  //   if (pickedDate != null && pickedDate != _selectedDate) {
-  //     setState(() {
-  //       _selectedDate = pickedDate;
-  //     });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +29,7 @@ class _AllMealPlanState extends ConsumerState<AllMealPlan> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: 100.0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -60,34 +46,38 @@ class _AllMealPlanState extends ConsumerState<AllMealPlan> {
           ],
         ),
         actions: [
-          DropdownButton<String>(
-            elevation: 3,
-            style: const TextStyle(
-                fontSize: 12,
-                color: Colors.orange,
-                fontWeight: FontWeight.w500),
-            value: _selectedDuration,
-            items: [
-              'Does Not Repeat',
-              'Week',
-              'Month',
-              'Quarter',
-              'Half-Year',
-              'Year',
-              'Custom'
-            ]
-                .map((duration) => DropdownMenuItem<String>(
-                      value: duration,
-                      child: Text(duration),
-                    ))
-                .toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedDuration = value!;
-                ref
-                    .read(mealPlansProvider.notifier)
-                    .filterByDuration(_selectedDuration);
-              });
+          Consumer(
+            builder: (context, ref, child) {
+              return DropdownButton<String>(
+                elevation: 3,
+                style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.orange,
+                    fontWeight: FontWeight.w500),
+                value: _selectedDuration,
+                items: [
+                  'Does Not Repeat',
+                  'Week',
+                  'Month',
+                  'Quarter',
+                  'Half-Year',
+                  'Year',
+                  'Custom'
+                ]
+                    .map((duration) => DropdownMenuItem<String>(
+                          value: duration,
+                          child: Text(duration),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedDuration = value!;
+                    ref
+                        .read(mealPlansProvider.notifier)
+                        .filterByDuration(_selectedDuration);
+                  });
+                },
+              );
             },
           ),
           const SizedBox(width: 10),
@@ -98,18 +88,18 @@ class _AllMealPlanState extends ConsumerState<AllMealPlan> {
         child: mealPlansState is MealPlansLoading
             ? const Center(child: CircularProgressIndicator())
             : mealPlansState is MealPlansError
-                ? Center(child: Text((mealPlansState).error))
+                ? const Center(child: Text('No meal plans available.'))
                 : mealPlansState is MealPlansLoaded
                     ? mealPlansState.mealPlans.isEmpty
                         ? const Center(child: Text('No meal plans available.'))
                         : ListView.builder(
-                            itemCount: (mealPlansState).mealPlans.length,
+                            itemCount: mealPlansState.mealPlans.length,
                             itemBuilder: (context, index) {
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 12.0),
                                 child: CalendarItem(
                                   titleIcon: Icons.restaurant_menu,
-                                  mealPlan: (mealPlansState).mealPlans[index],
+                                  mealPlan: mealPlansState.mealPlans[index],
                                 ),
                               );
                             },

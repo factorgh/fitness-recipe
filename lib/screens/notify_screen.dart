@@ -1,119 +1,122 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: avoid_print
 
-class NotificationsScreen extends StatelessWidget {
-  final List<NotificationItem> notifications = [
-    NotificationItem(
-      title: 'New Message from John',
-      description: 'Hey, are we still meeting today?',
-      timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-    ),
-    NotificationItem(
-      title: 'App Update Available',
-      description: 'Version 2.1.0 is now available.',
-      timestamp: DateTime.now().subtract(const Duration(hours: 1)),
-    ),
-    NotificationItem(
-      title: 'Reminder: Meeting at 3 PM',
-      description: 'Don\'t forget your meeting today.',
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    // Add more notifications here
-  ];
-  NotificationsScreen({super.key});
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lottie/lottie.dart';
+import 'package:voltican_fitness/models/notification.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/screens/notification_detail_screen.dart';
+import 'package:voltican_fitness/services/notifications_service.dart';
+import 'package:voltican_fitness/utils/socket_io_setup.dart';
+import 'package:voltican_fitness/widgets/notification_item.dart';
+
+class NotificationsScreen extends ConsumerStatefulWidget {
+  const NotificationsScreen({super.key});
+
+  @override
+  _NotificationsScreenState createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
+  late NotificationServiceSub _notificationService;
+  late SocketService _socketService;
+  late Future<List<AppNotification>> _notificationsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationService = NotificationServiceSub();
+    _socketService = SocketService();
+    _socketService.initSocket();
+
+    final user = ref.read(userProvider);
+    if (user != null) {
+      _notificationsFuture = _notificationService.getNotifications(user.id);
+
+      _socketService.listenForNotifications(user.id, (notification) {
+        setState(() {
+          _notificationsFuture = _notificationService.getNotifications(user.id);
+        });
+      });
+    } else {
+      _notificationsFuture = Future.value([]);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: const Text(
+          'Notifications',
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(top: 20, bottom: 10, left: 10),
-                child: Text(
-                  'New Alerts',
-                  style: TextStyle(color: Colors.lightBlue, fontSize: 20),
-                ),
+      body: FutureBuilder<List<AppNotification>>(
+        future: _notificationsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (!snapshot.hasData ||
+              snapshot.data!.isEmpty ||
+              snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Lottie.asset("assets/animations/notify.json"),
+                  const Text(
+                    'No notifications available',
+                    style: TextStyle(color: Colors.red, fontSize: 15),
+                  ),
+                ],
               ),
-            ],
-          ),
-          Expanded(
-            child: ListView.builder(
+            );
+          } else {
+            final notifications = snapshot.data!;
+            print('----------noti-------$notifications');
+
+            return ListView.builder(
               itemCount: notifications.length,
               itemBuilder: (context, index) {
                 final notification = notifications[index];
-                return NotificationTile(notification: notification);
+
+                return NotificationItem(
+                  notiIcon: Icons.notifications,
+                  notiText: notification.message,
+                  createdAt: notification.createdAt,
+                  isRead: notification.isRead,
+                  notificationId: notification.id,
+                  onNotificationTap: (message) async {
+                    // Assume this is inside your NotificationItem onTap method
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NotificationDetailsPage(
+                          type: notification.type,
+                          notiText: notification.message,
+                          createdAt: notification.createdAt,
+                          createdBy:
+                              'Trainer', // You can dynamically pass this value
+                          isRead: notification.isRead,
+                        ),
+                      ),
+                    );
+                  },
+                );
               },
-            ),
-          ),
-        ],
+            );
+          }
+        },
       ),
     );
   }
-}
-
-class NotificationItem {
-  final String title;
-  final String description;
-  final DateTime timestamp;
-
-  NotificationItem({
-    required this.title,
-    required this.description,
-    required this.timestamp,
-  });
-}
-
-class NotificationTile extends StatelessWidget {
-  final NotificationItem notification;
-
-  const NotificationTile({super.key, required this.notification});
 
   @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      leading: const Icon(Icons.notifications, color: Colors.blue),
-      title: Text(
-        notification.title,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(notification.description),
-          const SizedBox(height: 4),
-          Text(
-            _formatTimestamp(notification.timestamp),
-            style: const TextStyle(color: Colors.grey, fontSize: 12),
-          ),
-        ],
-      ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-      tileColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-    );
-  }
-
-  String _formatTimestamp(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-
-    if (difference.inDays > 1) {
-      return '${timestamp.month}/${timestamp.day}/${timestamp.year}';
-    } else if (difference.inHours > 1) {
-      return '${difference.inHours} hours ago';
-    } else if (difference.inMinutes > 1) {
-      return '${difference.inMinutes} minutes ago';
-    } else {
-      return 'Just now';
-    }
+  void dispose() {
+    _socketService.dispose();
+    super.dispose();
   }
 }

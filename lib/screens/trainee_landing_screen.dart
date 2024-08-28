@@ -1,11 +1,15 @@
+// ignore_for_file: avoid_print, unused_element
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
+import 'package:voltican_fitness/services/auth_service.dart';
+import 'package:voltican_fitness/utils/socket_io_setup.dart';
 import 'package:voltican_fitness/widgets/recipe_advert_slider.dart';
-import 'package:voltican_fitness/widgets/todays_pick.dart';
-import 'package:voltican_fitness/widgets/trainers_slider.dart';
+
 import 'package:badges/badges.dart' as badges;
+import 'package:voltican_fitness/widgets/slider_trainer_landing.dart';
 
 class TraineeLandingScreen extends ConsumerStatefulWidget {
   const TraineeLandingScreen({super.key});
@@ -15,12 +19,63 @@ class TraineeLandingScreen extends ConsumerStatefulWidget {
 }
 
 class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
+  final AuthService authService = AuthService();
+  List<String> _topTrainers = [];
+  List<String> _trainerImages = [];
+  List<String> _topTrainersEmail = [];
+  List<String> _topTrainerIds = [];
+  late SocketService _socketService;
+  int _notificationCount = 0;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showBottomSheet(context);
+      _fetchTopTrainers();
+      _socketService = SocketService();
+      _socketService.initSocket();
+      _listenForNotifications();
     });
+  }
+
+  void _listenForNotifications() {
+    _socketService.listenForNotifications(ref.read(userProvider)!.id,
+        (notification) {
+      _incrementNotificationCount();
+    });
+  }
+
+  void _incrementNotificationCount() {
+    setState(() {
+      _notificationCount++;
+    });
+  }
+
+  void _resetNotificationCount() {
+    setState(() {
+      _notificationCount = 0;
+    });
+  }
+
+  void _fetchTopTrainers() {
+    authService.getTopTrainers(
+      context: context,
+      onSuccess: (trainers) {
+        setState(() {
+          _topTrainers =
+              trainers.map((trainer) => trainer['username'] as String).toList();
+          _topTrainersEmail =
+              trainers.map((trainer) => trainer['username'] as String).toList();
+          _topTrainerIds =
+              trainers.map((trainer) => trainer['_id'] as String).toList();
+          _trainerImages = trainers
+              .map((trainer) =>
+                  trainer['imageUrl'] as String? ??
+                  'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png')
+              .toList();
+        });
+      },
+    );
   }
 
   void _showBottomSheet(BuildContext context) {
@@ -59,34 +114,6 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
-    final meals = [
-      'Breakfast',
-      'Deserts',
-      'Lunch',
-      'Dinner',
-      'Others',
-    ];
-    final trainers = [
-      'Albert M.',
-      'Ernest A.',
-      'Lucis M.',
-      'Mills A.',
-      'William A.',
-    ];
-    final images = [
-      "assets/images/pf.jpg",
-      "assets/images/pf2.jpg",
-      "assets/images/pf3.jpg",
-      "assets/images/pf4.jpg",
-      "assets/images/pf5.jpg",
-    ];
-    final emails = [
-      'albert.m@example.com',
-      'ernest.m@example.com.',
-      'lucy.m@example.com',
-      'mills.m@example.com',
-      'william.m@example.com',
-    ];
 
     void handleTrainerSelected(String category) {
       // Handle category selection
@@ -110,15 +137,17 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                     RichText(
                       text: TextSpan(
                         text: 'Hello, ',
-                        style:
-                            const TextStyle(fontSize: 20, color: Colors.black),
+                        style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w700),
                         children: <TextSpan>[
                           TextSpan(
                               text: user?.username,
                               style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w700,
                                   fontSize: 20,
-                                  color: Colors.orangeAccent)),
+                                  color: Colors.grey)),
                         ],
                       ),
                     ),
@@ -126,10 +155,10 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                     // right side of row
                     badges.Badge(
                       position: badges.BadgePosition.topEnd(top: -2, end: 1),
-                      showBadge: true,
-                      badgeContent: const Text(
-                        "4",
-                        style: TextStyle(color: Colors.white),
+                      showBadge: _notificationCount > 0,
+                      badgeContent: Text(
+                        "$_notificationCount",
+                        style: const TextStyle(color: Colors.white),
                       ),
                       badgeAnimation: const badges.BadgeAnimation.slide(
                         animationDuration: Duration(milliseconds: 300),
@@ -149,8 +178,10 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                           size: 25,
                         ),
                         onPressed: () {
+                          _resetNotificationCount();
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => NotificationsScreen()));
+                              builder: (context) =>
+                                  const NotificationsScreen()));
                         },
                       ),
                     )
@@ -166,7 +197,7 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                 child: Stack(
                   children: [
                     Container(
-                      height: 160,
+                      height: 200,
                       width: 360,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
@@ -190,7 +221,7 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
-                                      fontWeight: FontWeight.w500),
+                                      fontWeight: FontWeight.w900),
                                 ),
                                 Text(
                                   'Easier With AR',
@@ -231,34 +262,11 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                 ),
               ),
 
-              // End of second row
-
-              const SizedBox(
-                height: 15,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Today's pick",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                    ),
-                    Text(
-                      "See All",
-                      style: TextStyle(
-                          color: Colors.red[600], fontWeight: FontWeight.w500),
-                    )
-                  ],
-                ),
-              ),
               const SizedBox(
                 height: 10,
               ),
-              TodaysPickSlider(
-                  recipes: meals, onCategorySelected: handleCategorySelected),
+              // TodaysPickSlider(
+              //     recipes: meals, onCategorySelected: handleCategorySelected),
               const SizedBox(
                 height: 20,
               ),
@@ -270,19 +278,27 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                     Text(
                       "Top Trainers",
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
               ),
               // Trainers
 
-              TopTrainerSlider(
-                recipes: trainers,
+              SliderTrainerLanding(
+                ids: _topTrainerIds,
+                emails: _topTrainersEmail,
+                recipes: _topTrainers, // Pass the names of top trainers
+                images: _trainerImages, // Pass the list of trainer images
                 onTrainerSelected: handleTrainerSelected,
-                images: images,
-                emails: emails,
               ),
+              // TopTrainerSlider(
+              //   ids:
+              //   recipes: _topTrainers,
+              //   onTrainerSelected: handleTrainerSelected,
+              //   images: _trainerImages,
+              //   emails: _topTrainersEmail,
+              // ),
               const SizedBox(
                 height: 10,
               ),
@@ -294,9 +310,9 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                     Text(
                       "Latest Nutritional News",
                       style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.brown),
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ],
                 ),

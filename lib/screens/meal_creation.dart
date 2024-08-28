@@ -1,18 +1,21 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/screens/meal_plan_preview_screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
-import 'package:voltican_fitness/widgets/week_range_selector.dart';
+import 'package:voltican_fitness/widgets/recurrence_sheet.dart';
 
 class MealCreationScreen extends ConsumerStatefulWidget {
   final DateTime selectedDay;
@@ -31,7 +34,8 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   List<User> _searchResults = [];
   final List<User> _selectedTrainees = [];
   bool _isLoading = false;
-  List<String> _weekDays = [];
+  final List<DateTime> _highlightedDates = [];
+
   final List<RecipeAllocation> _selectedRecipeAllocations = [];
 
   final TextEditingController _searchController = TextEditingController();
@@ -42,59 +46,21 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
   final RecipeService recipeService = RecipeService();
   final TrainerService trainerService = TrainerService();
-
-  // This will store the selected recipe IDs flattened into a list of strings
+  DateTime? selectedDay;
 
   // Callback function to handle selection changes
   void _handleRecipeSelectionChanged(
       List<RecipeAllocation> selectedAllocations) {
+    showRecurrenceBottomSheet(context);
+    print("Recurrence");
     setState(() {
       _selectedRecipeAllocations.clear();
       _selectedRecipeAllocations.addAll(selectedAllocations);
     });
   }
 
-  void _onSelectionChanged(List<String> selectedDays) {
-    setState(() {
-      _weekDays = selectedDays;
-    });
-  }
-
   void handleSelectionChange(List<String> selectedPeriods) {
     setState(() {});
-  }
-
-  Future<void> _selectDate(BuildContext context, bool isStartDate) async {
-    DateTime initialDate = DateTime.now();
-    if (isStartDate && _startDate != null) {
-      initialDate = _startDate!;
-    } else if (!isStartDate && _endDate != null) {
-      initialDate = _endDate!;
-    }
-
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-
-    if (pickedDate != null &&
-        pickedDate != (isStartDate ? _startDate : _endDate)) {
-      setState(() {
-        if (isStartDate) {
-          _startDate = pickedDate;
-          // If the start date is updated, adjust the end date based on the current duration
-          if (_selectedDuration != 'Custom') {
-            _endDate = _calculateEndDate(_startDate!, _selectedDuration);
-          }
-        } else {
-          _endDate = pickedDate;
-          // Set the duration to 'Custom' if the end date is manually edited
-          _selectedDuration = 'Custom';
-        }
-      });
-    }
   }
 
   DateTime _calculateEndDate(DateTime startDate, String duration) {
@@ -124,7 +90,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   @override
   void initState() {
     _startDate = widget.selectedDay;
-
+    _updateHighlightedDates();
     fetchAllUserRecipes();
     getTraineesFollowingTrainer();
     super.initState();
@@ -135,6 +101,48 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     _searchController.dispose();
     _mealPlanNameController.dispose();
     super.dispose();
+  }
+
+// Highlighted dates logic
+  void _updateHighlightedDates() {
+    if (_startDate != null && _endDate != null) {
+      _highlightedDates.clear();
+      DateTime date = _startDate!;
+      while (date.isBefore(_endDate!.add(const Duration(days: 1)))) {
+        _highlightedDates.add(date);
+        date = date.add(const Duration(days: 1));
+      }
+    }
+  }
+
+  // SelectDate logic
+
+  Future<void> _selectDate(BuildContext context, bool isStartDate) async {
+    DateTime initialDate = DateTime.now();
+    if (isStartDate && _startDate != null) {
+      initialDate = _startDate!;
+    } else if (!isStartDate && _endDate != null) {
+      initialDate = _endDate!;
+    }
+
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (pickedDate != null &&
+        pickedDate != (isStartDate ? _startDate : _endDate)) {
+      setState(() {
+        if (isStartDate) {
+          _startDate = pickedDate;
+        } else {
+          _endDate = pickedDate;
+        }
+        _updateHighlightedDates(); // Update highlighted dates whenever start or end date changes
+      });
+    }
   }
 
   Future<void> fetchAllUserRecipes() async {
@@ -207,53 +215,75 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
   Future<void> _completeSchedule() async {
     final user = ref.read(userProvider);
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate() &&
+        _selectedRecipeAllocations.isNotEmpty &&
+        _selectedTrainees.isNotEmpty) {
       final mealPlan = MealPlan(
         name: _mealPlanNameController.text,
         duration: _selectedDuration,
-        startDate: _selectedDuration == 'Custom' ? _startDate : null,
-        endDate: _selectedDuration == 'Custom' ? _endDate : null,
-        days: _weekDays,
-        periods: [],
+        startDate: _startDate,
+        endDate: _endDate,
+
+        periods: [], // Add appropriate periods
         recipeAllocations: _selectedRecipeAllocations,
         trainees: _selectedTrainees.map((trainee) => trainee.id).toList(),
         createdBy: user!.id,
       );
 
+      setState(() {
+        _isLoading = true;
+      });
+
       try {
-        setState(() {
-          _isLoading = true;
-        });
-        await ref.read(mealPlanProvider.notifier).createMealPlan(mealPlan);
-        showSnack(context, 'Meal plan created successfully');
-        setState(() {
-          _isLoading = false;
-          Navigator.pop(context);
+        await ref
+            .read(mealPlanProvider.notifier)
+            .createMealPlan(mealPlan, context);
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            Navigator.pop(context);
+          });
+        }
+
+        Future.delayed(Duration.zero, () {
+          ref.read(mealPlansProvider.notifier).fetchAllMealPlans();
         });
       } catch (e) {
-        setState(() {
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to create meal plan: $e')),
-        );
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     } else {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all required fields')),
-      );
+      NativeAlerts()
+          .showErrorAlert(context, 'Please fill in all required fields');
     }
+  }
+
+  void createPlan() {
+    _completeSchedule();
+  }
+
+  bool _isWithinRange(DateTime day) {
+    if (_startDate != null && _endDate != null) {
+      return day.isAfter(_startDate!.subtract(const Duration(days: 1))) &&
+          day.isBefore(_endDate!.add(const Duration(days: 1)));
+    }
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Meal Plan'),
-        centerTitle: true,
+        title: const Text(
+          'Create Meal Plan',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -434,30 +464,87 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                 ],
               ),
               const SizedBox(height: 20),
-              const Text(
-                "Select Meal Periods",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              WeekRangeSelector(
-                // Provide your selected days here
-                onSelectionChanged: _onSelectionChanged,
-              ),
-              const SizedBox(height: 20),
-              MealPeriodSelector(
-                recipes: myRecipes, // Pass actual recipes here
+              _endDate != null
+                  ? TableCalendar(
+                      firstDay: DateTime(2000),
+                      lastDay: DateTime(2100),
+                      focusedDay: selectedDay ??
+                          DateTime.now(), // Focus on the selected day or today
+                      rangeStartDay: _startDate,
+                      rangeEndDay: _endDate,
 
-                onSelectionChanged: _handleRecipeSelectionChanged,
-              ),
+                      rowHeight: 43,
+                      calendarBuilders: CalendarBuilders(
+                        selectedBuilder: (context, date, _) {
+                          return Container(
+                            margin: const EdgeInsets.all(4.0),
+                            decoration: BoxDecoration(
+                              color:
+                                  Colors.red, // Highlight selected date in red
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                            child: Center(
+                                child: Text(
+                                    date.day.toString())), // Display day number
+                          );
+                        },
+                      ),
+                      selectedDayPredicate: (day) =>
+                          isSameDay(day, selectedDay),
+                      onDaySelected: (DateTime selectDay, DateTime focusDay) {
+                        if (_isWithinRange(selectDay)) {
+                          setState(() {
+                            selectedDay = selectDay;
+                          });
+                        }
+                        print('Selected Day: $selectedDay');
+                      },
+                      headerStyle: const HeaderStyle(
+                        formatButtonVisible: false,
+                        titleCentered: true,
+                      ),
+                      availableGestures: AvailableGestures.all,
+                    )
+                  : const SizedBox(),
+              const SizedBox(height: 20),
+              selectedDay != null
+                  ? MealPeriodSelector(
+                      recipes: myRecipes, // Pass actual recipes here
+
+                      onSelectionChanged: _handleRecipeSelectionChanged,
+                    )
+                  : const SizedBox(),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red, foregroundColor: Colors.white),
-                onPressed: _completeSchedule,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white),
+                onPressed: () {
+                  final mealPlan = MealPlan(
+                    name: _mealPlanNameController.text,
+                    duration: _selectedDuration,
+                    startDate: _startDate,
+                    endDate: _endDate,
+
+                    periods: [], // Add appropriate periods
+                    recipeAllocations: _selectedRecipeAllocations,
+                    trainees:
+                        _selectedTrainees.map((trainee) => trainee.id).toList(),
+                    createdBy: ref.read(userProvider)!.id,
+                  );
+                  showMealPlanPreviewBottomSheet(context, mealPlan, createPlan);
+                },
                 child: _isLoading
                     ? const CircularProgressIndicator(
                         color: Colors.white,
                       )
-                    : const Text('Complete Schedule'),
+                    : const Text(
+                        'Preview',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 20),
+                      ),
               ),
               const SizedBox(height: 20),
             ],

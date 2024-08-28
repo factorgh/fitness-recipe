@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:voltican_fitness/providers/user_provider.dart';
+// import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
 
 class AllTrainersScreen extends ConsumerWidget {
@@ -49,7 +49,7 @@ class AllTrainersScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider);
+    // final user = ref.watch(userProvider);
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
@@ -86,8 +86,8 @@ class AllTrainersScreen extends ConsumerWidget {
             GestureDetector(
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => TrainerProfileScreen(
-                          user: user!,
+                    builder: (context) => const TrainerProfileScreen(
+                          userId: '',
                         )));
               },
               child: Card(
@@ -118,8 +118,8 @@ class AllTrainersScreen extends ConsumerWidget {
             GestureDetector(
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => TrainerProfileScreen(
-                          user: user!,
+                    builder: (context) => const TrainerProfileScreen(
+                          userId: '',
                         )));
               },
               child: Card(

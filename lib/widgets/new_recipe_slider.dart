@@ -1,8 +1,12 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: avoid_print
 
-class NewRecipeSlider extends StatelessWidget {
-  final List<String> recipes;
-  final Function(String) onCategorySelected;
+import 'package:flutter/material.dart';
+import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/services/auth_service.dart';
+
+class NewRecipeSlider extends StatefulWidget {
+  final List<Recipe> recipes; // Updated to List<Recipe>
+  final Function(Recipe) onCategorySelected;
 
   const NewRecipeSlider({
     super.key,
@@ -11,26 +15,78 @@ class NewRecipeSlider extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 200, // Adjust height as needed
-      padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: recipes.length,
-        itemBuilder: (context, index) {
-          return _buildRecipeItem(context, recipes[index]);
-        },
-      ),
-    );
+  State<NewRecipeSlider> createState() => _NewRecipeSliderState();
+}
+
+class _NewRecipeSliderState extends State<NewRecipeSlider> {
+  final AuthService authService = AuthService();
+  Map<String, String> userNames = {}; // Store user names by user ID
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsers();
   }
 
-  Widget _buildRecipeItem(BuildContext context, String recipe) {
+  void _fetchUsers() async {
+    final userIds = widget.recipes.map((recipe) {
+      return recipe.createdBy;
+    }).toSet();
+
+    final futures = userIds.map((userId) {
+      return authService.getUser(
+        userId: userId,
+        onSuccess: (fetchedUser) {
+          setState(() {
+            userNames[userId] = fetchedUser.username;
+          });
+        },
+      );
+    }).toList();
+
+    await Future.wait(futures);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.recipes.isEmpty
+        ? SizedBox(
+            height: 150,
+            child: Center(
+              child: Text(
+                'No recipes available',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+          )
+        : Container(
+            height: 200, // Adjust height as needed
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: widget.recipes.length,
+              itemBuilder: (context, index) {
+                return _buildRecipeItem(
+                  context,
+                  widget.recipes[index],
+                );
+              },
+            ),
+          );
+  }
+
+  Widget _buildRecipeItem(BuildContext context, Recipe recipe) {
+    final userName = userNames[recipe.createdBy] ?? 'Unknown';
+    print(userName);
+
     return GestureDetector(
-      onTap: () => onCategorySelected(recipe),
+      onTap: () => widget.onCategorySelected(recipe),
       child: Container(
-        width: 330,
-        // Adjust width as needed
+        width: 330, // Adjust width as needed
         margin: const EdgeInsets.symmetric(horizontal: 10),
         child: Stack(
           children: [
@@ -38,8 +94,8 @@ class NewRecipeSlider extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                image: const DecorationImage(
-                  image: AssetImage("assets/recipe.jpg"),
+                image: DecorationImage(
+                  image: NetworkImage(recipe.imageUrl),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -56,22 +112,21 @@ class NewRecipeSlider extends StatelessWidget {
                         height: 30,
                         width: 150,
                         decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20)),
-                        child: const Center(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Center(
                           child: Row(
                             children: [
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Icon(
+                              const SizedBox(width: 5),
+                              const Icon(
                                 Icons.star,
                                 size: 20,
                                 color: Colors.amber,
                               ),
                               Text(
-                                '4.5 (1k+ Reviews)',
-                                style: TextStyle(
+                                '${recipe.averageRating.toStringAsFixed(1)} (1k+ Reviews)',
+                                style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -81,9 +136,7 @@ class NewRecipeSlider extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        width: 120,
-                      ),
+                      const SizedBox(width: 120),
                       // Add Favorite Icon
                       Container(
                         decoration: BoxDecoration(
@@ -95,37 +148,38 @@ class NewRecipeSlider extends StatelessWidget {
                           child: Icon(Icons.favorite_border_outlined,
                               color: Colors.black12, size: 20),
                         ),
-                      )
+                      ),
                     ],
                   ),
-                  // Short Description
                 ],
               ),
             ),
             Positioned(
-              top: 130,
               bottom: 0,
+              left: 0,
+              right: 0,
               child: Container(
-                width: 330,
-                height: 50,
+                height: 70,
                 decoration: BoxDecoration(
-                    color: Colors.white54,
-                    borderRadius: BorderRadius.circular(20)),
-                child: const Row(
+                  color: Colors.white54,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
                   children: [
                     Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Burst Tomatoes and Basil",
-                            style: TextStyle(
-                                color: Colors.black87,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
+                            recipe.title,
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                          Row(
+                          const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
@@ -133,34 +187,27 @@ class NewRecipeSlider extends StatelessWidget {
                                 color: Colors.amber,
                               ),
                               Text(
-                                "35 min",
+                                "35 min", // Use recipe.duration
                                 style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500),
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                               Text(
                                 ".",
                                 style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500),
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                "by Arlene Wills",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500),
-                              ),
+                              SizedBox(width: 10),
                             ],
-                          )
+                          ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

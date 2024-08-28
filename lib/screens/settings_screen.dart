@@ -11,7 +11,7 @@ import 'package:voltican_fitness/screens/login_screen.dart';
 
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/screens/profile_screen.dart';
-import 'package:voltican_fitness/utils/show_snackbar.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -26,10 +26,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('auth_token', '');
 
-    showSnack(context, "Logout sucessfully");
-
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => const LoginScreen()));
+    NativeAlerts().showSuccessAlert(context, "Logged Out successfully");
     // ); // Adjust route as necessary
   }
 
@@ -100,7 +99,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => NotificationsScreen()),
+          MaterialPageRoute(builder: (context) => const NotificationsScreen()),
         );
       },
       child: const Card(

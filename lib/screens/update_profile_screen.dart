@@ -19,6 +19,7 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
   @override
   void initState() {
     super.initState();
+    // Use ref.watch to ensure the state is reactive
     final user = ref.read(userProvider);
     _fullName = user?.fullName ?? '';
     _username = user?.username ?? '';
@@ -31,6 +32,7 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
 
       final user = ref.read(userProvider);
       if (user != null) {
+        // Perform the update
         await AuthService().updateUser(
           context: context,
           ref: ref,
@@ -39,6 +41,12 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
           username: _username,
           email: _email,
         );
+        // Update the userProvider with new data
+        ref.read(userProvider.notifier).updateUser(
+              fullName: _fullName,
+              username: _username,
+              email: _email,
+            );
       }
     }
   }

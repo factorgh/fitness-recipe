@@ -1,7 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/screens/signup_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
+import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/widgets/button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -16,6 +20,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final AuthService authService = AuthService();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final NativeAlerts alerts = NativeAlerts();
 
   bool _passwordVisible = false;
   bool _isLoading = false; // New: To manage loading state
@@ -39,16 +44,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _isLoading = true;
       });
 
-      await authService.signIn(
-        context: context,
-        ref: ref, // Use ref from the state
-        username: _usernameController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-
-      setState(() {
-        _isLoading = false;
-      });
+      try {
+        await authService.signIn(
+          context: context,
+          ref: ref, // Use ref from the state
+          username: _usernameController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+      } on DioException catch (e) {
+        if (e.response?.statusCode == 403) {
+          alerts.showErrorAlert(context,
+              'Access denied: You are not allowed to log in.You must follow a trainer');
+        } else {
+          // Show the default error alert for other cases
+          alerts.showErrorAlert(
+            context,
+            'Login failed: Please check your credentials and try again',
+          );
+        }
+      } catch (e) {
+        // Handle other types of exceptions if needed
+        alerts.showErrorAlert(
+          context,
+          'An unexpected error occurred. Please try again later.',
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
