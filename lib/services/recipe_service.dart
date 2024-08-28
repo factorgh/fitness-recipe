@@ -262,7 +262,7 @@ class RecipeService {
         throw Exception('Failed to load recipes');
       }
     } catch (e) {
-      throw Exception('Error: $e');
+      throw Exception('No recipes found');
     }
   }
 

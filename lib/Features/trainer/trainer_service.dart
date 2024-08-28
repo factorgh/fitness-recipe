@@ -150,10 +150,11 @@ class TrainerService {
       }
     } on DioException catch (e) {
       // Handle Dio-specific exceptions
-      throw Exception('Dio error: ${e.message}');
+      print(e);
+      throw Exception('Dio error:');
     } catch (e) {
       // Handle general exceptions
-      throw Exception('Unexpected error: $e');
+      throw Exception('Unexpected error: ');
     }
   }
 

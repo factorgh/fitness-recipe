@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
+import 'package:voltican_fitness/providers/trainer_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
@@ -36,6 +37,25 @@ class _TrainerMealDetailScreenState
   void initState() {
     super.initState();
     _fetchUser();
+  }
+
+  @override
+  void didChangeDependencies() {
+    isFollowing = checkIfFollowing() ?? false;
+    super.didChangeDependencies();
+  }
+
+  bool? checkIfFollowing() {
+    final me = ref.read(userProvider);
+    if (me == null) return null;
+
+    final followingTrainersAsync = ref.watch(followingTrainersProvider(me.id));
+    if (followingTrainersAsync.value == null) {
+      return null;
+    }
+
+    return followingTrainersAsync.value
+        ?.any((trainer) => trainer.id == widget.meal.createdBy);
   }
 
   void _fetchUser() {
@@ -149,7 +169,23 @@ class _TrainerMealDetailScreenState
     );
   }
 
-  void _toggleFollow() {
+  void _toggleFollow() async {
+    // Update the follow status in the database
+    final me = ref.read(userProvider);
+    if (isFollowing) {
+      await ref
+          .read(followersProvider(
+                  widget.meal.createdBy.isNotEmpty ? widget.meal.createdBy : '')
+              .notifier)
+          .unfollowTrainer(me!.id, widget.meal.createdBy);
+    } else {
+      await ref
+          .read(followersProvider(
+                  widget.meal.createdBy.isNotEmpty ? widget.meal.createdBy : '')
+              .notifier)
+          .followTrainer(me!.id, widget.meal.createdBy, context);
+    }
+
     setState(() {
       isFollowing = !isFollowing;
     });
