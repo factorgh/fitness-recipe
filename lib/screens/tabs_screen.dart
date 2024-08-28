@@ -36,7 +36,7 @@ class _TabsScreenState extends State<TabsScreen> {
       ];
     } else {
       return const [
-        TrainerLandingScreen(),
+        TrainerLandeingScreen(),
         MealPlanScreen(),
         CalendarScreen(),
         TraineesScreen(),

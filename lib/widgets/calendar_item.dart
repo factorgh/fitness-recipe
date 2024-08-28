@@ -2,11 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
-import 'package:voltican_fitness/providers/trainer_provider.dart';
 // Make sure to import the provider file
+import 'package:voltican_fitness/providers/trainer_provider.dart';
 import 'package:voltican_fitness/screens/single_meal_screen.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 
@@ -53,11 +52,8 @@ class CalendarItem extends ConsumerWidget {
                 final mealPlanId = mealPlan.id;
                 final notifier = ref.read(mealPlanProvider.notifier);
                 await notifier.deleteMealPlan(mealPlanId!);
+                await Future.delayed(const Duration(milliseconds: 500));
                 Navigator.of(context).pop();
-                Future.delayed(Duration.zero, () {
-                  ref.read(mealPlansProvider.notifier).fetchAllMealPlans();
-                });
-
                 showSnack(context, "Meal Plan deleted successfully!");
               },
             ),
@@ -71,13 +67,6 @@ class CalendarItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final traineeDetailsAsyncValue =
         ref.watch(traineeDetailsProvider(mealPlan.trainees));
-
-    final startDate = mealPlan.startDate != null
-        ? DateFormat('MMM d, yyyy').format(mealPlan.startDate!)
-        : 'Start Date Not Available';
-    final endDate = mealPlan.endDate != null
-        ? DateFormat('MMM d, yyyy').format(mealPlan.endDate!)
-        : 'End Date Not Available';
 
     return Container(
       decoration: BoxDecoration(
@@ -100,18 +89,6 @@ class CalendarItem extends ConsumerWidget {
                   const SizedBox(width: 20),
                   Text(mealPlan.duration),
                 ],
-              ),
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 15),
-                    const Icon(Icons.date_range),
-                    const SizedBox(width: 8),
-                    Text('$startDate - $endDate'),
-                  ],
-                ),
               ),
               const SizedBox(height: 20),
               const Row(

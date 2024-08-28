@@ -121,14 +121,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
         _selectedMeals[mealPeriod] = [];
       }
 
-      if (mealPeriod == 'Snack') {
-        // Allow multiple snacks
-        _selectedMeals[mealPeriod]!.add(allocation);
-      } else {
-        // Replace existing selection for Breakfast, Lunch, or Dinner
-        _selectedMeals[mealPeriod] = [allocation];
-      }
-
+      _selectedMeals[mealPeriod]!.add(allocation);
       widget.onSelectionChanged(_convertToRecipeAllocations());
     });
   }
@@ -184,122 +177,103 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
           ),
         ],
       ),
-      child: filteredRecipes.isEmpty
-          ? Center(
-              child: RichText(
-                text: TextSpan(
-                  text: ' No $mealPeriod available.',
-                  style: DefaultTextStyle.of(context).style,
-                  children: const <TextSpan>[
-                    TextSpan(
-                        text: 'click here to create a meal',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: filteredRecipes.length,
+        itemBuilder: (context, index) {
+          Recipe recipe = filteredRecipes[index];
+          bool isSelected = _selectedMeals[mealPeriod]
+                  ?.any((allocation) => allocation.recipeId == recipe.id) ??
+              false;
+
+          return GestureDetector(
+            onTap: () => _onRecipeTap(recipe.id!, mealPeriod),
+            child: Container(
+              width: 120,
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(15),
+                border: isSelected
+                    ? Border.all(color: Colors.blue, width: 2)
+                    : null,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: recipe.imageUrl.isNotEmpty
+                          ? Image.network(
+                              recipe.imageUrl,
+                              fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            (loadingProgress.expectedTotalBytes
+                                                as int)
+                                        : null,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Center(
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    size: 40,
+                                    color: Colors.grey[600],
+                                  ),
+                                );
+                              },
+                            )
+                          : Center(
+                              child: Icon(
+                                Icons.image_not_supported,
+                                size: 40,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.6),
+                          borderRadius: const BorderRadius.vertical(
+                            bottom: Radius.circular(15),
+                          ),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 8),
+                        child: Text(
+                          recipe.title.length > 8
+                              ? '${recipe.title.substring(0, 8)}...'
+                              : recipe.title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.center,
                           overflow: TextOverflow.ellipsis,
-                        )),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-            )
-          : ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: filteredRecipes.length,
-              itemBuilder: (context, index) {
-                Recipe recipe = filteredRecipes[index];
-                bool isSelected = _selectedMeals[mealPeriod]?.any(
-                        (allocation) => allocation.recipeId == recipe.id) ??
-                    false;
-
-                return GestureDetector(
-                  onTap: () => _onRecipeTap(recipe.id!, mealPeriod),
-                  child: Container(
-                    width: 120,
-                    margin: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(15),
-                      border: isSelected
-                          ? Border.all(color: Colors.blue, width: 2)
-                          : null,
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Stack(
-                        children: [
-                          Positioned.fill(
-                            child: recipe.imageUrl.isNotEmpty
-                                ? Image.network(
-                                    recipe.imageUrl,
-                                    fit: BoxFit.cover,
-                                    loadingBuilder:
-                                        (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  (loadingProgress
-                                                          .expectedTotalBytes
-                                                      as int)
-                                              : null,
-                                        ),
-                                      );
-                                    },
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Center(
-                                        child: Icon(
-                                          Icons.broken_image,
-                                          size: 40,
-                                          color: Colors.grey[600],
-                                        ),
-                                      );
-                                    },
-                                  )
-                                : Center(
-                                    child: Icon(
-                                      Icons.image_not_supported,
-                                      size: 40,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.6),
-                                borderRadius: const BorderRadius.vertical(
-                                  bottom: Radius.circular(15),
-                                ),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 8),
-                              child: Text(
-                                recipe.title.length > 8
-                                    ? '${recipe.title.substring(0, 8)}...'
-                                    : recipe.title,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
             ),
+          );
+        },
+      ),
     );
   }
 

@@ -1,52 +1,27 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/providers/all_recipes_provider.dart';
-
-import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
-// import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
-
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/saved_trainer_meal_details.dart';
-import 'package:voltican_fitness/screens/trainee_recipe_detail_screen.dart';
-
+import 'package:voltican_fitness/screens/meal_detail_screen.dart';
+import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/widgets/recipe_item.dart';
 import 'package:voltican_fitness/widgets/recipe_item_trainer.dart';
 
-class TraineeRecipeScreen extends ConsumerStatefulWidget {
+class TraineeRecipeScreen extends StatefulWidget {
   const TraineeRecipeScreen({super.key});
 
   @override
   _TraineeRecipeScreenState createState() => _TraineeRecipeScreenState();
 }
 
-class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
+class _TraineeRecipeScreenState extends State<TraineeRecipeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  String _searchQuery = '';
+  List<Recipe> userRecipes = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _fetchFollowedUsersRecipes();
-    _fetchSavedRecipes();
-  }
-
-  void _fetchFollowedUsersRecipes() {
-    ref.read(allRecipesProvider.notifier).loadAllRecipes(context);
-  }
-
-  void _fetchSavedRecipes() {
-    final user = ref.read(userProvider);
-    if (user == null) {
-      print('Error: User is null');
-      return;
-    }
-    final userId = user.id;
-    ref.read(savedRecipesProvider.notifier).loadSavedRecipes(userId);
   }
 
   @override
@@ -57,22 +32,22 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
 
   void selectMeal(BuildContext context, Recipe meal) {
     Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => TraineeRecipeDetailScreen(meal: meal),
+      builder: (context) => MealDetailScreen(meal: meal),
     ));
   }
 
   void selectRecipe(BuildContext context, Recipe meal) {
     Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => SavedTrainerMealDetailScreen(meal: meal),
+      builder: (context) => TrainerMealDetailScreen(meal: meal),
     ));
   }
 
-  Widget buildMealList(List<Recipe> recipes) {
+  Widget buildMealList() {
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: recipes.length,
+      itemCount: userRecipes.length,
       itemBuilder: (context, index) => RecipeItem(
-        meal: recipes[index],
+        meal: userRecipes[index],
         selectMeal: (meal) {
           selectMeal(context, meal);
         },
@@ -80,12 +55,12 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
     );
   }
 
-  Widget buildRecipeList(List<Recipe> recipes) {
+  Widget buildRecipeList() {
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: recipes.length,
+      itemCount: userRecipes.length,
       itemBuilder: (context, index) => RecipeItemTrainer(
-        meal: recipes[index],
+        meal: userRecipes[index],
         selectMeal: (meal) {
           selectRecipe(context, meal);
         },
@@ -93,27 +68,8 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
     );
   }
 
-  void _updateSearchQuery(String newQuery) {
-    setState(() {
-      _searchQuery = newQuery;
-    });
-  }
-
-  List<Recipe> _filterRecipes(List<Recipe> recipes) {
-    if (_searchQuery.isEmpty) {
-      return recipes;
-    }
-    return recipes
-        .where((recipe) =>
-            recipe.title.toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final savedRecipes = ref.watch(savedRecipesProvider);
-    final allRecipes = ref.watch(allRecipesProvider);
-
     return Container(
       width: double.infinity,
       height: double.maxFinite,
@@ -160,18 +116,7 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          TextField(
-            onChanged: _updateSearchQuery,
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.search),
-              hintText: 'Search Recipes...',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
           TabBar(
             controller: _tabController,
             indicatorColor: Colors.red,
@@ -187,21 +132,49 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                // Showing all recipes in the "Explore" tab
-                allRecipes.isEmpty
-                    ? const Center(
-                        child: Text('No followed recipes found.'),
-                      )
-                    : buildMealList(_filterRecipes(allRecipes)),
-                // Showing saved recipes in the "Saved Recipe" tab
-                savedRecipes.isEmpty
-                    ? const Center(
-                        child: Text('No saved recipes found.'),
-                      )
-                    : buildRecipeList(_filterRecipes(savedRecipes)),
+                buildTabContent(),
+                buildRecipeTabContent(),
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildTabContent() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: buildSearchBar()),
+              buildFilterIcon(),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Expanded(child: buildMealList()),
+        ],
+      ),
+    );
+  }
+
+  Widget buildRecipeTabContent() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: buildSearchBar()),
+              buildFilterIcon(),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Expanded(child: buildRecipeList()),
         ],
       ),
     );
@@ -222,7 +195,6 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
         ],
       ),
       child: TextField(
-        onChanged: _updateSearchQuery,
         decoration: InputDecoration(
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 20, vertical: 15),

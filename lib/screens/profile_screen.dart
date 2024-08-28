@@ -1,4 +1,6 @@
-// ignore_for_file: avoid_print, use_build_context_synchronously
+// ignore_for_file: avoid_print
+
+import 'dart:io';
 
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +9,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/update_profile_screen.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/widgets/copy_to_clipboard.dart';
 import 'package:voltican_fitness/widgets/status_toggle_button.dart';
 
@@ -20,7 +21,6 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String? _imageUrl;
-  AuthService authService = AuthService();
 
   final ImagePicker _picker = ImagePicker();
 
@@ -40,7 +40,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Future<void> _updateProfile(XFile imageFile) async {
-    final cloudinary = CloudinaryPublic('daq5dsnqy', 'jqx9kpde');
+    final cloudinary =
+        CloudinaryPublic('your-cloudinary-cloud-name', 'your-upload-preset');
 
     // Upload image to Cloudinary
     CloudinaryResponse uploadResult = await cloudinary.uploadFile(
@@ -50,16 +51,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final image = uploadResult.secureUrl;
     print('Image URL: $image');
 
-    final userId = ref.read(userProvider)?.id;
-
-    if (userId == null) {
-      print('User ID is null, cannot update profile image.');
-      return;
-    }
-
-    await authService.updateImage(
-        context: context, imageUrl: image, id: userId);
-
     // Here you would typically update the user's profile with the new image URL.
     ref.read(userProvider.notifier).updateImageUrl(imageUrl: image);
   }
@@ -67,18 +58,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
-
-    if (user == null) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Profile'),
-          centerTitle: true,
-        ),
-        body: const Center(
-          child: Text('User data not found.'),
-        ),
-      );
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -89,20 +68,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            _ProfileHeader(
-              imageUrl: user.imageUrl ?? _imageUrl,
-              onEdit: _pickImage,
-            ),
+            _ProfileHeader(imageUrl: _imageUrl, onEdit: _pickImage),
             const SizedBox(height: 20),
-            _ProfileInfo(user: user),
+            _ProfileInfo(user: user!),
             const SizedBox(height: 20),
             const StatusToggleButton(),
             const SizedBox(height: 20),
             _EditProfileButton(),
             const SizedBox(height: 50),
-            CopyToClipboardWidget(
-              textToCopy: user.code ?? 'No code available',
-            ),
+            CopyToClipboardWidget(textToCopy: user.code!)
           ],
         ),
       ),
@@ -129,7 +103,7 @@ class __ProfileHeaderState extends State<_ProfileHeader> {
           CircleAvatar(
             radius: 60,
             backgroundImage: widget.imageUrl != null
-                ? NetworkImage(widget.imageUrl!)
+                ? FileImage(File(widget.imageUrl!))
                 : const AssetImage('assets/images/default_profile.png')
                     as ImageProvider,
             backgroundColor: Colors.grey.shade200,

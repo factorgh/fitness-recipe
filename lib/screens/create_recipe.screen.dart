@@ -1,14 +1,11 @@
-// ignore_for_file: use_build_context_synchronously, avoid_print
+// ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
-
 import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/providers/user_recipes.dart';
 
 import 'package:voltican_fitness/screens/meal_creation.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
@@ -29,8 +26,6 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
   File? _selectedImage;
 
   String? selectedMealPeriod;
-  bool isPrivate = false;
-  String? status;
 
   final List<String> mealPeriods = [
     'Breakfast',
@@ -98,23 +93,17 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
 
     try {
       await recipeService.createRecipe(
-          context,
-          Recipe(
-              title: _mealNameController.text,
-              ingredients: _ingredientsController.text.split(","),
-              instructions: _instructionsController.text,
-              description: _descriptionController.text,
-              facts: _nutritionalFactsController.text,
-              status: status!,
-              period: selectedMealPeriod!,
-              imageUrl: _selectedImage!.path,
-              createdBy: user.id,
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now()));
+        context: context,
+        title: _mealNameController.text,
+        description: _descriptionController.text,
+        ingredients: _ingredientsController.text.split(","),
+        instructions: _instructionsController.text,
+        facts: _nutritionalFactsController.text,
+        imageUrl: _selectedImage!,
+        period: selectedMealPeriod!,
+        createdBy: user,
+      );
       setState(() {});
-      await Future.delayed(Duration.zero, () {
-        ref.read(userRecipesProvider.notifier).loadUserRecipes();
-      });
       // Optionally handle success (e.g., show a success message)
     } catch (e) {
       // Handle any errors (e.g., show an error message)
@@ -224,11 +213,10 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
               const SizedBox(height: 10),
               _buildMultilineTextField(
                 controller: _ingredientsController,
-                hintText:
-                    'Which ingredients were used in this recipe?..Example 2 cups of rice,1 teaspoon of salt,..',
+                hintText: 'Which ingredients were used in this recipe?',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter the ingredients .';
+                    return 'Please enter the ingredients';
                   }
                   return null;
                 },
@@ -293,32 +281,6 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                   'Selected recipe category: $selectedMealPeriod',
                   style: const TextStyle(fontSize: 16),
                 ),
-
-              const SizedBox(height: 20),
-              // Swictch for recipe status
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    isPrivate ? 'Public' : 'Private',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Switch(
-                    value: isPrivate,
-                    onChanged: (value) {
-                      setState(() {
-                        isPrivate = value;
-                        status = isPrivate ? 'public' : 'private';
-                      });
-
-                      print(status);
-                    },
-                  ),
-                ],
-              ),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),

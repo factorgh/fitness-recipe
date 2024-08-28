@@ -1,51 +1,18 @@
-// ignore_for_file: avoid_print, use_build_context_synchronously
+// ignore_for_file: avoid_print
 
-import 'package:flutter/material.dart';
 import 'package:voltican_fitness/classes/dio_client.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
-import 'package:voltican_fitness/services/noti_setup.dart';
-import 'package:voltican_fitness/utils/native_alert.dart';
 
 class MealPlanService {
   final DioClient client = DioClient();
-  final alerts = NativeAlerts();
-
-// For a success alert
-
-// For an error alert
-
   // Create a new meal plan
-
-  Future<MealPlan> createMealPlan(
-      MealPlan mealPlan, BuildContext context) async {
+  Future<MealPlan> createMealPlan(MealPlan mealPlan) async {
     try {
       final response =
           await client.dio.post('/meal-plans', data: mealPlan.toJson());
-
-      // Deserialize the response to a MealPlan object
-      MealPlan createdMealPlan = MealPlan.fromJson(response.data);
-
-      // Schedule notifications after successfully creating the meal plan
-      final notificationService = NotificationService();
-      await notificationService.scheduleMealPlanNotifications(
-        mealPlanId: createdMealPlan.id!,
-        creationDate: DateTime.now(),
-        days: createdMealPlan.days,
-        recipeAllocations: createdMealPlan.recipeAllocations,
-        trainees: createdMealPlan.trainees,
-      );
-      NativeAlerts()
-          .showSuccessAlert(context, "Meal plan created successfully");
-
-      return createdMealPlan;
+      return MealPlan.fromJson(response.data);
     } catch (e) {
-      // Log the error (you can also use any logging library)
-      debugPrint('Error creating meal plan: $e');
-
-      // Display a snackbar with a user-friendly error message
-      NativeAlerts().showErrorAlert(context,
-          'Failed to create meal plan. Please check days or duration or trainees on plan to avoid conflicts.');
-      // Re-throw the error if you want to handle it further up the call stack
+      // Handle error
       throw Exception('Failed to create meal plan: $e');
     }
   }
@@ -61,18 +28,14 @@ class MealPlanService {
     }
   }
 
-  Future<MealPlan> updateMealPlan(String mealPlanId, MealPlan mealPlan) async {
+  // Update an existing meal plan
+  Future<MealPlan> updateMealPlan(String id, MealPlan mealPlan) async {
     try {
-      final response = await client.dio
-          .put('/meal-plans/$mealPlanId', data: mealPlan.toJson());
-
-      if (response.statusCode == 200) {
-        return MealPlan.fromJson(response.data);
-      } else {
-        throw Exception(
-            'Failed to update meal plan: ${response.statusCode} ${response.statusMessage}');
-      }
+      final response =
+          await client.dio.put('/meal-plans/$id', data: mealPlan.toJson());
+      return MealPlan.fromJson(response.data);
     } catch (e) {
+      // Handle error
       throw Exception('Failed to update meal plan: $e');
     }
   }
@@ -103,13 +66,11 @@ class MealPlanService {
   Future<List<MealPlan>> fetchMealPlansByTrainee(String traineeId) async {
     try {
       final response = await client.dio.get('/meal-plans/trainee/$traineeId');
-      print('Response data: ${response.data}');
       return (response.data as List)
           .map((mealPlanData) => MealPlan.fromJson(mealPlanData))
           .toList();
     } catch (e) {
-      print('Failed to fetch meal plans: $e');
-      throw Exception('Failed to fetch meal plans from serverRR');
+      throw Exception('Failed to fetch meal plans');
     }
   }
 }

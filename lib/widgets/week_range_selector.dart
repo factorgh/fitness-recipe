@@ -2,13 +2,8 @@ import 'package:flutter/material.dart';
 
 class WeekRangeSelector extends StatefulWidget {
   final void Function(List<String> selectedDays) onSelectionChanged;
-  final List<String>? initialSelectedDays;
 
-  const WeekRangeSelector({
-    required this.onSelectionChanged,
-    this.initialSelectedDays,
-    super.key,
-  });
+  const WeekRangeSelector({required this.onSelectionChanged, super.key});
 
   @override
   _WeekRangeSelectorState createState() => _WeekRangeSelectorState();
@@ -24,27 +19,16 @@ class _WeekRangeSelectorState extends State<WeekRangeSelector> {
     'Sat',
     'Sun'
   ];
-  late List<String> _selectedDays;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedDays = widget.initialSelectedDays ?? [];
-  }
-
-  @override
-  void didUpdateWidget(covariant WeekRangeSelector oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.initialSelectedDays != oldWidget.initialSelectedDays) {
-      _selectedDays = widget.initialSelectedDays ?? [];
-    }
-  }
+  final List<String> _selectedDays = [];
 
   void _onDayTap(String day) {
     setState(() {
       if (_selectedDays.contains(day)) {
         _selectedDays.remove(day);
       } else {
+        if (_selectedDays.length == 2) {
+          _selectedDays.clear();
+        }
         _selectedDays.add(day);
       }
       widget.onSelectionChanged(_selectedDays);

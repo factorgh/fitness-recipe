@@ -1,14 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/providers/user_recipes.dart';
-
+import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
+import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
-import 'package:voltican_fitness/screens/meal_creation.dart';
-
 import 'package:voltican_fitness/widgets/button.dart';
 
 class MealDetailScreen extends ConsumerStatefulWidget {
@@ -54,15 +53,11 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
               child: const Text('Delete'),
               onPressed: () async {
                 Navigator.of(context).pop();
-                Navigator.of(context).pop();
                 await ref
-                    .read(userRecipesProvider.notifier)
+                    .read(savedRecipesProvider.notifier)
                     .deleteRecipe(widget.meal.id!);
-                Navigator.of(context).pop();
 
-                // await Future.delayed(Duration.zero, () {
-                //   ref.read(userRecipesProvider.notifier).loadUserRecipes();
-                // });
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -74,6 +69,31 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // floatingActionButton: SpeedDial(
+      //   animatedIcon: AnimatedIcons.menu_close,
+      //   animatedIconTheme: const IconThemeData(size: 28.0),
+      //   backgroundColor: Colors.green[900],
+      //   visible: true,
+      //   curve: Curves.bounceInOut,
+      //   children: [
+      //     SpeedDialChild(
+      //       child: const Icon(Icons.accessibility),
+      //       backgroundColor: Colors.blue,
+      //       label: 'Accessibility',
+      //       onTap: () {
+      //         print('Accessibility tapped');
+      //       },
+      //     ),
+      //     SpeedDialChild(
+      //       child: const Icon(Icons.add),
+      //       backgroundColor: Colors.red,
+      //       label: 'Add',
+      //       onTap: () {
+      //         print('Add tapped');
+      //       },
+      //     ),
+      //   ],
+      // ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -134,6 +154,32 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
+                        // IconButton(
+                        //   icon: Icon(
+                        //     isFollowing
+                        //         ? Icons.person_remove
+                        //         : Icons.person_add,
+                        //     color: Colors.white,
+                        //     size: 30,
+                        //   ),
+                        //   onPressed: () {
+                        //     setState(() {
+                        //       isFollowing = !isFollowing;
+                        //     });
+                        //   },
+                        // ),
+                        // ElevatedButton(
+                        //   style: ElevatedButton.styleFrom(
+                        //     foregroundColor: Colors.red, // background color
+                        //     backgroundColor: Colors.white, // text color
+                        //   ),
+                        //   onPressed: () {
+                        //     setState(() {
+                        //       isFollowing = !isFollowing;
+                        //     });
+                        //   },
+                        //   child: Text(isFollowing ? 'Following' : 'Follow'),
+                        // ),
                         IconButton(
                           icon: const Icon(
                             Icons.share,
@@ -172,27 +218,47 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      RatingStars(
+                        value: value,
+                        onValueChanged: (v) {
+                          setState(() {
+                            value = v;
+                          });
+                        },
+                        starCount: 5,
+                        starSpacing: 2,
+                        valueLabelVisibility: true,
+                        maxValue: 5,
+                        starOffColor: const Color(0xffe7e8ea),
+                        starColor: Colors.yellow,
+                      ),
+                      const SizedBox(width: 10),
+                      const Text("(32 Reviews)"),
+                    ],
+                  ),
                   const SizedBox(height: 20),
                   const Text(
-                    'Description',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                  ),
-                  Text(
-                    widget.meal.description,
-                    style: const TextStyle(color: Colors.black54),
+                    "psum passages, and more recently with desk publishing software like Aldus PageMaker \n"
+                    "psum passages, and more recently with desk publishing software like Aldus PageMaker  .",
+                    style: TextStyle(color: Colors.black38),
                   ),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Status',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w500),
+                        'Private',
+                        style: TextStyle(fontSize: 16),
                       ),
-                      Text(
-                        widget.meal.status,
-                        style: const TextStyle(fontSize: 16),
+                      Switch(
+                        value: isPrivate,
+                        onChanged: (value) {
+                          setState(() {
+                            isPrivate = value;
+                          });
+                        },
                       ),
                     ],
                   ),
@@ -207,36 +273,26 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                       SizedBox(width: 5),
                       Text(
                         'Ingredients',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w500),
+                        style: TextStyle(fontSize: 16),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: widget.meal.ingredients.map((ingredient) {
-                        return Row(
-                          children: [
-                            const Icon(
-                              Icons.check_circle_outline,
-                              color: Colors.green,
-                            ),
-                            const SizedBox(width: 12.0),
-                            Expanded(
-                              child: Text(
-                                ingredient,
-                                style: const TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
-                    ),
+                  const Text(
+                    '1 Cucumber (38 Cal)',
+                    style: TextStyle(color: Colors.black38),
+                  ),
+                  const Text(
+                    '2 Cups of rice',
+                    style: TextStyle(color: Colors.black38),
+                  ),
+                  const Text(
+                    '2 teaspoons of honey',
+                    style: TextStyle(color: Colors.black38),
+                  ),
+                  const Text(
+                    '1 tablespoon of salt',
+                    style: TextStyle(color: Colors.black38),
                   ),
                   const SizedBox(height: 30),
                   const Row(
@@ -249,40 +305,26 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                       SizedBox(width: 5),
                       Text(
                         'Instructions',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w500),
+                        style: TextStyle(fontSize: 16),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      widget.meal.instructions,
-                    ),
+                  const Text(
+                    '1. psum passages, and more recently with desk  ',
+                    style: TextStyle(color: Colors.black38),
                   ),
-                  const SizedBox(height: 30),
-                  const Row(
-                    children: [
-                      Icon(
-                        Icons.text_snippet,
-                        size: 25,
-                        color: Colors.orange,
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        'Nutritional facts',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w500),
-                      ),
-                    ],
+                  const Text(
+                    '2. psum passages, and more recently with desk',
+                    style: TextStyle(color: Colors.black38),
                   ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      widget.meal.facts,
-                    ),
+                  const Text(
+                    '3. psum passages, and more recently with desk ',
+                    style: TextStyle(color: Colors.black38),
+                  ),
+                  const Text(
+                    '4. psum passages, and more recently with desk ',
+                    style: TextStyle(color: Colors.black38),
                   ),
                   const SizedBox(height: 30),
                   InkWell(
@@ -302,8 +344,7 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                   InkWell(
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              MealCreationScreen(selectedDay: DateTime.now())));
+                          builder: (context) => const AssignRecipeScreen()));
                     },
                     splashColor: Colors.purple,
                     child: const ButtonWidget(

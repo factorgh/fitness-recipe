@@ -1,226 +1,35 @@
-// ignore_for_file: unused_local_variable, avoid_print
-
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
-import 'package:voltican_fitness/models/mealplan.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  // Future<void> init() async {
-  //   tz.initializeTimeZones();
-
-  //   const AndroidInitializationSettings initializationSettingsAndroid =
-  //       AndroidInitializationSettings('@mipmap/ic_launcher');
-
-  //   const InitializationSettings initializationSettings =
-  //       InitializationSettings(android: initializationSettingsAndroid);
-
-  //   await _flutterLocalNotificationsPlugin.initialize(
-  //     initializationSettings,
-  //     // onSelectNotification: (String? payload) async {
-  //     //   if (payload != null) {
-  //     //     print('Notification payload: $payload');
-  //     //     // Navigate to a specific screen or perform any action
-  //     //     // Example: Navigator.of(context).pushNamed('/meal-details', arguments: payload);
-  //     //   }
-  //     // },
-  //   );
-
-  //   // Define notification channel for Android
-  //   const AndroidNotificationChannel channel = AndroidNotificationChannel(
-  //     'mealplanid', // ID of the channel
-  //     'Meal Plan Notifications', // Name of the channel
-  //     description: 'Notifications for meal plans',
-  //     importance: Importance.max,
-  //     sound: RawResourceAndroidNotificationSound('notification_sound'),
-  //   );
-
-  //   await _flutterLocalNotificationsPlugin
-  //       .resolvePlatformSpecificImplementation<
-  //           AndroidFlutterLocalNotificationsPlugin>()
-  //       ?.createNotificationChannel(channel);
-  // }
-
   Future<void> init() async {
-    tz.initializeTimeZones();
-
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    // Updated iOS Initialization settings using DarwinInitializationSettings
-    final DarwinInitializationSettings initializationSettingsIOS =
-        DarwinInitializationSettings(
-            requestSoundPermission: true,
-            requestBadgePermission: true,
-            requestAlertPermission: true,
-            onDidReceiveLocalNotification: (
-              int id,
-              String? title,
-              String? body,
-              String? payload,
-            ) async {
-              // Handle when a notification is received while the app is in the foreground
-            });
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
 
-    // Combine Android and iOS settings
-    final InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS:
-          initializationSettingsIOS, // Using DarwinInitializationSettings for iOS
-    );
-
-    await _flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      // onSelectNotification: (String? payload) async {
-      //   if (payload != null) {
-      //     print('Notification payload: $payload');
-      //     // Navigate to a specific screen or perform any action
-      //     // Example: Navigator.of(context).pushNamed('/meal-details', arguments: payload);
-      //   }
-      // },
-    );
-
-    // Define notification channel for Android
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'mealplanid', // ID of the channel
-      'Meal Plan Notifications', // Name of the channel
-      description: 'Notifications for meal plans',
+  Future<void> showNotification(String title, String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'your_channel_id',
+      'your_channel_name',
       importance: Importance.max,
-      sound: RawResourceAndroidNotificationSound('notification_sound'),
+      priority: Priority.high,
+      showWhen: false,
     );
-
-    await _flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
-  }
-
-  Future<void> scheduleNotification({
-    required int id,
-    required String title,
-    required String body,
-    required DateTime scheduledDate,
-    String? payload,
-  }) async {
-    try {
-      await _flutterLocalNotificationsPlugin.zonedSchedule(
-        id,
-        title,
-        body,
-        tz.TZDateTime.from(scheduledDate, tz.local),
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'mealplanid',
-            'Meal Plan Notifications',
-            channelDescription: 'Notifications for meal plans',
-            importance: Importance.max,
-            priority: Priority.high,
-          ),
-        ),
-        payload: payload,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        // Disable exact alarms if the platform does not support them
-        matchDateTimeComponents: DateTimeComponents.dateAndTime,
-      );
-    } catch (e) {
-      print('Error scheduling notification: $e');
-    }
-  }
-
-  Future<void> requestNotificationPermission() async {
-    final status = await Permission.notification.request();
-    if (status.isGranted) {
-      // Permission granted
-    } else {
-      // Permission denied
-    }
-  }
-
-  Future<void> scheduleMealPlanNotifications({
-    required String mealPlanId,
-    required DateTime creationDate,
-    required List<String> days,
-    required List<RecipeAllocation> recipeAllocations,
-    required List<String> trainees,
-  }) async {
-    // Notify trainees when a new meal plan is created
-    for (var traineeId in trainees) {
-      await scheduleNotification(
-        id: _generateNotificationId(),
-        title: 'New Meal Plan Created',
-        body: 'A new meal plan has been created. Check it out!',
-        scheduledDate: creationDate,
-        payload: 'meal_plan_$mealPlanId',
-      );
-    }
-
-    // Schedule daily reminders based on recipe allocation
-    for (var allocation in recipeAllocations) {
-      DateTime allocatedTime = allocation.allocatedTime;
-
-      // Schedule notifications for each trainee on specific days
-      for (var trainee in trainees) {
-        for (var day in days) {
-          DateTime scheduledDate = _nextInstanceOfDay(allocatedTime, day);
-
-          await scheduleNotification(
-            id: _generateNotificationId(),
-            title: 'Meal Reminder',
-            body:
-                'You have a meal plan scheduled at ${allocatedTime.hour}:${allocatedTime.minute}.',
-            scheduledDate: scheduledDate,
-            payload: 'meal_plan_$mealPlanId',
-          );
-        }
-      }
-    }
-  }
-
-  int _generateNotificationId() {
-    return DateTime.now().millisecondsSinceEpoch.remainder(100000);
-  }
-
-  DateTime _nextInstanceOfDay(DateTime time, String day) {
-    DateTime now = DateTime.now();
-    int dayDiff = _dayDiff(day);
-
-    DateTime scheduledDate = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      time.hour,
-      time.minute,
-    ).add(Duration(days: dayDiff));
-
-    return scheduledDate.isBefore(now)
-        ? scheduledDate.add(const Duration(days: 7))
-        : scheduledDate;
-  }
-
-  int _dayDiff(String day) {
-    switch (day) {
-      case 'Mon':
-        return (DateTime.monday - DateTime.now().weekday + 7) % 7;
-      case 'Tue':
-        return (DateTime.tuesday - DateTime.now().weekday + 7) % 7;
-      case 'Wed':
-        return (DateTime.wednesday - DateTime.now().weekday + 7) % 7;
-      case 'Thu':
-        return (DateTime.thursday - DateTime.now().weekday + 7) % 7;
-      case 'Fri':
-        return (DateTime.friday - DateTime.now().weekday + 7) % 7;
-      case 'Sat':
-        return (DateTime.saturday - DateTime.now().weekday + 7) % 7;
-      case 'Sun':
-        return (DateTime.sunday - DateTime.now().weekday + 7) % 7;
-      default:
-        return 0;
-    }
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+    await _flutterLocalNotificationsPlugin.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: 'item x',
+    );
   }
 }

@@ -1,16 +1,13 @@
-// ignore_for_file: use_build_context_synchronously, avoid_print
+// ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
-import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/providers/user_recipes.dart';
-import 'package:voltican_fitness/services/recipe_service.dart';
+
 import 'package:voltican_fitness/widgets/custom_button.dart';
 
 class EditRecipeScreen extends ConsumerStatefulWidget {
@@ -24,10 +21,7 @@ class EditRecipeScreen extends ConsumerStatefulWidget {
 class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
   File? _selectedImage;
   String? selectedMealPeriod;
-  bool _isLoading = false;
-  String? cldImage;
-  String? status;
-  bool isPrivate = false;
+  bool _isLoading = false; // Track the loading state
 
   final List<String> mealPeriods = [
     'Breakfast',
@@ -43,8 +37,6 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
   final TextEditingController _nutritionalFactsController =
       TextEditingController();
 
-  final RecipeService recipeService = RecipeService();
-
   @override
   void initState() {
     super.initState();
@@ -54,14 +46,14 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
         widget.recipe.ingredients.join(","); // Convert list to string
     _instructionsController.text = widget.recipe.instructions;
     _nutritionalFactsController.text = widget.recipe.facts;
+    // Initialize the image if URL exists
     if (widget.recipe.imageUrl.isNotEmpty) {
-      cldImage = widget.recipe.imageUrl;
+      _selectedImage = null; // We don't need to use File for network images
     }
     selectedMealPeriod = widget.recipe.period;
-    status = widget.recipe.status;
   }
 
-  Future<void> _takePicture() async {
+  void _takePicture() async {
     final imagePicker = ImagePicker();
     final pickedImage =
         await imagePicker.pickImage(source: ImageSource.gallery);
@@ -75,13 +67,13 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
     });
   }
 
-  Future<void> _saveRecipe() async {
+  void _saveRecipe() async {
     setState(() {
-      _isLoading = true;
+      _isLoading = true; // Set loading state to true
     });
 
     try {
-      final user = ref.read(userProvider);
+      final user = ref.watch(userProvider);
       final updatedRecipe = Recipe(
         id: widget.recipe.id,
         title: _mealNameController.text,
@@ -89,87 +81,39 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
         ingredients: _ingredientsController.text.split(","),
         instructions: _instructionsController.text,
         facts: _nutritionalFactsController.text,
-        status: status!,
         imageUrl: _selectedImage != null
             ? await _uploadImage()
             : widget.recipe.imageUrl,
         updatedAt: DateTime.now(),
-        createdAt: widget.recipe.createdAt,
+        createdAt: widget.recipe.createdAt, // Use the existing creation date
         createdBy: user!.id,
         period: selectedMealPeriod!,
       );
 
       await ref
-          .read(userRecipesProvider.notifier)
+          .read(savedRecipesProvider.notifier)
           .updateRecipe(widget.recipe.id as String, updatedRecipe);
 
       Navigator.of(context).pop();
-      Navigator.of(context).pop();
     } catch (e) {
+      // Handle errors if needed
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to save recipe: $e')),
       );
     } finally {
       setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _createRecipe(User user) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      await recipeService.createRecipe(
-        context,
-        Recipe(
-          title: _mealNameController.text,
-          ingredients: _ingredientsController.text.split(","),
-          instructions: _instructionsController.text,
-          description: _descriptionController.text,
-          status: status!,
-          facts: _nutritionalFactsController.text,
-          period: selectedMealPeriod!,
-          imageUrl: _selectedImage!.path,
-          createdBy: user.id,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-      );
-      ref
-          .read(savedRecipesProvider.notifier)
-          .removeSavedRecipe(user.id, widget.recipe.id!);
-
-      await ref.read(userRecipesProvider.notifier).loadUserRecipes();
-      Navigator.of(context).pop(); // Navigate back after saving
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to create recipe: $e')),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
+        _isLoading = false; // Set loading state to false
       });
     }
   }
 
   Future<String> _uploadImage() async {
-    final cloudinary = CloudinaryPublic('daq5dsnqy', 'jqx9kpde');
-    CloudinaryResponse uploadResult = await cloudinary.uploadFile(
-      CloudinaryFile.fromFile(_selectedImage!.path, folder: 'voltican_fitness'),
-    );
-    final image = uploadResult.secureUrl;
-    print('Image URL: $image');
-
-    return image; // Return the actual image URL
+    // Implement image upload logic here
+    return 'uploaded_image_url';
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.read(userProvider);
-
     Widget content;
 
     if (_selectedImage != null) {
@@ -186,7 +130,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
       content = ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Image.network(
-          cldImage!,
+          widget.recipe.imageUrl,
           fit: BoxFit.cover,
           width: double.infinity,
           height: 200,
@@ -315,12 +259,14 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: TextFormField(
+                child: TextField(
                   controller: _descriptionController,
-                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  minLines: 1,
+                  maxLines: 4,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'Enter description',
+                    hintText: 'Enter recipe description',
                     contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),
@@ -344,12 +290,14 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: TextFormField(
+                child: TextField(
                   controller: _ingredientsController,
-                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  minLines: 1,
+                  maxLines: 4,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'Enter ingredients separated by commas',
+                    hintText: 'Which ingredients were used in this recipe?',
                     contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),
@@ -373,12 +321,14 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: TextFormField(
+                child: TextField(
                   controller: _instructionsController,
-                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  minLines: 1,
+                  maxLines: 4,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'Enter instructions',
+                    hintText: 'Enter the instructions for the recipe',
                     contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
                 ),
@@ -402,9 +352,11 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: TextFormField(
+                child: TextField(
                   controller: _nutritionalFactsController,
-                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  minLines: 1,
+                  maxLines: 4,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     hintText: 'Enter nutritional facts',
@@ -423,59 +375,40 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            DropdownButton<String>(
-              value: selectedMealPeriod,
-              items: mealPeriods.map((period) {
-                return DropdownMenuItem<String>(
-                  value: period,
-                  child: Text(period),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedMealPeriod = value;
-                });
-              },
-              hint: const Text('Select meal period'),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.black38),
+              ),
+              child: DropdownButton<String>(
+                value: selectedMealPeriod,
+                items: mealPeriods.map((period) {
+                  return DropdownMenuItem(
+                    value: period,
+                    child: Text(period),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedMealPeriod = value;
+                  });
+                },
+                underline: Container(),
+                isExpanded: true,
+              ),
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  isPrivate ? 'Public' : 'Private',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Switch(
-                  value: isPrivate,
-                  onChanged: (value) {
-                    setState(() {
-                      isPrivate = value;
-                      status = isPrivate ? 'public' : 'private';
-                    });
-
-                    print(status);
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 30),
             _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : CustomButton(
-                    textColor: Colors.white,
-                    size: 20,
-                    backColor: Colors.red,
                     width: double.infinity,
-                    text: widget.recipe.id != null
-                        ? 'Save Recipe'
-                        : 'Create Recipe',
-                    onPressed: () => user!.id == widget.recipe.createdBy
-                        ? _saveRecipe()
-                        : _createRecipe(user)),
+                    size: 15,
+                    backColor: Colors.red,
+                    textColor: Colors.white,
+                    text: 'Save Recipe',
+                    onPressed: _saveRecipe,
+                  ),
           ],
         ),
       ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/meal_plan_state.dart';
-import 'package:voltican_fitness/providers/trainee_mealplans_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/widgets/calendar_item.dart';
 
@@ -14,23 +14,37 @@ class AllMealPlanTrainee extends ConsumerStatefulWidget {
 }
 
 class _AllMealPlanTraineeState extends ConsumerState<AllMealPlanTrainee> {
-  // DateTime? _selectedDate;
-  // String _selectedDuration = 'Does Not Repeat';
+  DateTime? _selectedDate;
+  String _selectedDuration = 'Does Not Repeat';
 
   @override
   void initState() {
     super.initState();
+
+    // Defer the call to after widget build
     Future.microtask(() {
-      final traineeId = ref.read(userProvider)!.id;
-      ref
-          .read(traineeMealPlansProvider.notifier)
-          .fetchTraineeMealPlans(traineeId);
+      final traineeId = ref.read(userProvider)?.id; // Using ref.read here
+      ref.read(mealPlansProvider.notifier).fetchMealPlansByTrainee(traineeId!);
     });
+  }
+
+  Future<void> _pickDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final mealPlansState = ref.watch(traineeMealPlansProvider);
+    final mealPlansState = ref.watch(mealPlansProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -43,14 +57,44 @@ class _AllMealPlanTraineeState extends ConsumerState<AllMealPlanTrainee> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'All Meal Plans',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+              'My Meal Plans',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
             ),
             SizedBox(height: 8),
           ],
         ),
-        actions: const [
-          SizedBox(width: 10),
+        actions: [
+          DropdownButton<String>(
+            elevation: 3,
+            style: const TextStyle(
+                fontSize: 12,
+                color: Colors.orange,
+                fontWeight: FontWeight.w500),
+            value: _selectedDuration,
+            items: [
+              'Does Not Repeat',
+              'Week',
+              'Month',
+              'Quarter',
+              'Half-Year',
+              'Year',
+              'Custom'
+            ]
+                .map((duration) => DropdownMenuItem<String>(
+                      value: duration,
+                      child: Text(duration),
+                    ))
+                .toList(),
+            onChanged: (value) {
+              setState(() {
+                _selectedDuration = value!;
+                ref
+                    .read(mealPlansProvider.notifier)
+                    .filterByDuration(_selectedDuration);
+              });
+            },
+          ),
+          const SizedBox(width: 10),
         ],
       ),
       body: Padding(
@@ -58,7 +102,7 @@ class _AllMealPlanTraineeState extends ConsumerState<AllMealPlanTrainee> {
         child: mealPlansState is MealPlansLoading
             ? const Center(child: CircularProgressIndicator())
             : mealPlansState is MealPlansError
-                ? const Center(child: Text("No meal plans available"))
+                ? Center(child: Text((mealPlansState).error))
                 : mealPlansState is MealPlansLoaded
                     ? mealPlansState.mealPlans.isEmpty
                         ? const Center(child: Text('No meal plans available.'))

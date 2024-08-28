@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/Features/mealplan/services/mealplan_service.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
@@ -32,10 +31,9 @@ class MealPlanNotifier extends StateNotifier<MealPlan?> {
     }
   }
 
-  Future<void> createMealPlan(MealPlan mealPlan, BuildContext context) async {
+  Future<void> createMealPlan(MealPlan mealPlan) async {
     try {
-      final newMealPlan =
-          await _mealPlanService.createMealPlan(mealPlan, context);
+      final newMealPlan = await _mealPlanService.createMealPlan(mealPlan);
       state = newMealPlan; // Update state with newly created meal plan
     } catch (e) {
       print('Failed to create meal plan: $e');
@@ -46,9 +44,7 @@ class MealPlanNotifier extends StateNotifier<MealPlan?> {
     try {
       final updatedMealPlan =
           await _mealPlanService.updateMealPlan(id, mealPlan);
-      state = updatedMealPlan;
-      await _mealPlanService
-          .fetchAllMealPlans(); // Update state with updated meal plan
+      state = updatedMealPlan; // Update state with updated meal plan
     } catch (e) {
       print('Failed to update meal plan: $e');
     }
@@ -87,10 +83,19 @@ class MealPlansNotifier extends StateNotifier<MealPlansState> {
     }
   }
 
-  Future<void> addMealPlan(MealPlan mealPlan, BuildContext context) async {
+  Future<void> fetchMealPlansByTrainee(String traineeId) async {
+    state = const MealPlansLoading();
     try {
-      final newMealPlan =
-          await _mealPlanService.createMealPlan(mealPlan, context);
+      _allMealPlans = await _mealPlanService.fetchMealPlansByTrainee(traineeId);
+      state = MealPlansLoaded(_allMealPlans);
+    } catch (e) {
+      state = MealPlansError('Failed to fetch meal plans: $e');
+    }
+  }
+
+  Future<void> addMealPlan(MealPlan mealPlan) async {
+    try {
+      final newMealPlan = await _mealPlanService.createMealPlan(mealPlan);
       if (state is MealPlansLoaded) {
         _allMealPlans = [..._allMealPlans, newMealPlan];
         filterByDuration('Does Not Repeat'); // Reset filter after adding

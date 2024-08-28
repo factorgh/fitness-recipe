@@ -1,14 +1,10 @@
-// ignore_for_file: unused_element
-
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
-
 // import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
+
 class SliderTrainerLanding extends StatelessWidget {
   final List<String> recipes;
   final List<String> emails;
   final List<String> images;
-  final List<String> ids;
   final Function(String) onTrainerSelected;
 
   const SliderTrainerLanding({
@@ -16,7 +12,6 @@ class SliderTrainerLanding extends StatelessWidget {
     required this.recipes,
     required this.emails,
     required this.images,
-    required this.ids,
     required this.onTrainerSelected,
   });
 
@@ -94,23 +89,24 @@ class SliderTrainerLanding extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: recipes.length,
         itemBuilder: (context, index) {
-          return _buildTrainerItem(context, recipes[index], images[index],
-              emails[index], ids[index]);
+          return _buildTrainerItem(
+              context,
+              recipes[index],
+              images[index],
+              emails[
+                  index]); // Add email data here if available for each trainer);
         },
       ),
     );
   }
 
-  Widget _buildTrainerItem(BuildContext context, String trainer,
-      String imagePath, String email, String id) {
+  Widget _buildTrainerItem(
+      BuildContext context, String trainer, String imagePath, String email) {
+    // Add email data here if available for each trainer) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => TrainerProfileScreen(
-                      userId: id,
-                    )));
+        // Navigator.push(context,
+        //     MaterialPageRoute(builder: (context) => TrainerProfileScreen(user:)));
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 5),
@@ -119,7 +115,7 @@ class SliderTrainerLanding extends StatelessWidget {
             CircleAvatar(
               radius: 40,
               backgroundColor: Colors.black12,
-              backgroundImage: NetworkImage(imagePath),
+              backgroundImage: AssetImage(imagePath),
             ),
             const SizedBox(
               height: 10,

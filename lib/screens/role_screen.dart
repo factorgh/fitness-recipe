@@ -20,43 +20,34 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
   String? selectedRole;
   AuthService authService = AuthService();
   final CodeGenerator codeGenerator = CodeGenerator();
-  bool isLoading = false; // Add this
 
   @override
   void initState() {
     super.initState();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await authService.getMe(context: context, ref: ref);
   }
 
   Future<void> goToTabsScreen(BuildContext ctx) async {
-    setState(() {
-      isLoading = true; // Set loading state to true
-    });
+    if (selectedRole == 'Trainer') {
+      // Perform update functionality here before navigating to the tabs screen
+      await authService.updateRole(
+        context: context,
+        role: "1",
+      );
 
-    try {
-      if (selectedRole == 'Trainer') {
-        // Perform update functionality here before navigating to the tabs screen
-        await authService.updateRole(
-          ref: ref,
-          context: context,
-          role: "1",
-        );
-
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (ctx) => const TabsScreen(
-            userRole: '1',
-          ),
-        ));
-      } else if (selectedRole == 'Trainee') {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (ctx) => const CodeScreen(),
-        ));
-      }
-    } catch (e) {
-      // Handle error here if necessary
-    } finally {
-      setState(() {
-        isLoading = false; // Set loading state to false after processing
-      });
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (ctx) => const TabsScreen(
+          userRole: '1',
+        ),
+      ));
+    } else if (selectedRole == 'Trainee') {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (ctx) => const CodeScreen(),
+      ));
     }
   }
 
@@ -127,8 +118,7 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed:
-                          isLoading ? null : () => goToTabsScreen(context),
+                      onPressed: () => goToTabsScreen(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
@@ -137,16 +127,13 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: isLoading
-                          ? const CircularProgressIndicator(
-                              color: Colors.white) // Show a loading spinner
-                          : const Text(
-                              'Proceed',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                      child: const Text(
+                        'Proceed',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ),

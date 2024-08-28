@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
 import 'package:voltican_fitness/models/user.dart';
@@ -45,13 +44,11 @@ class FollowersNotifier
     }
   }
 
-  Future<void> followTrainer(
-      String trainerId, String trainerToFollowId, BuildContext context) async {
+  Future<void> followTrainer(String trainerId, String trainerToFollowId) async {
     try {
-      await _trainerService.followTrainer(
-          trainerId, trainerToFollowId, context);
+      await _trainerService.followTrainer(trainerId, trainerToFollowId);
       await fetchFollowers(
-          trainerId, 'Followers'); // Refresh followers list with default filter
+          trainerId, 'All'); // Refresh followers list with default filter
     } catch (e) {
       print('Failed to follow trainer: $e');
     }
@@ -65,33 +62,6 @@ class FollowersNotifier
           trainerId, 'All'); // Refresh followers list with default filter
     } catch (e) {
       print('Failed to unfollow trainer: $e');
-    }
-  }
-
-  Future<void> removeFollower(String trainerId, String followerId) async {
-    try {
-      // Optimistically update the state
-      final currentTrainees = state.value?['trainees'] ?? [];
-      final currentTrainers = state.value?['trainers'] ?? [];
-
-      final updatedTrainees =
-          currentTrainees.where((user) => user.id != followerId).toList();
-      final updatedTrainers =
-          currentTrainers.where((user) => user.id != followerId).toList();
-
-      state = AsyncValue.data({
-        'trainees': updatedTrainees,
-        'trainers': updatedTrainers,
-      });
-
-      // Call the service to remove the follower
-      await _trainerService.removeFollower(followerId);
-
-      // Optionally refetch followers from the service if needed
-      await fetchFollowers(trainerId, 'All');
-    } catch (e) {
-      state = AsyncValue.error(e, StackTrace.current);
-      print('Failed to remove follower: $e');
     }
   }
 }
@@ -114,11 +84,9 @@ class FollowingTrainersNotifier extends StateNotifier<AsyncValue<List<User>>> {
     }
   }
 
-  Future<void> followTrainer(
-      String trainerId, String trainerToFollowId, BuildContext context) async {
+  Future<void> followTrainer(String trainerId, String trainerToFollowId) async {
     try {
-      await _trainerService.followTrainer(
-          trainerId, trainerToFollowId, context);
+      await _trainerService.followTrainer(trainerId, trainerToFollowId);
       await fetchFollowingTrainers(
           trainerId); // Refresh following trainers list
     } catch (e) {
@@ -134,28 +102,6 @@ class FollowingTrainersNotifier extends StateNotifier<AsyncValue<List<User>>> {
           trainerId); // Refresh following trainers list
     } catch (e) {
       print('Failed to unfollow trainer: $e');
-    }
-  }
-
-  Future<void> removeFollowingTrainer(
-      String trainerId, String trainerToRemoveId) async {
-    try {
-      // Optimistically update the state
-      final currentFollowing = state.value ?? [];
-
-      final updatedFollowing = currentFollowing
-          .where((user) => user.id != trainerToRemoveId)
-          .toList();
-      state = AsyncValue.data(updatedFollowing);
-
-      // Call the service to unfollow the trainer
-      await _trainerService.unfollowTrainer(trainerToRemoveId);
-
-      // Optionally refetch following trainers from the service if needed
-      await fetchFollowingTrainers(trainerId);
-    } catch (e) {
-      state = AsyncValue.error(e, StackTrace.current);
-      print('Failed to remove following trainer: $e');
     }
   }
 }
@@ -219,7 +165,6 @@ final traineeDetailsProvider =
   final service = ref.watch(traineeServiceProvider);
   return await service.fetchTraineeDetails(traineeIds);
 });
-
 // Dropdown filter providers
 final trainerFilterProvider = StateProvider<String>((ref) => 'All');
 final traineeFilterProvider = StateProvider<String>((ref) => 'All');

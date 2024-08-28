@@ -1,14 +1,18 @@
-import 'package:flutter/foundation.dart';
+// ignore_for_file: avoid_print
+
+import 'dart:convert';
+
+import 'package:voltican_fitness/models/recipe.dart';
 
 class User {
   final String id;
   final String fullName;
-  final String username;
-  final String password;
   final String email;
-  final String? imageUrl;
+  final String username;
   final String role;
-  final List<String> savedRecipes;
+  final String? imageUrl;
+  final String password;
+  final List<Recipe> savedRecipes;
   final List<String> mealPlans;
   final List<String> following;
   final List<String> followers;
@@ -19,69 +23,29 @@ class User {
   User({
     required this.id,
     required this.fullName,
-    required this.username,
-    required this.password,
     required this.email,
-    this.imageUrl,
+    required this.username,
     required this.role,
+    this.imageUrl,
+    required this.password,
     required this.savedRecipes,
     required this.mealPlans,
     required this.following,
-    required this.followers,
+    this.followers = const [],
     this.code,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['_id'] as String? ?? '',
-      fullName: json['fullName'] as String? ?? '',
-      username: json['username'] as String? ?? '',
-      password: json['password'] as String? ?? '',
-      email: json['email'] as String? ?? '',
-      imageUrl: json['imageUrl'] as String?,
-      role: json['role'] as String? ?? '',
-      savedRecipes: List<String>.from(json['savedRecipes'] ?? []),
-      mealPlans: List<String>.from(json['mealPlans'] ?? []),
-      following: List<String>.from(json['following'] ?? []),
-      followers: List<String>.from(json['followers'] ?? []),
-      code: json['code'] as String?,
-      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ??
-          DateTime.now(),
-      updatedAt: DateTime.tryParse(json['updatedAt'] as String? ?? '') ??
-          DateTime.now(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      '_id': id,
-      'fullName': fullName,
-      'username': username,
-      'password': password,
-      'email': email,
-      'imageUrl': imageUrl,
-      'role': role,
-      'savedRecipes': savedRecipes,
-      'mealPlans': mealPlans,
-      'following': following,
-      'followers': followers,
-      'code': code,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-    };
-  }
-
   User copyWith({
     String? id,
     String? fullName,
-    String? username,
-    String? password,
     String? email,
-    String? imageUrl,
+    String? username,
     String? role,
-    List<String>? savedRecipes,
+    String? imageUrl,
+    String? password,
+    List<Recipe>? savedRecipes,
     List<String>? mealPlans,
     List<String>? following,
     List<String>? followers,
@@ -92,11 +56,11 @@ class User {
     return User(
       id: id ?? this.id,
       fullName: fullName ?? this.fullName,
-      username: username ?? this.username,
-      password: password ?? this.password,
       email: email ?? this.email,
-      imageUrl: imageUrl ?? this.imageUrl,
+      username: username ?? this.username,
       role: role ?? this.role,
+      imageUrl: imageUrl ?? this.imageUrl,
+      password: password ?? this.password,
       savedRecipes: savedRecipes ?? this.savedRecipes,
       mealPlans: mealPlans ?? this.mealPlans,
       following: following ?? this.following,
@@ -107,63 +71,58 @@ class User {
     );
   }
 
-  static User get empty => User(
-        id: '',
-        fullName: '',
-        username: '',
-        password: '',
-        email: '',
-        imageUrl: null,
-        role: '',
-        savedRecipes: [],
-        mealPlans: [],
-        following: [],
-        followers: [],
-        code: null,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+  factory User.fromJson(Map<String, dynamic> json) {
+    print('Parsing User from JSON: $json'); // Log the JSON data
+
+    return User(
+      id: json['_id'] as String? ?? '',
+      fullName: json['fullName'] as String? ?? '',
+      email: json['email'] as String? ?? '',
+      username: json['username'] as String? ?? '',
+      role: json['role'] as String? ?? '',
+      imageUrl: json['imageUrl'] as String?,
+      password: json['password'] as String? ?? '',
+      savedRecipes: (json['savedRecipes'] as List<dynamic>?)?.map((item) {
+            print('Parsing Recipe from JSON: $item'); // Log each recipe data
+            return Recipe.fromJson(item as Map<String, dynamic>);
+          }).toList() ??
+          [],
+      following: List<String>.from(json['following'] ?? []),
+      followers: List<String>.from(json['followers'] ?? []),
+      mealPlans: List<String>.from(json['mealPlans'] ?? []),
+      code: json['code'] as String?,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'])
+          : DateTime.now(),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      '_id': id,
+      'fullName': fullName,
+      'email': email,
+      'username': username,
+      'imageUrl': imageUrl,
+      'role': role,
+      'password': password,
+      'savedRecipes': savedRecipes.map((recipe) => recipe.toString()).toList(),
+      'mealPlans': mealPlans,
+      'following': following,
+      'followers': followers,
+      'code': code,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+
+  String toJson() => json.encode(toMap());
 
   @override
   String toString() {
-    return 'User(id: $id, fullName: $fullName, username: $username, password: $password, email: $email, imageUrl: $imageUrl, role: $role, savedRecipes: $savedRecipes, mealPlans: $mealPlans, following: $following, followers: $followers, code: $code, createdAt: $createdAt, updatedAt: $updatedAt)';
-  }
-
-  @override
-  bool operator ==(covariant User other) {
-    if (identical(this, other)) return true;
-
-    return other.id == id &&
-        other.fullName == fullName &&
-        other.username == username &&
-        other.password == password &&
-        other.email == email &&
-        other.imageUrl == imageUrl &&
-        other.role == role &&
-        listEquals(other.savedRecipes, savedRecipes) &&
-        listEquals(other.mealPlans, mealPlans) &&
-        listEquals(other.following, following) &&
-        listEquals(other.followers, followers) &&
-        other.code == code &&
-        other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode ^
-        fullName.hashCode ^
-        username.hashCode ^
-        password.hashCode ^
-        email.hashCode ^
-        imageUrl.hashCode ^
-        role.hashCode ^
-        savedRecipes.hashCode ^
-        mealPlans.hashCode ^
-        following.hashCode ^
-        followers.hashCode ^
-        code.hashCode ^
-        createdAt.hashCode ^
-        updatedAt.hashCode;
+    return 'User{id: $id, fullName: $fullName, email: $email, username: $username, role: $role, imageUrl: $imageUrl, password: $password, savedRecipes: $savedRecipes, mealPlans: $mealPlans, following: $following, followers: $followers, code: $code, createdAt: $createdAt, updatedAt: $updatedAt}';
   }
 }

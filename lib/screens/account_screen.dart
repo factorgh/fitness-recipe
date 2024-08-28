@@ -1,60 +1,33 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
-import 'package:voltican_fitness/utils/native_alert.dart';
 
-class AccountScreen extends ConsumerStatefulWidget {
+class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
 
   @override
   _AccountScreenState createState() => _AccountScreenState();
 }
 
-class _AccountScreenState extends ConsumerState<AccountScreen> {
-  final AuthService authService = AuthService();
+class _AccountScreenState extends State<AccountScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _newPasswordController = TextEditingController();
-
+  final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _obscureNewPassword = true;
-
-  bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    final user = ref.read(
-        userProvider); // Use read to get the current user without causing a rebuild
-    if (user != null) {
-      _emailController.text =
-          user.email; // Initialize the email field with the user's email
-    }
-  }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     _newPasswordController.dispose();
-
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final user =
-        ref.watch(userProvider); // Watch for changes in the userProvider
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Account Management',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
+        title: const Text('Account Management'),
         centerTitle: true,
       ),
       body: Padding(
@@ -89,33 +62,39 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               controller: _newPasswordController,
               label: 'New Password',
               icon: Icons.lock,
-              obscureText: _obscureNewPassword,
+              obscureText: _obscurePassword,
               suffixIcon: IconButton(
                 icon: Icon(
-                  _obscureNewPassword ? Icons.visibility : Icons.visibility_off,
+                  _obscurePassword ? Icons.visibility : Icons.visibility_off,
                 ),
                 onPressed: () {
                   setState(() {
-                    _obscureNewPassword = !_obscureNewPassword;
+                    _obscurePassword = !_obscurePassword;
                   });
                 },
               ),
             ),
             const SizedBox(height: 16),
+            _buildTextField(
+              controller: _confirmPasswordController,
+              label: 'Confirm New Password',
+              icon: Icons.lock,
+              obscureText: _obscurePassword,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+              ),
+            ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () async {
-                setState(() {
-                  _isLoading = true;
-                });
-                await authService.changePassword(
-                    context: context,
-                    email: _emailController.text.trim(),
-                    oldPassword: _passwordController.text.trim(),
-                    newPassword: _newPasswordController.text.trim());
-                setState(() {
-                  _isLoading = false;
-                });
+              onPressed: () {
+                // Add your change password logic here
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
@@ -123,54 +102,15 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                 textStyle:
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              child: _isLoading
-                  ? const CircularProgressIndicator(
-                      color: Colors.white,
-                    )
-                  : const Text(
-                      'Change Password',
-                      style: TextStyle(color: Colors.white),
-                    ),
+              child: const Text(
+                'Change Password',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () async {
-                // Show confirmation dialog before deleting
-                bool? confirmDelete = await showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Confirm Delete'),
-                      content: const Text(
-                          'Are you sure you want to delete your account? This action cannot be undone.'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context)
-                                .pop(false); // Return false when canceled
-                          },
-                          child: const Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context)
-                                .pop(true); // Return true when confirmed
-                          },
-                          child: const Text('Delete'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-
-                // If the user confirmed, proceed with deletion
-                if (confirmDelete == true) {
-                  if (user != null) {
-                    await authService.deleteUser(context: context, id: user.id);
-                  } else {
-                    NativeAlerts().showErrorAlert(context, 'User not found');
-                  }
-                }
+              onPressed: () {
+                // Add your change password logic here
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
