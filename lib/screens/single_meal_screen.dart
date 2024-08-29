@@ -3,13 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
-import 'package:voltican_fitness/models/recipe.dart';
 
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
 import 'package:voltican_fitness/providers/trainer_provider.dart';
 import 'package:voltican_fitness/screens/meal_update_screen.dart';
-// Import trainee provider
 import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:intl/intl.dart';
 
@@ -25,24 +23,32 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
         ref.watch(traineeDetailsProvider(mealPlan.trainees));
 
     // Group recipes by period
-    final Map<String, List<Recipe>> groupedRecipes = {
+    final Map<String, List<Meal>> groupedMeals = {
       'Breakfast': [],
       'Lunch': [],
       'Snack': [],
       'Dinner': [],
     };
 
-    for (final allocation in mealPlan.recipeAllocations) {
+    for (final allocation in mealPlan.meals) {
       try {
-        final recipe = allRecipes.firstWhere(
-          (recipe) => recipe.id == allocation.recipeId,
-        );
-        // Ensure the period exists in groupedRecipes
-        groupedRecipes[recipe.period]?.add(recipe);
+        final meal = allRecipes
+            .where((recipe) => allocation.recipes.contains(recipe))
+            .map((recipe) => Meal(
+                  date: DateTime.now(),
+                  mealType: recipe.period,
+                  recipes: [recipe],
+                  allocatedTime: allocation.allocatedTime,
+                ))
+            .toList();
+
+        for (var meal in meal) {
+          groupedMeals[meal.mealType]?.add(meal);
+        }
       } catch (e) {
         // Handle cases where the recipe is not found
-        print('Recipe with ID ${allocation.recipeId} not found. Error: $e');
-        // Optionally, you could add error handling or a placeholder here if needed
+        print(
+            'Error processing allocation with ID ${allocation.recipes}. Error: $e');
       }
     }
 
@@ -61,15 +67,11 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
             _buildDetailCard("Meal Plan Name", mealPlan.name),
             _buildDetailCard("Duration Selected", mealPlan.duration),
             _buildDateRange(mealPlan.startDate, mealPlan.endDate),
-            _buildDaysForMeal(),
-            _buildAllocatedMeals(groupedRecipes),
+            _buildAllocatedMeals(groupedMeals),
             _buildTraineeCard(context, traineeDetailsAsyncValue),
-            const SizedBox(
-              height: 30,
-            ), // Trainee Card here
+            const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {
-                // _showUpdateBottomSheet(context);
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) =>
                         MealUpdateScreen(mealPlan: mealPlan)));
@@ -225,36 +227,36 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDaysForMeal() {
-    if (mealPlan.days.isNotEmpty) {
-      // Join all the days with a comma to display them in a single line
-      String daysText = mealPlan.days.join(', ');
+  // Widget _buildDaysForMeal() {
+  //   if (mealPlan.days.isNotEmpty) {
+  //     // Join all the days with a comma to display them in a single line
+  //     String daysText = mealPlan.days.join(', ');
 
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Card(
-            elevation: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                daysText,
-                style: const TextStyle(color: Colors.black45, fontSize: 16),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-        ],
-      );
-    }
+  //     return Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Card(
+  //           elevation: 2,
+  //           child: Padding(
+  //             padding: const EdgeInsets.all(8.0),
+  //             child: Text(
+  //               daysText,
+  //               style: const TextStyle(color: Colors.black45, fontSize: 16),
+  //             ),
+  //           ),
+  //         ),
+  //         const SizedBox(height: 20),
+  //       ],
+  //     );
+  //   }
 
-    return _buildDetailCard("", "Repeats Everyday");
-  }
+  //   return _buildDetailCard("", "Repeats Everyday");
+  // }
 
-  Widget _buildAllocatedMeals(Map<String, List<Recipe>> groupedRecipes) {
+  Widget _buildAllocatedMeals(Map<String, List<Meal>> groupedMeals) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: groupedRecipes.entries.map((entry) {
+      children: groupedMeals.entries.map((entry) {
         return entry.value.isNotEmpty
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -269,15 +271,16 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 5),
                   Column(
-                    children: entry.value.map((recipe) {
-                      final allocation = mealPlan.recipeAllocations.firstWhere(
-                          (allocation) => allocation.recipeId == recipe.id);
-
-                      return MealPeriodCard(
-                        mealPeriod: recipe.title,
-                        time1: _formatTime(allocation.allocatedTime),
-                        time2: '', // Add other time logic if needed
-                        image: recipe.imageUrl, // Adjust with your images
+                    children: entry.value.map((meal) {
+                      return Column(
+                        children: meal.recipes.map((recipe) {
+                          return MealPeriodCard(
+                            mealPeriod: entry.key,
+                            time1: _formatTime(meal.allocatedTime),
+                            time2: '', // Add other time logic if needed
+                            image: recipe.imageUrl, // Adjust with your images
+                          );
+                        }).toList(),
                       );
                     }).toList(),
                   ),
@@ -290,8 +293,8 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
   }
 
   String _formatTime(DateTime time) {
-    return time.hour > 12
-        ? '${time.hour - 12}:${time.minute.toString().padLeft(2, '0')} PM'
+    return time.hour >= 12
+        ? '${time.hour > 12 ? time.hour - 12 : time.hour}:${time.minute.toString().padLeft(2, '0')} PM'
         : '${time.hour}:${time.minute.toString().padLeft(2, '0')} AM';
   }
 }

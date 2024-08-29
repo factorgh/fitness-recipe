@@ -30,8 +30,7 @@ class MealPlanService {
       await notificationService.scheduleMealPlanNotifications(
         mealPlanId: createdMealPlan.id!,
         creationDate: DateTime.now(),
-        days: createdMealPlan.days,
-        recipeAllocations: createdMealPlan.recipeAllocations,
+        recipeAllocations: createdMealPlan.meals,
         trainees: createdMealPlan.trainees,
       );
       NativeAlerts()

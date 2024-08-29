@@ -29,16 +29,16 @@ class SingleMealPlanScreenTrainee extends ConsumerWidget {
       'Dinner': [],
     };
 
-    for (final allocation in mealPlan.recipeAllocations) {
+    for (final allocation in mealPlan.meals) {
       try {
         final recipe = allRecipes.firstWhere(
-          (recipe) => recipe.id == allocation.recipeId,
+          (recipe) => recipe.id == allocation.recipes.map((id) => id),
         );
         // Ensure the period exists in groupedRecipes
         groupedRecipes[recipe.period]?.add(recipe);
       } catch (e) {
         // Handle cases where the recipe is not found
-        print('Recipe with ID ${allocation.recipeId} not found. Error: $e');
+        print('Recipe with ID ${allocation.recipes} not found. Error: $e');
         // Optionally, you could add error handling or a placeholder here if needed
       }
     }
@@ -202,30 +202,30 @@ class SingleMealPlanScreenTrainee extends ConsumerWidget {
     );
   }
 
-  Widget _buildDaysForMeal() {
-    if (mealPlan.days.isNotEmpty) {
-      String dayRange = "${mealPlan.days.first} to ${mealPlan.days.last}";
+  // Widget _buildDaysForMeal() {
+  //   if (mealPlan.days.isNotEmpty) {
+  //     String dayRange = "${mealPlan.days.first} to ${mealPlan.days.last}";
 
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Card(
-            elevation: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                dayRange,
-                style: const TextStyle(color: Colors.black45, fontSize: 16),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-        ],
-      );
-    }
+  //     return Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Card(
+  //           elevation: 2,
+  //           child: Padding(
+  //             padding: const EdgeInsets.all(8.0),
+  //             child: Text(
+  //               dayRange,
+  //               style: const TextStyle(color: Colors.black45, fontSize: 16),
+  //             ),
+  //           ),
+  //         ),
+  //         const SizedBox(height: 20),
+  //       ],
+  //     );
+  //   }
 
-    return _buildDetailCard("", "Repeats Everyday");
-  }
+  //   return _buildDetailCard("", "Repeats Everyday");
+  // }
 
   Widget _buildAllocatedMeals(Map<String, List<Recipe>> groupedRecipes) {
     return Column(
@@ -246,8 +246,9 @@ class SingleMealPlanScreenTrainee extends ConsumerWidget {
                   const SizedBox(height: 5),
                   Column(
                     children: entry.value.map((recipe) {
-                      final allocation = mealPlan.recipeAllocations.firstWhere(
-                          (allocation) => allocation.recipeId == recipe.id);
+                      final allocation = mealPlan.meals.firstWhere(
+                          (allocation) =>
+                              allocation.recipes.map((id) => id) == recipe.id);
 
                       return MealPeriodCard(
                         mealPeriod: recipe.title,

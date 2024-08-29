@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable, avoid_print
+// ignore_for_file: unused_local_variable, avoid_print, unused_element
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -145,8 +145,7 @@ class NotificationService {
   Future<void> scheduleMealPlanNotifications({
     required String mealPlanId,
     required DateTime creationDate,
-    required List<String> days,
-    required List<RecipeAllocation> recipeAllocations,
+    required List<Meal> recipeAllocations,
     required List<String> trainees,
   }) async {
     // Notify trainees when a new meal plan is created
@@ -165,20 +164,20 @@ class NotificationService {
       DateTime allocatedTime = allocation.allocatedTime;
 
       // Schedule notifications for each trainee on specific days
-      for (var trainee in trainees) {
-        for (var day in days) {
-          DateTime scheduledDate = _nextInstanceOfDay(allocatedTime, day);
+      //     for (var trainee in trainees) {
+      //       for (var day in days) {
+      //         DateTime scheduledDate = _nextInstanceOfDay(allocatedTime, day);
 
-          await scheduleNotification(
-            id: _generateNotificationId(),
-            title: 'Meal Reminder',
-            body:
-                'You have a meal plan scheduled at ${allocatedTime.hour}:${allocatedTime.minute}.',
-            scheduledDate: scheduledDate,
-            payload: 'meal_plan_$mealPlanId',
-          );
-        }
-      }
+      //         await scheduleNotification(
+      //           id: _generateNotificationId(),
+      //           title: 'Meal Reminder',
+      //           body:
+      //               'You have a meal plan scheduled at ${allocatedTime.hour}:${allocatedTime.minute}.',
+      //           scheduledDate: scheduledDate,
+      //           payload: 'meal_plan_$mealPlanId',
+      //         );
+      //       }
+      //     }
     }
   }
 

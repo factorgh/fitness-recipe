@@ -36,7 +36,7 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
   final List<User> _selectedTrainees = [];
   bool _isLoading = false;
   List<String> _weekDays = [];
-  final List<RecipeAllocation> _selectedRecipeAllocations = [];
+  final List<Meal> _selectedRecipeAllocations = [];
 
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _mealPlanNameController = TextEditingController();
@@ -99,8 +99,8 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
     _selectedDuration = mealPlan.duration;
     _startDate = mealPlan.startDate;
     _endDate = mealPlan.endDate;
-    _weekDays = List<String>.from(mealPlan.days);
-    _selectedRecipeAllocations.addAll(mealPlan.recipeAllocations);
+
+    _selectedRecipeAllocations.addAll(mealPlan.meals);
     print(
         '----------------Prepopulated-----------------------------$_weekDays');
 
@@ -177,9 +177,7 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
         duration: _selectedDuration,
         startDate: _startDate,
         endDate: _endDate,
-        days: _weekDays,
-        periods: [],
-        recipeAllocations: _selectedRecipeAllocations,
+        meals: _selectedRecipeAllocations,
         trainees: _selectedTrainees.map((trainee) => trainee.id).toList(),
         createdBy: user!.id,
       );

@@ -15,7 +15,6 @@ import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
-import 'package:voltican_fitness/widgets/recurrence_sheet.dart';
 
 class MealCreationScreen extends ConsumerStatefulWidget {
   final DateTime selectedDay;
@@ -36,7 +35,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   bool _isLoading = false;
   final List<DateTime> _highlightedDates = [];
 
-  final List<RecipeAllocation> _selectedRecipeAllocations = [];
+  final List<Meal> _selectedRecipeAllocations = [];
 
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _mealPlanNameController = TextEditingController();
@@ -49,9 +48,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   DateTime? selectedDay;
 
   // Callback function to handle selection changes
-  void _handleRecipeSelectionChanged(
-      List<RecipeAllocation> selectedAllocations) {
-    showRecurrenceBottomSheet(context);
+  void _handleRecipeSelectionChanged(List<Meal> selectedAllocations) {
     print("Recurrence");
     setState(() {
       _selectedRecipeAllocations.clear();
@@ -224,8 +221,8 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         startDate: _startDate,
         endDate: _endDate,
 
-        periods: [], // Add appropriate periods
-        recipeAllocations: _selectedRecipeAllocations,
+        // Add appropriate periods
+        meals: _selectedRecipeAllocations,
         trainees: _selectedTrainees.map((trainee) => trainee.id).toList(),
         createdBy: user!.id,
       );
@@ -514,6 +511,9 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                       onSelectionChanged: _handleRecipeSelectionChanged,
                     )
                   : const SizedBox(),
+              const SizedBox(
+                height: 20,
+              ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -527,9 +527,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     duration: _selectedDuration,
                     startDate: _startDate,
                     endDate: _endDate,
-
-                    periods: [], // Add appropriate periods
-                    recipeAllocations: _selectedRecipeAllocations,
+                    meals: _selectedRecipeAllocations,
                     trainees:
                         _selectedTrainees.map((trainee) => trainee.id).toList(),
                     createdBy: ref.read(userProvider)!.id,

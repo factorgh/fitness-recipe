@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/widgets/recurrence_sheet.dart';
 
 class MealPeriodSelector extends ConsumerStatefulWidget {
-  final void Function(List<RecipeAllocation>) onSelectionChanged;
-
+  final void Function(List<Meal>) onSelectionChanged;
   final List<Recipe> recipes;
 
   const MealPeriodSelector({
@@ -23,7 +23,7 @@ class MealPeriodSelector extends ConsumerStatefulWidget {
 class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     with SingleTickerProviderStateMixin {
   final List<String> _mealPeriods = ['Breakfast', 'Lunch', 'Snack', 'Dinner'];
-  final Map<String, List<RecipeAllocation>> _selectedMeals = {};
+  final Map<String, List<Meal>> _selectedMeals = {}; // Store selected meals
 
   TabController? _tabController;
 
@@ -39,8 +39,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     super.dispose();
   }
 
-  void _onRecipeTap(String recipeId, String mealPeriod) async {
-    // Determine the valid time range for the selected meal period
+  Future<void> _onRecipeTap(String recipeId, String mealPeriod) async {
     TimeOfDay startTime;
     TimeOfDay endTime;
 
@@ -79,11 +78,10 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     );
 
     if (selectedTime == null) {
-      return; // User canceled the time picker
+      return;
     }
 
     if (!_isTimeWithinRange(selectedTime, startTime, endTime)) {
-      // Show alert dialog if time is outside the allowed range
       showDialog(
         context: context,
         builder: (context) {
@@ -100,7 +98,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
           );
         },
       );
-      return; // Do not proceed if time is invalid
+      return;
     }
 
     DateTime allocatedTime = DateTime(
@@ -111,22 +109,26 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       selectedTime.minute,
     );
 
+    Recipe? selectedRecipe = widget.recipes.firstWhere(
+      (recipe) => recipe.id == recipeId,
+    );
+
     setState(() {
-      RecipeAllocation allocation = RecipeAllocation(
-        recipeId: recipeId,
+      Meal allocation = Meal(
+        date: DateTime.now(),
+        mealType: mealPeriod,
+        recipes: [selectedRecipe],
         allocatedTime: allocatedTime,
       );
 
-      if (!_selectedMeals.containsKey(mealPeriod)) {
+      if (_selectedMeals[mealPeriod] == null) {
         _selectedMeals[mealPeriod] = [];
       }
 
       if (mealPeriod == 'Snack') {
-        // Allow multiple snacks
-        _selectedMeals[mealPeriod]!.add(allocation);
+        _selectedMeals[mealPeriod]!.add(allocation); // Allow multiple snacks
       } else {
-        // Replace existing selection for Breakfast, Lunch, or Dinner
-        _selectedMeals[mealPeriod] = [allocation];
+        _selectedMeals[mealPeriod] = [allocation]; // Only one for other periods
       }
 
       widget.onSelectionChanged(_convertToRecipeAllocations());
@@ -149,8 +151,8 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
 
   void _removeRecipe(String mealPeriod, String recipeId) {
     setState(() {
-      _selectedMeals[mealPeriod]
-          ?.removeWhere((allocation) => allocation.recipeId == recipeId);
+      _selectedMeals[mealPeriod]?.removeWhere(
+          (allocation) => allocation.recipes.any((r) => r.id == recipeId));
       if (_selectedMeals[mealPeriod]?.isEmpty ?? false) {
         _selectedMeals.remove(mealPeriod);
       }
@@ -158,10 +160,10 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     });
   }
 
-  List<RecipeAllocation> _convertToRecipeAllocations() {
-    List<RecipeAllocation> allocations = [];
-    _selectedMeals.forEach((mealPeriod, allocationsList) {
-      allocations.addAll(allocationsList);
+  List<Meal> _convertToRecipeAllocations() {
+    List<Meal> allocations = [];
+    _selectedMeals.forEach((mealPeriod, meals) {
+      allocations.addAll(meals);
     });
     return allocations;
   }
@@ -192,7 +194,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                   style: DefaultTextStyle.of(context).style,
                   children: const <TextSpan>[
                     TextSpan(
-                        text: 'click here to create a meal',
+                        text: ' Click here to create a meal',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           overflow: TextOverflow.ellipsis,
@@ -207,7 +209,8 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
               itemBuilder: (context, index) {
                 Recipe recipe = filteredRecipes[index];
                 bool isSelected = _selectedMeals[mealPeriod]?.any(
-                        (allocation) => allocation.recipeId == recipe.id) ??
+                        (allocation) =>
+                            allocation.recipes.any((r) => r.id == recipe.id)) ??
                     false;
 
                 return GestureDetector(
@@ -308,20 +311,50 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: _selectedMeals.entries.map((entry) {
         String mealPeriod = entry.key;
-        List<RecipeAllocation> allocations = entry.value;
+        List<Meal> allocations = entry.value;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              mealPeriod,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            // Divider with meal period label and recurrence button
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Divider(
+                      thickness: 2,
+                      color: Colors.grey[400],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text(
+                      mealPeriod,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.calendar_today),
+                    onPressed: () {
+                      showRecurrenceBottomSheet(context);
+                    },
+                    tooltip: 'Set Recurrence',
+                  ),
+                  Expanded(
+                    child: Divider(
+                      thickness: 2,
+                      color: Colors.grey[400],
+                    ),
+                  ),
+                ],
+              ),
             ),
             Wrap(
               spacing: 8,
               children: allocations.map((allocation) {
-                Recipe? recipe = widget.recipes
-                    .firstWhere((recipe) => recipe.id == allocation.recipeId);
-                String displayText = recipe.title;
+                String displayText =
+                    allocation.recipes.map((r) => r.title).join(', ');
                 displayText +=
                     ' @ ${allocation.allocatedTime.hour}:${allocation.allocatedTime.minute.toString().padLeft(2, '0')}';
 
@@ -330,11 +363,10 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                   backgroundColor: Colors.blue.withOpacity(0.2),
                   deleteIcon: const Icon(Icons.cancel),
                   onDeleted: () =>
-                      _removeRecipe(mealPeriod, allocation.recipeId),
+                      _removeRecipe(mealPeriod, allocation.recipes.first.id!),
                 );
               }).toList(),
             ),
-            const SizedBox(height: 10),
           ],
         );
       }).toList(),
@@ -353,7 +385,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
           }).toList(),
         ),
         SizedBox(
-          height: 220, // Adjust height as needed
+          height: 220,
           child: TabBarView(
             controller: _tabController,
             children: _mealPeriods.map((mealPeriod) {

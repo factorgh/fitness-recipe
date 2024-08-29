@@ -44,17 +44,18 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
       'Dinner': [],
     };
 
-    for (final allocation in mealPlan.recipeAllocations) {
-      try {
-        final recipe = allRecipes.firstWhere(
-          (recipe) => recipe.id == allocation.recipeId,
-        );
-        // Ensure the period exists in groupedRecipes
-        groupedRecipes[recipe.period]?.add(recipe);
-      } catch (e) {
-        // Handle cases where the recipe is not found
-        print('Recipe with ID ${allocation.recipeId} not found. Error: $e');
-        // Optionally, you could add error handling or a placeholder here if needed
+    for (final allocation in mealPlan.meals) {
+      for (final recipeId in allocation.recipes) {
+        try {
+          final recipe = allRecipes.firstWhere(
+            (recipe) => recipe.id == recipeId,
+          );
+          // Ensure the period exists in groupedRecipes
+          groupedRecipes[recipe.period]?.add(recipe);
+        } catch (e) {
+          // Handle cases where the recipe is not found
+          print('Recipe with ID $recipeId not found. Error: $e');
+        }
       }
     }
 
@@ -98,12 +99,10 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        const SizedBox(height: 16),
                         _buildDetailCard("Meal Plan Name", mealPlan.name),
                         _buildDetailCard(
                             "Duration Selected", mealPlan.duration),
                         _buildDateRange(mealPlan.startDate, mealPlan.endDate),
-                        _buildDaysForMeal(),
                         _buildAllocatedMeals(groupedRecipes),
                         _buildTraineeCard(context, traineeDetailsAsyncValue),
                         const SizedBox(height: 30),
@@ -315,32 +314,6 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
     return '$day${daySuffix(date.day)} $month, $year';
   }
 
-  Widget _buildDaysForMeal() {
-    if (mealPlan.days.isNotEmpty) {
-      // Join all the days with a comma to display them in a single line
-      String daysText = mealPlan.days.join(', ');
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Card(
-            elevation: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                daysText,
-                style: const TextStyle(color: Colors.black45, fontSize: 16),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-        ],
-      );
-    }
-
-    return _buildDetailCard("", "Repeats Everyday");
-  }
-
   Widget _buildAllocatedMeals(Map<String, List<Recipe>> groupedRecipes) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,8 +333,8 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
                   const SizedBox(height: 5),
                   Column(
                     children: entry.value.map((recipe) {
-                      final allocation = mealPlan.recipeAllocations.firstWhere(
-                          (allocation) => allocation.recipeId == recipe.id);
+                      final allocation = mealPlan.meals.firstWhere(
+                          (allocation) => allocation.recipes.contains(recipe));
 
                       return MealPeriodCard(
                         mealPeriod: recipe.title,
