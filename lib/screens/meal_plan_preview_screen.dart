@@ -338,7 +338,7 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
 
                       return MealPeriodCard(
                         mealPeriod: recipe.title,
-                        time1: _formatTime(allocation.allocatedTime),
+                        time1: allocation.timeOfDay,
                         time2: '', // Add other time logic if needed
                         image: recipe.imageUrl, // Adjust with your images
                       );
@@ -352,9 +352,9 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
     );
   }
 
-  String _formatTime(DateTime time) {
-    return time.hour > 12
-        ? '${time.hour - 12}:${time.minute.toString().padLeft(2, '0')} PM'
-        : '${time.hour}:${time.minute.toString().padLeft(2, '0')} AM';
-  }
+  // String _formatTime(DateTime time) {
+  //   return time.hour > 12
+  //       ? '${time.hour - 12}:${time.minute.toString().padLeft(2, '0')} PM'
+  //       : '${time.hour}:${time.minute.toString().padLeft(2, '0')} AM';
+  // }
 }

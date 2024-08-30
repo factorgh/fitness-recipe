@@ -10,10 +10,6 @@ class MealPlanService {
   final DioClient client = DioClient();
   final alerts = NativeAlerts();
 
-// For a success alert
-
-// For an error alert
-
   // Create a new meal plan
 
   Future<MealPlan> createMealPlan(

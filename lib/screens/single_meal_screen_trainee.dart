@@ -252,7 +252,7 @@ class SingleMealPlanScreenTrainee extends ConsumerWidget {
 
                       return MealPeriodCard(
                         mealPeriod: recipe.title,
-                        time1: _formatTime(allocation.allocatedTime),
+                        time1: allocation.timeOfDay,
                         time2: '', // Add other time logic if needed
                         image: recipe.imageUrl, // Adjust with your images
                       );

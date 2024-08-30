@@ -1,17 +1,20 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/widgets/recurrence_sheet.dart';
+import 'package:intl/intl.dart';
 
 class MealPeriodSelector extends ConsumerStatefulWidget {
   final void Function(List<Meal>) onSelectionChanged;
   final List<Recipe> recipes;
+  final void Function(Map<String, dynamic>) onRecurrenceChanged;
 
   const MealPeriodSelector({
     required this.onSelectionChanged,
+    required this.onRecurrenceChanged,
     required this.recipes,
     super.key,
   });
@@ -23,7 +26,10 @@ class MealPeriodSelector extends ConsumerStatefulWidget {
 class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     with SingleTickerProviderStateMixin {
   final List<String> _mealPeriods = ['Breakfast', 'Lunch', 'Snack', 'Dinner'];
-  final Map<String, List<Meal>> _selectedMeals = {}; // Store selected meals
+  final Map<String, List<Meal>> _selectedMeals = {};
+  final Map<String, dynamic>? recurrence = {};
+
+  // Recurrence object
 
   TabController? _tabController;
 
@@ -113,12 +119,14 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       (recipe) => recipe.id == recipeId,
     );
 
+    String formattedTime = DateFormat('hh:mm a').format(allocatedTime);
+
     setState(() {
       Meal allocation = Meal(
         date: DateTime.now(),
         mealType: mealPeriod,
         recipes: [selectedRecipe],
-        allocatedTime: allocatedTime,
+        timeOfDay: formattedTime,
       );
 
       if (_selectedMeals[mealPeriod] == null) {
@@ -166,6 +174,35 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       allocations.addAll(meals);
     });
     return allocations;
+  }
+
+  // Recurrence fxn
+
+  void _handleRecurrenceSelection() async {
+    final Map<String, dynamic>? recurrenceData =
+        await showRecurrenceBottomSheet(context);
+
+    if (recurrenceData != null) {
+      // Process the recurrence data
+      print('Selected Recurrence Data: $recurrenceData');
+
+      // Example of processing:
+      final String recurrencyOption = recurrenceData['option'] ?? 'None';
+      final List<int> customDays =
+          List<int>.from(recurrenceData['customDays'] ?? []);
+      final List<String> exceptions =
+          List<String>.from(recurrenceData['exceptions'] ?? []);
+      final List<String> customDates =
+          List<String>.from(recurrenceData['customDates'] ?? []);
+
+      setState(() {
+        recurrence?["option"] = recurrencyOption;
+        recurrence?["customDays"] = customDays;
+        recurrence?["exceptions"] = exceptions;
+        recurrence?["customDates"] = customDates;
+      });
+      widget.onRecurrenceChanged(recurrence!);
+    }
   }
 
   Widget _buildRecipeSelector(String mealPeriod) {
@@ -336,8 +373,8 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                   ),
                   IconButton(
                     icon: const Icon(Icons.calendar_today),
-                    onPressed: () {
-                      showRecurrenceBottomSheet(context);
+                    onPressed: () async {
+                      _handleRecurrenceSelection();
                     },
                     tooltip: 'Set Recurrence',
                   ),
@@ -355,8 +392,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
               children: allocations.map((allocation) {
                 String displayText =
                     allocation.recipes.map((r) => r.title).join(', ');
-                displayText +=
-                    ' @ ${allocation.allocatedTime.hour}:${allocation.allocatedTime.minute.toString().padLeft(2, '0')}';
+                displayText += ' @ ${allocation.timeOfDay}';
 
                 return Chip(
                   label: Text(displayText),
@@ -375,6 +411,8 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
 
   @override
   Widget build(BuildContext context) {
+    print(
+        "-----------------------------recurrences-----------------------------$recurrence");
     return Column(
       children: [
         TabBar(

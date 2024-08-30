@@ -161,7 +161,7 @@ class NotificationService {
 
     // Schedule daily reminders based on recipe allocation
     for (var allocation in recipeAllocations) {
-      DateTime allocatedTime = allocation.allocatedTime;
+      String allocatedTime = allocation.timeOfDay;
 
       // Schedule notifications for each trainee on specific days
       //     for (var trainee in trainees) {

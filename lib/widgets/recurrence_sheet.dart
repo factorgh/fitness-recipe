@@ -2,8 +2,9 @@
 
 import 'package:flutter/material.dart';
 
-void showRecurrenceBottomSheet(BuildContext context) {
-  showModalBottomSheet(
+Future<Map<String, dynamic>?> showRecurrenceBottomSheet(
+    BuildContext context) async {
+  return await showModalBottomSheet<Map<String, dynamic>>(
     context: context,
     isScrollControlled: true,
     enableDrag: true,
@@ -59,11 +60,7 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
         CheckboxListTile(
           title: const Text('Every Day'),
           value: _selectedRecurrence == 'Daily',
-          onChanged: (bool? value) {
-            setState(() {
-              _selectedRecurrence = value == true ? 'Daily' : 'None';
-            });
-          },
+          onChanged: (bool? value) {},
         ),
         _buildExceptionDates(),
       ],
@@ -95,7 +92,6 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
   }
 
 // Add a state variable to track whether the checkbox is selected
-  bool _showBiWeeklyInfo = false;
 
   Widget _buildBiWeeklyOptions() {
     return Column(
@@ -104,27 +100,18 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
         CheckboxListTile(
           title: const Text('Bi-Weekly'),
           value: _selectedRecurrence == 'Bi-Weekly',
-          onChanged: (bool? value) {
-            setState(() {
-              if (value == true) {
-                _selectedRecurrence = 'Bi-Weekly';
-              } else {
-                _selectedRecurrence = '';
-              }
-              _showBiWeeklyInfo = value ?? false;
-            });
-          },
+          onChanged: (bool? value) {},
         ),
 
         // Conditionally show bi-weekly info if the checkbox is selected
-        if (_showBiWeeklyInfo)
-          const Padding(
-            padding: EdgeInsets.only(left: 16.0),
-            child: Text(
-              'Bi-Weekly runs every two weeks.',
-              style: TextStyle(fontSize: 14, color: Colors.black54),
-            ),
+
+        const Padding(
+          padding: EdgeInsets.only(left: 16.0),
+          child: Text(
+            'Bi-Weekly runs every two weeks.',
+            style: TextStyle(fontSize: 14, color: Colors.black54),
           ),
+        ),
       ],
     );
   }
@@ -289,7 +276,7 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
 
     print('Recurrence Data: $recurrenceData');
 
-    Navigator.pop(context);
+    Navigator.pop(context, recurrenceData);
   }
 
   @override

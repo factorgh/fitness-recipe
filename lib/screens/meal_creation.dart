@@ -4,17 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:voltican_fitness/Features/mealplan/services/mealplan_service.dart';
 import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/meal_plan_preview_screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/hive/services/meal_service_hive.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
+import 'package:voltican_fitness/utils/hive/services/mealplan_service_hive.dart';
 
 class MealCreationScreen extends ConsumerStatefulWidget {
   final DateTime selectedDay;
@@ -32,24 +34,43 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   List<User> _allTrainees = [];
   List<User> _searchResults = [];
   final List<User> _selectedTrainees = [];
-  bool _isLoading = false;
+  final bool _isLoading = false;
   final List<DateTime> _highlightedDates = [];
 
   final List<Meal> _selectedRecipeAllocations = [];
+  Recurrence? chosenRecurrence;
 
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _mealPlanNameController = TextEditingController();
 
   Map<String, List<Map<String, dynamic>>> selectedMeals = {};
   List<Recipe> myRecipes = [];
-
+  final MealPlanService mealPlanService = MealPlanService();
   final RecipeService recipeService = RecipeService();
   final TrainerService trainerService = TrainerService();
   DateTime? selectedDay;
 
+  // Hive services
+  MealService mealService = MealService();
+  HiveMealPlanService hiveMealPlanService = HiveMealPlanService();
+
   // Callback function to handle selection changes
   void _handleRecipeSelectionChanged(List<Meal> selectedAllocations) {
     print("Recurrence");
+
+    for (Meal meal in selectedAllocations) {
+      print("------------Meal Allocation------------");
+      print("Meal Type: ${meal.mealType}");
+      print("Date: ${meal.date}");
+      print("Allocated Time: ${meal.timeOfDay}");
+      print("Recipes:");
+      for (Recipe recipe in meal.recipes) {
+        print("Recipe ID: ${recipe.id}");
+        print("Recipe Title: ${recipe.title}");
+        // Add any other properties you want to print from the Recipe object
+      }
+    }
+
     setState(() {
       _selectedRecipeAllocations.clear();
       _selectedRecipeAllocations.addAll(selectedAllocations);
@@ -90,6 +111,11 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     _updateHighlightedDates();
     fetchAllUserRecipes();
     getTraineesFollowingTrainer();
+
+    // Initialize hive service
+    mealService.init();
+    hiveMealPlanService.init();
+
     super.initState();
   }
 
@@ -210,57 +236,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     });
   }
 
-  Future<void> _completeSchedule() async {
-    final user = ref.read(userProvider);
-    if (_formKey.currentState!.validate() &&
-        _selectedRecipeAllocations.isNotEmpty &&
-        _selectedTrainees.isNotEmpty) {
-      final mealPlan = MealPlan(
-        name: _mealPlanNameController.text,
-        duration: _selectedDuration,
-        startDate: _startDate,
-        endDate: _endDate,
-
-        // Add appropriate periods
-        meals: _selectedRecipeAllocations,
-        trainees: _selectedTrainees.map((trainee) => trainee.id).toList(),
-        createdBy: user!.id,
-      );
-
-      setState(() {
-        _isLoading = true;
-      });
-
-      try {
-        await ref
-            .read(mealPlanProvider.notifier)
-            .createMealPlan(mealPlan, context);
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            Navigator.pop(context);
-          });
-        }
-
-        Future.delayed(Duration.zero, () {
-          ref.read(mealPlansProvider.notifier).fetchAllMealPlans();
-        });
-      } catch (e) {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
-    } else {
-      setState(() {
-        _isLoading = false;
-      });
-      NativeAlerts()
-          .showErrorAlert(context, 'Please fill in all required fields');
-    }
-  }
-
   void createPlan() {
     _completeSchedule();
   }
@@ -271,6 +246,77 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
           day.isBefore(_endDate!.add(const Duration(days: 1)));
     }
     return true;
+  }
+
+// Start of complete schedule
+
+  Future<void> _completeSchedule() async {
+    final user = ref.read(userProvider);
+    final List<Meal> meals = [];
+
+    for (Meal meal in _selectedRecipeAllocations) {
+      print("------------Meal Allocation------------");
+      for (Recipe recipe in meal.recipes) {
+        print("Recipe ID: ${recipe.id}");
+        print("Recipe Title: ${recipe.title}");
+
+        meals.add(Meal(
+          mealType: meal.mealType,
+          date: selectedDay!,
+          timeOfDay: meal.timeOfDay,
+          recipes: [recipe],
+          recurrence: chosenRecurrence,
+        ));
+      }
+    }
+
+    print(
+        "\n================================meals================================$meals");
+
+    final mealPlan = MealPlan(
+      name: _mealPlanNameController.text,
+      duration: _selectedDuration,
+      startDate: _startDate,
+      endDate: _endDate,
+      meals: meals,
+      trainees: _selectedTrainees.map((trainee) => trainee.id).toList(),
+      createdBy: user!.id,
+    );
+    print('---------------------mealplan-------------$mealPlan');
+    ref.read(mealPlanProvider.notifier).createMealPlan(mealPlan, context);
+  }
+
+// End of complete sche
+// Handle recurrence here
+  void handleRecurrence(Map<String, dynamic> recurrenceData) {
+    print(
+        '---------------------recurrence before preview------------$recurrenceData');
+
+    setState(() {
+      // Convert the Map<String, dynamic> to a Recurrence object using fromJson
+      chosenRecurrence = Recurrence.fromJson(recurrenceData);
+    });
+  }
+
+  // Hive implementations
+  void onSaveMeal() {
+    final List<Meal> meals = [];
+    for (Meal meal in _selectedRecipeAllocations) {
+      print("------------Meal Allocation------------");
+      for (Recipe recipe in meal.recipes) {
+        print("Recipe ID: ${recipe.id}");
+        print("Recipe Title: ${recipe.title}");
+
+        meals.add(Meal(
+          mealType: meal.mealType,
+          date: selectedDay!,
+          timeOfDay: meal.timeOfDay,
+          recipes: [recipe],
+          recurrence: chosenRecurrence,
+        ));
+      }
+    }
+    mealService.saveMealsForDate(selectedDay!, meals);
   }
 
   @override
@@ -507,42 +553,98 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
               selectedDay != null
                   ? MealPeriodSelector(
                       recipes: myRecipes, // Pass actual recipes here
-
+                      onRecurrenceChanged: handleRecurrence,
                       onSelectionChanged: _handleRecipeSelectionChanged,
                     )
                   : const SizedBox(),
               const SizedBox(
                 height: 20,
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white),
-                onPressed: () {
-                  final mealPlan = MealPlan(
-                    name: _mealPlanNameController.text,
-                    duration: _selectedDuration,
-                    startDate: _startDate,
-                    endDate: _endDate,
-                    meals: _selectedRecipeAllocations,
-                    trainees:
-                        _selectedTrainees.map((trainee) => trainee.id).toList(),
-                    createdBy: ref.read(userProvider)!.id,
-                  );
-                  showMealPlanPreviewBottomSheet(context, mealPlan, createPlan);
-                },
-                child: _isLoading
-                    ? const CircularProgressIndicator(
-                        color: Colors.white,
-                      )
-                    : const Text(
-                        'Preview',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 20),
-                      ),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Divider(
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Row(
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white),
+                    onPressed: () {
+                      NativeAlerts()
+                          .showSuccessAlert(context, 'Saved to draft');
+
+                      // final mealPlan = MealPlan(
+                      //   name: _mealPlanNameController.text,
+                      //   duration: _selectedDuration,
+                      //   startDate: _startDate,
+                      //   endDate: _endDate,
+                      //   meals: _selectedRecipeAllocations,
+                      //   trainees:
+                      //       _selectedTrainees.map((trainee) => trainee.id).toList(),
+                      //   createdBy: ref.read(userProvider)!.id,
+                      // );
+                      // // showMealPlanPreviewBottomSheet(context, mealPlan, createPlan);
+                    },
+                    child: _isLoading
+                        ? const CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                        : const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Save to draft',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w300, fontSize: 20),
+                            ),
+                          ),
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white),
+                    onPressed: () {
+                      createPlan();
+                      // final mealPlan = MealPlan(
+                      //   name: _mealPlanNameController.text,
+                      //   duration: _selectedDuration,
+                      //   startDate: _startDate,
+                      //   endDate: _endDate,
+                      //   meals: _selectedRecipeAllocations,
+                      //   trainees:
+                      //       _selectedTrainees.map((trainee) => trainee.id).toList(),
+                      //   createdBy: ref.read(userProvider)!.id,
+                      // );
+                      // // showMealPlanPreviewBottomSheet(context, mealPlan, createPlan);
+                    },
+                    child: _isLoading
+                        ? const CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                        : const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Preview',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w300, fontSize: 20),
+                            ),
+                          ),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
             ],

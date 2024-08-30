@@ -38,7 +38,7 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
                   date: DateTime.now(),
                   mealType: recipe.period,
                   recipes: [recipe],
-                  allocatedTime: allocation.allocatedTime,
+                  timeOfDay: allocation.timeOfDay,
                 ))
             .toList();
 
@@ -276,7 +276,7 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
                         children: meal.recipes.map((recipe) {
                           return MealPeriodCard(
                             mealPeriod: entry.key,
-                            time1: _formatTime(meal.allocatedTime),
+                            time1: meal.timeOfDay,
                             time2: '', // Add other time logic if needed
                             image: recipe.imageUrl, // Adjust with your images
                           );

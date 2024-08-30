@@ -359,6 +359,7 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                       ),
                       const SizedBox(height: 16),
                       MealPeriodSelector(
+                        onRecurrenceChanged: (reccurreneDta) {},
                         onSelectionChanged: (allocations) {
                           setState(() {
                             _selectedRecipeAllocations.clear();
