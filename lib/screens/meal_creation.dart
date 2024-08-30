@@ -12,11 +12,10 @@ import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
-import 'package:voltican_fitness/utils/hive/services/meal_service_hive.dart';
+
 import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
-import 'package:voltican_fitness/utils/hive/services/mealplan_service_hive.dart';
 
 class MealCreationScreen extends ConsumerStatefulWidget {
   final DateTime selectedDay;
@@ -51,8 +50,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   DateTime? selectedDay;
 
   // Hive services
-  MealService mealService = MealService();
-  HiveMealPlanService hiveMealPlanService = HiveMealPlanService();
 
   // Callback function to handle selection changes
   void _handleRecipeSelectionChanged(List<Meal> selectedAllocations) {
@@ -113,8 +110,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     getTraineesFollowingTrainer();
 
     // Initialize hive service
-    mealService.init();
-    hiveMealPlanService.init();
 
     super.initState();
   }
@@ -316,7 +311,8 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         ));
       }
     }
-    mealService.saveMealsForDate(selectedDay!, meals);
+
+    print('---------------------meals data hive--------------------$meals');
   }
 
   @override
@@ -327,6 +323,14 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
           'Create Meal Plan',
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                print(
+                    "-------------------meals from hive-----------------------");
+              },
+              icon: const Icon(Icons.view_week))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -579,6 +583,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white),
                     onPressed: () {
+                      onSaveMeal();
                       NativeAlerts()
                           .showSuccessAlert(context, 'Saved to draft');
 
