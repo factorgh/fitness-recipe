@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 
 import 'package:voltican_fitness/models/recipe.dart';
@@ -60,6 +62,7 @@ class Recurrence {
 }
 
 class Meal {
+  final String? id;
   final String mealType; // "breakfast", "lunch", "dinner", "snack"
   final String timeOfDay; // e.g., "08:00 AM", "12:00 PM", etc.
   final List<Recipe> recipes; // List of Recipe objects
@@ -71,26 +74,33 @@ class Meal {
     required this.timeOfDay,
     required this.recipes,
     this.recurrence,
+    this.id,
     required this.date,
   });
 
   factory Meal.fromJson(Map<String, dynamic> json) {
     return Meal(
-      mealType: json['mealType'] as String,
-      timeOfDay: json['allocatedTime'] as String,
+      mealType: json['mealType'] as String? ?? '', // Provide a default value
+      timeOfDay: json['timeOfDay'] as String? ?? '', // Provide a default value
       recipes: json['recipes'] != null
           ? List<Recipe>.from(
               json['recipes'].map((item) => Recipe.fromJson(item)))
           : [],
+      // Check if recurrence is a String (likely stored as a JSON string)
       recurrence: json['recurrence'] != null
-          ? Recurrence.fromJson(json['recurrence'])
+          ? (json['recurrence'] is String
+              ? Recurrence.fromJson(jsonDecode(json['recurrence']))
+              : Recurrence.fromJson(json['recurrence']))
           : null,
-      date: DateTime.parse(json['date']),
+      date: json['date'] != null
+          ? DateTime.parse(json['date'])
+          : DateTime.now(), // Fallback to current date if null
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'mealType': mealType,
       'timeOfDay': timeOfDay,
       'recipes': recipes.map((e) => e.toJson()).toList(),
@@ -101,7 +111,7 @@ class Meal {
 
   @override
   String toString() {
-    return 'Meal(mealType: $mealType, date: $date, timeOfDay: $timeOfDay, recipes: $recipes, recurrence: $recurrence)';
+    return 'Meal(id:$id,mealType: $mealType, date: $date, timeOfDay: $timeOfDay, recipes: $recipes, recurrence: $recurrence)';
   }
 }
 

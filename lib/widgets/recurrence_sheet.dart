@@ -200,7 +200,6 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
     );
   }
 
-  // Helper: Build exceptions UI
   Widget _buildExceptionDates() {
     return Column(
       children: [
@@ -237,7 +236,6 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
     );
   }
 
-  // Logic for saving the recurrence
   void _saveRecurrence() {
     final Map<String, dynamic> recurrenceData = {};
 
@@ -251,8 +249,8 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
             .asMap()
             .entries
             .where((entry) => entry.value)
-            .map((entry) => entry.key)
-            .toList(); // Selected days (0 = Mon, 6 = Sun)
+            .map((entry) => entry.key + 1)
+            .toList(); // Selected days (1 = Mon, 7 = Sun)
         break;
       case 'Bi-Weekly':
         recurrenceData['option'] = 'bi_weekly';
@@ -268,7 +266,6 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
         break;
     }
 
-    // Add exceptions if any
     if (_exceptions.isNotEmpty) {
       recurrenceData['exceptions'] =
           _exceptions.map((e) => e.toIso8601String()).toList();

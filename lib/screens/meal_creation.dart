@@ -15,6 +15,7 @@ import 'package:voltican_fitness/services/recipe_service.dart';
 
 import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
+import 'package:voltican_fitness/utils/sqflite_setup/database_helpers.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
 
 class MealCreationScreen extends ConsumerStatefulWidget {
@@ -35,6 +36,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   final List<User> _selectedTrainees = [];
   final bool _isLoading = false;
   final List<DateTime> _highlightedDates = [];
+  List<Meal> startMeals = [];
 
   final List<Meal> _selectedRecipeAllocations = [];
   Recurrence? chosenRecurrence;
@@ -47,9 +49,10 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   final MealPlanService mealPlanService = MealPlanService();
   final RecipeService recipeService = RecipeService();
   final TrainerService trainerService = TrainerService();
-  DateTime? selectedDay;
+  DateTime? newDay;
 
-  // Hive services
+  // SqflITE SETUP AND SERVICES
+  final DatabaseHelper dbHelper = DatabaseHelper();
 
   // Callback function to handle selection changes
   void _handleRecipeSelectionChanged(List<Meal> selectedAllocations) {
@@ -64,7 +67,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
       for (Recipe recipe in meal.recipes) {
         print("Recipe ID: ${recipe.id}");
         print("Recipe Title: ${recipe.title}");
-        // Add any other properties you want to print from the Recipe object
       }
     }
 
@@ -109,9 +111,18 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     fetchAllUserRecipes();
     getTraineesFollowingTrainer();
 
-    // Initialize hive service
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchMealsForSelectedDay();
+    });
 
     super.initState();
+  }
+
+  void fetchMealsForSelectedDay() async {
+    final meals = await fetchMealsFromDatabase(widget.selectedDay);
+    setState(() {
+      startMeals = meals; // Update the default meals when the date changes
+    });
   }
 
   @override
@@ -243,8 +254,9 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     return true;
   }
 
-// Start of complete schedule
+// Save meal plan to  draft
 
+// Start of complete schedule
   Future<void> _completeSchedule() async {
     final user = ref.read(userProvider);
     final List<Meal> meals = [];
@@ -257,7 +269,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
         meals.add(Meal(
           mealType: meal.mealType,
-          date: selectedDay!,
+          date: newDay!,
           timeOfDay: meal.timeOfDay,
           recipes: [recipe],
           recurrence: chosenRecurrence,
@@ -281,7 +293,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     ref.read(mealPlanProvider.notifier).createMealPlan(mealPlan, context);
   }
 
-// End of complete sche
 // Handle recurrence here
   void handleRecurrence(Map<String, dynamic> recurrenceData) {
     print(
@@ -294,7 +305,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   }
 
   // Hive implementations
-  void onSaveMeal() {
+  void onSaveMeal() async {
     final List<Meal> meals = [];
     for (Meal meal in _selectedRecipeAllocations) {
       print("------------Meal Allocation------------");
@@ -304,7 +315,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
         meals.add(Meal(
           mealType: meal.mealType,
-          date: selectedDay!,
+          date: newDay!,
           timeOfDay: meal.timeOfDay,
           recipes: [recipe],
           recurrence: chosenRecurrence,
@@ -313,6 +324,13 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     }
 
     print('---------------------meals data hive--------------------$meals');
+    await dbHelper.insertMealsForDayAndRecurrence(
+        newDay!, meals, _startDate!, _endDate!);
+  }
+
+// Handle meal fetch on date selection from the database
+  Future<List<Meal>> fetchMealsFromDatabase(DateTime day) async {
+    return await dbHelper.getMealsByDate(day);
   }
 
   @override
@@ -325,9 +343,11 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         ),
         actions: [
           IconButton(
-              onPressed: () {
+              onPressed: () async {
+                // On date changed get meals from draft and pass as th deault meals to the meal period selector
+                final draftMeals = await dbHelper.getMealsByDate(newDay!);
                 print(
-                    "-------------------meals from hive-----------------------");
+                    "-------------------draft meals from sql-----------------------$draftMeals--------------------");
               },
               icon: const Icon(Icons.view_week))
         ],
@@ -444,8 +464,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                             _calculateEndDate(_startDate!, _selectedDuration);
                       }
                     } else {
-                      _endDate =
-                          null; // Clear end date if duration is set to 'Custom'
+                      _endDate = null;
                     }
                   });
                 },
@@ -515,11 +534,9 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                   ? TableCalendar(
                       firstDay: DateTime(2000),
                       lastDay: DateTime(2100),
-                      focusedDay: selectedDay ??
-                          DateTime.now(), // Focus on the selected day or today
+                      focusedDay: newDay ?? DateTime.now(),
                       rangeStartDay: _startDate,
                       rangeEndDay: _endDate,
-
                       rowHeight: 43,
                       calendarBuilders: CalendarBuilders(
                         selectedBuilder: (context, date, _) {
@@ -536,15 +553,24 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                           );
                         },
                       ),
-                      selectedDayPredicate: (day) =>
-                          isSameDay(day, selectedDay),
-                      onDaySelected: (DateTime selectDay, DateTime focusDay) {
+                      selectedDayPredicate: (day) => isSameDay(day, newDay),
+                      onDaySelected:
+                          (DateTime selectDay, DateTime focusDay) async {
+                        // Check if the selected day is within the range
                         if (_isWithinRange(selectDay)) {
+                          // Fetch meals for the selected day from the database
+                          startMeals = await fetchMealsFromDatabase(selectDay);
+
+                          // Debugging information
+                          print('-------------- trainer -------------');
+                          print('Selected Day: $selectDay');
+                          print('Start Meals: $startMeals');
+
+                          // Update the state with the new day and fetched meals
                           setState(() {
-                            selectedDay = selectDay;
+                            newDay = selectDay;
                           });
                         }
-                        print('Selected Day: $selectedDay');
                       },
                       headerStyle: const HeaderStyle(
                         formatButtonVisible: false,
@@ -554,15 +580,52 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     )
                   : const SizedBox(),
               const SizedBox(height: 20),
-              selectedDay != null
+              newDay != null
                   ? MealPeriodSelector(
-                      recipes: myRecipes, // Pass actual recipes here
+                      recipes: myRecipes,
                       onRecurrenceChanged: handleRecurrence,
                       onSelectionChanged: _handleRecipeSelectionChanged,
+                      defaultMeals: startMeals.isNotEmpty ? startMeals : [],
                     )
                   : const SizedBox(),
               const SizedBox(
                 height: 20,
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white),
+                onPressed: () {
+                  onSaveMeal();
+                  NativeAlerts().showSuccessAlert(context, 'Saved to draft');
+
+                  // final mealPlan = MealPlan(
+                  //   name: _mealPlanNameController.text,
+                  //   duration: _selectedDuration,
+                  //   startDate: _startDate,
+                  //   endDate: _endDate,
+                  //   meals: _selectedRecipeAllocations,
+                  //   trainees:
+                  //       _selectedTrainees.map((trainee) => trainee.id).toList(),
+                  //   createdBy: ref.read(userProvider)!.id,
+                  // );
+                  // // showMealPlanPreviewBottomSheet(context, mealPlan, createPlan);
+                },
+                child: _isLoading
+                    ? const CircularProgressIndicator(
+                        color: Colors.white,
+                      )
+                    : const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'Save',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w300, fontSize: 20),
+                        ),
+                      ),
               ),
               const Padding(
                 padding: EdgeInsets.all(8.0),
@@ -570,86 +633,39 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                   color: Colors.black,
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              Row(
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white),
+                onPressed: () {
+                  createPlan();
+                  // final mealPlan = MealPlan(
+                  //   name: _mealPlanNameController.text,
+                  //   duration: _selectedDuration,
+                  //   startDate: _startDate,
+                  //   endDate: _endDate,
+                  //   meals: _selectedRecipeAllocations,
+                  //   trainees:
+                  //       _selectedTrainees.map((trainee) => trainee.id).toList(),
+                  //   createdBy: ref.read(userProvider)!.id,
+                  // );
+                  // // showMealPlanPreviewBottomSheet(context, mealPlan, createPlan);
+                },
+                child: _isLoading
+                    ? const CircularProgressIndicator(
+                        color: Colors.white,
+                      )
+                    : const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'Preview',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w300, fontSize: 20),
                         ),
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white),
-                    onPressed: () {
-                      onSaveMeal();
-                      NativeAlerts()
-                          .showSuccessAlert(context, 'Saved to draft');
-
-                      // final mealPlan = MealPlan(
-                      //   name: _mealPlanNameController.text,
-                      //   duration: _selectedDuration,
-                      //   startDate: _startDate,
-                      //   endDate: _endDate,
-                      //   meals: _selectedRecipeAllocations,
-                      //   trainees:
-                      //       _selectedTrainees.map((trainee) => trainee.id).toList(),
-                      //   createdBy: ref.read(userProvider)!.id,
-                      // );
-                      // // showMealPlanPreviewBottomSheet(context, mealPlan, createPlan);
-                    },
-                    child: _isLoading
-                        ? const CircularProgressIndicator(
-                            color: Colors.white,
-                          )
-                        : const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text(
-                              'Save to draft',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w300, fontSize: 20),
-                            ),
-                          ),
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white),
-                    onPressed: () {
-                      createPlan();
-                      // final mealPlan = MealPlan(
-                      //   name: _mealPlanNameController.text,
-                      //   duration: _selectedDuration,
-                      //   startDate: _startDate,
-                      //   endDate: _endDate,
-                      //   meals: _selectedRecipeAllocations,
-                      //   trainees:
-                      //       _selectedTrainees.map((trainee) => trainee.id).toList(),
-                      //   createdBy: ref.read(userProvider)!.id,
-                      // );
-                      // // showMealPlanPreviewBottomSheet(context, mealPlan, createPlan);
-                    },
-                    child: _isLoading
-                        ? const CircularProgressIndicator(
-                            color: Colors.white,
-                          )
-                        : const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text(
-                              'Preview',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w300, fontSize: 20),
-                            ),
-                          ),
-                  ),
-                ],
+                      ),
               ),
               const SizedBox(height: 20),
             ],
