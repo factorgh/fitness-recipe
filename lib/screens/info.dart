@@ -1,128 +1,90 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
 
-// import 'package:voltican_fitness/providers/meal_plan_provider.dart';
-// import 'package:voltican_fitness/providers/meal_plan_state.dart';
-// import 'package:voltican_fitness/providers/user_provider.dart';
-// import 'package:voltican_fitness/widgets/calendar_item.dart';
+import 'package:voltican_fitness/utils/sqflite_setup/database_helpers.dart';
 
-// class AllMealPlanTrainee extends ConsumerStatefulWidget {
-//   const AllMealPlanTrainee({super.key});
+class MyTbApp extends StatelessWidget {
+  final Future<Database> database;
 
-//   @override
-//   ConsumerState<AllMealPlanTrainee> createState() => _AllMealPlanTraineeState();
-// }
+  const MyTbApp({super.key, required this.database});
 
-// class _AllMealPlanTraineeState extends ConsumerState<AllMealPlanTrainee> {
-//   DateTime? _selectedDate;
-//   String _selectedDuration = 'Does Not Repeat';
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: const Text('SQLite Tables and Content')),
+        body: TableContentViewer(database: database),
+      ),
+    );
+  }
+}
 
-//   @override
-//   void initState() {
-//     super.initState();
+class TableContentViewer extends StatefulWidget {
+  final Future<Database> database;
 
-//     // Defer the call to after widget build
-//     Future.microtask(() async {
-//       final traineeId = ref.read(userProvider)?.id;
-//       print(traineeId); // Using ref.read here
-//       await ref
-//           .read(mealPlansProvider.notifier)
-//           .fetchMealPlansByTrainee(traineeId!);
-//     });
-//   }
+  const TableContentViewer({super.key, required this.database});
 
-//   Future<void> _pickDate(BuildContext context) async {
-//     final DateTime? pickedDate = await showDatePicker(
-//       context: context,
-//       initialDate: _selectedDate ?? DateTime.now(),
-//       firstDate: DateTime(2000),
-//       lastDate: DateTime(2101),
-//     );
-//     if (pickedDate != null && pickedDate != _selectedDate) {
-//       setState(() {
-//         _selectedDate = pickedDate;
-//       });
-//     }
-//   }
+  @override
+  _TableContentViewerState createState() => _TableContentViewerState();
+}
 
-//   @override
-//   Widget build(BuildContext context) {
-//     final mealPlansState = ref.watch(mealPlansProvider);
+class _TableContentViewerState extends State<TableContentViewer> {
+  late Future<List<String>> _tableNames;
+  late Future<Map<String, List<Map<String, dynamic>>>> _tableContents;
 
-//     return Scaffold(
-//       appBar: AppBar(
-//         toolbarHeight: 100.0,
-//         leading: IconButton(
-//           icon: const Icon(Icons.arrow_back),
-//           onPressed: () => Navigator.of(context).pop(),
-//         ),
-//         title: const Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Text(
-//               'My Meal Plans',
-//               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-//             ),
-//             SizedBox(height: 8),
-//           ],
-//         ),
-//         actions: [
-//           DropdownButton<String>(
-//             elevation: 3,
-//             style: const TextStyle(
-//                 fontSize: 12,
-//                 color: Colors.orange,
-//                 fontWeight: FontWeight.w500),
-//             value: _selectedDuration,
-//             items: [
-//               'Does Not Repeat',
-//               'Week',
-//               'Month',
-//               'Quarter',
-//               'Half-Year',
-//               'Year',
-//               'Custom'
-//             ]
-//                 .map((duration) => DropdownMenuItem<String>(
-//                       value: duration,
-//                       child: Text(duration),
-//                     ))
-//                 .toList(),
-//             onChanged: (value) {
-//               setState(() {
-//                 _selectedDuration = value!;
-//                 ref
-//                     .read(mealPlansProvider.notifier)
-//                     .filterByDuration(_selectedDuration);
-//               });
-//             },
-//           ),
-//           const SizedBox(width: 10),
-//         ],
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-//         child: mealPlansState is MealPlansLoading
-//             ? const Center(child: CircularProgressIndicator())
-//             : mealPlansState is MealPlansError
-//                 ? Center(child: Text((mealPlansState).error))
-//                 : mealPlansState is MealPlansLoaded
-//                     ? mealPlansState.mealPlans.isEmpty
-//                         ? const Center(child: Text('No meal plans available.'))
-//                         : ListView.builder(
-//                             itemCount: (mealPlansState).mealPlans.length,
-//                             itemBuilder: (context, index) {
-//                               return Padding(
-//                                 padding: const EdgeInsets.only(bottom: 12.0),
-//                                 child: CalendarItem(
-//                                   titleIcon: Icons.restaurant_menu,
-//                                   mealPlan: (mealPlansState).mealPlans[index],
-//                                 ),
-//                               );
-//                             },
-//                           )
-//                     : const Center(child: Text('Unexpected state')),
-//       ),
-//     );
-//   }
-// }
+  @override
+  void initState() {
+    super.initState();
+    _tableNames = DatabaseHelper().getTableNames();
+    _tableContents = _loadTableContents();
+  }
+
+  Future<Map<String, List<Map<String, dynamic>>>> _loadTableContents() async {
+    final tableNames = await _tableNames;
+    final contents = <String, List<Map<String, dynamic>>>{};
+
+    for (final tableName in tableNames) {
+      contents[tableName] = await DatabaseHelper().getTableContent(tableName);
+    }
+
+    return contents;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, List<Map<String, dynamic>>>>(
+      future: _tableContents,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+
+        if (!snapshot.hasData) {
+          return const Center(child: Text('No data available'));
+        }
+
+        final tableContents = snapshot.data!;
+
+        return ListView(
+          children: tableContents.entries.map((entry) {
+            final tableName = entry.key;
+            final rows = entry.value;
+
+            return ExpansionTile(
+              title: Text(tableName),
+              children: rows.map((row) {
+                return ListTile(
+                  title: Text(row.toString()),
+                );
+              }).toList(),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+}

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
+import 'package:uuid/uuid.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -29,20 +30,20 @@ class DatabaseHelper {
 
   void _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE meal_plans (
-       id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        duration TEXT NOT NULL,
-        startDate TEXT,
-        endDate TEXT,
-        datesArray TEXT,
-        meals TEXT,
-        trainees TEXT,
-        createdBy TEXT NOT NULL,
-        createdAt TEXT,
-        updatedAt TEXT
-      )
-    ''');
+    CREATE TABLE meal_plans (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      duration TEXT NOT NULL,
+      startDate TEXT,
+      endDate TEXT,
+      datesArray TEXT,
+      meals TEXT,
+      trainees TEXT,
+      createdBy TEXT NOT NULL,
+      createdAt TEXT,
+      updatedAt TEXT
+    )
+  ''');
 
     await db.execute('''
     CREATE TABLE recurrences (
@@ -56,16 +57,16 @@ class DatabaseHelper {
   ''');
 
     await db.execute('''
-      CREATE TABLE meals (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        mealType TEXT,
-        timeOfDay TEXT,
-        date TEXT,
-        recurrence TEXT,
-        mealPlanId TEXT,  -- Changed to TEXT to match meal_plans id type
-        FOREIGN KEY (mealPlanId) REFERENCES meal_plans(id)
-      )
-    ''');
+    CREATE TABLE meals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      mealType TEXT,
+      timeOfDay TEXT,
+      date TEXT,
+      recurrence TEXT,
+      mealPlanId TEXT,
+      FOREIGN KEY (mealPlanId) REFERENCES meal_plans(id)
+    )
+  ''');
 
     await db.execute('''
     CREATE TABLE meal_dates (
@@ -75,6 +76,11 @@ class DatabaseHelper {
       FOREIGN KEY (mealId) REFERENCES meals(id)
     )
   ''');
+  }
+
+  String _generateUniqueId() {
+    var uuid = const Uuid();
+    return uuid.v4(); // Generate a unique ID
   }
 
   Future<void> insertMeal(Meal meal) async {
@@ -101,7 +107,6 @@ class DatabaseHelper {
       'timeOfDay': meal.timeOfDay,
       'date': meal.date.toIso8601String(),
       'recurrence': jsonEncode(meal.recurrence?.toJson()),
-      // Use null if not yet available
     });
   }
 
@@ -207,8 +212,7 @@ class DatabaseHelper {
     if (recurrenceType == 'daily') {
       return true; // Daily recurrence, every day is valid
     } else if (recurrenceType == 'weekly' || recurrenceType == 'custom') {
-      return daysOfWeek
-          .contains(date.weekday); // Match against custom days of the week
+      return daysOfWeek.contains(date.weekday);
     }
     return false;
   }
@@ -317,5 +321,126 @@ class DatabaseHelper {
       'createdAt': mealPlan.createdAt?.toIso8601String(),
       'updatedAt': mealPlan.updatedAt?.toIso8601String(),
     });
+  }
+
+  Future<Map<String, List<DateTime>>> fetchMealsAndDates() async {
+    final db = await database;
+
+    // Fetch all meals from the draft
+    final mealsResult = await db.query('meals');
+    final mealDatesResult = await db.query('meal_dates');
+
+    // Create a map to store meal IDs and their associated dates
+    Map<String, List<DateTime>> mealsWithDates = {};
+
+    for (var meal in mealsResult) {
+      String mealId = meal['id'].toString();
+      List<DateTime> dates = [];
+
+      // Filter dates for the current meal
+      for (var mealDate in mealDatesResult) {
+        if (mealDate['mealId'].toString() == mealId) {
+          dates.add(DateTime.parse(mealDate['date'].toString()));
+        }
+      }
+
+      mealsWithDates[mealId] = dates;
+    }
+
+    return mealsWithDates;
+  }
+
+  // Create meal plan with populated meals
+  Future<void> createMealPlanWithPrepopulatedMeals(
+      String mealPlanName,
+      String duration,
+      DateTime startDate,
+      DateTime endDate,
+      String createdBy,
+      List<String> trainees) async {
+    final db = await database;
+    final mealsWithDates = await fetchMealsAndDates();
+
+    // Insert the new meal plan
+    String mealPlanId =
+        _generateUniqueId(); // Generate a unique ID for the meal plan
+
+    // Calculate all dates from the meals' dates
+    List<DateTime> allDates = [];
+    for (var dates in mealsWithDates.values) {
+      allDates.addAll(dates);
+    }
+
+    await db.insert('meal_plans', {
+      'id': mealPlanId,
+      'name': mealPlanName,
+      'duration': duration,
+      'startDate': startDate.toIso8601String(),
+      'endDate': endDate.toIso8601String(),
+      'datesArray': jsonEncode(allDates
+          .map((e) => e.toIso8601String())
+          .toList()), // Set datesArray now
+      'meals': jsonEncode(mealsWithDates.keys.toList()),
+      'trainees': jsonEncode(trainees),
+      'createdBy': createdBy,
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+    });
+
+    // Insert meals into the new meal plan
+    final batch = db.batch();
+    for (var mealId in mealsWithDates.keys) {
+      batch.update('meals', {'mealPlanId': mealPlanId},
+          where: 'id = ?', whereArgs: [mealId]);
+    }
+
+    await batch.commit();
+  }
+
+  Future<MealPlan?> getFirstMealPlan() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps =
+        await db.query('meal_plans', limit: 1);
+
+    if (maps.isNotEmpty) {
+      // Create a mutable copy of the map
+      Map<String, dynamic> mealPlanMap = Map<String, dynamic>.from(maps.first);
+      print(
+          '-----------------------mealPlanMap--------------------$mealPlanMap--------------------');
+      // Check if 'datesArray' exists and is a string (JSON-encoded)
+      if (mealPlanMap['datesArray'] != null &&
+          mealPlanMap['datesArray'] is String) {
+        // Decode the JSON string into a list of strings
+        final List<dynamic> decodedDates =
+            jsonDecode(mealPlanMap['datesArray']);
+
+        // Convert the list of strings into a list of DateTime objects
+        mealPlanMap['datesArray'] = decodedDates
+            .map<DateTime>((dateString) => DateTime.parse(dateString))
+            .toList();
+      }
+
+      return MealPlan.fromJson(mealPlanMap);
+    }
+    return null;
+  }
+
+  Future<List<Map<String, dynamic>>> getTableContent(String tableName) async {
+    final db = await database;
+    final List<Map<String, dynamic>> content = await db.query(tableName);
+    return content;
+  }
+
+  Future<List<String>> getTableNames() async {
+    final db = await database;
+    final List<Map<String, dynamic>> tables =
+        await db.rawQuery('SELECT name FROM sqlite_master WHERE type="table"');
+
+    return tables.map((table) => table['name'] as String).toList();
+  }
+
+  // Delete the database
+  Future<void> deleteDb() async {
+    await deleteDatabase(join(await getDatabasesPath(), 'drafts.db'));
   }
 }

@@ -11,6 +11,7 @@ import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/screens/meal_plan_preview_screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 
 import 'package:voltican_fitness/utils/native_alert.dart';
@@ -344,6 +345,18 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         actions: [
           IconButton(
               onPressed: () async {
+                await dbHelper.deleteDb();
+              },
+              icon: const Icon(Icons.delete)),
+          IconButton(
+              onPressed: () async {
+                final tables = await dbHelper.getTableNames();
+                print("-------------------tables------------------$tables");
+
+                final content = await dbHelper.getTableContent('meal_dates');
+                print(
+                    '------------------content of a meal------------------$content');
+
                 // On date changed get meals from draft and pass as th deault meals to the meal period selector
                 final draftMeals = await dbHelper.getMealsByDate(newDay!);
                 print(
@@ -640,8 +653,26 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     ),
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white),
-                onPressed: () {
-                  createPlan();
+                onPressed: () async {
+                  // createPlan();
+                  ////Save meal plan to the draft
+                  await dbHelper.createMealPlanWithPrepopulatedMeals(
+                    _mealPlanNameController.text.trim(),
+                    _selectedDuration,
+                    _startDate!,
+                    _endDate!,
+                    ref.read(userProvider)!.id,
+                    _selectedTrainees.map((trainee) => trainee.id).toList(),
+                  );
+
+                  ///Delay for sometime then after show bottom  sheet with meal plan preview
+                  Future.delayed(
+                    const Duration(milliseconds: 3000),
+                  );
+
+                  //  Fectch meal plan from db
+
+                  showMealPlanPreviewBottomSheet(context, createPlan);
                   // final mealPlan = MealPlan(
                   //   name: _mealPlanNameController.text,
                   //   duration: _selectedDuration,
@@ -652,7 +683,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                   //       _selectedTrainees.map((trainee) => trainee.id).toList(),
                   //   createdBy: ref.read(userProvider)!.id,
                   // );
-                  // // showMealPlanPreviewBottomSheet(context, mealPlan, createPlan);
                 },
                 child: _isLoading
                     ? const CircularProgressIndicator(

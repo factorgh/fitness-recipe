@@ -70,6 +70,7 @@ dependencies:
   rrule: ^0.2.16
   sqflite: ^2.3.3+1
   path: ^1.9.0
+  uuid:
 
 dev_dependencies:
   flutter_test:

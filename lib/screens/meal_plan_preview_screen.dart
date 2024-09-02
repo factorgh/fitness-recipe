@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,18 +7,32 @@ import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/trainer_provider.dart';
+import 'package:voltican_fitness/utils/sqflite_setup/database_helpers.dart';
 import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
 
 void showMealPlanPreviewBottomSheet(
-    BuildContext context, MealPlan mealPlan, Function createPlan) {
+    BuildContext context, Function createPlan) async {
+  final mealPlan = await DatabaseHelper().getFirstMealPlan();
+  print('----------------------meal plan from the db$mealPlan');
+
+  if (mealPlan == null) {
+    // Handle the case where no meal plan is found
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('No meal plans available')),
+    );
+    return;
+  }
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (context) {
       return MealPlanPreviewBottomSheet(
-          mealPlan: mealPlan, createPlan: createPlan);
+        mealPlan: mealPlan,
+        createPlan: createPlan,
+      );
     },
   );
 }
@@ -53,7 +67,6 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
           // Ensure the period exists in groupedRecipes
           groupedRecipes[recipe.period]?.add(recipe);
         } catch (e) {
-          // Handle cases where the recipe is not found
           print('Recipe with ID $recipeId not found. Error: $e');
         }
       }
