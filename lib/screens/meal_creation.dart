@@ -353,7 +353,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                 final tables = await dbHelper.getTableNames();
                 print("-------------------tables------------------$tables");
 
-                final content = await dbHelper.getTableContent('meal_dates');
+                final content = await dbHelper.getTableContent('meals[0]');
                 print(
                     '------------------content of a meal------------------$content');
 

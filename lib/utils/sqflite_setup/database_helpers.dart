@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unused_local_variable, avoid_print
 
 import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
@@ -397,32 +397,113 @@ class DatabaseHelper {
     await batch.commit();
   }
 
+  Future<List<Meal>> fetchMealsByIds(List<String> mealIds) async {
+    final db = await database;
+    final meals = await db.query(
+      'meals',
+      where: 'id IN (${mealIds.join(",")})',
+    );
+    return meals.map((mealMap) => Meal.fromJson(mealMap)).toList();
+  }
+
   Future<MealPlan?> getFirstMealPlan() async {
     final db = await database;
+
+    // Query to get the first meal plan
     final List<Map<String, dynamic>> maps =
         await db.query('meal_plans', limit: 1);
 
-    if (maps.isNotEmpty) {
-      // Create a mutable copy of the map
-      Map<String, dynamic> mealPlanMap = Map<String, dynamic>.from(maps.first);
-      print(
-          '-----------------------mealPlanMap--------------------$mealPlanMap--------------------');
-      // Check if 'datesArray' exists and is a string (JSON-encoded)
-      if (mealPlanMap['datesArray'] != null &&
-          mealPlanMap['datesArray'] is String) {
-        // Decode the JSON string into a list of strings
-        final List<dynamic> decodedDates =
-            jsonDecode(mealPlanMap['datesArray']);
+    if (maps.isEmpty) {
+      return null; // Return null if no meal plans are found
+    }
 
-        // Convert the list of strings into a list of DateTime objects
-        mealPlanMap['datesArray'] = decodedDates
-            .map<DateTime>((dateString) => DateTime.parse(dateString))
-            .toList();
+    try {
+      // Extract and convert the first meal plan map
+      Map<String, dynamic> mealPlanMap = Map<String, dynamic>.from(maps.first);
+
+      // Debug: Print raw data
+      print('Raw mealPlanMap: $mealPlanMap');
+
+      // Fetch the meal IDs from the meal plan (assuming meals are stored as a list of meal IDs)
+      List<String> mealIds = _parseMealIds(mealPlanMap['meals']);
+
+      // Fetch meals from the 'meals' table based on the meal IDs
+      List<Meal> meals = await fetchMealsByIds(mealIds);
+
+      // Convert meals to JSON and set them in the map
+      mealPlanMap['meals'] = meals.map((meal) => meal.toJson()).toList();
+
+      // Parse the 'datesArray' if it exists
+      mealPlanMap['datesArray'] = _parseDatesArray(mealPlanMap['datesArray']);
+
+      // Convert the map to a MealPlan object
+      return MealPlan.fromJson(mealPlanMap);
+    } catch (e) {
+      // Log or handle parsing errors if needed
+      print('Error fetching MealPlan: $e');
+      return null;
+    }
+  }
+
+// Helper function to parse datesArray
+  List<DateTime>? _parseDatesArray(dynamic datesArray) {
+    print('-----------------datesArray---------------- $datesArray');
+
+    // If datesArray is null, return null
+    if (datesArray == null) {
+      print('datesArray is null');
+      return null;
+    }
+
+    // Ensure datesArray is a List
+    if (datesArray is List) {
+      if (datesArray.isEmpty) {
+        print('datesArray is an empty list');
+        return [];
       }
 
-      return MealPlan.fromJson(mealPlanMap);
+      // Process each item in the list
+      return datesArray
+          .map((e) {
+            if (e is int) {
+              print('Parsing int timestamp: $e');
+              return DateTime.fromMillisecondsSinceEpoch(e);
+            } else if (e is String) {
+              print('Parsing date string: $e');
+              try {
+                return DateTime.parse(e);
+              } catch (e) {
+                print('Error parsing date string: $e');
+                return null;
+              }
+            } else {
+              print('Invalid date format: $e');
+              return null;
+            }
+          })
+          .whereType<DateTime>()
+          .toList();
+    } else {
+      print('datesArray is not a List');
+      throw const FormatException('Invalid format for datesArray');
     }
-    return null;
+  }
+
+// Helper function to parse meal IDs
+  List<String> _parseMealIds(dynamic meals) {
+    if (meals == null || meals is! String) {
+      return [];
+    }
+
+    try {
+      final decodedMeals = jsonDecode(meals);
+      if (decodedMeals is List) {
+        return List<String>.from(decodedMeals);
+      }
+    } catch (e) {
+      print('Error parsing meal IDs: $e');
+    }
+    return [];
   }
 
   Future<List<Map<String, dynamic>>> getTableContent(String tableName) async {
