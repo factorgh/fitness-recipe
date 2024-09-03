@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/utils/sqflite_setup/database_helpers.dart';
+
 import 'package:voltican_fitness/widgets/recurrence_sheet.dart';
 import 'package:intl/intl.dart';
 
@@ -34,7 +34,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
   final Map<String, dynamic>? recurrence = {};
 
 // Create db instance
-  DatabaseHelper dbHelper = DatabaseHelper();
+
   // Recurrence object
 
   TabController? _tabController;
@@ -208,8 +208,6 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
 
   void _removeRecipe(String mealPeriod, String recipeId) async {
     // Remove from SQFlite before removing from UI
-    await dbHelper
-        .removeMeal(recipeId); // Make sure you have a function to handle this
 
     setState(() {
       _selectedMeals[mealPeriod]?.removeWhere(

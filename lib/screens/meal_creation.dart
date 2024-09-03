@@ -11,12 +11,13 @@ import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/meal_plan_preview_screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/hive/hive_class.dart';
+import 'package:voltican_fitness/utils/hive/mealplan.dart' as hive_mealplan;
 
 import 'package:voltican_fitness/utils/native_alert.dart';
+
 import 'package:voltican_fitness/utils/show_snackbar.dart';
-import 'package:voltican_fitness/utils/sqflite_setup/database_helpers.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
 
 class MealCreationScreen extends ConsumerStatefulWidget {
@@ -53,7 +54,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   DateTime? newDay;
 
   // SqflITE SETUP AND SERVICES
-  final DatabaseHelper dbHelper = DatabaseHelper();
+  // final DatabaseHelper dbHelper = DatabaseHelper();
 
   // Callback function to handle selection changes
   void _handleRecipeSelectionChanged(List<Meal> selectedAllocations) {
@@ -107,22 +108,22 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
   @override
   void initState() {
+    super.initState();
     _startDate = widget.selectedDay;
     _updateHighlightedDates();
     fetchAllUserRecipes();
     getTraineesFollowingTrainer();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      fetchMealsForSelectedDay();
-    });
-
-    super.initState();
+    // Initialize HiveService outside of initState
+    _initializeHiveService();
   }
 
-  void fetchMealsForSelectedDay() async {
-    final meals = await fetchMealsFromDatabase(widget.selectedDay);
+  Future<void> _initializeHiveService() async {
+    final hiveService = HiveService();
+    await hiveService.init();
+
     setState(() {
-      startMeals = meals; // Update the default meals when the date changes
+      // Update state if needed after initialization
     });
   }
 
@@ -323,16 +324,9 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         ));
       }
     }
-
-    print('---------------------meals data hive--------------------$meals');
-    await dbHelper.insertMealsForDayAndRecurrence(
-        newDay!, meals, _startDate!, _endDate!);
   }
 
 // Handle meal fetch on date selection from the database
-  Future<List<Meal>> fetchMealsFromDatabase(DateTime day) async {
-    return await dbHelper.getMealsByDate(day);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -345,22 +339,54 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         actions: [
           IconButton(
               onPressed: () async {
-                await dbHelper.deleteDb();
+                // Fetching a MealPlan
+                final hiveService = HiveService();
+                final fetchedMealPlan = hiveService.getMealPlan('1');
+                print(fetchedMealPlan);
+
+                // final List<Meal> meals = [];
+
+                // // Create stor instance
+
+                // for (Meal meal in _selectedRecipeAllocations) {
+                //   print("------------Meal Allocation------------");
+                //   for (Recipe recipe in meal.recipes) {
+                //     print("Recipe ID: ${recipe.id}");
+                //     print("Recipe Title: ${recipe.title}");
+
+                //     meals.add(Meal(
+                //       mealType: meal.mealType,
+                //       date: newDay!,
+                //       timeOfDay: meal.timeOfDay,
+                //       recipes: [recipe],
+                //       recurrence: chosenRecurrence,
+                //     ));
+                //   }
+                // }
               },
-              icon: const Icon(Icons.delete)),
+              icon: const Icon(Icons.add)),
           IconButton(
               onPressed: () async {
-                final tables = await dbHelper.getTableNames();
-                print("-------------------tables------------------$tables");
+                final hiveService = HiveService();
 
-                final content = await dbHelper.getTableContent('meals[0]');
-                print(
-                    '------------------content of a meal------------------$content');
+                // Creating or updating a MealPlan
+                final mealPlan = hive_mealplan.MealPlan(
+                  id: '1',
+                  name: 'Weekly Plan',
+                  duration: 'Week',
+                  startDate: DateTime.now(),
+                  endDate: DateTime.now().add(const Duration(days: 7)),
+                  datesArray: [DateTime.now()],
+                  meals: [],
+                  trainees: ['trainee1', 'trainee2'],
+                  createdBy: 'user123',
+                  createdAt: DateTime.now(),
+                  updatedAt: DateTime.now(),
+                );
+                print('------------------------$mealPlan');
+                await hiveService.saveMealPlan(mealPlan);
 
-                // On date changed get meals from draft and pass as th deault meals to the meal period selector
-                final draftMeals = await dbHelper.getMealsByDate(newDay!);
-                print(
-                    "-------------------draft meals from sql-----------------------$draftMeals--------------------");
+                // Deleting a MealPlan
               },
               icon: const Icon(Icons.view_week))
         ],
@@ -572,7 +598,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                         // Check if the selected day is within the range
                         if (_isWithinRange(selectDay)) {
                           // Fetch meals for the selected day from the database
-                          startMeals = await fetchMealsFromDatabase(selectDay);
 
                           // Debugging information
                           print('-------------- trainer -------------');
@@ -656,14 +681,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                 onPressed: () async {
                   // createPlan();
                   ////Save meal plan to the draft
-                  await dbHelper.createMealPlanWithPrepopulatedMeals(
-                    _mealPlanNameController.text.trim(),
-                    _selectedDuration,
-                    _startDate!,
-                    _endDate!,
-                    ref.read(userProvider)!.id,
-                    _selectedTrainees.map((trainee) => trainee.id).toList(),
-                  );
 
                   ///Delay for sometime then after show bottom  sheet with meal plan preview
                   Future.delayed(
@@ -672,7 +689,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
                   //  Fectch meal plan from db
 
-                  showMealPlanPreviewBottomSheet(context, createPlan);
+                  // showMealPlanPreviewBottomSheet(context, createPlan);
                   // final mealPlan = MealPlan(
                   //   name: _mealPlanNameController.text,
                   //   duration: _selectedDuration,

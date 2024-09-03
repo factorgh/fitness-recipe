@@ -1,18 +1,25 @@
-import 'package:objectbox/objectbox.dart';
+import 'package:hive/hive.dart';
 
-@Entity()
+part 'recurrence.g.dart';
+
+@HiveType(typeId: 0)
 class Recurrence {
-  @Id()
-  int id; // Add an ID field for ObjectBox
-
+  @HiveField(0)
   final String option;
+
+  @HiveField(1)
   final DateTime date;
+
+  @HiveField(2)
   final List<DateTime>? exceptions;
+
+  @HiveField(3)
   final List<DateTime>? customDates;
+
+  @HiveField(4)
   final List<int>? customDays;
 
   Recurrence({
-    this.id = 0,
     required this.option,
     required this.date,
     this.customDates,

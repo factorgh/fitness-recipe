@@ -7,35 +7,24 @@ import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/trainer_provider.dart';
-import 'package:voltican_fitness/utils/sqflite_setup/database_helpers.dart';
+
 import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
 
-void showMealPlanPreviewBottomSheet(
-    BuildContext context, Function createPlan) async {
-  final mealPlan = await DatabaseHelper().getFirstMealPlan();
-  print('----------------------meal plan from the db$mealPlan');
-
-  if (mealPlan == null) {
-    // Handle the case where no meal plan is found
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('No meal plans available')),
-    );
-    return;
-  }
-
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (context) {
-      return MealPlanPreviewBottomSheet(
-        mealPlan: mealPlan,
-        createPlan: createPlan,
-      );
-    },
-  );
-}
+// void showMealPlanPreviewBottomSheet(
+//     BuildContext context, Function createPlan) async {
+//   showModalBottomSheet(
+//     context: context,
+//     isScrollControlled: true,
+//     backgroundColor: Colors.transparent,
+//     builder: (context) {
+//       return MealPlanPreviewBottomSheet(
+//         mealPlan: ,
+//         createPlan: createPlan,
+//       );
+//     },
+//   );
+// }
 
 class MealPlanPreviewBottomSheet extends ConsumerWidget {
   final MealPlan mealPlan;
