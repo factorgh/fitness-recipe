@@ -11,6 +11,8 @@ import 'package:voltican_fitness/services/noti_setup.dart'; // Ensure this is th
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'package:voltican_fitness/utils/hive/mealplan.dart';
+import 'package:voltican_fitness/utils/hive/rating.dart';
+import 'package:voltican_fitness/utils/hive/recipe.dart';
 import 'package:voltican_fitness/utils/hive/recurrence.dart';
 
 void main() async {
@@ -20,6 +22,9 @@ void main() async {
   Hive.registerAdapter(MealPlanAdapter());
 
   Hive.registerAdapter(RecurrenceAdapter());
+  Hive.registerAdapter(RecipeAdapter());
+  Hive.registerAdapter(RatingAdapter());
+
   // Initialize Timezone and Notifications
   tz.initializeTimeZones();
   final notificationService = NotificationService();

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/Features/mealplan/services/mealplan_service.dart';
@@ -341,8 +342,12 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
               onPressed: () async {
                 // Fetching a MealPlan
                 final hiveService = HiveService();
-                final fetchedMealPlan = hiveService.getMealPlan('1');
-                print(fetchedMealPlan);
+                final fetchedMealPlan = await hiveService.getAllMealPlans();
+                print('--------------all-------$fetchedMealPlan');
+
+                // check hive box state
+                final hiveState = hiveService.isMealPlanBoxEmpty();
+                print('----------------hiveState----------------$hiveState');
 
                 // final List<Meal> meals = [];
 
@@ -385,8 +390,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                 );
                 print('------------------------$mealPlan');
                 await hiveService.saveMealPlan(mealPlan);
-
-                // Deleting a MealPlan
               },
               icon: const Icon(Icons.view_week))
         ],

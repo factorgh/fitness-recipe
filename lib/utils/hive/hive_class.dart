@@ -24,18 +24,43 @@ class HiveService {
 
   // Create or Update MealPlan
   Future<void> saveMealPlan(MealPlan mealPlan) async {
-    print('---------------------------meal plan passed------------$mealPlan');
-    await _mealPlanBox?.put(mealPlan.id, mealPlan);
+    try {
+      print('---------------------------meal plan passed------------');
+      print(mealPlan.id);
+      print(mealPlan);
+      await _mealPlanBox?.put(mealPlan.id, mealPlan);
+      print('Meal plan saved successfully');
+    } catch (e) {
+      print('Error saving meal plan: $e');
+    }
   }
 
   // Get MealPlan by ID
   MealPlan? getMealPlan(String id) {
+    print('---------- id --------');
+    print(id);
     return _mealPlanBox?.get(id);
   }
 
   // Get all MealPlans
-  List<MealPlan> getAllMealPlans() {
-    return _mealPlanBox?.values.toList() ?? [];
+  Future<List<MealPlan>> getAllMealPlans() async {
+    final box = _mealPlanBox; // Retrieve your Box instance
+    if (box == null) {
+      return []; // Return an empty list if the box is null
+    }
+
+    // Asynchronous operation to fetch all values
+    final mealPlans = box.values.toList();
+    return mealPlans;
+  }
+
+  // Check if MealPlan box is empty
+  bool isMealPlanBoxEmpty() {
+    final box = _mealPlanBox;
+    if (box == null) {
+      return true; // Box is not initialized
+    }
+    return box.isEmpty;
   }
 
   // Delete MealPlan
@@ -58,6 +83,15 @@ class HiveService {
     return _recurrenceBox?.values.toList() ?? [];
   }
 
+  // Check if Recurrence box is empty
+  bool isRecurrenceBoxEmpty() {
+    final box = _recurrenceBox;
+    if (box == null) {
+      return true; // Box is not initialized
+    }
+    return box.isEmpty;
+  }
+
   // Delete Recurrence
   Future<void> deleteRecurrence(DateTime date) async {
     await _recurrenceBox?.delete(date.toIso8601String());
@@ -76,6 +110,15 @@ class HiveService {
   // Get all Meals
   List<Meal> getAllMeals() {
     return _mealBox?.values.toList() ?? [];
+  }
+
+  // Check if Meal box is empty
+  bool isMealBoxEmpty() {
+    final box = _mealBox;
+    if (box == null) {
+      return true; // Box is not initialized
+    }
+    return box.isEmpty;
   }
 
   // Delete Meal
