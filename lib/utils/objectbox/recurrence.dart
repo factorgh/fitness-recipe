@@ -3,18 +3,20 @@ import 'package:objectbox/objectbox.dart';
 @Entity()
 class Recurrence {
   @Id()
-  int id = 0;
-  String? option;
-  DateTime? date;
-  List<String>? exceptions;
-  List<DateTime>? customDates;
-  List<int>? customDays;
+  int id; // Add an ID field for ObjectBox
+
+  final String option;
+  final DateTime date;
+  final List<DateTime>? exceptions;
+  final List<DateTime>? customDates;
+  final List<int>? customDays;
 
   Recurrence({
-    this.option,
-    this.date,
-    this.exceptions,
+    this.id = 0,
+    required this.option,
+    required this.date,
     this.customDates,
+    this.exceptions,
     this.customDays,
   });
 }

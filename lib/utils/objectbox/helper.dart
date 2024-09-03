@@ -1,74 +1,100 @@
-// import 'package:objectbox/objectbox.dart';
-// import 'package:path_provider/path_provider.dart';
-// import 'package:voltican_fitness/models/mealplan.dart';
+import 'package:objectbox/objectbox.dart';
+import 'package:voltican_fitness/models/mealplan.dart';
 
-// class ObjectBoxHelper {
-//   late final Store store;
-//   late final Box<MealPlan> mealPlanBox;
-//   late final Box<Meal> mealBox;
-//   late final Box<Recurrence> recurrenceBox;
+class ObjehctHelper {
+  List<DateTime> generateRecurrenceDates(
+      DateTime startDate, DateTime endDate, Recurrence recurrence) {
+    List<DateTime> dates = [];
+    DateTime currentDate = startDate;
 
-//   ObjectBoxHelper._create(this.store) {
-//     mealPlanBox = Box<MealPlan>(store);
-//     mealBox = Box<Meal>(store);
-//     recurrenceBox = Box<Recurrence>(store);
-//   }
+    // Handle different recurrence types
+    if (recurrence.option == 'daily') {
+      // Daily recurrence
+      while (currentDate.isBefore(endDate) ||
+          currentDate.isAtSameMomentAs(endDate)) {
+        dates.add(currentDate);
+        currentDate = currentDate.add(const Duration(days: 1));
+      }
+    } else if (recurrence.option == 'weekly') {
+      // Weekly recurrence with specific days of the week
+      while (currentDate.isBefore(endDate) ||
+          currentDate.isAtSameMomentAs(endDate)) {
+        for (var day in recurrence.customDays!) {
+          DateTime weekDayDate = _getWeekdayDate(currentDate, day);
+          if (weekDayDate.isBefore(endDate) ||
+              weekDayDate.isAtSameMomentAs(endDate)) {
+            dates.add(weekDayDate);
+          }
+        }
+        currentDate =
+            currentDate.add(const Duration(days: 7)); // Move to the next week
+      }
+    } else if (recurrence.option == 'custom') {
+      // Custom recurrence, similar to weekly but user-defined days of the week
+      while (currentDate.isBefore(endDate) ||
+          currentDate.isAtSameMomentAs(endDate)) {
+        for (var day in recurrence.customDays!) {
+          DateTime weekDayDate = _getWeekdayDate(currentDate, day);
+          if (weekDayDate.isBefore(endDate) ||
+              weekDayDate.isAtSameMomentAs(endDate)) {
+            dates.add(weekDayDate);
+          }
+        }
+        currentDate = currentDate.add(const Duration(days: 7));
+      }
+    }
 
-//   static Future<ObjectBoxHelper> init() async {
-//     final dir = await getApplicationDocumentsDirectory();
-//     final store =
-//         Store(getObjectBoxModel(), directory: '${dir.path}/objectbox');
-//     return ObjectBoxHelper._create(store);
-//   }
+    // Include the endDate if it matches the recurrence pattern
+    if (_isRecurrenceDay(endDate, recurrence.option, recurrence.customDays!) &&
+        !dates.contains(endDate)) {
+      dates.add(endDate);
+    }
 
-//   // Insert MealPlan
-//   Future<void> insertMealPlan(MealPlan mealPlan) async {
-//     mealPlan.id = 0; // Reset ID for new entries
-//     mealPlanBox.put(mealPlan);
-//   }
+    return dates;
+  }
 
-//   // Insert Meal
-//   Future<void> insertMeal(Meal meal) async {
-//     meal.id = 0;
-//     mealBox.put(meal);
-//   }
+// Helper function to check if a given date matches the recurrence pattern
+  bool _isRecurrenceDay(
+      DateTime date, String recurrenceType, List<int> daysOfWeek) {
+    if (recurrenceType == 'daily') {
+      return true; // Daily recurrence, every day is valid
+    } else if (recurrenceType == 'weekly' || recurrenceType == 'custom') {
+      return daysOfWeek.contains(date.weekday);
+    }
+    return false;
+  }
 
-//   // Insert Recurrence
-//   Future<void> insertRecurrence(Recurrence recurrence) async {
-//     recurrence.id = 0;
-//     recurrenceBox.put(recurrence);
-//   }
+// Helper function to get the date of a specific weekday from a given date
+  DateTime _getWeekdayDate(DateTime date, int weekday) {
+    int daysUntilWeekday = (weekday - date.weekday + 7) % 7;
+    return date.add(Duration(days: daysUntilWeekday));
+  }
 
-//   // Fetch all MealPlans
-//   List<MealPlan> getMealPlans() {
-//     return mealPlanBox.getAll();
-//   }
+// Example: Save a meal plan with recurrence
+  void saveMealPlan(
+      Store store,
+      DateTime startDate,
+      DateTime endDate,
+      Recurrence recurrence,
+      String name,
+      String duration,
+      String createdBy,
+      List<String> trainees) {
+    final mealPlan = MealPlan(
+        name: name,
+        startDate: startDate,
+        endDate: endDate,
+        duration: duration,
+        createdBy: createdBy,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        trainees: trainees);
+    store.box<MealPlan>().put(mealPlan);
+  }
 
-//   // Fetch Meals by Date
-//   List<Meal> getMealsByDate(DateTime date) {
-//     return mealBox
-//         .query(Meal_.date.equals(date.millisecondsSinceEpoch))
-//         .build()
-//         .find();
-//   }
-
-//   // Remove Meal
-//   Future<void> removeMeal(int mealId) async {
-//     mealBox.remove(mealId);
-//   }
-
-//   // Update Meals with MealPlan ID
-//   Future<void> updateMealPlanId(int mealPlanId) async {
-//     final meals = mealBox.getAll();
-//     meals.forEach((meal) {
-//       meal?.mealPlan.targetId = mealPlanId;
-//     });
-//     mealBox.putMany(meals);
-//   }
-
-//   // Get all MealPlans with Meals
-//   List<MealPlan> getMealPlansWithMeals() {
-//     final mealPlans = mealPlanBox.getAll();
-//     return mealPlans;
-//   }
-// }
+// Example: Retrieve and process meal plans
+  List<MealPlan> getMealPlans(Store store) {
+    final mealPlans = store.box<MealPlan>().getAll();
+    return mealPlans;
+  }
+}

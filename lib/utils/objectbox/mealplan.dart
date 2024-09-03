@@ -1,33 +1,38 @@
 import 'package:objectbox/objectbox.dart';
-import 'package:voltican_fitness/models/mealplan.dart';
+import 'package:voltican_fitness/models/meal.dart'; // Assuming this file contains the Meal class
 
 @Entity()
 class MealPlan {
   @Id()
-  int id = 0;
-  String name;
-  String duration;
-  DateTime? startDate;
-  DateTime? endDate;
-  String createdBy;
-  DateTime? createdAt;
-  DateTime? updatedAt;
-  List<String>? trainees;
+  int id; // ObjectBox ID field
 
-  @Property(type: PropertyType.byteVector)
-  List<DateTime>? datesArray; // Store dates as byte array
+  final String name;
+  final String duration;
+  final DateTime? startDate;
+  final DateTime? endDate;
 
-  @Backlink('mealPlan')
-  final meals = ToMany<Meal>();
+  // DatesArray cannot be directly stored as List<DateTime>, consider serializing or handling separately
+  @Transient() // Ignoring this field for ObjectBox
+  final List<DateTime>? datesArray;
+
+  // Define a One-to-Many relationship with Meal
+  final ToMany<Meal> meals; // ObjectBox relationship
+
+  final List<String> trainees;
+  final String createdBy;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   MealPlan({
+    this.id = 0, // Default ID
     required this.name,
     required this.duration,
-    required this.createdBy,
     this.startDate,
     this.endDate,
-    this.trainees,
+    this.datesArray, // This will not be persisted directly in ObjectBox
+    required this.trainees,
+    required this.createdBy,
     this.createdAt,
     this.updatedAt,
-  });
+  }) : meals = ToMany<Meal>(); // Initialize ToMany relationship
 }
