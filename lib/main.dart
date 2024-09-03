@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/onboarding_screen.dart';
@@ -10,20 +9,14 @@ import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/services/noti_setup.dart'; // Ensure this is the correct import for NotificationService
 import 'package:timezone/data/latest.dart' as tz;
 
-import 'package:voltican_fitness/utils/hive/mealplan.dart';
-import 'package:voltican_fitness/utils/hive/rating.dart';
-import 'package:voltican_fitness/utils/hive/recipe.dart';
-import 'package:voltican_fitness/utils/hive/recurrence.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
 // Initializing hive
-  Hive.registerAdapter(MealPlanAdapter());
 
-  Hive.registerAdapter(RecurrenceAdapter());
-  Hive.registerAdapter(RecipeAdapter());
-  Hive.registerAdapter(RatingAdapter());
+  // Hive.registerAdapter(RecurrenceAdapter());
+  // Hive.registerAdapter(RecipeAdapter());
+  // Hive.registerAdapter(RatingAdapter());
 
   // Initialize Timezone and Notifications
   tz.initializeTimeZones();

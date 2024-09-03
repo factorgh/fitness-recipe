@@ -33,7 +33,7 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
     for (final allocation in mealPlan.meals) {
       try {
         final meal = allRecipes
-            .where((recipe) => allocation.recipes.contains(recipe))
+            .where((recipe) => allocation.recipes!.contains(recipe))
             .map((recipe) => Meal(
                   date: DateTime.now(),
                   mealType: recipe.period,
@@ -273,7 +273,7 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
                   Column(
                     children: entry.value.map((meal) {
                       return Column(
-                        children: meal.recipes.map((recipe) {
+                        children: meal.recipes!.map((recipe) {
                           return MealPeriodCard(
                             mealPeriod: entry.key,
                             time1: meal.timeOfDay,

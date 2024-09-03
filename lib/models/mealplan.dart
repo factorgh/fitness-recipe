@@ -65,16 +65,18 @@ class Meal {
   final String? id;
   final String mealType; // "breakfast", "lunch", "dinner", "snack"
   final String timeOfDay; // e.g., "08:00 AM", "12:00 PM", etc.
-  final List<Recipe> recipes; // List of Recipe objects
+  final List<Recipe>? recipes; // List of Recipe objects
   final Recurrence? recurrence; // Optional recurrence for the meal
   final DateTime date; // Date for the meal
+  final bool? isDraft;
 
   Meal({
     required this.mealType,
     required this.timeOfDay,
-    required this.recipes,
+    this.recipes,
     this.recurrence,
     this.id,
+    this.isDraft,
     required this.date,
   });
 
@@ -85,7 +87,8 @@ class Meal {
       recipes: json['recipes'] != null
           ? List<Recipe>.from(
               json['recipes'].map((item) => Recipe.fromJson(item)))
-          : [],
+          : null,
+      isDraft: json['isDraft'] != null as bool?,
       // Check if recurrence is a String (likely stored as a JSON string)
       recurrence: json['recurrence'] != null
           ? (json['recurrence'] is String
@@ -103,7 +106,8 @@ class Meal {
       'id': id,
       'mealType': mealType,
       'timeOfDay': timeOfDay,
-      'recipes': recipes.map((e) => e.toJson()).toList(),
+      'isDraft': isDraft,
+      'recipes': recipes?.map((e) => e.toJson()).toList(),
       'recurrence': recurrence?.toJson(),
       'date': date.toIso8601String(),
     };
@@ -111,7 +115,7 @@ class Meal {
 
   @override
   String toString() {
-    return 'Meal(id:$id,mealType: $mealType, date: $date, timeOfDay: $timeOfDay, recipes: $recipes, recurrence: $recurrence)';
+    return 'Meal(id:$id,mealType: $mealType, date: $date,isDraft: $isDraft,, timeOfDay: $timeOfDay, recipes: $recipes, recurrence: $recurrence)';
   }
 }
 
@@ -119,6 +123,7 @@ class MealPlan {
   final String? id;
   final String name;
   final String duration; // Duration: "Does Not Repeat", "Week", "Month", etc.
+  final bool? isDraft;
   final DateTime? startDate; // Start date of the meal plan
   final DateTime? endDate; // End date of the meal plan
   final List<DateTime>? datesArray; // Array of dates for custom meal plan
@@ -132,6 +137,7 @@ class MealPlan {
     this.id,
     required this.name,
     required this.duration,
+    this.isDraft,
     this.startDate,
     this.endDate,
     this.datesArray,
@@ -151,14 +157,17 @@ class MealPlan {
           json['startDate'] != null ? DateTime.parse(json['startDate']) : null,
       endDate: json['endDate'] != null ? DateTime.parse(json['endDate']) : null,
       datesArray: json['datesArray'] != null
-          ? List<DateTime>.from(
-              json['datesArray'].map((e) => DateTime.parse(e)))
+          ? List<DateTime>.from((json['datesArray'] as List)
+              .map((e) => DateTime.parse(e as String)))
           : null,
+      isDraft: json['isDraft'] as bool?,
       meals: json['meals'] != null
-          ? List<Meal>.from(json['meals'].map((item) => Meal.fromJson(item)))
+          ? List<Meal>.from((json['meals'] as List)
+              .map((item) => Meal.fromJson(item as Map<String, dynamic>)))
           : [],
-      trainees:
-          json['trainees'] != null ? List<String>.from(json['trainees']) : [],
+      trainees: json['trainees'] != null
+          ? List<String>.from(json['trainees'] as List)
+          : [],
       createdBy: json['createdBy'] as String? ?? '',
       createdAt:
           json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
@@ -174,6 +183,7 @@ class MealPlan {
       'duration': duration,
       'startDate': startDate?.toIso8601String(),
       'endDate': endDate?.toIso8601String(),
+      'isDraft': isDraft,
       'datesArray': datesArray?.map((e) => e.toIso8601String()).toList(),
       'meals': meals.map((e) => e.toJson()).toList(),
       'trainees': trainees,
@@ -185,7 +195,7 @@ class MealPlan {
 
   @override
   String toString() {
-    return 'MealPlan(id: $id, name: $name, duration: $duration, startDate: $startDate, endDate: $endDate, datesArray: $datesArray, meals: $meals, trainees: $trainees, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'MealPlan(id: $id, name: $name,isDraft: $isDraft,, duration: $duration, startDate: $startDate, endDate: $endDate, datesArray: $datesArray, meals: $meals, trainees: $trainees, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override

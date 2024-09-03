@@ -211,7 +211,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
 
     setState(() {
       _selectedMeals[mealPeriod]?.removeWhere(
-          (allocation) => allocation.recipes.any((r) => r.id == recipeId));
+          (allocation) => allocation.recipes!.any((r) => r.id == recipeId));
       if (_selectedMeals[mealPeriod]?.isEmpty ?? false) {
         _selectedMeals.remove(mealPeriod);
       }
@@ -301,8 +301,8 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
               itemBuilder: (context, index) {
                 Recipe recipe = filteredRecipes[index];
                 bool isSelected = _selectedMeals[mealPeriod]?.any(
-                        (allocation) =>
-                            allocation.recipes.any((r) => r.id == recipe.id)) ??
+                        (allocation) => allocation.recipes!
+                            .any((r) => r.id == recipe.id)) ??
                     false;
 
                 return GestureDetector(
@@ -453,7 +453,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
               spacing: 8,
               children: allocations.map((allocation) {
                 String displayText =
-                    allocation.recipes.map((r) => r.title).join(', ');
+                    allocation.recipes!.map((r) => r.title).join(', ');
                 displayText += ' @ ${allocation.timeOfDay}';
 
                 return Chip(
@@ -461,7 +461,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                   backgroundColor: Colors.blue.withOpacity(0.2),
                   deleteIcon: const Icon(Icons.cancel),
                   onDeleted: () =>
-                      _removeRecipe(mealPeriod, allocation.recipes.first.id!),
+                      _removeRecipe(mealPeriod, allocation.recipes!.first.id!),
                 );
               }).toList(),
             ),

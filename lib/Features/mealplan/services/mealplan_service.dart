@@ -107,4 +107,24 @@ class MealPlanService {
       throw Exception('Failed to fetch meal plans from serverRR');
     }
   }
+
+  // Fetch the draft meal plan
+  Future<MealPlan> getMealPlanDraft() async {
+    try {
+      final response = await client.dio.get('/meal-plans/meals/mealplan/draft');
+      print(
+          '------------------------------meal drafts--------------------------');
+      print(response.data);
+
+      // Check if a draft meal plan exists in the response
+      if (response.statusCode == 200) {
+        return MealPlan.fromJson(response.data);
+      } else {
+        throw Exception('No draft meal plan found');
+      }
+    } catch (e) {
+      print('Error fetching draft meal plan: $e');
+      throw Exception('Failed to fetch draft meal plan: $e');
+    }
+  }
 }

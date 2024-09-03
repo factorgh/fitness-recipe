@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, unused_element
+// ignore_for_file: avoid_print, unused_element, unrelated_type_equality_checks
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,7 +32,7 @@ class SingleMealPlanScreenTrainee extends ConsumerWidget {
     for (final allocation in mealPlan.meals) {
       try {
         final recipe = allRecipes.firstWhere(
-          (recipe) => recipe.id == allocation.recipes.map((id) => id),
+          (recipe) => recipe.id == allocation.recipes?.map((id) => id),
         );
         // Ensure the period exists in groupedRecipes
         groupedRecipes[recipe.period]?.add(recipe);
@@ -248,7 +248,7 @@ class SingleMealPlanScreenTrainee extends ConsumerWidget {
                     children: entry.value.map((recipe) {
                       final allocation = mealPlan.meals.firstWhere(
                           (allocation) =>
-                              allocation.recipes.map((id) => id) == recipe.id);
+                              allocation.recipes?.map((id) => id) == recipe.id);
 
                       return MealPeriodCard(
                         mealPeriod: recipe.title,

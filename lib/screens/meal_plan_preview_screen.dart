@@ -11,20 +11,20 @@ import 'package:voltican_fitness/providers/trainer_provider.dart';
 import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
 
-// void showMealPlanPreviewBottomSheet(
-//     BuildContext context, Function createPlan) async {
-//   showModalBottomSheet(
-//     context: context,
-//     isScrollControlled: true,
-//     backgroundColor: Colors.transparent,
-//     builder: (context) {
-//       return MealPlanPreviewBottomSheet(
-//         mealPlan: ,
-//         createPlan: createPlan,
-//       );
-//     },
-//   );
-// }
+void showMealPlanPreviewBottomSheet(
+    BuildContext context, Function createPlan, MealPlan mealplan) async {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) {
+      return MealPlanPreviewBottomSheet(
+        mealPlan: mealplan,
+        createPlan: createPlan,
+      );
+    },
+  );
+}
 
 class MealPlanPreviewBottomSheet extends ConsumerWidget {
   final MealPlan mealPlan;
@@ -48,7 +48,7 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
     };
 
     for (final allocation in mealPlan.meals) {
-      for (final recipeId in allocation.recipes) {
+      for (final recipeId in allocation.recipes!) {
         try {
           final recipe = allRecipes.firstWhere(
             (recipe) => recipe.id == recipeId,
@@ -336,7 +336,7 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
                   Column(
                     children: entry.value.map((recipe) {
                       final allocation = mealPlan.meals.firstWhere(
-                          (allocation) => allocation.recipes.contains(recipe));
+                          (allocation) => allocation.recipes!.contains(recipe));
 
                       return MealPeriodCard(
                         mealPeriod: recipe.title,
