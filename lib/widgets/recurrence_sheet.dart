@@ -26,7 +26,7 @@ class RecurrenceSelectionWidget extends StatefulWidget {
 
 class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
   String _selectedRecurrence = 'Daily'; // Default recurrence selection
-  int _customDays = 1; // Custom interval days
+  final int _customDays = 1; // Custom interval days
   final List<bool> _daysSelected =
       List.generate(7, (_) => false); // Selected days for weekly options
 // Date for custom rule
@@ -58,48 +58,18 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
   // Helper: Build daily recurrence widget
   Widget _buildDailyOptions() {
     return const Column(
-      children: [
-        // CheckboxListTile(
-        //   title: const Text('Every Day'),
-        //   value: _selectedRecurrence == 'Daily',
-        //   onChanged: (bool? value) {},
-        // ),
-        // _buildExceptionDates(),
-      ],
+      children: [],
     );
   }
 
   // Helper: Build weekly recurrence widget
   Widget _buildWeeklyOptions() {
-    return const Column(
-      children: [
-        Text('Create custom recurrence ')
-        // Text('Select Days of the Week'),
-        // _buildExceptionDates(),
-      ],
-    );
-  }
-
-// Add a state variable to track whether the checkbox is selected
-
-  Widget _buildBiWeeklyOptions() {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [Text('Create custom recurrence ')],
-    );
-  }
-
-  Widget _buildCustomOptions() {
     return Column(
       children: [
         const Text(
-          'Create custom recurrence',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          'Create custom recurrence ',
+          style: TextStyle(fontWeight: FontWeight.w800),
         ),
-        const SizedBox(
-          width: 50,
-        ),
-        const SizedBox(height: 10),
         ListTile(
           title: const Text('Select Days of the Week'),
           subtitle: Wrap(
@@ -117,6 +87,54 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
             }),
           ),
         ),
+      ],
+    );
+  }
+
+// Add a state variable to track whether the checkbox is selected
+
+  Widget _buildBiWeeklyOptions() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Center(
+            child: Text(
+          'Create custom recurrence ',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        )),
+        ListTile(
+          title: const Text('Select Days of the Week'),
+          subtitle: Wrap(
+            spacing: 10.0,
+            children: List.generate(7, (index) {
+              return FilterChip(
+                label: Text(weekdays[index]),
+                selected: _daysOfWeekSelected[index],
+                onSelected: (bool selected) {
+                  setState(() {
+                    _daysOfWeekSelected[index] = selected;
+                  });
+                },
+              );
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCustomOptions() {
+    return Column(
+      children: [
+        const Text(
+          'Create custom recurrence',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+        ),
+        const SizedBox(
+          width: 50,
+        ),
+        const SizedBox(height: 10),
+
         const SizedBox(height: 10),
         // Horizontally scrollable list of days of the month
         ListTile(
@@ -176,9 +194,27 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
   Widget _buildMonthlyOptions() {
     return Column(
       children: [
-        const Text('Create custom recurrence '),
-        // const Text('Select Specific Date(s) of the Month'),
-        // const SizedBox(height: 10),
+        const Text(
+          'Create custom recurrence ',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
+        ListTile(
+          title: const Text('Select Days of the Week'),
+          subtitle: Wrap(
+            spacing: 10.0,
+            children: List.generate(7, (index) {
+              return FilterChip(
+                label: Text(weekdays[index]),
+                selected: _daysOfWeekSelected[index],
+                onSelected: (bool selected) {
+                  setState(() {
+                    _daysOfWeekSelected[index] = selected;
+                  });
+                },
+              );
+            }),
+          ),
+        ),
 
         const SizedBox(height: 10),
 

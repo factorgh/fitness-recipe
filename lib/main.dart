@@ -9,8 +9,6 @@ import 'package:voltican_fitness/screens/tabs_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/services/noti_setup.dart'; // Ensure this is the correct import for NotificationService
 import 'package:timezone/data/latest.dart' as tz;
-import 'package:voltican_fitness/utils/hive/meal.dart';
-import 'package:voltican_fitness/utils/hive/mealplan.dart';
 import 'package:voltican_fitness/utils/hive/rating.dart';
 import 'package:voltican_fitness/utils/hive/recipe.dart';
 import 'package:voltican_fitness/utils/hive/recurrence.dart';
@@ -20,9 +18,8 @@ void main() async {
 
 // Initializing hive
   await Hive.initFlutter();
+  await Hive.openBox('testBox');
 
-  Hive.registerAdapter(MealPlanAdapter());
-  Hive.registerAdapter(MealAdapter());
   Hive.registerAdapter(RecurrenceAdapter());
   Hive.registerAdapter(RecipeAdapter());
   Hive.registerAdapter(RatingAdapter());

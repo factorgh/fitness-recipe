@@ -16,8 +16,6 @@ import 'package:voltican_fitness/screens/meal_plan_preview_screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/hive/hive_class.dart';
 
-import 'package:voltican_fitness/utils/native_alert.dart';
-
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
 

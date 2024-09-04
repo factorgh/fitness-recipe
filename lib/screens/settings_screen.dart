@@ -22,6 +22,19 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  List<Map<String, dynamic>> _items = [];
+  final box = Hive.box('testBox');
+  void _refreshtems() {
+    final data = box.keys.map((key) {
+      final item = box.get(key);
+      return {'key': key, 'value': item};
+    }).toList();
+
+    setState(() {
+      _items = data.reversed.toList();
+    });
+  }
+
   Future<void> _logout() async {
     ref.read(userProvider.notifier).clearUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -59,15 +72,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   TextButton(
                     onPressed: () async {
-                      var box = await Hive.openBox('testBox');
-                      box.put('name', 'David');
+                      await box.add('mIKE');
+                      _refreshtems();
                     },
                     child: const Text('Add '),
                   ),
                   TextButton(
                     onPressed: () async {
-                      var box = await Hive.openBox('testBox');
-                      print('Name: ${box.get('name')}');
+                      print('Name: ${box.length}');
+                      print('--------------------hive items------------------');
+                      print(_items);
                     },
                     child: const Text('Get '),
                   ),

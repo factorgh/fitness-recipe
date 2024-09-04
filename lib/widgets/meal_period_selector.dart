@@ -435,19 +435,9 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                 ],
               ),
             ),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                    onPressed: () {
-                      _handleRecurrenceSelection();
-                    },
-                    child: const Text(
-                      'Recur',
-                      style: TextStyle(
-                          color: Colors.redAccent, fontWeight: FontWeight.w800),
-                    ))
-              ],
+              children: [],
             ),
             Wrap(
               spacing: 8,
@@ -456,12 +446,20 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                     allocation.recipes!.map((r) => r.title).join(', ');
                 displayText += ' @ ${allocation.timeOfDay}';
 
-                return Chip(
-                  label: Text(displayText),
-                  backgroundColor: Colors.blue.withOpacity(0.2),
-                  deleteIcon: const Icon(Icons.cancel),
-                  onDeleted: () =>
-                      _removeRecipe(mealPeriod, allocation.recipes!.first.id!),
+                return Row(
+                  children: [
+                    Chip(
+                      label: Text(displayText),
+                      backgroundColor: Colors.blue.withOpacity(0.2),
+                      deleteIcon: const Icon(Icons.cancel),
+                      onDeleted: () => _removeRecipe(
+                          mealPeriod, allocation.recipes!.first.id!),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh, color: Colors.redAccent),
+                      onPressed: () => _handleRecurrenceSelection(),
+                    ),
+                  ],
                 );
               }).toList(),
             ),
