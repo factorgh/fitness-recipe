@@ -73,6 +73,7 @@ dependencies:
   uuid:
   hive: ^2.0.4
   hive_flutter: ^1.1.0
+  path_provider:
 
 dev_dependencies:
   flutter_test:

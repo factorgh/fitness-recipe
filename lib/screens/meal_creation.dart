@@ -128,39 +128,51 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   }
 
   Future<void> getDraftMealPlan() async {
-    final draftPlan = await mealPlanService.getMealPlanDraft();
-    print('------------------draft plan----------------');
-    print(draftPlan);
-    setState(() {
-      mealPlanDraft = draftPlan;
+    try {
+      final draftPlan = await mealPlanService.getMealPlanDraft();
+      print('------------------draft plan----------------');
+      print(draftPlan);
 
-      // Populate fields if draft is not null and not empty
-      if (mealPlanDraft != null) {
-        // Populate meal plan name
-        _mealPlanNameController.text = mealPlanDraft!.name;
+      setState(() {
+        mealPlanDraft = draftPlan;
 
-        // Populate selected trainees
-        _selectedTrainees.clear();
-        for (var traineeId in mealPlanDraft!.trainees) {
-          final trainee = _allTrainees.firstWhere(
-            (user) => user.id == traineeId,
-          );
+        // Ensure mealPlanDraft is not null before accessing fields
+        if (mealPlanDraft != null) {
+          _mealPlanNameController.text = mealPlanDraft!.name;
 
-          _selectedTrainees.add(trainee);
+          _selectedDuration = mealPlanDraft!.duration;
+          // Populate selected meals safely
+
+          print(
+              '-----------------------------meals --------------------------');
+          print(mealPlanDraft!.meals);
+          _selectedRecipeAllocations.clear();
+          _selectedRecipeAllocations.addAll(mealPlanDraft!.meals);
+
+          // Set the start and end dates safely
+          _startDate = mealPlanDraft!.startDate;
+          _endDate = mealPlanDraft!.endDate;
+
+          // Update highlighted dates for the calendar
+          _updateHighlightedDates();
+
+          // Clear and populate selected trainees if not null
+          _selectedTrainees.clear();
+          for (var traineeId in mealPlanDraft!.trainees) {
+            final trainee = _allTrainees.firstWhere(
+              (user) => user.id == traineeId,
+            );
+            _selectedTrainees.add(trainee);
+          }
         }
+      });
+    } catch (e) {
+      print('Error fetching draft meal plan: $e');
+      // Optionally, show error in the UI
+    }
 
-        // Populate selected meals
-        _selectedRecipeAllocations.clear();
-        _selectedRecipeAllocations.addAll(mealPlanDraft!.meals);
-
-        // Set the start and end date
-        _startDate = mealPlanDraft!.startDate;
-        _endDate = mealPlanDraft!.endDate;
-
-        // Update highlighted dates for calendar
-        _updateHighlightedDates();
-      }
-    });
+    // Refresh ui for state persistency
+    setState(() {});
   }
 
   @override

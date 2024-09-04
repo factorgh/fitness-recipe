@@ -5,7 +5,7 @@ part 'meal.g.dart'; // This file will be generated
 @HiveType(typeId: 0)
 class Meal extends HiveObject {
   @HiveField(0)
-  final String id;
+  final String? id;
 
   @HiveField(1)
   final String mealType;
@@ -23,7 +23,7 @@ class Meal extends HiveObject {
   final DateTime date;
 
   Meal({
-    required this.id,
+    this.id,
     required this.mealType,
     required this.timeOfDay,
     required this.recipes,

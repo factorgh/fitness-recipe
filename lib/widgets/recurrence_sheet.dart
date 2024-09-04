@@ -124,6 +124,22 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
   }
 
   Widget _buildCustomOptions() {
+    String _getOrdinal(int number) {
+      if (number >= 11 && number <= 13) {
+        return '${number}th';
+      }
+      switch (number % 10) {
+        case 1:
+          return '${number}st';
+        case 2:
+          return '${number}nd';
+        case 3:
+          return '${number}rd';
+        default:
+          return '${number}th';
+      }
+    }
+
     return Column(
       children: [
         const Text(
@@ -138,15 +154,20 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
         const SizedBox(height: 10),
         // Horizontally scrollable list of days of the month
         ListTile(
-          title: const Text('Select Days of the Month'),
+          title: const Text(
+            'Select Days of the Month',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          ),
           subtitle: SingleChildScrollView(
             scrollDirection: Axis.horizontal, // Enables horizontal scrolling
             child: Wrap(
               spacing: 10.0,
               children: List.generate(31, (index) {
                 int day = index + 1;
+                String ordinalDay =
+                    _getOrdinal(day); // Get the ordinal version of the day
                 return FilterChip(
-                  label: Text('$day'),
+                  label: Text(ordinalDay),
                   selected: _daysOfMonthSelected[index],
                   onSelected: (bool selected) {
                     setState(() {
@@ -158,6 +179,13 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
             ),
           ),
         ),
+
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Divider(
+            color: Colors.black,
+          ),
+        ),
         const SizedBox(height: 10),
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -166,6 +194,7 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
               const SizedBox(width: 10),
               const Text(
                 'Select specific dates ',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
               ),
               const SizedBox(width: 30),
               ElevatedButton(
@@ -187,6 +216,34 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
             ],
           ),
         ),
+
+        if (_selectedMonthlyDates.isNotEmpty)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  'Selected Dates:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              ..._selectedMonthlyDates.map((date) {
+                return ListTile(
+                  title: Text(date.toLocal().toString().split(' ')[0]),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.remove_circle),
+                    onPressed: () {
+                      setState(() {
+                        // Remove the date from the list
+                        _selectedMonthlyDates.remove(date);
+                      });
+                    },
+                  ),
+                );
+              }),
+            ],
+          ),
       ],
     );
   }
@@ -215,35 +272,6 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
             }),
           ),
         ),
-
-        const SizedBox(height: 10),
-
-        // Display selected dates
-        if (_selectedMonthlyDates.isNotEmpty)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Selected Dates:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              ..._selectedMonthlyDates.map((date) {
-                return ListTile(
-                  title: Text(date.toLocal().toString().split(' ')[0]),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.remove_circle),
-                    onPressed: () {
-                      setState(() {
-                        // Remove the date from the list
-                        _selectedMonthlyDates.remove(date);
-                      });
-                    },
-                  ),
-                );
-              }),
-            ],
-          ),
-
         const SizedBox(height: 20),
       ],
     );
