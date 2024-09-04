@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:voltican_fitness/classes/dio_client.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/services/noti_setup.dart';
@@ -121,6 +122,30 @@ class MealPlanService {
         return MealPlan.fromJson(response.data);
       } else {
         throw Exception('No draft meal plan found');
+      }
+    } catch (e) {
+      print('Error fetching draft meal plan: $e');
+      throw Exception('Failed to fetch draft meal plan: $e');
+    }
+  }
+
+  Future<List<Meal>> getMealByDate(DateTime date) async {
+    print('----------date');
+    print(date);
+    String formattedDate = DateFormat('yyyy-M-d').format(date);
+    try {
+      final response = await client.dio.get('/meal-plans/meals/$formattedDate');
+      print(
+          '------------------------------meal drafts--------------------------');
+      print(response.data);
+
+      // Check if a draft meal plan exists in the response
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((mealData) => Meal.fromJson(mealData))
+            .toList();
+      } else {
+        throw Exception('No  meals found');
       }
     } catch (e) {
       print('Error fetching draft meal plan: $e');

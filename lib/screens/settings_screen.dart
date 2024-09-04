@@ -1,7 +1,8 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:voltican_fitness/providers/user_provider.dart';
@@ -29,7 +30,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => const LoginScreen()));
     NativeAlerts().showSuccessAlert(context, "Logged Out successfully");
-    // ); // Adjust route as necessary
   }
 
   @override
@@ -54,6 +54,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               _buildNotificationSection(),
               _buildGeneralSection(),
               _buildLogoutButton(),
+              Expanded(
+                  child: Row(
+                children: [
+                  TextButton(
+                    onPressed: () async {
+                      var box = await Hive.openBox('testBox');
+                      box.put('name', 'David');
+                    },
+                    child: const Text('Add '),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var box = await Hive.openBox('testBox');
+                      print('Name: ${box.get('name')}');
+                    },
+                    child: const Text('Get '),
+                  ),
+                ],
+              ))
             ],
           ),
         ),

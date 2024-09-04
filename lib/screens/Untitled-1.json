@@ -1,0 +1,864 @@
+{
+  "_id": "66d725ea886da3ef9a3f1e77",
+  "name": "Weekly Meal Plan",
+  "trainees": ["64f8b0e15b0e6a7a9c4f2c3a"],
+  "duration": "Week",
+  "startDate": "2024-09-01T00:00:00.000Z",
+  "endDate": "2024-10-01T00:00:00.000Z",
+  "datesArray": [
+    "2024-09-01T00:00:00.000Z",
+    "2024-09-02T00:00:00.000Z",
+    "2024-09-03T00:00:00.000Z",
+    "2024-09-04T00:00:00.000Z",
+    "2024-09-05T00:00:00.000Z",
+    "2024-09-06T00:00:00.000Z",
+    "2024-09-07T00:00:00.000Z",
+    "2024-09-08T00:00:00.000Z",
+    "2024-09-09T00:00:00.000Z",
+    "2024-09-10T00:00:00.000Z",
+    "2024-09-11T00:00:00.000Z",
+    "2024-09-12T00:00:00.000Z",
+    "2024-09-13T00:00:00.000Z",
+    "2024-09-14T00:00:00.000Z",
+    "2024-09-15T00:00:00.000Z",
+    "2024-09-16T00:00:00.000Z",
+    "2024-09-17T00:00:00.000Z",
+    "2024-09-18T00:00:00.000Z",
+    "2024-09-19T00:00:00.000Z",
+    "2024-09-20T00:00:00.000Z",
+    "2024-09-21T00:00:00.000Z",
+    "2024-09-22T00:00:00.000Z",
+    "2024-09-23T00:00:00.000Z",
+    "2024-09-24T00:00:00.000Z",
+    "2024-09-25T00:00:00.000Z",
+    "2024-09-26T00:00:00.000Z",
+    "2024-09-27T00:00:00.000Z",
+    "2024-09-28T00:00:00.000Z",
+    "2024-09-29T00:00:00.000Z",
+    "2024-09-30T00:00:00.000Z",
+    "2024-10-01T00:00:00.000Z"
+  ],
+  "isDraft": true,
+  "meals": [
+    {
+      "mealType": "Breakfast",
+      "recipes": ["64f8c1e95b0e6a7a9c4f2c3b"],
+      "timeOfDay": "08:00 AM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-03T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e79"
+      },
+      "date": "2024-09-01T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e78"
+    },
+    {
+      "mealType": "Breakfast",
+      "recipes": ["64f8c1e95b0e6a7a9c4f2c3b"],
+      "timeOfDay": "08:00 AM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-03T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e7b"
+      },
+      "date": "2024-09-08T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e7a"
+    },
+    {
+      "mealType": "Breakfast",
+      "recipes": ["64f8c1e95b0e6a7a9c4f2c3b"],
+      "timeOfDay": "08:00 AM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-03T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e7d"
+      },
+      "date": "2024-09-15T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e7c"
+    },
+    {
+      "mealType": "Breakfast",
+      "recipes": ["64f8c1e95b0e6a7a9c4f2c3b"],
+      "timeOfDay": "08:00 AM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-03T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e7f"
+      },
+      "date": "2024-09-22T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e7e"
+    },
+    {
+      "mealType": "Breakfast",
+      "recipes": ["64f8c1e95b0e6a7a9c4f2c3b"],
+      "timeOfDay": "08:00 AM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-03T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e81"
+      },
+      "date": "2024-09-29T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e80"
+    },
+    {
+      "mealType": "Lunch",
+      "recipes": ["64f8c2e95b0e6a7a9c4f2c3c"],
+      "timeOfDay": "01:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "bi_weekly",
+        "date": "2024-09-02T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e83"
+      },
+      "date": "2024-09-02T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e82"
+    },
+    {
+      "mealType": "Lunch",
+      "recipes": ["64f8c2e95b0e6a7a9c4f2c3c"],
+      "timeOfDay": "01:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "bi_weekly",
+        "date": "2024-09-02T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e85"
+      },
+      "date": "2024-09-16T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e84"
+    },
+    {
+      "mealType": "Lunch",
+      "recipes": ["64f8c2e95b0e6a7a9c4f2c3c"],
+      "timeOfDay": "01:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "bi_weekly",
+        "date": "2024-09-02T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e87"
+      },
+      "date": "2024-09-30T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e86"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e89"
+      },
+      "date": "2024-09-01T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e88"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e8b"
+      },
+      "date": "2024-09-02T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e8a"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e8d"
+      },
+      "date": "2024-09-03T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e8c"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e8f"
+      },
+      "date": "2024-09-05T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e8e"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e91"
+      },
+      "date": "2024-09-06T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e90"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e93"
+      },
+      "date": "2024-09-07T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e92"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e95"
+      },
+      "date": "2024-09-08T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e94"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e97"
+      },
+      "date": "2024-09-09T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e96"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e99"
+      },
+      "date": "2024-09-10T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e98"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e9b"
+      },
+      "date": "2024-09-11T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e9a"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e9d"
+      },
+      "date": "2024-09-12T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e9c"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1e9f"
+      },
+      "date": "2024-09-13T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1e9e"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ea1"
+      },
+      "date": "2024-09-14T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ea0"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ea3"
+      },
+      "date": "2024-09-15T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ea2"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ea5"
+      },
+      "date": "2024-09-16T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ea4"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ea7"
+      },
+      "date": "2024-09-17T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ea6"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ea9"
+      },
+      "date": "2024-09-18T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ea8"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1eab"
+      },
+      "date": "2024-09-19T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1eaa"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ead"
+      },
+      "date": "2024-09-20T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1eac"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1eaf"
+      },
+      "date": "2024-09-21T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1eae"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1eb1"
+      },
+      "date": "2024-09-22T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1eb0"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1eb3"
+      },
+      "date": "2024-09-23T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1eb2"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1eb5"
+      },
+      "date": "2024-09-24T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1eb4"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1eb7"
+      },
+      "date": "2024-09-25T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1eb6"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1eb9"
+      },
+      "date": "2024-09-26T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1eb8"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ebb"
+      },
+      "date": "2024-09-27T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1eba"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ebd"
+      },
+      "date": "2024-09-28T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ebc"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ebf"
+      },
+      "date": "2024-09-29T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ebe"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ec1"
+      },
+      "date": "2024-09-30T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ec0"
+    },
+    {
+      "mealType": "Dinner",
+      "recipes": ["64f8c3e95b0e6a7a9c4f2c3d"],
+      "timeOfDay": "07:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "every_day",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": ["2024-09-04T00:00:00.000Z"],
+        "customDays": [],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ec3"
+      },
+      "date": "2024-10-01T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ec2"
+    },
+    {
+      "mealType": "Snack",
+      "recipes": ["64f8c4e95b0e6a7a9c4f2c3e"],
+      "timeOfDay": "04:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "custom_weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [2, 4, 6],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ec5"
+      },
+      "date": "2024-09-03T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ec4"
+    },
+    {
+      "mealType": "Snack",
+      "recipes": ["64f8c4e95b0e6a7a9c4f2c3e"],
+      "timeOfDay": "04:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "custom_weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [2, 4, 6],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ec7"
+      },
+      "date": "2024-09-05T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ec6"
+    },
+    {
+      "mealType": "Snack",
+      "recipes": ["64f8c4e95b0e6a7a9c4f2c3e"],
+      "timeOfDay": "04:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "custom_weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [2, 4, 6],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ec9"
+      },
+      "date": "2024-09-07T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ec8"
+    },
+    {
+      "mealType": "Snack",
+      "recipes": ["64f8c4e95b0e6a7a9c4f2c3e"],
+      "timeOfDay": "04:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "custom_weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [2, 4, 6],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ecb"
+      },
+      "date": "2024-09-10T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1eca"
+    },
+    {
+      "mealType": "Snack",
+      "recipes": ["64f8c4e95b0e6a7a9c4f2c3e"],
+      "timeOfDay": "04:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "custom_weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [2, 4, 6],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ecd"
+      },
+      "date": "2024-09-12T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ecc"
+    },
+    {
+      "mealType": "Snack",
+      "recipes": ["64f8c4e95b0e6a7a9c4f2c3e"],
+      "timeOfDay": "04:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "custom_weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [2, 4, 6],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ecf"
+      },
+      "date": "2024-09-14T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ece"
+    },
+    {
+      "mealType": "Snack",
+      "recipes": ["64f8c4e95b0e6a7a9c4f2c3e"],
+      "timeOfDay": "04:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "custom_weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [2, 4, 6],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ed1"
+      },
+      "date": "2024-09-17T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ed0"
+    },
+    {
+      "mealType": "Snack",
+      "recipes": ["64f8c4e95b0e6a7a9c4f2c3e"],
+      "timeOfDay": "04:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "custom_weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [2, 4, 6],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ed3"
+      },
+      "date": "2024-09-19T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ed2"
+    },
+    {
+      "mealType": "Snack",
+      "recipes": ["64f8c4e95b0e6a7a9c4f2c3e"],
+      "timeOfDay": "04:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "custom_weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [2, 4, 6],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ed5"
+      },
+      "date": "2024-09-21T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ed4"
+    },
+    {
+      "mealType": "Snack",
+      "recipes": ["64f8c4e95b0e6a7a9c4f2c3e"],
+      "timeOfDay": "04:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "custom_weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [2, 4, 6],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ed7"
+      },
+      "date": "2024-09-24T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ed6"
+    },
+    {
+      "mealType": "Snack",
+      "recipes": ["64f8c4e95b0e6a7a9c4f2c3e"],
+      "timeOfDay": "04:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "custom_weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [2, 4, 6],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1ed9"
+      },
+      "date": "2024-09-26T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1ed8"
+    },
+    {
+      "mealType": "Snack",
+      "recipes": ["64f8c4e95b0e6a7a9c4f2c3e"],
+      "timeOfDay": "04:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "custom_weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [2, 4, 6],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1edb"
+      },
+      "date": "2024-09-28T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1eda"
+    },
+    {
+      "mealType": "Snack",
+      "recipes": ["64f8c4e95b0e6a7a9c4f2c3e"],
+      "timeOfDay": "04:00 PM",
+      "isDraft": true,
+      "recurrence": {
+        "option": "custom_weekly",
+        "date": "2024-09-01T00:00:00.000Z",
+        "exceptions": [],
+        "customDays": [2, 4, 6],
+        "customDates": [],
+        "_id": "66d725ea886da3ef9a3f1edd"
+      },
+      "date": "2024-10-01T00:00:00.000Z",
+      "_id": "66d725ea886da3ef9a3f1edc"
+    }
+  ],
+  "createdBy": "64f8c5e95b0e6a7a9c4f2c3f",
+  "createdAt": "2024-09-03T15:06:18.320Z",
+  "updatedAt": "2024-09-03T15:06:18.320Z",
+  "__v": 0
+}

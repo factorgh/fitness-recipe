@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, unused_element
 
 import 'package:flutter/material.dart';
 
@@ -33,6 +33,8 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
   final List<DateTime> _exceptions = []; // List of exception dates
   final List<DateTime> _selectedMonthlyDates = [];
 
+  final List<bool> _daysOfWeekSelected = List<bool>.filled(7, false);
+  final List<bool> _daysOfMonthSelected = List<bool>.filled(31, false);
   // Selected custom days for recurrence
 
   final List<String> weekdays = [
@@ -55,38 +57,25 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
 
   // Helper: Build daily recurrence widget
   Widget _buildDailyOptions() {
-    return Column(
+    return const Column(
       children: [
-        CheckboxListTile(
-          title: const Text('Every Day'),
-          value: _selectedRecurrence == 'Daily',
-          onChanged: (bool? value) {},
-        ),
-        _buildExceptionDates(),
+        // CheckboxListTile(
+        //   title: const Text('Every Day'),
+        //   value: _selectedRecurrence == 'Daily',
+        //   onChanged: (bool? value) {},
+        // ),
+        // _buildExceptionDates(),
       ],
     );
   }
 
   // Helper: Build weekly recurrence widget
   Widget _buildWeeklyOptions() {
-    return Column(
+    return const Column(
       children: [
-        const Text('Select Days of the Week'),
-        Wrap(
-          spacing: 10.0,
-          children: List.generate(7, (index) {
-            return FilterChip(
-              label: Text(weekdays[index]),
-              selected: _daysSelected[index],
-              onSelected: (bool selected) {
-                setState(() {
-                  _daysSelected[index] = selected;
-                });
-              },
-            );
-          }),
-        ),
-        _buildExceptionDates(),
+        Text('Create custom recurrence ')
+        // Text('Select Days of the Week'),
+        // _buildExceptionDates(),
       ],
     );
   }
@@ -94,50 +83,92 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
 // Add a state variable to track whether the checkbox is selected
 
   Widget _buildBiWeeklyOptions() {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CheckboxListTile(
-          title: const Text('Bi-Weekly'),
-          value: _selectedRecurrence == 'Bi-Weekly',
-          onChanged: (bool? value) {},
-        ),
-
-        // Conditionally show bi-weekly info if the checkbox is selected
-
-        const Padding(
-          padding: EdgeInsets.only(left: 16.0),
-          child: Text(
-            'Bi-Weekly runs every two weeks.',
-            style: TextStyle(fontSize: 14, color: Colors.black54),
-          ),
-        ),
-      ],
+      children: [Text('Create custom recurrence ')],
     );
   }
 
-  // Helper: Build custom options
   Widget _buildCustomOptions() {
     return Column(
       children: [
+        const Text(
+          'Create custom recurrence',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+        ),
+        const SizedBox(
+          width: 50,
+        ),
+        const SizedBox(height: 10),
         ListTile(
-          title: const Text('Every X Days'),
-          subtitle: TextFormField(
-            initialValue: '$_customDays',
-            keyboardType: TextInputType.number,
-            onChanged: (String value) {
-              setState(() {
-                _customDays = int.tryParse(value) ?? 1;
-              });
-            },
-            decoration: const InputDecoration(
-              labelText: 'Days Interval',
-              border: OutlineInputBorder(),
+          title: const Text('Select Days of the Week'),
+          subtitle: Wrap(
+            spacing: 10.0,
+            children: List.generate(7, (index) {
+              return FilterChip(
+                label: Text(weekdays[index]),
+                selected: _daysOfWeekSelected[index],
+                onSelected: (bool selected) {
+                  setState(() {
+                    _daysOfWeekSelected[index] = selected;
+                  });
+                },
+              );
+            }),
+          ),
+        ),
+        const SizedBox(height: 10),
+        // Horizontally scrollable list of days of the month
+        ListTile(
+          title: const Text('Select Days of the Month'),
+          subtitle: SingleChildScrollView(
+            scrollDirection: Axis.horizontal, // Enables horizontal scrolling
+            child: Wrap(
+              spacing: 10.0,
+              children: List.generate(31, (index) {
+                int day = index + 1;
+                return FilterChip(
+                  label: Text('$day'),
+                  selected: _daysOfMonthSelected[index],
+                  onSelected: (bool selected) {
+                    setState(() {
+                      _daysOfMonthSelected[index] = selected;
+                    });
+                  },
+                );
+              }),
             ),
           ),
         ),
         const SizedBox(height: 10),
-        _buildExceptionDates(),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              const SizedBox(width: 10),
+              const Text(
+                'Select specific dates ',
+              ),
+              const SizedBox(width: 30),
+              ElevatedButton(
+                onPressed: () async {
+                  final DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime(2030),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      _selectedMonthlyDates.add(pickedDate);
+                    });
+                  }
+                },
+                child: const Text('Add Date'),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -145,27 +176,9 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
   Widget _buildMonthlyOptions() {
     return Column(
       children: [
-        const Text('Select Specific Date(s) of the Month'),
-        const SizedBox(height: 10),
-
-        // Button to trigger date picker
-        ElevatedButton(
-          onPressed: () async {
-            final DateTime? pickedDate = await showDatePicker(
-              context: context,
-              initialDate: DateTime.now(),
-              firstDate: DateTime(2020),
-              lastDate: DateTime(2030),
-            );
-            if (pickedDate != null) {
-              setState(() {
-                // Add selected date to the list
-                _selectedMonthlyDates.add(pickedDate);
-              });
-            }
-          },
-          child: const Text('Add Date'),
-        ),
+        const Text('Create custom recurrence '),
+        // const Text('Select Specific Date(s) of the Month'),
+        // const SizedBox(height: 10),
 
         const SizedBox(height: 10),
 

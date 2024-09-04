@@ -37,7 +37,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   List<User> _allTrainees = [];
   List<User> _searchResults = [];
   final List<User> _selectedTrainees = [];
-  final bool _isLoading = false;
+  bool _isLoading = false;
   final List<DateTime> _highlightedDates = [];
   List<Meal> startMeals = [];
 
@@ -147,6 +147,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
           final trainee = _allTrainees.firstWhere(
             (user) => user.id == traineeId,
           );
+
           _selectedTrainees.add(trainee);
         }
 
@@ -208,7 +209,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         } else {
           _endDate = pickedDate;
         }
-        _updateHighlightedDates(); // Update highlighted dates whenever start or end date changes
+        _updateHighlightedDates();
       });
     }
   }
@@ -300,11 +301,19 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     final user = ref.read(userProvider);
     final List<Meal> meals = [];
 
+    if (user == null) {
+      print('---------user is null----');
+    }
+
     for (Meal meal in _selectedRecipeAllocations) {
       print("------------Meal Allocation------------");
       for (Recipe recipe in meal.recipes!) {
         print("Recipe ID: ${recipe.id}");
         print("Recipe Title: ${recipe.title}");
+
+        if (newDay == null) {
+          print('----------------------------newDay is null------------------');
+        }
 
         meals.add(Meal(
           mealType: meal.mealType,
@@ -320,16 +329,17 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         "\n================================meals================================$meals");
 
     final mealPlan = MealPlan(
-      name: _mealPlanNameController.text,
-      duration: _selectedDuration,
-      startDate: _startDate,
-      endDate: _endDate,
-      meals: meals,
-      trainees: _selectedTrainees.map((trainee) => trainee.id).toList(),
-      createdBy: user!.id,
-    );
+        name: _mealPlanNameController.text,
+        duration: _selectedDuration,
+        startDate: _startDate,
+        endDate: _endDate,
+        meals: meals,
+        trainees: _selectedTrainees.map((trainee) => trainee.id).toList(),
+        createdBy: user!.id,
+        isDraft: false);
     print('---------------------mealplan-------------$mealPlan');
     ref.read(mealPlanProvider.notifier).createMealPlan(mealPlan, context);
+    Navigator.of(context).pop();
   }
 
 // Handle recurrence here
@@ -362,8 +372,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
       }
     }
   }
-
-// Handle meal fetch on date selection from the database
 
   @override
   Widget build(BuildContext context) {
@@ -635,6 +643,9 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                       onDaySelected:
                           (DateTime selectDay, DateTime focusDay) async {
                         // Check if the selected day is within the range
+
+                        // final meals =
+                        //     await mealPlanService.getMealByDate(selectDay);
                         if (_isWithinRange(selectDay)) {
                           // Fetch meals for the selected day from the database
 
@@ -676,9 +687,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white),
                 onPressed: () {
-                  onSaveMeal();
-                  NativeAlerts().showSuccessAlert(context, 'Saved to draft');
-                  createPlan();
                   // final mealPlan = MealPlan(
                   //   name: _mealPlanNameController.text,
                   //   duration: _selectedDuration,
@@ -689,6 +697,9 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                   //       _selectedTrainees.map((trainee) => trainee.id).toList(),
                   //   createdBy: ref.read(userProvider)!.id,
                   // );
+                  _isLoading = true;
+                  _completeSchedule();
+                  _isLoading = false;
                   // showMealPlanPreviewBottomSheet(context, mealPlan, createPlan);
                 },
                 child: _isLoading
@@ -719,7 +730,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     foregroundColor: Colors.white),
                 onPressed: () async {
                   // createPlan();
-                  ////Save meal plan to the draft
 
                   ///Delay for sometime then after show bottom  sheet with meal plan preview
                   Future.delayed(
