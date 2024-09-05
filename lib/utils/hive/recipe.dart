@@ -3,7 +3,7 @@ import 'package:voltican_fitness/models/recipe.dart';
 
 part 'recipe.g.dart';
 
-@HiveType(typeId: 1)
+@HiveType(typeId: 3)
 class Recipe extends HiveObject {
   @HiveField(0)
   final String id;

@@ -23,7 +23,8 @@ class MealPlanAdapter extends TypeAdapter<MealPlan> {
       startDate: fields[3] as DateTime?,
       endDate: fields[4] as DateTime?,
       datesArray: (fields[5] as List?)?.cast<DateTime>(),
-      meals: (fields[6] as List?)?.cast<Meal>(),
+      isDraft: fields[11] as bool,
+      meals: (fields[6] as List?)?.cast<HiveMeal>(),
       trainees: (fields[7] as List).cast<String>(),
       createdBy: fields[8] as String,
       createdAt: fields[9] as DateTime?,
@@ -34,7 +35,7 @@ class MealPlanAdapter extends TypeAdapter<MealPlan> {
   @override
   void write(BinaryWriter writer, MealPlan obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -56,7 +57,9 @@ class MealPlanAdapter extends TypeAdapter<MealPlan> {
       ..writeByte(9)
       ..write(obj.createdAt)
       ..writeByte(10)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(11)
+      ..write(obj.isDraft);
   }
 
   @override

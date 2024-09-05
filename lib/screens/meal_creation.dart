@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fpdart/fpdart.dart';
 
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -15,7 +16,9 @@ import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/meal_plan_preview_screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/hive/hive_class.dart';
-
+import 'package:voltican_fitness/utils/hive/hive_meal.dart';
+import 'package:voltican_fitness/utils/hive/hive_recurrence.dart';
+import 'package:voltican_fitness/utils/hive/mealplan.dart' as hive_mealplan;
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
 
@@ -35,9 +38,12 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   List<User> _allTrainees = [];
   List<User> _searchResults = [];
   final List<User> _selectedTrainees = [];
-  bool _isLoading = false;
+  final bool _isLoading = false;
   final List<DateTime> _highlightedDates = [];
   List<Meal> startMeals = [];
+  List<Meal> _draftMeals = [];
+
+  List<Meal> newMeals = [];
 
   final List<Meal> _selectedRecipeAllocations = [];
   Recurrence? chosenRecurrence;
@@ -53,8 +59,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   DateTime? newDay;
 
   MealPlan? mealPlanDraft;
-  // SqflITE SETUP AND SERVICES
-  // final DatabaseHelper dbHelper = DatabaseHelper();
 
   // Callback function to handle selection changes
   void _handleRecipeSelectionChanged(List<Meal> selectedAllocations) {
@@ -76,6 +80,10 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
       _selectedRecipeAllocations.clear();
       _selectedRecipeAllocations.addAll(selectedAllocations);
     });
+
+    print(
+      '------------------allocations------------------$_selectedRecipeAllocations',
+    );
   }
 
   void handleSelectionChange(List<String> selectedPeriods) {
@@ -113,7 +121,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     _updateHighlightedDates();
     fetchAllUserRecipes();
     getTraineesFollowingTrainer();
-    getDraftMealPlan();
+    // getDraftMealPlan();
     // Initialize HiveService outside of initState
     _initializeHiveService();
   }
@@ -122,9 +130,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     final hiveService = HiveService();
     await hiveService.init();
 
-    setState(() {
-      // Update state if needed after initialization
-    });
+    setState(() {});
   }
 
   Future<void> getDraftMealPlan() async {
@@ -146,6 +152,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
           print(
               '-----------------------------meals --------------------------');
           print(mealPlanDraft!.meals);
+          _draftMeals = mealPlanDraft!.meals;
           _selectedRecipeAllocations.clear();
           _selectedRecipeAllocations.addAll(mealPlanDraft!.meals);
 
@@ -173,6 +180,22 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
     // Refresh ui for state persistency
     setState(() {});
+  }
+
+// Get meals by date from the draft
+  void getMealsFromDraftByDate(DateTime date) async {
+    try {
+      final meals = _draftMeals.filter((meal) => meal.date == date).toList();
+      print(
+          '------------------------------meal from draft that matches the date-------------------');
+      print(meals);
+      setState(() {
+        // Update meals safely
+        startMeals = meals;
+      });
+    } catch (e) {
+      print('Error fetching meals by date: $e');
+    }
   }
 
   @override
@@ -304,8 +327,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     return true;
   }
 
-// Save meal plan to  draft
-
 // Start of complete schedule
   Future<void> _completeSchedule() async {
     final user = ref.read(userProvider);
@@ -383,6 +404,34 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     }
   }
 
+  HiveRecurrence convertToHiveRecurrence(Recurrence recurrence) {
+    return HiveRecurrence(
+        option: recurrence.option,
+        date: recurrence.date,
+        customDates: recurrence.customDates,
+        exceptions: recurrence.exceptions,
+        customDays: recurrence.customDays);
+  }
+
+//Convert to hive meals
+  List<HiveMeal> convertMealsToHiveMeals(List<Meal> meals) {
+    return meals.map((meal) {
+      return HiveMeal(
+        // Check for null and provide default values or handle null cases
+        mealType: meal.mealType, // Provide a default value if necessary
+        recipes: meal.recipes ?? [], // Provide an empty list if recipes is null
+        isDraft: true,
+        timeOfDay: meal.timeOfDay, // Provide a default value if necessary
+        date: meal.date, // Provide a default value if necessary
+        recurrence: meal.recurrence != null
+            ? convertToHiveRecurrence(meal.recurrence!)
+            : null, // Handle null recurrence case
+
+        // etc.
+      );
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -391,62 +440,62 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
           'Create Meal Plan',
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
-        // actions: [
-        //   IconButton(
-        //       onPressed: () async {
-        //         // Fetching a MealPlan
-        //         final hiveService = HiveService();
-        //         final fetchedMealPlan = await hiveService.getAllMealPlans();
-        //         print('--------------all-------$fetchedMealPlan');
+        actions: [
+          IconButton(
+              onPressed: () async {
+                // Fetching a MealPlan
+                final hiveService = HiveService();
+                final fetchedMealPlan = await hiveService.getDraftMealPlan();
+                print('--------------all-------$fetchedMealPlan');
 
-        //         // check hive box state
-        //         final hiveState = hiveService.isMealPlanBoxEmpty();
-        //         print('----------------hiveState----------------$hiveState');
+                // check hive box state
+                final hiveState = hiveService.isMealPlanBoxEmpty();
+                print('----------------hiveState----------------$hiveState');
 
-        //         // final List<Meal> meals = [];
+                final List<Meal> meals = [];
 
-        //         // // Create stor instance
+                // Create stor instance
 
-        //         // for (Meal meal in _selectedRecipeAllocations) {
-        //         //   print("------------Meal Allocation------------");
-        //         //   for (Recipe recipe in meal.recipes) {
-        //         //     print("Recipe ID: ${recipe.id}");
-        //         //     print("Recipe Title: ${recipe.title}");
+                for (Meal meal in _selectedRecipeAllocations) {
+                  print("------------Meal Allocation------------");
+                  for (Recipe recipe in meal.recipes!) {
+                    print("Recipe ID: ${recipe.id}");
+                    print("Recipe Title: ${recipe.title}");
 
-        //         //     meals.add(Meal(
-        //         //       mealType: meal.mealType,
-        //         //       date: newDay!,
-        //         //       timeOfDay: meal.timeOfDay,
-        //         //       recipes: [recipe],
-        //         //       recurrence: chosenRecurrence,
-        //         //     ));
-        //         //   }
-        //         // }
-        //       },
-        //       icon: const Icon(Icons.add)),
-        //   IconButton(
-        //       onPressed: () async {
-        //         final hiveService = HiveService();
+                    meals.add(Meal(
+                      mealType: meal.mealType,
+                      date: newDay!,
+                      timeOfDay: meal.timeOfDay,
+                      recipes: [recipe],
+                      recurrence: chosenRecurrence,
+                    ));
+                  }
+                }
+              },
+              icon: const Icon(Icons.add)),
+          IconButton(
+              onPressed: () async {
+                final hiveService = HiveService();
 
-        //         // Creating or updating a MealPlan
-        //         final mealPlan = hive_mealplan.MealPlan(
-        //           id: '1',
-        //           name: 'Weekly Plan',
-        //           duration: 'Week',
-        //           startDate: DateTime.now(),
-        //           endDate: DateTime.now().add(const Duration(days: 7)),
-        //           datesArray: [DateTime.now()],
-        //           meals: [],
-        //           trainees: ['trainee1', 'trainee2'],
-        //           createdBy: 'user123',
-        //           createdAt: DateTime.now(),
-        //           updatedAt: DateTime.now(),
-        //         );
-        //         print('------------------------$mealPlan');
-        //         await hiveService.saveMealPlan(mealPlan);
-        //       },
-        //       icon: const Icon(Icons.view_week))
-        // ],
+                // Creating or updating a MealPlan
+                final mealPlan = hive_mealplan.MealPlan(
+                  id: '2',
+                  name: 'Weekly Plan',
+                  duration: 'Week',
+                  startDate: DateTime.now(),
+                  endDate: DateTime.now().add(const Duration(days: 7)),
+                  datesArray: [DateTime.now()],
+                  meals: [],
+                  trainees: ['trainee1', 'trainee2'],
+                  createdBy: 'user123',
+                  createdAt: DateTime.now(),
+                  updatedAt: DateTime.now(),
+                );
+                print('------------------------$mealPlan');
+                await hiveService.saveDraftMealPlan(mealPlan);
+              },
+              icon: const Icon(Icons.view_week))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -657,11 +706,20 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                         // final meals =
                         //     await mealPlanService.getMealByDate(selectDay);
                         if (_isWithinRange(selectDay)) {
-                          // Fetch meals for the selected day from the database
-
+                          // Fetch meals for the selected day from the meal draft
+                          if (_draftMeals.isNotEmpty) {
+                            getMealsFromDraftByDate(selectDay);
+                            // Refresh the ui
+                            setState(() {});
+                          } else if (_draftMeals.isEmpty) {
+                            setState(() {
+                              startMeals = [];
+                            });
+                          }
                           // Debugging information
                           print('-------------- trainer -------------');
                           print('Selected Day: $selectDay');
+
                           print('Start Meals: $startMeals');
 
                           // Update the state with the new day and fetched meals
@@ -696,21 +754,18 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     ),
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white),
-                onPressed: () {
-                  // final mealPlan = MealPlan(
-                  //   name: _mealPlanNameController.text,
-                  //   duration: _selectedDuration,
-                  //   startDate: _startDate,
-                  //   endDate: _endDate,
-                  //   meals: _selectedRecipeAllocations,
-                  //   trainees:
-                  //       _selectedTrainees.map((trainee) => trainee.id).toList(),
-                  //   createdBy: ref.read(userProvider)!.id,
-                  // );
-                  _isLoading = true;
-                  _completeSchedule();
-                  _isLoading = false;
-                  // showMealPlanPreviewBottomSheet(context, mealPlan, createPlan);
+                onPressed: () async {
+                  // Save meal to hive with the date
+                  final hiveService = HiveService();
+                  final meals =
+                      convertMealsToHiveMeals(_selectedRecipeAllocations);
+                  // Save the meals to hive with the date
+
+                  print(
+                      '-------------------------Save to hive meal draft box ----------------');
+
+                  await hiveService.saveRecurringMealsInDraft(
+                      meals, _startDate!, _endDate!);
                 },
                 child: _isLoading
                     ? const CircularProgressIndicator(

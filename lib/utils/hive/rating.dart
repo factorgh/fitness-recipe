@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 part 'rating.g.dart';
 
-@HiveType(typeId: 2)
+@HiveType(typeId: 4)
 class Rating extends HiveObject {
   @HiveField(0)
   final String user;

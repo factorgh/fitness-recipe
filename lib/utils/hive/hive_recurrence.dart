@@ -1,9 +1,9 @@
 import 'package:hive/hive.dart';
 
-part 'recurrence.g.dart';
+part 'hive_recurrence.g.dart';
 
-@HiveType(typeId: 0)
-class Recurrence {
+@HiveType(typeId: 2)
+class HiveRecurrence {
   @HiveField(0)
   final String option;
 
@@ -19,7 +19,7 @@ class Recurrence {
   @HiveField(4)
   final List<int>? customDays;
 
-  Recurrence({
+  HiveRecurrence({
     required this.option,
     required this.date,
     this.customDates,

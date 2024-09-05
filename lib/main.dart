@@ -11,7 +11,9 @@ import 'package:voltican_fitness/services/noti_setup.dart'; // Ensure this is th
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'package:path_provider/path_provider.dart' as path_provider;
-import 'package:voltican_fitness/utils/hive/meal.dart';
+import 'package:voltican_fitness/utils/hive/hive_meal.dart';
+import 'package:voltican_fitness/utils/hive/mealplan.dart';
+import 'package:voltican_fitness/utils/hive/hive_recurrence.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +26,9 @@ void main() async {
   await Hive.openBox('testBox');
 
   //  Register hive adapters here
-  Hive.registerAdapter(MealAdapter());
+  Hive.registerAdapter(HiveMealAdapter());
+  Hive.registerAdapter(MealPlanAdapter());
+  Hive.registerAdapter(HiveRecurrenceAdapter());
 
   // Initialize Timezone and Notifications
   tz.initializeTimeZones();

@@ -8,7 +8,7 @@ part of 'rating.dart';
 
 class RatingAdapter extends TypeAdapter<Rating> {
   @override
-  final int typeId = 2;
+  final int typeId = 4;
 
   @override
   Rating read(BinaryReader reader) {

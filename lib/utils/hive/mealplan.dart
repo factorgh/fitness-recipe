@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'meal.dart'; // Ensure you have this import
+import 'hive_meal.dart'; // Ensure you have this import
 
 part 'mealplan.g.dart'; // This file will be generated
 
@@ -24,7 +24,7 @@ class MealPlan extends HiveObject {
   final List<DateTime>? datesArray;
 
   @HiveField(6)
-  final List<Meal> meals;
+  final List<HiveMeal> meals;
 
   @HiveField(7)
   final List<String> trainees;
@@ -38,14 +38,18 @@ class MealPlan extends HiveObject {
   @HiveField(10)
   final DateTime? updatedAt;
 
+  @HiveField(11)
+  bool isDraft;
+
   MealPlan({
     this.id,
     required this.name,
     required this.duration,
     this.startDate,
     this.endDate,
-    this.datesArray,
-    List<Meal>? meals,
+    this.datesArray = const [],
+    this.isDraft = true,
+    List<HiveMeal>? meals,
     required this.trainees,
     required this.createdBy,
     this.createdAt,
