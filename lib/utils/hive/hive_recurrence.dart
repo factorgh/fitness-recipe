@@ -26,4 +26,8 @@ class HiveRecurrence {
     this.exceptions,
     this.customDays,
   });
+  @override
+  String toString() {
+    return 'HiveRecurrence(option: $option, date: $date, exceptions: $exceptions, customDates: $customDates, customDays: $customDays)';
+  }
 }

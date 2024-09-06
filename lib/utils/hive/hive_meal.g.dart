@@ -19,10 +19,10 @@ class HiveMealAdapter extends TypeAdapter<HiveMeal> {
     return HiveMeal(
       id: fields[0] as String?,
       mealType: fields[1] as String,
-      recipes: (fields[3] as List).cast<Recipe>(),
+      recipes: (fields[3] as List).cast<HiveRecipe>(),
       timeOfDay: fields[2] as String,
       isDraft: fields[6] as bool,
-      recurrence: fields[4] as dynamic,
+      recurrence: fields[4] as HiveRecurrence?,
       date: fields[5] as DateTime?,
     );
   }

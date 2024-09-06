@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
-import 'package:voltican_fitness/models/recipe.dart';
+
 import 'package:voltican_fitness/utils/hive/hive_recurrence.dart';
+import 'package:voltican_fitness/utils/hive/hive_recipe.dart';
 
 part 'hive_meal.g.dart';
 
@@ -16,7 +17,7 @@ class HiveMeal extends HiveObject {
   final String timeOfDay;
 
   @HiveField(3)
-  final List<Recipe> recipes;
+  final List<HiveRecipe> recipes;
 
   @HiveField(4)
   final HiveRecurrence? recurrence;
@@ -36,4 +37,11 @@ class HiveMeal extends HiveObject {
     this.recurrence,
     required this.date,
   });
+
+  @override
+  String toString() {
+    return 'HiveMeal(id: $id, mealType: $mealType, timeOfDay: $timeOfDay, '
+        'recipes: $recipes, '
+        'recurrence: ${recurrence.toString()}, date: $date, isDraft: $isDraft)';
+  }
 }

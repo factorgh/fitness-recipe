@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/utils/hive/hive_class.dart';
 
 import 'package:voltican_fitness/widgets/recurrence_sheet.dart';
 import 'package:intl/intl.dart';
@@ -11,15 +12,17 @@ import 'package:intl/intl.dart';
 class MealPeriodSelector extends ConsumerStatefulWidget {
   final void Function(List<Meal>) onSelectionChanged;
   final List<Recipe> recipes;
-  final void Function(Map<String, dynamic>) onRecurrenceChanged;
+  final void Function(Recurrence) onRecurrenceChanged;
 
-  final List<Meal>? defaultMeals; // Add this to pass initial meals
+  final List<Meal>? defaultMeals;
+  final DateTime? selectedDay;
 
   const MealPeriodSelector({
     required this.onSelectionChanged,
     required this.onRecurrenceChanged,
     required this.recipes,
     this.defaultMeals,
+    this.selectedDay,
     super.key,
   });
 
@@ -31,11 +34,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     with SingleTickerProviderStateMixin {
   final List<String> _mealPeriods = ['Breakfast', 'Lunch', 'Snack', 'Dinner'];
   final Map<String, List<Meal>> _selectedMeals = {};
-  final Map<String, dynamic>? recurrence = {};
-
-// Create db instance
-
-  // Recurrence object
+  Recurrence? recurrence;
 
   TabController? _tabController;
 
@@ -44,7 +43,6 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     super.initState();
     _tabController = TabController(length: _mealPeriods.length, vsync: this);
 
-    // Initialize _selectedMeals with defaultMeals if provided
     _initializeSelectedMeals();
   }
 
@@ -52,27 +50,32 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
   void didUpdateWidget(covariant MealPeriodSelector oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Update _selectedMeals if defaultMeals has changed
-    if (widget.defaultMeals != oldWidget.defaultMeals) {
-      _initializeSelectedMeals();
+    if (widget.defaultMeals != oldWidget.defaultMeals ||
+        widget.selectedDay != oldWidget.selectedDay) {
+      // Check if the data actually changed before updating
+      if (widget.defaultMeals?.toString() !=
+              oldWidget.defaultMeals?.toString() ||
+          widget.selectedDay != oldWidget.selectedDay) {
+        _initializeSelectedMeals();
+      }
     }
   }
 
 //  Default meal initialization
   void _initializeSelectedMeals() {
+    _selectedMeals.clear();
     if (widget.defaultMeals != null && widget.defaultMeals!.isNotEmpty) {
-      _selectedMeals.clear();
       for (var meal in widget.defaultMeals!) {
         if (_selectedMeals[meal.mealType] == null) {
           _selectedMeals[meal.mealType] = [];
         }
         _selectedMeals[meal.mealType]!.add(meal);
       }
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Notify parent widget with the initial selection
-        widget.onSelectionChanged(_convertToRecipeAllocations());
-      });
     }
+    // Notify parent widget even if no meals are selected
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onSelectionChanged(_convertToRecipeAllocations());
+    });
   }
 
   @override
@@ -85,7 +88,6 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     TimeOfDay startTime;
     TimeOfDay endTime;
 
-    // Set meal period start and end times
     switch (mealPeriod) {
       case 'Breakfast':
         startTime = const TimeOfDay(hour: 0, minute: 0);
@@ -106,7 +108,6 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
         break;
     }
 
-    // Show time picker for the selected meal period
     TimeOfDay? selectedTime = await showTimePicker(
       context: context,
       initialTime: startTime,
@@ -122,7 +123,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     );
 
     if (selectedTime == null) {
-      return; // User canceled the time selection
+      return;
     }
 
     // Check if the selected time is within the allowed range
@@ -147,7 +148,6 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       return;
     }
 
-    // Create a DateTime object for the allocated time
     DateTime allocatedTime = DateTime(
       DateTime.now().year,
       DateTime.now().month,
@@ -156,7 +156,6 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       selectedTime.minute,
     );
 
-    // Find the selected recipe by ID
     Recipe? selectedRecipe = widget.recipes.firstWhere(
       (recipe) => recipe.id == recipeId,
     );
@@ -171,6 +170,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
         mealType: mealPeriod,
         recipes: [selectedRecipe],
         timeOfDay: formattedTime,
+        recurrence: recurrence,
       );
 
       // Initialize _selectedMeals if it doesn't exist for the current meal period
@@ -207,20 +207,31 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
   }
 
   void _removeRecipe(String mealPeriod, String recipeId) async {
-    // Remove from SQFlite before removing from UI
+    final hiveService = HiveService();
+
+    // Remove the meal from Hive for the selected date and meal period
+    await hiveService.deleteMealForDate(widget.selectedDay!, mealPeriod);
 
     setState(() {
-      _selectedMeals[mealPeriod]?.removeWhere(
-          (allocation) => allocation.recipes!.any((r) => r.id == recipeId));
+      // Remove the recipe from the UI (_selectedMeals)
+      _selectedMeals[mealPeriod]?.removeWhere((allocation) {
+        return allocation.recipes != null &&
+            allocation.recipes!.isNotEmpty &&
+            allocation.recipes!.any((r) => r.id == recipeId);
+      });
+
+      // If the meal period has no more meals, remove the entire period
       if (_selectedMeals[mealPeriod]?.isEmpty ?? false) {
         _selectedMeals.remove(mealPeriod);
       }
 
+      // Notify the parent widget of the change
       widget.onSelectionChanged(_convertToRecipeAllocations());
       setState(() {});
-
-      ///Refresh the state
     });
+
+    // Debugging
+    print('Removed recipe with ID: $recipeId from meal period: $mealPeriod');
   }
 
   List<Meal> _convertToRecipeAllocations() {
@@ -241,21 +252,28 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       // Process the recurrence data
       print('Selected Recurrence Data: $recurrenceData');
 
-      // Example of processing:
+      // Extracting recurrence option and custom days
       final String recurrencyOption = recurrenceData['option'] ?? 'None';
       final List<int> customDays =
           List<int>.from(recurrenceData['customDays'] ?? []);
-      final List<String> exceptions =
-          List<String>.from(recurrenceData['exceptions'] ?? []);
-      final List<String> customDates =
-          List<String>.from(recurrenceData['customDates'] ?? []);
+
+      // Properly convert customDates to DateTime from string if needed
+      final List<DateTime> customDates =
+          (recurrenceData['customDates'] as List<dynamic>?)
+                  ?.map((date) => DateTime.parse(date as String))
+                  .toList() ??
+              [];
 
       setState(() {
-        recurrence?["option"] = recurrencyOption;
-        recurrence?["customDays"] = customDays;
-        recurrence?["exceptions"] = exceptions;
-        recurrence?["customDates"] = customDates;
+        recurrence = Recurrence(
+          option: recurrencyOption,
+          date: DateTime.now(),
+          customDays: customDays,
+          customDates: customDates,
+        );
       });
+
+      // Trigger the recurrence change callback
       widget.onRecurrenceChanged(recurrence!);
     }
   }
@@ -407,7 +425,6 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Divider with meal period label and recurrence button
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10.0),
               child: Row(
@@ -473,6 +490,11 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
   Widget build(BuildContext context) {
     print(
         "-----------------------------recurrences-----------------------------$recurrence");
+
+    // Check if there are any meals selected by the user or from the defaultMeals
+    bool hasMeals = _selectedMeals.isNotEmpty ||
+        (widget.defaultMeals != null && widget.defaultMeals!.isNotEmpty);
+
     return Column(
       children: [
         TabBar(
@@ -492,7 +514,9 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
           ),
         ),
         const SizedBox(height: 20),
-        _buildSelectedMeals(),
+
+        // Conditionally show _buildSelectedMeals only if there are meals to display
+        if (hasMeals) _buildSelectedMeals(),
       ],
     );
   }

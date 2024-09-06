@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, use_build_context_synchronously, unrelated_type_equality_checks
+// ignore_for_file: avoid_print, use_build_context_synchronously, unrelated_type_equality_checks, unused_element
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +7,8 @@ import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/trainer_provider.dart';
+import 'package:voltican_fitness/utils/conversions/hive_conversions.dart';
+import 'package:voltican_fitness/utils/hive/hive_class.dart';
 
 import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
@@ -26,7 +28,7 @@ void showMealPlanPreviewBottomSheet(
   );
 }
 
-class MealPlanPreviewBottomSheet extends ConsumerWidget {
+class MealPlanPreviewBottomSheet extends ConsumerStatefulWidget {
   final MealPlan mealPlan;
   final Function createPlan;
 
@@ -34,10 +36,44 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
       {super.key, required this.mealPlan, required this.createPlan});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MealPlanPreviewBottomSheet> createState() =>
+      _MealPlanPreviewBottomSheetState();
+}
+
+class _MealPlanPreviewBottomSheetState
+    extends ConsumerState<MealPlanPreviewBottomSheet> {
+  HiveService hiveService = HiveService();
+  List<Meal> transMeal = <Meal>[];
+
+  @override
+  void initState() {
+    getHiveMeals();
+    super.initState();
+  }
+
+  // Fetch meal from hive mealdraftbox
+  Future<void> getHiveMeals() async {
+    final meals = await hiveService.fetchAllMeals();
+    print('---------------------------Meal from hive----------------------');
+    print(meals);
+    print(meals.length);
+
+    // Convert hive meals to meals itself
+    final convMeal = convertHiveMealsToMeals(meals);
+    print('-------------------------Converted meals --------------------');
+    print(convMeal);
+    setState(() {
+      transMeal = convMeal;
+    });
+  }
+
+  @override
+  Widget build(
+    BuildContext context,
+  ) {
     final allRecipes = ref.watch(allRecipesProvider);
     final traineeDetailsAsyncValue =
-        ref.watch(traineeDetailsProvider(mealPlan.trainees));
+        ref.watch(traineeDetailsProvider(widget.mealPlan.trainees));
 
     // Group recipes by period
     final Map<String, List<Recipe>> groupedRecipes = {
@@ -47,7 +83,7 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
       'Dinner': [],
     };
 
-    for (final allocation in mealPlan.meals) {
+    for (final allocation in widget.mealPlan.meals) {
       for (final recipeId in allocation.recipes!) {
         try {
           final recipe = allRecipes.firstWhere(
@@ -101,11 +137,20 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        _buildDetailCard("Meal Plan Name", mealPlan.name),
                         _buildDetailCard(
-                            "Duration Selected", mealPlan.duration),
-                        _buildDateRange(mealPlan.startDate, mealPlan.endDate),
-                        _buildAllocatedMeals(groupedRecipes),
+                            "Meal Plan Name", widget.mealPlan.name),
+                        _buildDetailCard(
+                            "Duration Selected", widget.mealPlan.duration),
+                        _buildDateRange(
+                            widget.mealPlan.startDate, widget.mealPlan.endDate),
+                        const ExpansionTile(
+                          title: Text('ExpansionTile 1'),
+                          subtitle: Text('Trailing expansion arrow icon'),
+                          children: <Widget>[
+                            ListTile(title: Text('This is tile number 1')),
+                          ],
+                        ),
+                        // _buildAllocatedMeals(groupedRecipes),
                         _buildTraineeCard(context, traineeDetailsAsyncValue),
                         const SizedBox(height: 30),
                         SizedBox(
@@ -118,7 +163,7 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
                                     borderRadius: BorderRadius.circular(16),
                                   )),
                               onPressed: () {
-                                createPlan();
+                                widget.createPlan();
                                 Navigator.pop(context);
                               },
                               child: const Text('Create plan')),
@@ -335,7 +380,7 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
                   const SizedBox(height: 5),
                   Column(
                     children: entry.value.map((recipe) {
-                      final allocation = mealPlan.meals.firstWhere(
+                      final allocation = widget.mealPlan.meals.firstWhere(
                           (allocation) => allocation.recipes!.contains(recipe));
 
                       return MealPeriodCard(
@@ -353,10 +398,4 @@ class MealPlanPreviewBottomSheet extends ConsumerWidget {
       }).toList(),
     );
   }
-
-  // String _formatTime(DateTime time) {
-  //   return time.hour > 12
-  //       ? '${time.hour - 12}:${time.minute.toString().padLeft(2, '0')} PM'
-  //       : '${time.hour}:${time.minute.toString().padLeft(2, '0')} AM';
-  // }
 }

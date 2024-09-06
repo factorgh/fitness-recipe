@@ -1,12 +1,12 @@
 import 'package:hive/hive.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 
-part 'recipe.g.dart';
+part 'hive_recipe.g.dart';
 
 @HiveType(typeId: 3)
-class Recipe extends HiveObject {
+class HiveRecipe extends HiveObject {
   @HiveField(0)
-  final String id;
+  final String? id;
 
   @HiveField(1)
   final String title;
@@ -33,7 +33,7 @@ class Recipe extends HiveObject {
   final String imageUrl;
 
   @HiveField(9)
-  final List<Rating> ratings;
+  final List<Rating>? ratings;
 
   @HiveField(10)
   final String createdBy;
@@ -44,8 +44,8 @@ class Recipe extends HiveObject {
   @HiveField(12)
   final DateTime updatedAt;
 
-  Recipe({
-    required this.id,
+  HiveRecipe({
+    this.id,
     required this.title,
     required this.ingredients,
     required this.instructions,
@@ -54,11 +54,18 @@ class Recipe extends HiveObject {
     required this.status,
     required this.period,
     required this.imageUrl,
-    required this.ratings,
+    this.ratings,
     required this.createdBy,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  // Add fromJson and toJson methods if needed
+  // Override toString method for better readability
+  @override
+  String toString() {
+    return 'HiveRecipe{id: $id, title: $title, ingredients: ${ingredients.join(", ")}, '
+        'instructions: $instructions, description: $description, facts: $facts, '
+        'status: $status, period: $period, imageUrl: $imageUrl, createdBy: $createdBy, '
+        'createdAt: $createdAt, updatedAt: $updatedAt}';
+  }
 }

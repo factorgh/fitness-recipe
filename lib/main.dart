@@ -14,6 +14,8 @@ import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:voltican_fitness/utils/hive/hive_meal.dart';
 import 'package:voltican_fitness/utils/hive/mealplan.dart';
 import 'package:voltican_fitness/utils/hive/hive_recurrence.dart';
+import 'package:voltican_fitness/utils/hive/rating.dart';
+import 'package:voltican_fitness/utils/hive/hive_recipe.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,9 +28,13 @@ void main() async {
   await Hive.openBox('testBox');
 
   //  Register hive adapters here
+
   Hive.registerAdapter(HiveMealAdapter());
   Hive.registerAdapter(MealPlanAdapter());
   Hive.registerAdapter(HiveRecurrenceAdapter());
+  Hive.registerAdapter(HiveRecipeAdapter());
+
+  Hive.registerAdapter(RatingAdapter());
 
   // Initialize Timezone and Notifications
   tz.initializeTimeZones();

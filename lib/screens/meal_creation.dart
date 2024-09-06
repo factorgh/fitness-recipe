@@ -17,6 +17,7 @@ import 'package:voltican_fitness/screens/meal_plan_preview_screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/hive/hive_class.dart';
 import 'package:voltican_fitness/utils/hive/hive_meal.dart';
+import 'package:voltican_fitness/utils/hive/hive_recipe.dart';
 import 'package:voltican_fitness/utils/hive/hive_recurrence.dart';
 import 'package:voltican_fitness/utils/hive/mealplan.dart' as hive_mealplan;
 import 'package:voltican_fitness/utils/show_snackbar.dart';
@@ -69,6 +70,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
       print("Meal Type: ${meal.mealType}");
       print("Date: ${meal.date}");
       print("Allocated Time: ${meal.timeOfDay}");
+      print('Alloacted recurrences: ${meal.recurrence}');
       print("Recipes:");
       for (Recipe recipe in meal.recipes!) {
         print("Recipe ID: ${recipe.id}");
@@ -374,13 +376,13 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   }
 
 // Handle recurrence here
-  void handleRecurrence(Map<String, dynamic> recurrenceData) {
+  void handleRecurrence(Recurrence recurrenceData) {
     print(
         '---------------------recurrence before preview------------$recurrenceData');
 
     setState(() {
-      // Convert the Map<String, dynamic> to a Recurrence object using fromJson
-      chosenRecurrence = Recurrence.fromJson(recurrenceData);
+      //
+      chosenRecurrence = recurrenceData;
     });
   }
 
@@ -405,6 +407,9 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   }
 
   HiveRecurrence convertToHiveRecurrence(Recurrence recurrence) {
+    print('----------------Recurrence in conversion----------------');
+    print(recurrence);
+
     return HiveRecurrence(
         option: recurrence.option,
         date: recurrence.date,
@@ -413,22 +418,101 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         customDays: recurrence.customDays);
   }
 
+  Recurrence convertFromHiveRecurrence(HiveRecurrence recurrence) {
+    print('----------------Recurrence in conversion----------------');
+    print(recurrence);
+
+    return Recurrence(
+        option: recurrence.option,
+        date: recurrence.date,
+        customDates: recurrence.customDates,
+        exceptions: recurrence.exceptions,
+        customDays: recurrence.customDays);
+  }
+
+// Convert Recipes to hive recipe
+  List<HiveRecipe> convertRecipeToHiveRecipes(List<Recipe> recipes) {
+    // Chosen recurrence
+    print('---------------------chosen recurrence');
+    print(chosenRecurrence);
+    return recipes.map((recipe) {
+      return HiveRecipe(
+          id: recipe.id!,
+          title: recipe.title,
+          ingredients: recipe.ingredients,
+          instructions: recipe.instructions,
+          description: recipe.description,
+          facts: recipe.facts,
+          imageUrl: recipe.imageUrl,
+          status: recipe.status,
+          createdAt: recipe.createdAt,
+          updatedAt: recipe.updatedAt,
+          period: recipe.period,
+          createdBy: recipe.createdBy
+          // Add more properties as needed
+          // etc.
+          );
+    }).toList();
+  }
+
+  List<Recipe> convertHiveRecipeToRecipes(List<HiveRecipe> recipes) {
+    // Chosen recurrence
+    print('---------------------chosen recurrence');
+    print(chosenRecurrence);
+    return recipes.map((recipe) {
+      return Recipe(
+          id: recipe.id,
+          title: recipe.title,
+          ingredients: recipe.ingredients,
+          instructions: recipe.instructions,
+          description: recipe.description,
+          facts: recipe.facts,
+          imageUrl: recipe.imageUrl,
+          status: recipe.status,
+          createdAt: recipe.createdAt,
+          updatedAt: recipe.updatedAt,
+          period: recipe.period,
+          createdBy: recipe.createdBy
+          // Add more properties as needed
+          // etc.
+          );
+    }).toList();
+  }
+
 //Convert to hive meals
   List<HiveMeal> convertMealsToHiveMeals(List<Meal> meals) {
+    // Chosen recurrence
+    print('---------------------chosen recurrence');
+    print(chosenRecurrence);
     return meals.map((meal) {
       return HiveMeal(
-        // Check for null and provide default values or handle null cases
-        mealType: meal.mealType, // Provide a default value if necessary
-        recipes: meal.recipes ?? [], // Provide an empty list if recipes is null
-        isDraft: true,
-        timeOfDay: meal.timeOfDay, // Provide a default value if necessary
-        date: meal.date, // Provide a default value if necessary
-        recurrence: meal.recurrence != null
-            ? convertToHiveRecurrence(meal.recurrence!)
-            : null, // Handle null recurrence case
+          mealType: meal.mealType,
+          recipes: convertRecipeToHiveRecipes(meal.recipes!),
+          isDraft: true,
+          timeOfDay: meal.timeOfDay,
+          date: meal.date,
+          recurrence: convertToHiveRecurrence(chosenRecurrence!)
+          // etc.
+          );
+    }).toList();
+  }
 
-        // etc.
-      );
+  // Convert meals from hive back
+
+  List<Meal> convertHiveMealsToMeals(List<HiveMeal> meals) {
+    // Chosen recurrence
+    print('---------------------chosen recurrence');
+    print(chosenRecurrence);
+    return meals.map((meal) {
+      return Meal(
+          mealType: meal.mealType,
+          recipes: convertHiveRecipeToRecipes(meal.recipes),
+          isDraft: true,
+          timeOfDay: meal.timeOfDay,
+          date: meal.date!,
+          recurrence: convertFromHiveRecurrence(meal.recurrence!)
+          // etc.
+          );
     }).toList();
   }
 
@@ -445,11 +529,11 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
               onPressed: () async {
                 // Fetching a MealPlan
                 final hiveService = HiveService();
-                final fetchedMealPlan = await hiveService.getDraftMealPlan();
-                print('--------------all-------$fetchedMealPlan');
+                final fetchMeals = await hiveService.fetchAllMeals();
+                print('--------------all-------$fetchMeals');
 
                 // check hive box state
-                final hiveState = hiveService.isMealPlanBoxEmpty();
+                final hiveState = hiveService.isMealBoxEmpty();
                 print('----------------hiveState----------------$hiveState');
 
                 final List<Meal> meals = [];
@@ -701,31 +785,32 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                       selectedDayPredicate: (day) => isSameDay(day, newDay),
                       onDaySelected:
                           (DateTime selectDay, DateTime focusDay) async {
-                        // Check if the selected day is within the range
+                        final hiveService = HiveService();
 
-                        // final meals =
-                        //     await mealPlanService.getMealByDate(selectDay);
                         if (_isWithinRange(selectDay)) {
                           // Fetch meals for the selected day from the meal draft
-                          if (_draftMeals.isNotEmpty) {
-                            getMealsFromDraftByDate(selectDay);
-                            // Refresh the ui
-                            setState(() {});
-                          } else if (_draftMeals.isEmpty) {
-                            setState(() {
-                              startMeals = [];
-                            });
-                          }
-                          // Debugging information
-                          print('-------------- trainer -------------');
-                          print('Selected Day: $selectDay');
+                          final meals =
+                              await hiveService.fetchMealsForDate(selectDay);
 
-                          print('Start Meals: $startMeals');
+                          print(
+                              '----------------------mealsByDate--------------------');
+                          print(meals);
 
-                          // Update the state with the new day and fetched meals
+                          // Convert Hive meals to normal meals if there are any, or assign an empty list of type Meal
+                          final selectMeals = meals.isNotEmpty
+                              ? convertHiveMealsToMeals(meals)
+                              : <Meal>[];
+
+                          // Update the state with the selected day and fetched meals
                           setState(() {
+                            startMeals = selectMeals;
                             newDay = selectDay;
                           });
+
+                          setState(() {});
+                          // Debugging information
+                          print('Selected Day: $selectDay');
+                          print('Start Meals: $startMeals');
                         }
                       },
                       headerStyle: const HeaderStyle(
@@ -738,6 +823,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
               const SizedBox(height: 20),
               newDay != null
                   ? MealPeriodSelector(
+                      selectedDay: newDay,
                       recipes: myRecipes,
                       onRecurrenceChanged: handleRecurrence,
                       onSelectionChanged: _handleRecipeSelectionChanged,
@@ -762,7 +848,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                   // Save the meals to hive with the date
 
                   print(
-                      '-------------------------Save to hive meal draft box ----------------');
+                      '-------------------------Save to hive meal draft box ----------------$meals');
 
                   await hiveService.saveRecurringMealsInDraft(
                       meals, _startDate!, _endDate!);
@@ -801,8 +887,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     const Duration(milliseconds: 3000),
                   );
 
-                  //  Fectch meal plan from db
-
                   final mealPlan = MealPlan(
                     name: _mealPlanNameController.text,
                     duration: _selectedDuration,
@@ -822,7 +906,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     : const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: Text(
-                          'Preview',
+                          'Next',
                           style: TextStyle(
                               fontWeight: FontWeight.w300, fontSize: 20),
                         ),

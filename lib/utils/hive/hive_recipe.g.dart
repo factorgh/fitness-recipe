@@ -1,23 +1,23 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'recipe.dart';
+part of 'hive_recipe.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class RecipeAdapter extends TypeAdapter<Recipe> {
+class HiveRecipeAdapter extends TypeAdapter<HiveRecipe> {
   @override
   final int typeId = 3;
 
   @override
-  Recipe read(BinaryReader reader) {
+  HiveRecipe read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Recipe(
-      id: fields[0] as String,
+    return HiveRecipe(
+      id: fields[0] as String?,
       title: fields[1] as String,
       ingredients: (fields[2] as List).cast<String>(),
       instructions: fields[3] as String,
@@ -26,7 +26,7 @@ class RecipeAdapter extends TypeAdapter<Recipe> {
       status: fields[6] as String,
       period: fields[7] as String,
       imageUrl: fields[8] as String,
-      ratings: (fields[9] as List).cast<Rating>(),
+      ratings: (fields[9] as List?)?.cast<Rating>(),
       createdBy: fields[10] as String,
       createdAt: fields[11] as DateTime,
       updatedAt: fields[12] as DateTime,
@@ -34,7 +34,7 @@ class RecipeAdapter extends TypeAdapter<Recipe> {
   }
 
   @override
-  void write(BinaryWriter writer, Recipe obj) {
+  void write(BinaryWriter writer, HiveRecipe obj) {
     writer
       ..writeByte(13)
       ..writeByte(0)
@@ -71,7 +71,7 @@ class RecipeAdapter extends TypeAdapter<Recipe> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is RecipeAdapter &&
+      other is HiveRecipeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

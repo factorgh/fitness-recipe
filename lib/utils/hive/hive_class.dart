@@ -1,7 +1,8 @@
 // ignore_for_file: avoid_print
 
 import 'package:hive/hive.dart';
-import 'package:voltican_fitness/models/recipe.dart';
+
+import 'package:voltican_fitness/utils/hive/hive_recipe.dart';
 import 'hive_recurrence.dart'; // Ensure you have this import
 import 'mealplan.dart'; // Ensure you have this import
 import 'hive_meal.dart'; // Ensure you have this import
@@ -16,11 +17,13 @@ class HiveService {
   Box<MealPlan>? _mealPlanBox;
   Box<HiveRecurrence>? _recurrenceBox;
   Box<HiveMeal>? _mealBox;
+  Box<HiveRecipe>? _recipes;
 
   Future<void> init() async {
     _mealPlanBox = await Hive.openBox<MealPlan>('mealPlans');
     _recurrenceBox = await Hive.openBox<HiveRecurrence>('recurrences');
     _mealBox = await Hive.openBox<HiveMeal>('meals');
+    _recipes = await Hive.openBox<HiveRecipe>('recipes');
   }
 
   // Create or Update MealPlan
@@ -127,8 +130,8 @@ class HiveService {
     final box = await Hive.openBox<MealPlan>('mealPlanDraftBox');
     await box.delete('draftMealPlan');
   }
-  // Ends here
 
+  // Ends here
   List<DateTime> generateRecurringDates(
       HiveRecurrence recurrence, DateTime startDate, DateTime endDate) {
     List<DateTime> recurringDates = [];
@@ -137,28 +140,50 @@ class HiveService {
     while (currentDate.isBefore(endDate)) {
       switch (recurrence.option) {
         case 'every_day':
+          // Generate dates every day, no customDays required
           recurringDates.add(currentDate);
           currentDate = currentDate.add(const Duration(days: 1));
           break;
+
         case 'weekly':
-          recurringDates.add(currentDate);
-          currentDate = currentDate.add(const Duration(days: 7));
-          break;
         case 'bi_weekly':
-          recurringDates.add(currentDate);
-          currentDate = currentDate.add(const Duration(days: 14));
+          // Generate dates based on the selected customDays within each week or bi-weekly cycle
+          for (int day in recurrence.customDays!) {
+            // Calculate the date corresponding to the customDay (Monday=1, Sunday=7)
+            DateTime customDate = currentDate
+                .add(Duration(days: (day - currentDate.weekday + 7) % 7));
+            if (customDate.isBefore(endDate)) recurringDates.add(customDate);
+          }
+          // Move to the next week or two weeks based on recurrence
+          currentDate = currentDate.add(recurrence.option == 'weekly'
+              ? const Duration(days: 7)
+              : const Duration(days: 14));
           break;
+
         case 'custom_weekly':
-          // Add only days that match customDays
+          // Custom weekly recurrence, generating dates only for the selected customDays
           for (int customDay in recurrence.customDays!) {
             DateTime customDate = currentDate
                 .add(Duration(days: (customDay - currentDate.weekday + 7) % 7));
             if (customDate.isBefore(endDate)) recurringDates.add(customDate);
           }
-          currentDate = currentDate.add(const Duration(days: 7));
+          currentDate =
+              currentDate.add(const Duration(days: 7)); // Move to the next week
           break;
+
         case 'monthly':
-          recurringDates.add(currentDate);
+          // Generate dates based on the selected customDays within each month cycle
+          for (int customDay in recurrence.customDays!) {
+            DateTime tempDate = currentDate;
+            // For each month, find all matching customDays (days of the week)
+            while (tempDate.month == currentDate.month) {
+              if (tempDate.weekday == customDay && tempDate.isBefore(endDate)) {
+                recurringDates.add(tempDate);
+              }
+              tempDate = tempDate.add(const Duration(days: 1));
+            }
+          }
+          // Move to the same day in the next month
           currentDate = DateTime(
               currentDate.year, currentDate.month + 1, currentDate.day);
           break;
@@ -199,6 +224,8 @@ class HiveService {
 
 // Fetch meals for speicfic dates
   Future<List<HiveMeal>> fetchMealsForDate(DateTime date) async {
+    print('-------------------------date for meals------------------------');
+    print(date);
     final box = await Hive.openBox<HiveMeal>('mealDraftBox');
     List<HiveMeal> mealsForDate = [];
 
@@ -244,7 +271,7 @@ class HiveService {
   }
 
   // Save draft meal to Hive
-  void saveMealDraft(List<Recipe> recipes, String time, String recurrence,
+  void saveMealDraft(List<HiveRecipe> recipes, String time, String recurrence,
       List<DateTime> dates, String mealType) {
     final mealBox = Hive.box('meals');
     final newMeal = HiveMeal(
@@ -257,5 +284,17 @@ class HiveService {
     );
 
     mealBox.put(newMeal.id, newMeal);
+  }
+
+  Future<List<HiveMeal>> fetchAllMeals() async {
+    final box = await Hive.openBox<HiveMeal>('mealDraftBox');
+
+    // Retrieve all the values from the box
+    final allMeals = box.values.toList().cast<HiveMeal>();
+
+    // Close the box after retrieving data
+    await box.close();
+
+    return allMeals;
   }
 }
