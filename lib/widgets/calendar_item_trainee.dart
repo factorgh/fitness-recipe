@@ -13,9 +13,11 @@ class CalendarItemTrainee extends ConsumerWidget {
   final IconData titleIcon;
   final Color borderColor;
   final bool isFocused;
+  final DateTime selectedDay;
 
   const CalendarItemTrainee({
     super.key,
+    required this.selectedDay,
     required this.mealPlan,
     required this.titleIcon,
     required this.borderColor,
@@ -119,8 +121,8 @@ class CalendarItemTrainee extends ConsumerWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                SingleMealPlanScreenTrainee(mealPlan: mealPlan),
+                            builder: (context) => SingleMealPlanScreenTrainee(
+                                mealPlan: mealPlan, selectedDay: selectedDay),
                           ),
                         );
                       },

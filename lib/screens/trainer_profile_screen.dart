@@ -32,7 +32,7 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
   List<Recipe> userRecipes = [];
   final RecipeService recipeService = RecipeService();
   final AuthService authService = AuthService();
-  User? user; // Allow user to be null
+  User? user;
   final EmailService emailService = EmailService();
 
   final alerts = NativeAlerts();
@@ -233,6 +233,9 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                                               user!.email, me.email);
                                           alerts.showSuccessAlert(context,
                                               "Request sent successfully");
+                                          setState(() {
+                                            sent = true;
+                                          });
                                         }
                                       }
                                     } catch (error) {

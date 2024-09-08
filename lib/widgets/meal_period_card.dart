@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/screens/trainee_recipe_detail_screen.dart';
 
 class MealPeriodCard extends StatelessWidget {
-  const MealPeriodCard({
-    super.key,
-    required this.mealPeriod,
-    required this.time1,
-    required this.time2,
-    required this.image,
-  });
+  const MealPeriodCard(
+      {super.key,
+      required this.mealPeriod,
+      required this.time1,
+      required this.time2,
+      required this.image,
+      this.recipe});
 
   final String mealPeriod;
   final String time1;
   final String time2;
   final String image;
+  final Recipe? recipe;
 
   @override
   Widget build(BuildContext context) {
@@ -25,68 +28,69 @@ class MealPeriodCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Avatar on the left
-            CircleAvatar(
-              radius: 28,
-              backgroundImage: NetworkImage(image),
+            const SizedBox(
+              width: 10,
             ),
-            const SizedBox(width: 16),
+            // Avatar on the left
+            Column(
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundImage: NetworkImage(image),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  mealPeriod,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
 
             // Meal period and time
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    mealPeriod,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       const Icon(Icons.access_time,
-                          size: 18, color: Colors.grey),
+                          size: 20, color: Colors.black),
                       const SizedBox(width: 4),
                       Text(
                         time1,
                         style: const TextStyle(
                           fontSize: 14,
-                          color: Colors.grey,
+                          color: Colors.black54,
                         ),
                       ),
+                      const SizedBox(width: 8),
                     ],
                   ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  OutlinedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                TraineeRecipeDetailScreen(meal: recipe!)));
+                      },
+                      child: const Text('View recipe '))
                 ],
               ),
             ),
 
             // Additional time or details (optional)
-            if (time2.isNotEmpty)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(Icons.access_time,
-                          size: 18, color: Colors.grey),
-                      const SizedBox(width: 4),
-                      Text(
-                        time2,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
           ],
         ),
       ),

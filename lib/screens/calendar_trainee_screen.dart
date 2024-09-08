@@ -233,6 +233,7 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: CalendarItemTrainee(
+                        selectedDay: selectedDay!,
                         isFocused: isFocused,
                         titleIcon: Icons.restaurant_menu,
                         mealPlan: mealPlan,

@@ -5,7 +5,10 @@ import 'package:dio/dio.dart';
 import 'package:voltican_fitness/classes/dio_client.dart';
 
 class EmailService {
-  Future<void> sendEmail(String to, String userEmail) async {
+  Future<void> sendEmail(
+    String to,
+    String userEmail,
+  ) async {
     final DioClient client = DioClient();
 
     try {

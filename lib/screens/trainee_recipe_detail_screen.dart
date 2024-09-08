@@ -153,23 +153,6 @@ class _TraineeRecipeDetailScreenState
     final user = ref.watch(userProvider);
     final savedRecipes = ref.watch(savedRecipesProvider);
     return Scaffold(
-      // floatingActionButton: SpeedDial(
-      //   animatedIcon: AnimatedIcons.menu_close,
-      //   animatedIconTheme: const IconThemeData(size: 28.0),
-      //   backgroundColor: Colors.green[900],
-      //   visible: true,
-      //   curve: Curves.bounceInOut,
-      //   children: [
-      //     SpeedDialChild(
-      //       child: const Icon(Icons.bookmark_border_rounded),
-      //       backgroundColor: Colors.blue,
-      //       label: 'Save Recipe',
-      //       onTap: () async {
-
-      //       },
-      //     ),
-      //   ],
-      // ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -291,41 +274,7 @@ class _TraineeRecipeDetailScreenState
                     ],
                   ),
                   const SizedBox(height: 10),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Recipe by",
-                        style: TextStyle(fontWeight: FontWeight.w500),
-                      ),
-                      SizedBox(height: 5),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundImage:
-                                AssetImage('assets/images/pf2.jpg'),
-                          ),
-                          SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Dianne Russell",
-                                style: TextStyle(fontWeight: FontWeight.w500),
-                              ),
-                              Text(
-                                "Dian",
-                                style: TextStyle(fontWeight: FontWeight.w400),
-                              ),
-                            ],
-                          ),
-                          Spacer(),
-                        ],
-                      ),
-                    ],
-                  ),
+
                   const SizedBox(height: 30),
                   const Text(
                     'Description',

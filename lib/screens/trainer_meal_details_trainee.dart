@@ -5,8 +5,10 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/services/auth_service.dart';
 
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/button.dart';
@@ -25,6 +27,8 @@ class _TrainerMealDetailScreenState
   double value = 3.8;
   bool isPrivate = false;
   bool isFollowing = false;
+  final AuthService authService = AuthService();
+  User? user;
 
   Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
@@ -119,6 +123,23 @@ class _TrainerMealDetailScreenState
             ),
           ],
         );
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUser();
+  }
+
+  void _fetchUser() {
+    authService.getUser(
+      userId: widget.meal.createdBy,
+      onSuccess: (fetchedUser) {
+        setState(() {
+          user = fetchedUser;
+        });
       },
     );
   }
@@ -244,37 +265,39 @@ class _TrainerMealDetailScreenState
                     ],
                   ),
                   const SizedBox(height: 10),
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         "Recipe by",
                         style: TextStyle(fontWeight: FontWeight.w500),
                       ),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          CircleAvatar(
+                          const CircleAvatar(
                             radius: 30,
                             backgroundImage:
                                 AssetImage('assets/images/pf2.jpg'),
                           ),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Dianne Russell",
-                                style: TextStyle(fontWeight: FontWeight.w500),
+                                user!.fullName,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500),
                               ),
                               Text(
-                                "Dian",
-                                style: TextStyle(fontWeight: FontWeight.w400),
+                                user.username,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w400),
                               ),
                             ],
                           ),
-                          Spacer(),
+                          const Spacer(),
                           // Contact section goes here
                         ],
                       ),
@@ -385,7 +408,7 @@ class _TrainerMealDetailScreenState
                       Navigator.of(context).pop();
                       await ref
                           .read(savedRecipesProvider.notifier)
-                          .saveRecipe(user!.id, widget.meal);
+                          .saveRecipe(user.id, widget.meal);
                       showSnack(context, 'Recipe has been saved successfully');
                     },
                     splashColor: Colors.purple,
