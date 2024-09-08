@@ -292,4 +292,20 @@ class RecipeService {
       showSnack(context, 'Failed to fetch recipes for user');
     }
   }
+
+  Future<Recipe?> getRecipeById(String recipeId) async {
+    try {
+      final response = await client.dio.get('/recipes/$recipeId');
+
+      if (response.statusCode == 200) {
+        final recipeData = response.data;
+        return Recipe.fromJson(recipeData);
+      } else {
+        throw Exception('Failed to load recipe');
+      }
+    } catch (e) {
+      print('Error fetching recipe by ID: $e');
+      return null; // or throw Exception if you prefer
+    }
+  }
 }

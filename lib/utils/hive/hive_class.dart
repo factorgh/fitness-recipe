@@ -2,7 +2,6 @@
 
 import 'package:hive/hive.dart';
 
-import 'package:voltican_fitness/utils/hive/hive_recipe.dart';
 import 'hive_recurrence.dart'; // Ensure you have this import
 import 'mealplan.dart'; // Ensure you have this import
 import 'hive_meal.dart'; // Ensure you have this import
@@ -17,13 +16,11 @@ class HiveService {
   Box<MealPlan>? _mealPlanBox;
   Box<HiveRecurrence>? _recurrenceBox;
   Box<HiveMeal>? _mealBox;
-  Box<HiveRecipe>? _recipes;
 
   Future<void> init() async {
     _mealPlanBox = await Hive.openBox<MealPlan>('mealPlans');
     _recurrenceBox = await Hive.openBox<HiveRecurrence>('recurrences');
     _mealBox = await Hive.openBox<HiveMeal>('meals');
-    _recipes = await Hive.openBox<HiveRecipe>('recipes');
   }
 
   // Create or Update MealPlan
@@ -271,7 +268,7 @@ class HiveService {
   }
 
   // Save draft meal to Hive
-  void saveMealDraft(List<HiveRecipe> recipes, String time, String recurrence,
+  void saveMealDraft(List<String> recipes, String time, String recurrence,
       List<DateTime> dates, String mealType) {
     final mealBox = Hive.box('meals');
     final newMeal = HiveMeal(
@@ -296,5 +293,17 @@ class HiveService {
     await box.close();
 
     return allMeals;
+  }
+
+  // Clear the meal draft box
+  Future<void> clearMealDraftBox() async {
+    // Open the Hive box
+    var box = await Hive.openBox<HiveMeal>('mealDraftBox');
+
+    // Clear the box
+    await box.clear();
+
+    // Close the box
+    await box.close();
   }
 }

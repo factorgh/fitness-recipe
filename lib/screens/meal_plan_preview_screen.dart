@@ -3,10 +3,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:voltican_fitness/Features/mealplan/services/mealplan_service.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/trainer_provider.dart';
+import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/conversions/hive_conversions.dart';
 import 'package:voltican_fitness/utils/hive/hive_class.dart';
 
@@ -14,7 +17,7 @@ import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
 
 void showMealPlanPreviewBottomSheet(
-    BuildContext context, Function createPlan, MealPlan mealplan) async {
+    BuildContext context, MealPlan mealplan) async {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -22,7 +25,6 @@ void showMealPlanPreviewBottomSheet(
     builder: (context) {
       return MealPlanPreviewBottomSheet(
         mealPlan: mealplan,
-        createPlan: createPlan,
       );
     },
   );
@@ -30,10 +32,11 @@ void showMealPlanPreviewBottomSheet(
 
 class MealPlanPreviewBottomSheet extends ConsumerStatefulWidget {
   final MealPlan mealPlan;
-  final Function createPlan;
 
-  const MealPlanPreviewBottomSheet(
-      {super.key, required this.mealPlan, required this.createPlan});
+  const MealPlanPreviewBottomSheet({
+    super.key,
+    required this.mealPlan,
+  });
 
   @override
   ConsumerState<MealPlanPreviewBottomSheet> createState() =>
@@ -44,7 +47,9 @@ class _MealPlanPreviewBottomSheetState
     extends ConsumerState<MealPlanPreviewBottomSheet> {
   HiveService hiveService = HiveService();
   List<Meal> transMeal = <Meal>[];
+  MealPlanService mealPlanService = MealPlanService();
 
+  final RecipeService recipeService = RecipeService();
   @override
   void initState() {
     getHiveMeals();
@@ -60,11 +65,66 @@ class _MealPlanPreviewBottomSheetState
 
     // Convert hive meals to meals itself
     final convMeal = convertHiveMealsToMeals(meals);
+    // Convert hive recurrences to recurrences
+
     print('-------------------------Converted meals --------------------');
     print(convMeal);
     setState(() {
       transMeal = convMeal;
     });
+  }
+
+  Future<void> _handleCreatePlan() async {
+    // Read the user from the provider
+    final user = ref.read(userProvider);
+
+    // Check if the user is null
+    if (user == null) {
+      print('User is null. Cannot create a meal plan.');
+      // You can show an error dialog here or navigate back
+      return;
+    }
+
+    // Create a new meal plan
+    final newMealPlan = MealPlan(
+      name: widget.mealPlan.name,
+      startDate: widget.mealPlan.startDate,
+      endDate: widget.mealPlan.endDate,
+      duration: widget.mealPlan.duration,
+      trainees: widget.mealPlan.trainees,
+      meals: transMeal,
+      createdBy: user.id,
+    );
+
+    print(
+        '---------------------------------Meal plan body to db---------------');
+    print(newMealPlan);
+    print('------------------------end of meal plan body-------------------');
+
+    try {
+      // Save the meal plan to the database
+      await mealPlanService.createMealPlan(newMealPlan, context);
+
+      // Navigate back to the meal plan list
+      Navigator.pop(context);
+      Navigator.pop(context);
+    } catch (e) {
+      print("Error creating meal plan: $e");
+    }
+  }
+
+  Future<Recipe> fetchRecipe(String recipeId) async {
+    try {
+      final recipe = await recipeService.getRecipeById(recipeId);
+      if (recipe != null) {
+        return recipe;
+      } else {
+        throw Exception('Recipe not found');
+      }
+    } catch (e) {
+      print('Error fetching recipe with ID $recipeId: $e');
+      rethrow;
+    }
   }
 
   @override
@@ -141,15 +201,15 @@ class _MealPlanPreviewBottomSheetState
                             "Meal Plan Name", widget.mealPlan.name),
                         _buildDetailCard(
                             "Duration Selected", widget.mealPlan.duration),
+
                         _buildDateRange(
                             widget.mealPlan.startDate, widget.mealPlan.endDate),
-                        const ExpansionTile(
-                          title: Text('ExpansionTile 1'),
-                          subtitle: Text('Trailing expansion arrow icon'),
-                          children: <Widget>[
-                            ListTile(title: Text('This is tile number 1')),
-                          ],
+                        const Text(
+                          'Meal Recurrence Set',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
+                        _buildMealFromDraft(transMeal),
                         // _buildAllocatedMeals(groupedRecipes),
                         _buildTraineeCard(context, traineeDetailsAsyncValue),
                         const SizedBox(height: 30),
@@ -162,9 +222,8 @@ class _MealPlanPreviewBottomSheetState
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
                                   )),
-                              onPressed: () {
-                                widget.createPlan();
-                                Navigator.pop(context);
+                              onPressed: () async {
+                                await _handleCreatePlan();
                               },
                               child: const Text('Create plan')),
                         )
@@ -300,6 +359,105 @@ class _MealPlanPreviewBottomSheetState
     );
   }
 
+  Widget _buildMealFromDraft(List<Meal> convertedMeals) {
+    if (convertedMeals.isEmpty) {
+      return const Center(child: Text('No meals available.'));
+    }
+
+    // Group meals by date
+    final Map<String, List<Meal>> groupedMeals = {};
+    for (final meal in convertedMeals) {
+      final formattedDate = DateFormat('yyyy-MM-dd').format(meal.date);
+      if (groupedMeals.containsKey(formattedDate)) {
+        groupedMeals[formattedDate]!.add(meal);
+      } else {
+        groupedMeals[formattedDate] = [meal];
+      }
+    }
+
+    return SizedBox(
+      height: 300, // Adjust the height as needed
+      child: ListView(
+        children: groupedMeals.entries.map((entry) {
+          final date = entry.key;
+          final meals = entry.value;
+
+          return ExpansionTile(
+            title: Text(date),
+            children: meals.map((meal) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListTile(
+                    title: Row(
+                      children: [
+                        Text(
+                          meal.mealType,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Icon(Icons.arrow_circle_right),
+                        ),
+                        Text(meal.timeOfDay)
+                      ],
+                    ),
+                  ),
+                  // Fetch recipes asynchronously
+                  FutureBuilder<List<Recipe>>(
+                    future: _fetchRecipes(meal.recipes!),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<Recipe>> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (snapshot.hasData) {
+                        return Column(
+                          children: snapshot.data!
+                              .map((recipe) => Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundImage:
+                                            NetworkImage(recipe.imageUrl),
+                                        backgroundColor: Colors.transparent,
+                                      ),
+                                      title: Text(recipe.title),
+                                    ),
+                                  ))
+                              .toList(),
+                        );
+                      } else {
+                        return const Text('No recipes available.');
+                      }
+                    },
+                  ),
+                ],
+              );
+            }).toList(),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Future<List<Recipe>> _fetchRecipes(List<String> recipeIds) async {
+    final List<Recipe> recipes = [];
+    for (String id in recipeIds) {
+      try {
+        final recipe = await fetchRecipe(id);
+        recipes.add(recipe);
+      } catch (e) {
+        print('Failed to fetch recipe $id: $e');
+      }
+    }
+    return recipes;
+  }
+
   Widget _buildDetailCard(String title, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -381,7 +539,8 @@ class _MealPlanPreviewBottomSheetState
                   Column(
                     children: entry.value.map((recipe) {
                       final allocation = widget.mealPlan.meals.firstWhere(
-                          (allocation) => allocation.recipes!.contains(recipe));
+                          (allocation) =>
+                              allocation.recipes!.contains(recipe.id));
 
                       return MealPeriodCard(
                         mealPeriod: recipe.title,

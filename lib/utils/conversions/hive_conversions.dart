@@ -81,7 +81,7 @@ List<HiveMeal> convertMealsToHiveMeals(
   return meals.map((meal) {
     return HiveMeal(
         mealType: meal.mealType,
-        recipes: convertRecipeToHiveRecipes(meal.recipes!),
+        recipes: meal.recipes!,
         isDraft: true,
         timeOfDay: meal.timeOfDay,
         date: meal.date,
@@ -96,7 +96,7 @@ List<Meal> convertHiveMealsToMeals(List<HiveMeal> meals) {
   return meals.map((meal) {
     return Meal(
         mealType: meal.mealType,
-        recipes: convertHiveRecipeToRecipes(meal.recipes),
+        recipes: meal.recipes,
         isDraft: true,
         timeOfDay: meal.timeOfDay,
         date: meal.date!,

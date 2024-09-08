@@ -17,9 +17,7 @@ import 'package:voltican_fitness/screens/meal_plan_preview_screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/hive/hive_class.dart';
 import 'package:voltican_fitness/utils/hive/hive_meal.dart';
-import 'package:voltican_fitness/utils/hive/hive_recipe.dart';
 import 'package:voltican_fitness/utils/hive/hive_recurrence.dart';
-import 'package:voltican_fitness/utils/hive/mealplan.dart' as hive_mealplan;
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
 
@@ -72,10 +70,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
       print("Allocated Time: ${meal.timeOfDay}");
       print('Alloacted recurrences: ${meal.recurrence}');
       print("Recipes:");
-      for (Recipe recipe in meal.recipes!) {
-        print("Recipe ID: ${recipe.id}");
-        print("Recipe Title: ${recipe.title}");
-      }
     }
 
     setState(() {
@@ -339,23 +333,17 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     }
 
     for (Meal meal in _selectedRecipeAllocations) {
-      print("------------Meal Allocation------------");
-      for (Recipe recipe in meal.recipes!) {
-        print("Recipe ID: ${recipe.id}");
-        print("Recipe Title: ${recipe.title}");
-
-        if (newDay == null) {
-          print('----------------------------newDay is null------------------');
-        }
-
-        meals.add(Meal(
-          mealType: meal.mealType,
-          date: newDay!,
-          timeOfDay: meal.timeOfDay,
-          recipes: [recipe],
-          recurrence: chosenRecurrence,
-        ));
+      if (newDay == null) {
+        print('----------------------------newDay is null------------------');
       }
+
+      meals.add(Meal(
+        mealType: meal.mealType,
+        date: newDay!,
+        timeOfDay: meal.timeOfDay,
+        recipes: meal.recipes,
+        recurrence: chosenRecurrence,
+      ));
     }
 
     print(
@@ -391,18 +379,14 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     final List<Meal> meals = [];
     for (Meal meal in _selectedRecipeAllocations) {
       print("------------Meal Allocation------------");
-      for (Recipe recipe in meal.recipes!) {
-        print("Recipe ID: ${recipe.id}");
-        print("Recipe Title: ${recipe.title}");
 
-        meals.add(Meal(
-          mealType: meal.mealType,
-          date: newDay!,
-          timeOfDay: meal.timeOfDay,
-          recipes: [recipe],
-          recurrence: chosenRecurrence,
-        ));
-      }
+      meals.add(Meal(
+        mealType: meal.mealType,
+        date: newDay!,
+        timeOfDay: meal.timeOfDay,
+        recipes: meal.recipes,
+        recurrence: chosenRecurrence,
+      ));
     }
   }
 
@@ -430,55 +414,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         customDays: recurrence.customDays);
   }
 
-// Convert Recipes to hive recipe
-  List<HiveRecipe> convertRecipeToHiveRecipes(List<Recipe> recipes) {
-    // Chosen recurrence
-    print('---------------------chosen recurrence');
-    print(chosenRecurrence);
-    return recipes.map((recipe) {
-      return HiveRecipe(
-          id: recipe.id!,
-          title: recipe.title,
-          ingredients: recipe.ingredients,
-          instructions: recipe.instructions,
-          description: recipe.description,
-          facts: recipe.facts,
-          imageUrl: recipe.imageUrl,
-          status: recipe.status,
-          createdAt: recipe.createdAt,
-          updatedAt: recipe.updatedAt,
-          period: recipe.period,
-          createdBy: recipe.createdBy
-          // Add more properties as needed
-          // etc.
-          );
-    }).toList();
-  }
-
-  List<Recipe> convertHiveRecipeToRecipes(List<HiveRecipe> recipes) {
-    // Chosen recurrence
-    print('---------------------chosen recurrence');
-    print(chosenRecurrence);
-    return recipes.map((recipe) {
-      return Recipe(
-          id: recipe.id,
-          title: recipe.title,
-          ingredients: recipe.ingredients,
-          instructions: recipe.instructions,
-          description: recipe.description,
-          facts: recipe.facts,
-          imageUrl: recipe.imageUrl,
-          status: recipe.status,
-          createdAt: recipe.createdAt,
-          updatedAt: recipe.updatedAt,
-          period: recipe.period,
-          createdBy: recipe.createdBy
-          // Add more properties as needed
-          // etc.
-          );
-    }).toList();
-  }
-
 //Convert to hive meals
   List<HiveMeal> convertMealsToHiveMeals(List<Meal> meals) {
     // Chosen recurrence
@@ -487,7 +422,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     return meals.map((meal) {
       return HiveMeal(
           mealType: meal.mealType,
-          recipes: convertRecipeToHiveRecipes(meal.recipes!),
+          recipes: meal.recipes!,
           isDraft: true,
           timeOfDay: meal.timeOfDay,
           date: meal.date,
@@ -506,7 +441,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     return meals.map((meal) {
       return Meal(
           mealType: meal.mealType,
-          recipes: convertHiveRecipeToRecipes(meal.recipes),
+          recipes: meal.recipes,
           isDraft: true,
           timeOfDay: meal.timeOfDay,
           date: meal.date!,
@@ -514,6 +449,12 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
           // etc.
           );
     }).toList();
+  }
+
+  void _moveToNextDay() {
+    setState(() {
+      newDay = newDay!.add(const Duration(days: 1));
+    });
   }
 
   @override
@@ -541,44 +482,25 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                 // Create stor instance
 
                 for (Meal meal in _selectedRecipeAllocations) {
-                  print("------------Meal Allocation------------");
-                  for (Recipe recipe in meal.recipes!) {
-                    print("Recipe ID: ${recipe.id}");
-                    print("Recipe Title: ${recipe.title}");
-
-                    meals.add(Meal(
-                      mealType: meal.mealType,
-                      date: newDay!,
-                      timeOfDay: meal.timeOfDay,
-                      recipes: [recipe],
-                      recurrence: chosenRecurrence,
-                    ));
-                  }
+                  meals.add(Meal(
+                    mealType: meal.mealType,
+                    date: newDay!,
+                    timeOfDay: meal.timeOfDay,
+                    recipes: meal.recipes,
+                    recurrence: chosenRecurrence,
+                  ));
                 }
               },
               icon: const Icon(Icons.add)),
           IconButton(
               onPressed: () async {
                 final hiveService = HiveService();
+                await hiveService.clearMealDraftBox();
 
-                // Creating or updating a MealPlan
-                final mealPlan = hive_mealplan.MealPlan(
-                  id: '2',
-                  name: 'Weekly Plan',
-                  duration: 'Week',
-                  startDate: DateTime.now(),
-                  endDate: DateTime.now().add(const Duration(days: 7)),
-                  datesArray: [DateTime.now()],
-                  meals: [],
-                  trainees: ['trainee1', 'trainee2'],
-                  createdBy: 'user123',
-                  createdAt: DateTime.now(),
-                  updatedAt: DateTime.now(),
-                );
-                print('------------------------$mealPlan');
-                await hiveService.saveDraftMealPlan(mealPlan);
+                print(
+                    '------------------------Meal Draft box cleared-------------');
               },
-              icon: const Icon(Icons.view_week))
+              icon: const Icon(Icons.delete))
         ],
       ),
       body: Padding(
@@ -823,6 +745,8 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
               const SizedBox(height: 20),
               newDay != null
                   ? MealPeriodSelector(
+                      startDate: _startDate!,
+                      endDate: _endDate!,
                       selectedDay: newDay,
                       recipes: myRecipes,
                       onRecurrenceChanged: handleRecurrence,
@@ -852,6 +776,9 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
                   await hiveService.saveRecurringMealsInDraft(
                       meals, _startDate!, _endDate!);
+
+                  // After saving data to hive move to next day
+                  _moveToNextDay();
                 },
                 child: _isLoading
                     ? const CircularProgressIndicator(
@@ -860,9 +787,9 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     : const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: Text(
-                          'Save',
+                          'Continue to Next Day',
                           style: TextStyle(
-                              fontWeight: FontWeight.w300, fontSize: 20),
+                              fontWeight: FontWeight.w500, fontSize: 16),
                         ),
                       ),
               ),
@@ -897,7 +824,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                         _selectedTrainees.map((trainee) => trainee.id).toList(),
                     createdBy: ref.read(userProvider)!.id,
                   );
-                  showMealPlanPreviewBottomSheet(context, createPlan, mealPlan);
+                  showMealPlanPreviewBottomSheet(context, mealPlan);
                 },
                 child: _isLoading
                     ? const CircularProgressIndicator(
@@ -906,9 +833,9 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     : const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: Text(
-                          'Next',
+                          'Preview Meal Plan',
                           style: TextStyle(
-                              fontWeight: FontWeight.w300, fontSize: 20),
+                              fontWeight: FontWeight.w500, fontSize: 16),
                         ),
                       ),
               ),

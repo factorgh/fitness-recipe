@@ -1,7 +1,6 @@
 import 'package:hive/hive.dart';
 
 import 'package:voltican_fitness/utils/hive/hive_recurrence.dart';
-import 'package:voltican_fitness/utils/hive/hive_recipe.dart';
 
 part 'hive_meal.g.dart';
 
@@ -17,7 +16,7 @@ class HiveMeal extends HiveObject {
   final String timeOfDay;
 
   @HiveField(3)
-  final List<HiveRecipe> recipes;
+  final List<String> recipes;
 
   @HiveField(4)
   final HiveRecurrence? recurrence;

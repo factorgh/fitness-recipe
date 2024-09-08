@@ -1,9 +1,7 @@
-// ignore_for_file: avoid_print, unused_element
-
 import 'package:flutter/material.dart';
 
 Future<Map<String, dynamic>?> showRecurrenceBottomSheet(
-    BuildContext context) async {
+    BuildContext context, DateTime startDate, DateTime endDate) async {
   return await showModalBottomSheet<Map<String, dynamic>>(
     context: context,
     isScrollControlled: true,
@@ -11,13 +9,19 @@ Future<Map<String, dynamic>?> showRecurrenceBottomSheet(
     isDismissible: true,
     backgroundColor: Colors.transparent,
     builder: (BuildContext context) {
-      return const RecurrenceSelectionWidget();
+      return RecurrenceSelectionWidget(
+        startDate: startDate,
+        endDate: endDate,
+      );
     },
   );
 }
 
 class RecurrenceSelectionWidget extends StatefulWidget {
-  const RecurrenceSelectionWidget({super.key});
+  final DateTime startDate;
+  final DateTime endDate;
+  const RecurrenceSelectionWidget(
+      {super.key, required this.startDate, required this.endDate});
 
   @override
   _RecurrenceSelectionWidgetState createState() =>
@@ -27,13 +31,10 @@ class RecurrenceSelectionWidget extends StatefulWidget {
 class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
   String _selectedRecurrence = 'Daily'; // Default recurrence selection
 
-// Date for custom rule
   final List<DateTime> _exceptions = []; // List of exception dates
   final List<DateTime> _selectedMonthlyDates = [];
 
   final List<bool> _daysOfWeekSelected = List<bool>.filled(7, false);
-
-  // Selected custom days for recurrence
 
   final List<String> weekdays = [
     'Mon',
@@ -53,14 +54,48 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
     'Custom',
   ];
 
-  // Helper: Build daily recurrence widget
-  Widget _buildDailyOptions() {
-    return const Column(
-      children: [],
+  bool _hasSelectedDays =
+      false; // To track if days of the week have been selected
+  bool _hasSelectedDates =
+      false; // To track if specific dates have been selected
+
+  // Function to show confirmation dialog
+  Future<void> _showOverrideConfirmationDialog(String type) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Override Selection'),
+          content: Text(
+              'Switching to $type will override your previous selection. Do you want to proceed?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Proceed'),
+              onPressed: () {
+                setState(() {
+                  // Clear both lists when switching
+                  _hasSelectedDays = (type == 'Days of the Week');
+                  _hasSelectedDates = (type == 'Specific Dates');
+                  _daysOfWeekSelected.fillRange(
+                      0, _daysOfWeekSelected.length, false);
+                  _selectedMonthlyDates.clear();
+                });
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
-  // Helper: Build weekly recurrence widget
   Widget _buildWeeklyOptions() {
     return Column(
       children: [
@@ -76,19 +111,21 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
               return FilterChip(
                 label: Text(weekdays[index]),
                 selected: _daysOfWeekSelected[index],
-                onSelected: (bool selected) {
-                  setState(() {
-                    _daysOfWeekSelected[index] = selected;
-                  });
+                onSelected: (bool selected) async {
+                  if (_hasSelectedDates) {
+                    await _showOverrideConfirmationDialog('Days of the Week');
+                  } else {
+                    setState(() {
+                      _daysOfWeekSelected[index] = selected;
+                      _hasSelectedDays = true;
+                    });
+                  }
                 },
               );
             }),
           ),
         ),
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Divider(),
-        ),
+        const Divider(),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
@@ -101,16 +138,21 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
               const SizedBox(width: 30),
               ElevatedButton(
                 onPressed: () async {
-                  final DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2030),
-                  );
-                  if (pickedDate != null) {
-                    setState(() {
-                      _selectedMonthlyDates.add(pickedDate);
-                    });
+                  if (_hasSelectedDays) {
+                    await _showOverrideConfirmationDialog('Specific Dates');
+                  } else {
+                    final DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: widget.startDate,
+                      firstDate: widget.startDate,
+                      lastDate: widget.endDate,
+                    );
+                    if (pickedDate != null) {
+                      setState(() {
+                        _selectedMonthlyDates.add(pickedDate);
+                        _hasSelectedDates = true;
+                      });
+                    }
                   }
                 },
                 child: const Text('Add Date'),
@@ -136,8 +178,10 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
                     icon: const Icon(Icons.remove_circle),
                     onPressed: () {
                       setState(() {
-                        // Remove the date from the list
                         _selectedMonthlyDates.remove(date);
+                        if (_selectedMonthlyDates.isEmpty) {
+                          _hasSelectedDates = false;
+                        }
                       });
                     },
                   ),
@@ -145,320 +189,6 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
               }),
             ],
           ),
-      ],
-    );
-  }
-
-// Add a state variable to track whether the checkbox is selected
-
-  Widget _buildBiWeeklyOptions() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Center(
-            child: Text(
-          'Create custom recurrence ',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        )),
-        ListTile(
-          title: const Text('Select Days of the Week'),
-          subtitle: Wrap(
-            spacing: 10.0,
-            children: List.generate(7, (index) {
-              return FilterChip(
-                label: Text(weekdays[index]),
-                selected: _daysOfWeekSelected[index],
-                onSelected: (bool selected) {
-                  setState(() {
-                    _daysOfWeekSelected[index] = selected;
-                  });
-                },
-              );
-            }),
-          ),
-        ),
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Divider(),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              const SizedBox(width: 10),
-              const Text(
-                'Select specific dates ',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(width: 30),
-              ElevatedButton(
-                onPressed: () async {
-                  final DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2030),
-                  );
-                  if (pickedDate != null) {
-                    setState(() {
-                      _selectedMonthlyDates.add(pickedDate);
-                    });
-                  }
-                },
-                child: const Text('Add Date'),
-              ),
-            ],
-          ),
-        ),
-        if (_selectedMonthlyDates.isNotEmpty)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  'Selected Dates:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              ..._selectedMonthlyDates.map((date) {
-                return ListTile(
-                  title: Text(date.toLocal().toString().split(' ')[0]),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.remove_circle),
-                    onPressed: () {
-                      setState(() {
-                        // Remove the date from the list
-                        _selectedMonthlyDates.remove(date);
-                      });
-                    },
-                  ),
-                );
-              }),
-            ],
-          ),
-      ],
-    );
-  }
-
-  Widget _buildCustomOptions() {
-    return Column(
-      children: [
-        const Text(
-          'Create custom recurrence',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        const SizedBox(
-          width: 50,
-        ),
-        const SizedBox(height: 10),
-
-        ListTile(
-          title: const Text('Select Days of the Week'),
-          subtitle: Wrap(
-            spacing: 10.0,
-            children: List.generate(7, (index) {
-              return FilterChip(
-                label: Text(weekdays[index]),
-                selected: _daysOfWeekSelected[index],
-                onSelected: (bool selected) {
-                  setState(() {
-                    _daysOfWeekSelected[index] = selected;
-                  });
-                },
-              );
-            }),
-          ),
-        ),
-        // Horizontally scrollable list of days of the month
-
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Divider(),
-        ),
-        const SizedBox(height: 10),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              const SizedBox(width: 10),
-              const Text(
-                'Select specific dates ',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(width: 30),
-              ElevatedButton(
-                onPressed: () async {
-                  final DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2030),
-                  );
-                  if (pickedDate != null) {
-                    setState(() {
-                      _selectedMonthlyDates.add(pickedDate);
-                    });
-                  }
-                },
-                child: const Text('Add Date'),
-              ),
-            ],
-          ),
-        ),
-
-        if (_selectedMonthlyDates.isNotEmpty)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  'Selected Dates:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              ..._selectedMonthlyDates.map((date) {
-                return ListTile(
-                  title: Text(date.toLocal().toString().split(' ')[0]),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.remove_circle),
-                    onPressed: () {
-                      setState(() {
-                        // Remove the date from the list
-                        _selectedMonthlyDates.remove(date);
-                      });
-                    },
-                  ),
-                );
-              }),
-            ],
-          ),
-      ],
-    );
-  }
-
-  Widget _buildMonthlyOptions() {
-    return Column(
-      children: [
-        const Text(
-          'Create custom recurrence ',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
-        ListTile(
-          title: const Text('Select Days of the Week'),
-          subtitle: Wrap(
-            spacing: 10.0,
-            children: List.generate(7, (index) {
-              return FilterChip(
-                label: Text(weekdays[index]),
-                selected: _daysOfWeekSelected[index],
-                onSelected: (bool selected) {
-                  setState(() {
-                    _daysOfWeekSelected[index] = selected;
-                  });
-                },
-              );
-            }),
-          ),
-        ),
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Divider(),
-        ),
-        const SizedBox(height: 20),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              const SizedBox(width: 10),
-              const Text(
-                'Select specific dates ',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(width: 30),
-              ElevatedButton(
-                onPressed: () async {
-                  final DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2030),
-                  );
-                  if (pickedDate != null) {
-                    setState(() {
-                      _selectedMonthlyDates.add(pickedDate);
-                    });
-                  }
-                },
-                child: const Text('Add Date'),
-              ),
-            ],
-          ),
-        ),
-        if (_selectedMonthlyDates.isNotEmpty)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  'Selected Dates:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              ..._selectedMonthlyDates.map((date) {
-                return ListTile(
-                  title: Text(date.toLocal().toString().split(' ')[0]),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.remove_circle),
-                    onPressed: () {
-                      setState(() {
-                        // Remove the date from the list
-                        _selectedMonthlyDates.remove(date);
-                      });
-                    },
-                  ),
-                );
-              }),
-            ],
-          ),
-      ],
-    );
-  }
-
-  Widget _buildExceptionDates() {
-    return Column(
-      children: [
-        const Text('Add Exception Dates (Optional)'),
-        ElevatedButton(
-          onPressed: () async {
-            final DateTime? pickedDate = await showDatePicker(
-              context: context,
-              initialDate: DateTime.now(),
-              firstDate: DateTime(2020),
-              lastDate: DateTime(2030),
-            );
-            if (pickedDate != null) {
-              setState(() {
-                _exceptions.add(pickedDate);
-              });
-            }
-          },
-          child: const Text('Add Exception Date'),
-        ),
-        Wrap(
-          children: _exceptions
-              .map((date) => Chip(
-                    label: Text(date.toLocal().toString().split(' ')[0]),
-                    onDeleted: () {
-                      setState(() {
-                        _exceptions.remove(date);
-                      });
-                    },
-                  ))
-              .toList(),
-        ),
       ],
     );
   }
@@ -477,10 +207,9 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
             .entries
             .where((entry) => entry.value)
             .map((entry) => entry.key + 1)
-            .toList(); // Selected days (1 = Mon, 7 = Sun)
-        recurrenceData['customDates'] = _selectedMonthlyDates
-            .map((d) => d.toIso8601String())
-            .toList(); // Specific monthly dates
+            .toList();
+        recurrenceData['customDates'] =
+            _selectedMonthlyDates.map((d) => d.toIso8601String()).toList();
         break;
       case 'Bi-Weekly':
         recurrenceData['option'] = 'bi_weekly';
@@ -490,15 +219,13 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
             .where((entry) => entry.value)
             .map((entry) => entry.key + 1)
             .toList();
-        recurrenceData['customDates'] = _selectedMonthlyDates
-            .map((d) => d.toIso8601String())
-            .toList(); // Specific monthly dates
+        recurrenceData['customDates'] =
+            _selectedMonthlyDates.map((d) => d.toIso8601String()).toList();
         break;
       case 'Monthly':
         recurrenceData['option'] = 'monthly';
-        recurrenceData['customDates'] = _selectedMonthlyDates
-            .map((d) => d.toIso8601String())
-            .toList(); // Specific monthly dates
+        recurrenceData['customDates'] =
+            _selectedMonthlyDates.map((d) => d.toIso8601String()).toList();
         recurrenceData['customDays'] = _daysOfWeekSelected
             .asMap()
             .entries
@@ -513,20 +240,19 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
             .entries
             .where((entry) => entry.value)
             .map((entry) => entry.key + 1)
-            .toList(); // Custom-selected days of the week
-        recurrenceData['customDates'] = _selectedMonthlyDates
-            .map((d) => d.toIso8601String())
-            .toList(); // Optional specific dates
+            .toList();
+        recurrenceData['customDates'] =
+            _selectedMonthlyDates.map((d) => d.toIso8601String()).toList();
         break;
     }
 
-    // Add exceptions
+    // Add exceptions if present
     if (_exceptions.isNotEmpty) {
       recurrenceData['exceptions'] =
           _exceptions.map((date) => date.toIso8601String()).toList();
     }
 
-    // Save the recurrence data to be returned to the previous screen
+    // Save and return recurrence data
     Navigator.pop(context, recurrenceData);
   }
 
@@ -574,18 +300,16 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
 
               // Render specific options for selected recurrence type
-              if (_selectedRecurrence == 'Daily') _buildDailyOptions(),
+              if (_selectedRecurrence == 'Daily') const SizedBox(),
               if (_selectedRecurrence == 'Weekly') _buildWeeklyOptions(),
-              if (_selectedRecurrence == 'Monthly') _buildMonthlyOptions(),
-              if (_selectedRecurrence == 'Custom') _buildCustomOptions(),
-              if (_selectedRecurrence == 'Bi-Weekly') _buildBiWeeklyOptions(),
+              if (_selectedRecurrence == 'Monthly') _buildWeeklyOptions(),
+              if (_selectedRecurrence == 'Custom') _buildWeeklyOptions(),
+              if (_selectedRecurrence == 'Bi-Weekly') _buildWeeklyOptions(),
 
               const SizedBox(height: 20),
-
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ElevatedButton(

@@ -3,18 +3,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
-
+import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
 import 'package:voltican_fitness/providers/trainer_provider.dart';
 import 'package:voltican_fitness/screens/meal_update_screen.dart';
-import 'package:voltican_fitness/widgets/meal_period_card.dart';
+import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:intl/intl.dart';
 
 class SingleMealPlanDetailScreen extends ConsumerWidget {
   final MealPlan mealPlan;
 
-  const SingleMealPlanDetailScreen({super.key, required this.mealPlan});
+  SingleMealPlanDetailScreen({super.key, required this.mealPlan});
+
+  final RecipeService recipeService = RecipeService();
+
+  Future<List<Recipe>> fetchRecipes(List<String> recipeIds) async {
+    try {
+      final recipes = await Future.wait(
+          recipeIds.map((id) => recipeService.getRecipeById(id)));
+      return recipes.where((recipe) => recipe != null).cast<Recipe>().toList();
+    } catch (e) {
+      print('Error fetching recipes: $e');
+      rethrow;
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,24 +44,18 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
     };
 
     for (final allocation in mealPlan.meals) {
-      try {
-        final meal = allRecipes
-            .where((recipe) => allocation.recipes!.contains(recipe))
-            .map((recipe) => Meal(
-                  date: DateTime.now(),
-                  mealType: recipe.period,
-                  recipes: [recipe],
-                  timeOfDay: allocation.timeOfDay,
-                ))
-            .toList();
+      final meal = allRecipes
+          .where((recipe) => allocation.recipes!.contains(recipe.id))
+          .map((recipe) => Meal(
+                date: DateTime.now(),
+                mealType: recipe.period,
+                recipes: [recipe.id!],
+                timeOfDay: allocation.timeOfDay,
+              ))
+          .toList();
 
-        for (var meal in meal) {
-          groupedMeals[meal.mealType]?.add(meal);
-        }
-      } catch (e) {
-        // Handle cases where the recipe is not found
-        print(
-            'Error processing allocation with ID ${allocation.recipes}. Error: $e');
+      for (var mealItem in meal) {
+        groupedMeals[mealItem.mealType]?.add(mealItem);
       }
     }
 
@@ -56,7 +63,7 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text(
           'Meal Plan Details',
-          style: TextStyle(fontWeight: FontWeight.w500),
+          style: TextStyle(fontWeight: FontWeight.w800),
         ),
         centerTitle: true,
       ),
@@ -67,7 +74,7 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
             _buildDetailCard("Meal Plan Name", mealPlan.name),
             _buildDetailCard("Duration Selected", mealPlan.duration),
             _buildDateRange(mealPlan.startDate, mealPlan.endDate),
-            _buildAllocatedMeals(groupedMeals),
+            _buildMealFromDraft(mealPlan.meals),
             _buildTraineeCard(context, traineeDetailsAsyncValue),
             const SizedBox(height: 30),
             ElevatedButton(
@@ -127,7 +134,6 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 10),
-                // Create a horizontal ListView for trainee images
                 SizedBox(
                   height: 50,
                   child: ListView.builder(
@@ -227,75 +233,89 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
     );
   }
 
-  // Widget _buildDaysForMeal() {
-  //   if (mealPlan.days.isNotEmpty) {
-  //     // Join all the days with a comma to display them in a single line
-  //     String daysText = mealPlan.days.join(', ');
+  Widget _buildMealFromDraft(List<Meal> convertedMeals) {
+    if (convertedMeals.isEmpty) {
+      return const Center(child: Text('No meals available.'));
+    }
 
-  //     return Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Card(
-  //           elevation: 2,
-  //           child: Padding(
-  //             padding: const EdgeInsets.all(8.0),
-  //             child: Text(
-  //               daysText,
-  //               style: const TextStyle(color: Colors.black45, fontSize: 16),
-  //             ),
-  //           ),
-  //         ),
-  //         const SizedBox(height: 20),
-  //       ],
-  //     );
-  //   }
+    // Group meals by date
+    final Map<String, List<Meal>> groupedMeals = {};
+    for (final meal in convertedMeals) {
+      final formattedDate = DateFormat('yyyy-MM-dd').format(meal.date);
+      if (groupedMeals.containsKey(formattedDate)) {
+        groupedMeals[formattedDate]!.add(meal);
+      } else {
+        groupedMeals[formattedDate] = [meal];
+      }
+    }
 
-  //   return _buildDetailCard("", "Repeats Everyday");
-  // }
+    return SizedBox(
+      height: 300, // Adjust the height as needed
+      child: ListView(
+        children: groupedMeals.entries.map((entry) {
+          final date = entry.key;
+          final meals = entry.value;
 
-  Widget _buildAllocatedMeals(Map<String, List<Meal>> groupedMeals) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: groupedMeals.entries.map((entry) {
-        return entry.value.isNotEmpty
-            ? Column(
+          return ExpansionTile(
+            title: Text(date),
+            children: meals.map((meal) {
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    entry.key,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[700],
+                  ListTile(
+                    title: Row(
+                      children: [
+                        Text(
+                          meal.mealType,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Icon(Icons.arrow_circle_right),
+                        ),
+                        Text(meal.timeOfDay)
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 5),
-                  Column(
-                    children: entry.value.map((meal) {
-                      return Column(
-                        children: meal.recipes!.map((recipe) {
-                          return MealPeriodCard(
-                            mealPeriod: entry.key,
-                            time1: meal.timeOfDay,
-                            time2: '', // Add other time logic if needed
-                            image: recipe.imageUrl, // Adjust with your images
-                          );
-                        }).toList(),
-                      );
-                    }).toList(),
+                  FutureBuilder<List<Recipe>>(
+                    future: fetchRecipes(meal.recipes!),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<Recipe>> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (snapshot.hasData) {
+                        return Column(
+                          children: snapshot.data!
+                              .map((recipe) => Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundImage:
+                                            NetworkImage(recipe.imageUrl),
+                                        backgroundColor: Colors.transparent,
+                                      ),
+                                      title: Text(recipe.title),
+                                    ),
+                                  ))
+                              .toList(),
+                        );
+                      } else {
+                        return const Text('No recipes available.');
+                      }
+                    },
                   ),
-                  const SizedBox(height: 20),
                 ],
-              )
-            : const SizedBox.shrink();
-      }).toList(),
+              );
+            }).toList(),
+          );
+        }).toList(),
+      ),
     );
-  }
-
-  String _formatTime(DateTime time) {
-    return time.hour >= 12
-        ? '${time.hour > 12 ? time.hour - 12 : time.hour}:${time.minute.toString().padLeft(2, '0')} PM'
-        : '${time.hour}:${time.minute.toString().padLeft(2, '0')} AM';
   }
 }
 

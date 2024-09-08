@@ -16,6 +16,8 @@ class MealPlanService {
   Future<MealPlan> createMealPlan(
       MealPlan mealPlan, BuildContext context) async {
     try {
+      print('-----------------------Plan creation----------------------');
+      print(mealPlan);
       final response =
           await client.dio.post('/meal-plans', data: mealPlan.toJson());
 

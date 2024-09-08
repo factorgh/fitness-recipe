@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/hive/hive_class.dart';
 
 import 'package:voltican_fitness/widgets/recurrence_sheet.dart';
@@ -16,11 +17,15 @@ class MealPeriodSelector extends ConsumerStatefulWidget {
 
   final List<Meal>? defaultMeals;
   final DateTime? selectedDay;
+  final DateTime startDate;
+  final DateTime endDate;
 
   const MealPeriodSelector({
     required this.onSelectionChanged,
     required this.onRecurrenceChanged,
     required this.recipes,
+    required this.startDate,
+    required this.endDate,
     this.defaultMeals,
     this.selectedDay,
     super.key,
@@ -35,6 +40,25 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
   final List<String> _mealPeriods = ['Breakfast', 'Lunch', 'Snack', 'Dinner'];
   final Map<String, List<Meal>> _selectedMeals = {};
   Recurrence? recurrence;
+
+  RecipeService recipeService = RecipeService();
+  Future<List<String>> fetchRecipeTitles(List<String> recipeIds) async {
+    final List<String> titles = [];
+
+    try {
+      for (String recipeId in recipeIds) {
+        final recipe = await recipeService.getRecipeById(recipeId);
+        if (recipe != null) {
+          titles.add(recipe.title);
+        }
+      }
+    } catch (e) {
+      print('Error fetching recipe titles: $e');
+      // Handle error as needed
+    }
+
+    return titles;
+  }
 
   TabController? _tabController;
 
@@ -168,7 +192,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       Meal allocation = Meal(
         date: DateTime.now(),
         mealType: mealPeriod,
-        recipes: [selectedRecipe],
+        recipes: [selectedRecipe.id!],
         timeOfDay: formattedTime,
         recurrence: recurrence,
       );
@@ -213,11 +237,10 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     await hiveService.deleteMealForDate(widget.selectedDay!, mealPeriod);
 
     setState(() {
-      // Remove the recipe from the UI (_selectedMeals)
+      // Remove the recipe ID from the list of recipe IDs in the UI (_selectedMeals)
       _selectedMeals[mealPeriod]?.removeWhere((allocation) {
         return allocation.recipes != null &&
-            allocation.recipes!.isNotEmpty &&
-            allocation.recipes!.any((r) => r.id == recipeId);
+            allocation.recipes!.contains(recipeId);
       });
 
       // If the meal period has no more meals, remove the entire period
@@ -227,11 +250,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
 
       // Notify the parent widget of the change
       widget.onSelectionChanged(_convertToRecipeAllocations());
-      setState(() {});
     });
-
-    // Debugging
-    print('Removed recipe with ID: $recipeId from meal period: $mealPeriod');
   }
 
   List<Meal> _convertToRecipeAllocations() {
@@ -246,7 +265,8 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
 
   void _handleRecurrenceSelection() async {
     final Map<String, dynamic>? recurrenceData =
-        await showRecurrenceBottomSheet(context);
+        await showRecurrenceBottomSheet(
+            context, widget.startDate, widget.endDate);
 
     if (recurrenceData != null) {
       // Process the recurrence data
@@ -319,8 +339,8 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
               itemBuilder: (context, index) {
                 Recipe recipe = filteredRecipes[index];
                 bool isSelected = _selectedMeals[mealPeriod]?.any(
-                        (allocation) => allocation.recipes!
-                            .any((r) => r.id == recipe.id)) ??
+                        (allocation) =>
+                            allocation.recipes!.contains(recipe.id)) ??
                     false;
 
                 return GestureDetector(
@@ -459,27 +479,42 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
             Wrap(
               spacing: 8,
               children: allocations.map((allocation) {
-                String displayText =
-                    allocation.recipes!.map((r) => r.title).join(', ');
-                displayText += ' @ ${allocation.timeOfDay}';
+                return FutureBuilder<List<String>>(
+                  future: fetchRecipeTitles(allocation.recipes!),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<String>> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator(); // Or any other loading indicator
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else if (snapshot.hasData) {
+                      // Create display text
+                      String displayText = snapshot.data!.join(', ');
+                      displayText += ' @ ${allocation.timeOfDay}';
 
-                return Row(
-                  children: [
-                    Chip(
-                      label: Text(displayText),
-                      backgroundColor: Colors.blue.withOpacity(0.2),
-                      deleteIcon: const Icon(Icons.cancel),
-                      onDeleted: () => _removeRecipe(
-                          mealPeriod, allocation.recipes!.first.id!),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.refresh, color: Colors.redAccent),
-                      onPressed: () => _handleRecurrenceSelection(),
-                    ),
-                  ],
+                      return Row(
+                        children: [
+                          Chip(
+                            label: Text(displayText),
+                            backgroundColor: Colors.blue.withOpacity(0.2),
+                            deleteIcon: const Icon(Icons.cancel),
+                            onDeleted: () => _removeRecipe(
+                                mealPeriod, allocation.recipes!.first),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.refresh,
+                                color: Colors.redAccent),
+                            onPressed: () => _handleRecurrenceSelection(),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return const Text('No data');
+                    }
+                  },
                 );
               }).toList(),
-            ),
+            )
           ],
         );
       }).toList(),

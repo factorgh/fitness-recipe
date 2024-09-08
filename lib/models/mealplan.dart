@@ -1,16 +1,11 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-
-import 'package:voltican_fitness/models/recipe.dart';
 
 class Recurrence {
   final String
       option; // "every_day", "weekly", "custom_weekly", "monthly", "bi_weekly"
   final DateTime date; // Required date for the recurrence
   final List<DateTime>? exceptions; // List of exception dates
-  final List<DateTime>? customDates; // List of exception dates
+  final List<DateTime>? customDates; // List of custom dates
   final List<int>?
       customDays; // For custom weekly recurrence: 0 = Sunday, 1 = Monday, etc.
 
@@ -24,20 +19,16 @@ class Recurrence {
 
   factory Recurrence.fromJson(Map<String, dynamic> json) {
     return Recurrence(
-      option: json['option'] != null
-          ? json['option'] as String
-          : 'default_option', // Add a fallback default value
-      date: json['date'] != null
-          ? DateTime.parse(json['date'])
-          : DateTime.now(), // Fallback to current date if null
+      option: json['option'] as String? ?? 'default_option',
+      date:
+          json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
       exceptions: json['exceptions'] != null
-          ? List<DateTime>.from(
-              json['exceptions'].map((e) => DateTime.parse(e)))
+          ? List<DateTime>.from((json['exceptions'] as List)
+              .map((e) => DateTime.parse(e as String)))
           : null,
-      customDates: json['customDates'] !=
-              null // Corrected this from exceptions to customDates
-          ? List<DateTime>.from(
-              json['customDates'].map((e) => DateTime.parse(e)))
+      customDates: json['customDates'] != null
+          ? List<DateTime>.from((json['customDates'] as List)
+              .map((e) => DateTime.parse(e as String)))
           : null,
       customDays: json['customDays'] != null
           ? List<int>.from(json['customDays'])
@@ -50,7 +41,7 @@ class Recurrence {
       'option': option,
       'date': date.toIso8601String(),
       'exceptions': exceptions?.map((e) => e.toIso8601String()).toList(),
-      'customDates': exceptions?.map((e) => e.toIso8601String()).toList(),
+      'customDates': customDates?.map((e) => e.toIso8601String()).toList(),
       'customDays': customDays,
     };
   }
@@ -65,7 +56,7 @@ class Meal {
   final String? id;
   final String mealType; // "breakfast", "lunch", "dinner", "snack"
   final String timeOfDay; // e.g., "08:00 AM", "12:00 PM", etc.
-  final List<Recipe>? recipes; // List of Recipe objects
+  final List<String>? recipes; // List of recipe IDs or names as strings
   final Recurrence? recurrence; // Optional recurrence for the meal
   final DateTime date; // Date for the meal
   final bool? isDraft;
@@ -82,22 +73,17 @@ class Meal {
 
   factory Meal.fromJson(Map<String, dynamic> json) {
     return Meal(
-      mealType: json['mealType'] as String? ?? '', // Provide a default value
-      timeOfDay: json['timeOfDay'] as String? ?? '', // Provide a default value
-      recipes: json['recipes'] != null
-          ? List<Recipe>.from(
-              json['recipes'].map((item) => Recipe.fromJson(item)))
-          : null,
-      isDraft: json['isDraft'] != null as bool?,
-      // Check if recurrence is a String (likely stored as a JSON string)
+      id: json['id'] as String?,
+      mealType: json['mealType'] as String? ?? '',
+      timeOfDay: json['timeOfDay'] as String? ?? '',
+      recipes:
+          json['recipes'] != null ? List<String>.from(json['recipes']) : null,
+      isDraft: json['isDraft'] as bool?,
       recurrence: json['recurrence'] != null
-          ? (json['recurrence'] is String
-              ? Recurrence.fromJson(jsonDecode(json['recurrence']))
-              : Recurrence.fromJson(json['recurrence']))
+          ? Recurrence.fromJson(json['recurrence'] as Map<String, dynamic>)
           : null,
-      date: json['date'] != null
-          ? DateTime.parse(json['date'])
-          : DateTime.now(), // Fallback to current date if null
+      date:
+          json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
     );
   }
 
@@ -107,7 +93,7 @@ class Meal {
       'mealType': mealType,
       'timeOfDay': timeOfDay,
       'isDraft': isDraft,
-      'recipes': recipes?.map((e) => e.toJson()).toList(),
+      'recipes': recipes,
       'recurrence': recurrence?.toJson(),
       'date': date.toIso8601String(),
     };
@@ -115,7 +101,7 @@ class Meal {
 
   @override
   String toString() {
-    return 'Meal(id:$id,mealType: $mealType, date: $date,isDraft: $isDraft,, timeOfDay: $timeOfDay, recipes: $recipes, recurrence: $recurrence)';
+    return 'Meal(id:$id, mealType: $mealType, timeOfDay: $timeOfDay, recipes: $recipes, recurrence: $recurrence, date: $date, isDraft: $isDraft)';
   }
 }
 
@@ -195,7 +181,7 @@ class MealPlan {
 
   @override
   String toString() {
-    return 'MealPlan(id: $id, name: $name,isDraft: $isDraft,, duration: $duration, startDate: $startDate, endDate: $endDate, datesArray: $datesArray, meals: $meals, trainees: $trainees, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'MealPlan(id: $id, name: $name, duration: $duration, startDate: $startDate, endDate: $endDate, datesArray: $datesArray, meals: $meals, trainees: $trainees, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
