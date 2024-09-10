@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fpdart/fpdart.dart';
 
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -15,6 +14,7 @@ import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/meal_plan_preview_screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/conversions/hive_conversions.dart';
 import 'package:voltican_fitness/utils/hive/hive_class.dart';
 import 'package:voltican_fitness/utils/hive/hive_meal.dart';
 import 'package:voltican_fitness/utils/hive/hive_recurrence.dart';
@@ -40,7 +40,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   final bool _isLoading = false;
   final List<DateTime> _highlightedDates = [];
   List<Meal> startMeals = [];
-  List<Meal> _draftMeals = [];
 
   List<Meal> newMeals = [];
 
@@ -127,71 +126,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     await hiveService.init();
 
     setState(() {});
-  }
-
-  Future<void> getDraftMealPlan() async {
-    try {
-      final draftPlan = await mealPlanService.getMealPlanDraft();
-      print('------------------draft plan----------------');
-      print(draftPlan);
-
-      setState(() {
-        mealPlanDraft = draftPlan;
-
-        // Ensure mealPlanDraft is not null before accessing fields
-        if (mealPlanDraft != null) {
-          _mealPlanNameController.text = mealPlanDraft!.name;
-
-          _selectedDuration = mealPlanDraft!.duration;
-          // Populate selected meals safely
-
-          print(
-              '-----------------------------meals --------------------------');
-          print(mealPlanDraft!.meals);
-          _draftMeals = mealPlanDraft!.meals;
-          _selectedRecipeAllocations.clear();
-          _selectedRecipeAllocations.addAll(mealPlanDraft!.meals);
-
-          // Set the start and end dates safely
-          _startDate = mealPlanDraft!.startDate;
-          _endDate = mealPlanDraft!.endDate;
-
-          // Update highlighted dates for the calendar
-          _updateHighlightedDates();
-
-          // Clear and populate selected trainees if not null
-          _selectedTrainees.clear();
-          for (var traineeId in mealPlanDraft!.trainees) {
-            final trainee = _allTrainees.firstWhere(
-              (user) => user.id == traineeId,
-            );
-            _selectedTrainees.add(trainee);
-          }
-        }
-      });
-    } catch (e) {
-      print('Error fetching draft meal plan: $e');
-      // Optionally, show error in the UI
-    }
-
-    // Refresh ui for state persistency
-    setState(() {});
-  }
-
-// Get meals by date from the draft
-  void getMealsFromDraftByDate(DateTime date) async {
-    try {
-      final meals = _draftMeals.filter((meal) => meal.date == date).toList();
-      print(
-          '------------------------------meal from draft that matches the date-------------------');
-      print(meals);
-      setState(() {
-        // Update meals safely
-        startMeals = meals;
-      });
-    } catch (e) {
-      print('Error fetching meals by date: $e');
-    }
   }
 
   @override
@@ -414,23 +348,23 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         customDays: recurrence.customDays);
   }
 
-//Convert to hive meals
-  List<HiveMeal> convertMealsToHiveMeals(List<Meal> meals) {
-    // Chosen recurrence
-    print('---------------------chosen recurrence');
-    print(chosenRecurrence);
-    return meals.map((meal) {
-      return HiveMeal(
-          mealType: meal.mealType,
-          recipes: meal.recipes!,
-          isDraft: true,
-          timeOfDay: meal.timeOfDay,
-          date: meal.date,
-          recurrence: convertToHiveRecurrence(chosenRecurrence!)
-          // etc.
-          );
-    }).toList();
-  }
+// //Convert to hive meals
+//   List<HiveMeal> convertMealsToHiveMeals(List<Meal> meals) {
+//     // Chosen recurrence
+//     print('---------------------chosen recurrence');
+//     print(chosenRecurrence);
+//     return meals.map((meal) {
+//       return HiveMeal(
+//           mealType: meal.mealType,
+//           recipes: meal.recipes!,
+//           isDraft: true,
+//           timeOfDay: meal.timeOfDay,
+//           date: meal.date,
+//           recurrence: convertToHiveRecurrence(chosenRecurrence!)
+//           // etc.
+//           );
+//     }).toList();
+//   }
 
   // Convert meals from hive back
 
@@ -767,18 +701,42 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                 onPressed: () async {
                   // Save meal to hive with the date
                   final hiveService = HiveService();
-                  final meals =
-                      convertMealsToHiveMeals(_selectedRecipeAllocations);
-                  // Save the meals to hive with the date
+
+                  // Convert selected recipe allocations to HiveMeals
+                  final meals = convertMealsToHiveMeals(
+                    _selectedRecipeAllocations,
+                    chosenRecurrence,
+                  );
 
                   print(
                       '-------------------------Save to hive meal draft box ----------------$meals');
-
-                  await hiveService.saveRecurringMealsInDraft(
-                      meals, _startDate!, _endDate!);
+                  for (final meal in meals) {
+                    print(
+                        '---------------------Save to Hive meal draft box ----------------$meal');
+                    print(
+                        '------------$_startDate---$_endDate---$newDay---$meal');
+                    // Ensure that _startDate, _endDate, newDay, and meal are not null before calling updateMealForDate
+                    if (_startDate != null &&
+                        _endDate != null &&
+                        newDay != null) {
+                      await hiveService.updateMealForDate(
+                        _startDate!,
+                        _endDate!,
+                        newDay!,
+                        meal,
+                        context,
+                      );
+                    } else {
+                      // Handle the case where one or more values are null
+                      print('Error: One or more required values are null.');
+                    }
+                  }
 
                   // After saving data to hive move to next day
                   _moveToNextDay();
+
+                  // Refrehs the UI
+                  setState(() {});
                 },
                 child: _isLoading
                     ? const CircularProgressIndicator(

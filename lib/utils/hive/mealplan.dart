@@ -39,7 +39,7 @@ class MealPlan extends HiveObject {
   final DateTime? updatedAt;
 
   @HiveField(11)
-  bool isDraft;
+  bool? isDraft;
 
   MealPlan({
     this.id,

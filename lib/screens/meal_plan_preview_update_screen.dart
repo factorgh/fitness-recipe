@@ -16,35 +16,35 @@ import 'package:voltican_fitness/utils/hive/hive_class.dart';
 import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
 
-void showMealPlanPreviewBottomSheet(
+void showMealPlanPreviewUpdateBottomSheet(
     BuildContext context, MealPlan mealplan) async {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (context) {
-      return MealPlanPreviewBottomSheet(
+      return MealPlanPreviewUpdateBottomSheet(
         mealPlan: mealplan,
       );
     },
   );
 }
 
-class MealPlanPreviewBottomSheet extends ConsumerStatefulWidget {
+class MealPlanPreviewUpdateBottomSheet extends ConsumerStatefulWidget {
   final MealPlan mealPlan;
 
-  const MealPlanPreviewBottomSheet({
+  const MealPlanPreviewUpdateBottomSheet({
     super.key,
     required this.mealPlan,
   });
 
   @override
-  ConsumerState<MealPlanPreviewBottomSheet> createState() =>
+  ConsumerState<MealPlanPreviewUpdateBottomSheet> createState() =>
       _MealPlanPreviewBottomSheetState();
 }
 
 class _MealPlanPreviewBottomSheetState
-    extends ConsumerState<MealPlanPreviewBottomSheet> {
+    extends ConsumerState<MealPlanPreviewUpdateBottomSheet> {
   HiveService hiveService = HiveService();
   List<Meal> transMeal = <Meal>[];
   MealPlanService mealPlanService = MealPlanService();
@@ -81,25 +81,17 @@ class _MealPlanPreviewBottomSheetState
     // Check if the user is null
     if (user == null) {
       print('User is null. Cannot create a meal plan.');
-      // Show an error dialog or navigate back
-      return;
-    }
-
-    // Check if widget.mealPlan is null or has any required fields missing
-    final mealPlan = widget.mealPlan;
-    if (mealPlan.startDate == null || mealPlan.endDate == null) {
-      print('Meal plan properties are missing or null.');
-      // Show an error dialog or navigate back
+      // You can show an error dialog here or navigate back
       return;
     }
 
     // Create a new meal plan
     final newMealPlan = MealPlan(
-      name: mealPlan.name,
-      startDate: mealPlan.startDate!,
-      endDate: mealPlan.endDate!,
-      duration: mealPlan.duration,
-      trainees: mealPlan.trainees,
+      name: widget.mealPlan.name,
+      startDate: widget.mealPlan.startDate,
+      endDate: widget.mealPlan.endDate,
+      duration: widget.mealPlan.duration,
+      trainees: widget.mealPlan.trainees,
       meals: transMeal,
       createdBy: user.id,
     );
@@ -111,7 +103,10 @@ class _MealPlanPreviewBottomSheetState
 
     try {
       // Save the meal plan to the database
-      await mealPlanService.createMealPlan(newMealPlan, context);
+      await mealPlanService.updateMealPlan(
+        widget.mealPlan.id!,
+        newMealPlan,
+      );
 
       await hiveService.clearMealDraftBox();
 
@@ -235,7 +230,7 @@ class _MealPlanPreviewBottomSheetState
                               onPressed: () async {
                                 await _handleCreatePlan();
                               },
-                              child: const Text('Complete plan')),
+                              child: const Text('Update meal plan')),
                         )
                       ],
                     ),
@@ -555,8 +550,8 @@ class _MealPlanPreviewBottomSheetState
                       return MealPeriodCard(
                         mealPeriod: recipe.title,
                         time1: allocation.timeOfDay,
-                        time2: '', // Add other time logic if needed
-                        image: recipe.imageUrl, // Adjust with your images
+                        time2: '',
+                        image: recipe.imageUrl,
                       );
                     }).toList(),
                   ),

@@ -48,7 +48,7 @@ class HiveMeal extends HiveObject {
       mealType: mealType ?? this.mealType,
       timeOfDay: timeOfDay ?? this.timeOfDay,
       isDraft: isDraft ?? this.isDraft,
-      recipes: recipes ?? this.recipes, // Corrected to handle list of strings
+      recipes: recipes ?? this.recipes,
       recurrence: recurrence ?? this.recurrence,
       date: date ?? this.date,
     );

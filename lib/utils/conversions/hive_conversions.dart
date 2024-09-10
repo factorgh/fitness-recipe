@@ -105,7 +105,9 @@ List<Meal> convertHiveMealsToMeals(List<HiveMeal> meals) {
         isDraft: true,
         timeOfDay: meal.timeOfDay,
         date: meal.date!,
-        recurrence: convertFromHiveRecurrence(meal.recurrence!)
+        recurrence: meal.recurrence != null
+            ? convertFromHiveRecurrence(meal.recurrence!)
+            : null
         // etc.
         );
   }).toList();

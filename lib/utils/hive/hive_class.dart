@@ -14,61 +14,61 @@ class HiveService {
 
   HiveService._internal();
 
-  Box<MealPlan>? _mealPlanBox;
+  // Box<MealPlan>? _mealPlanBox;
   Box<HiveRecurrence>? _recurrenceBox;
   Box<HiveMeal>? _mealBox;
 
   Future<void> init() async {
-    _mealPlanBox = await Hive.openBox<MealPlan>('mealPlans');
+    // _mealPlanBox = await Hive.openBox<MealPlan>('mealPlans');
     _recurrenceBox = await Hive.openBox<HiveRecurrence>('recurrences');
     _mealBox = await Hive.openBox<HiveMeal>('meals');
   }
 
   // Create or Update MealPlan
-  Future<void> saveMealPlan(MealPlan mealPlan) async {
-    try {
-      print('---------------------------meal plan passed------------');
-      print(mealPlan.id);
-      print(mealPlan);
-      await _mealPlanBox?.put(mealPlan.id, mealPlan);
-      print('HiveMeal plan saved successfully');
-    } catch (e) {
-      print('Error saving meal plan: $e');
-    }
-  }
+  // Future<void> saveMealPlan(MealPlan mealPlan) async {
+  //   try {
+  //     print('---------------------------meal plan passed------------');
+  //     print(mealPlan.id);
+  //     print(mealPlan);
+  //     await _mealPlanBox?.put(mealPlan.id, mealPlan);
+  //     print('HiveMeal plan saved successfully');
+  //   } catch (e) {
+  //     print('Error saving meal plan: $e');
+  //   }
+  // }
 
   // Get MealPlan by ID
-  MealPlan? getMealPlan(String id) {
-    print('---------- id --------');
-    print(id);
-    return _mealPlanBox?.get(id);
-  }
+  // MealPlan? getMealPlan(String id) {
+  //   print('---------- id --------');
+  //   print(id);
+  //   return _mealPlanBox?.get(id);
+  // }
 
   // Get all MealPlans
-  Future<List<MealPlan>> getAllMealPlans() async {
-    final box = _mealPlanBox; // Retrieve your Box instance
-    if (box == null) {
-      return []; // Return an empty list if the box is null
-    }
+  // Future<List<MealPlan>> getAllMealPlans() async {
+  //   final box = _mealPlanBox; // Retrieve your Box instance
+  //   if (box == null) {
+  //     return []; // Return an empty list if the box is null
+  //   }
 
-    // Asynchronous operation to fetch all values
-    final mealPlans = box.values.toList();
-    return mealPlans;
-  }
+  //   // Asynchronous operation to fetch all values
+  //   final mealPlans = box.values.toList();
+  //   return mealPlans;
+  // }
 
   // Check if MealPlan box is empty
-  bool isMealPlanBoxEmpty() {
-    final box = _mealPlanBox;
-    if (box == null) {
-      return true; // Box is not initialized
-    }
-    return box.isEmpty;
-  }
+  // bool isMealPlanBoxEmpty() {
+  //   final box = _mealPlanBox;
+  //   if (box == null) {
+  //     return true; // Box is not initialized
+  //   }
+  //   return box.isEmpty;
+  // }
 
-  // Delete MealPlan
-  Future<void> deleteMealPlan(String id) async {
-    await _mealPlanBox?.delete(id);
-  }
+  // // Delete MealPlan
+  // Future<void> deleteMealPlan(String id) async {
+  //   await _mealPlanBox?.delete(id);
+  // }
 
   // Create or Update HiveRecurrence
   Future<void> saveRecurrence(HiveRecurrence recurrence) async {
@@ -135,57 +135,67 @@ class HiveService {
     List<DateTime> recurringDates = [];
     DateTime currentDate = startDate;
 
-    while (currentDate.isBefore(endDate)) {
+    while (currentDate.isBefore(endDate) ||
+        currentDate.isAtSameMomentAs(endDate)) {
       switch (recurrence.option) {
         case 'every_day':
-          // Generate dates every day, no customDays required
           recurringDates.add(currentDate);
           currentDate = currentDate.add(const Duration(days: 1));
           break;
 
         case 'weekly':
         case 'bi_weekly':
-          // Generate dates based on the selected customDays within each week or bi-weekly cycle
           for (int day in recurrence.customDays!) {
-            // Calculate the date corresponding to the customDay (Monday=1, Sunday=7)
-            DateTime customDate = currentDate
-                .add(Duration(days: (day - currentDate.weekday + 7) % 7));
-            if (customDate.isBefore(endDate)) recurringDates.add(customDate);
+            DateTime customDate = currentDate.add(
+              Duration(days: (day - currentDate.weekday + 7) % 7),
+            );
+            if (customDate.isBefore(endDate) ||
+                customDate.isAtSameMomentAs(endDate)) {
+              recurringDates.add(customDate);
+            }
           }
-          // Move to the next week or two weeks based on recurrence
-          currentDate = currentDate.add(recurrence.option == 'weekly'
-              ? const Duration(days: 7)
-              : const Duration(days: 14));
+          currentDate = currentDate.add(
+            recurrence.option == 'weekly'
+                ? const Duration(days: 7)
+                : const Duration(days: 14),
+          );
           break;
 
         case 'custom_weekly':
-          // Custom weekly recurrence, generating dates only for the selected customDays
           for (int customDay in recurrence.customDays!) {
-            DateTime customDate = currentDate
-                .add(Duration(days: (customDay - currentDate.weekday + 7) % 7));
-            if (customDate.isBefore(endDate)) recurringDates.add(customDate);
+            DateTime customDate = currentDate.add(
+              Duration(days: (customDay - currentDate.weekday + 7) % 7),
+            );
+            if (customDate.isBefore(endDate) ||
+                customDate.isAtSameMomentAs(endDate)) {
+              recurringDates.add(customDate);
+            }
           }
           currentDate =
               currentDate.add(const Duration(days: 7)); // Move to the next week
           break;
 
         case 'monthly':
-          // Generate dates based on the selected customDays within each month cycle
           for (int customDay in recurrence.customDays!) {
             DateTime tempDate = currentDate;
-            // For each month, find all matching customDays (days of the week)
             while (tempDate.month == currentDate.month) {
-              if (tempDate.weekday == customDay && tempDate.isBefore(endDate)) {
+              if ((tempDate.weekday == customDay) &&
+                  (tempDate.isBefore(endDate) ||
+                      tempDate.isAtSameMomentAs(endDate))) {
                 recurringDates.add(tempDate);
               }
               tempDate = tempDate.add(const Duration(days: 1));
             }
           }
-          // Move to the same day in the next month
           currentDate = DateTime(
               currentDate.year, currentDate.month + 1, currentDate.day);
           break;
       }
+    }
+
+    // Add endDate if it fits the recurrence pattern
+    if (currentDate.isAtSameMomentAs(endDate)) {
+      recurringDates.add(endDate);
     }
 
     return recurringDates;
@@ -220,26 +230,47 @@ class HiveService {
     }
   }
 
+  String formatDateWithoutTime(DateTime date) {
+    return DateTime(date.year, date.month, date.day).toIso8601String();
+  }
+
 // Fetch meals for speicfic dates
   Future<List<HiveMeal>> fetchMealsForDate(DateTime date) async {
     print('-------------------------date for meals------------------------');
     print(date);
-    final box = await Hive.openBox<HiveMeal>('mealDraftBox');
-    List<HiveMeal> mealsForDate = [];
 
-    for (var mealType in ['Breakfast', 'Lunch', 'Dinner', 'Snack']) {
-      HiveMeal? meal = box.get('${date.toIso8601String()}_$mealType');
-      if (meal != null) {
-        mealsForDate.add(meal);
+    try {
+      final box = await Hive.openBox<HiveMeal>('mealDraftBox');
+      List<HiveMeal> mealsForDate = [];
+
+      // Format the date without time and timezone
+      // String dateKey = formatDateWithoutTime(date);
+
+      // print('----------formated date------------');
+      // print(dateKey);
+
+      // Retrieve meals for predefined meal types
+      for (var mealType in ['Breakfast', 'Lunch', 'Dinner', 'Snack']) {
+        HiveMeal? meal = box.get('${date.toIso8601String()}_$mealType');
+        if (meal != null) {
+          mealsForDate.add(meal);
+        }
       }
-    }
 
-    return mealsForDate;
+      return mealsForDate;
+    } catch (e) {
+      print('Error fetching meals: $e');
+      return []; // Return an empty list if an error occurs
+    }
   }
 
   // Edit meals for date
-  Future<void> updateMealForDate(
+  Future<void> updateMealForDate(DateTime startDate, DateTime endDate,
       DateTime date, HiveMeal updatedMeal, BuildContext context) async {
+    print(
+        '-----------------------Data check for updating meal----------------------');
+    print('---------${updatedMeal.recurrence}-----------');
+
     final box = await Hive.openBox<HiveMeal>('mealDraftBox');
 
     // If recurrence is not null, show confirmation dialog
@@ -247,7 +278,9 @@ class HiveService {
       bool confirmOverride = await showConfirmationDialog(
         context: context,
         title: 'Confirm Override',
-        message: 'Do you want to override this meal for all recurring days?',
+        message:
+            'Do you want to override the "${updatedMeal.mealType}" meal at '
+            '${updatedMeal.timeOfDay} for all recurring days?',
       );
 
       if (confirmOverride) {
@@ -256,19 +289,22 @@ class HiveService {
           meal: updatedMeal,
           date: date,
           updateOption: 'future',
-          startDate:
-              date, // Assuming startDate and endDate are determined elsewhere
-          endDate: date, // Modify as needed for your use case
+          startDate: startDate,
+          endDate: endDate,
         );
       } else {
         // If not confirmed, update only the specified date
-        await box.put(
-            '${date.toIso8601String()}_${updatedMeal.mealType}', updatedMeal);
+        final updatedMealWithDate = updatedMeal.copyWith(date: date);
+
+        await box.put('${date.toIso8601String()}_${updatedMeal.mealType}',
+            updatedMealWithDate);
       }
     } else {
       // If no recurrence, just update for the specific date
-      await box.put(
-          '${date.toIso8601String()}_${updatedMeal.mealType}', updatedMeal);
+      final updatedMealWithDate = updatedMeal.copyWith(date: date);
+
+      await box.put('${date.toIso8601String()}_${updatedMeal.mealType}',
+          updatedMealWithDate);
     }
   }
 
@@ -355,13 +391,19 @@ class HiveService {
     List<DateTime> dates =
         generateRecurringDates(meal.recurrence!, startDate, endDate);
 
+    print('--------------------Recurring dates--------------------');
+    print(dates);
+
     // If "future", update meals from the current date onward.
     if (updateOption == 'future') {
       for (var d in dates) {
         if (d.isAfter(date) || d.isAtSameMomentAs(date)) {
-          // Update only meals from the current date onward
+          print('Updating meal for date: $d');
           await box.put('${d.toIso8601String()}_${meal.mealType}',
               meal.copyWith(date: d));
+          print('Meal saved for date: $d');
+        } else {
+          print('Skipping date: $d');
         }
       }
     }

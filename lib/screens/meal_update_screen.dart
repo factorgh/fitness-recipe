@@ -12,6 +12,7 @@ import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
+import 'package:voltican_fitness/screens/meal_plan_preview_update_screen.dart';
 
 import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/conversions/hive_conversions.dart';
@@ -59,15 +60,25 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
   void initState() {
     super.initState();
     _updateHighlightedDates();
+    print('--------------after highlights-----------------');
     _initializeHiveService();
+
+    print('-------------------afer service ---------------------');
 
     fetchInitialData();
 
+    print('---------------------fetchInitialData--------------------');
 // Save meal plans to meal to allow user to update
     _saveMealsToDraftOnInitialization();
 
+    print(
+        '-----------------After save to draft on initialization--------------------');
+
     fetchAllUserRecipes();
+    print('----------------after print fetch all user recipes----------------');
     getTraineesFollowingTrainer();
+    print(
+        '-----------------After get trainees following trainer-------------------');
   }
 
   void _saveMealsToDraftOnInitialization() async {
@@ -547,12 +558,10 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                                       '----------------------mealsByDate--------------------');
                                   print(meals);
 
-                                  // Convert Hive meals to normal meals if there are any, or assign an empty list of type Meal
                                   final selectMeals = meals.isNotEmpty
                                       ? convertHiveMealsToMeals(meals)
                                       : <Meal>[];
 
-                                  // Update the state with the selected day and fetched meals
                                   setState(() {
                                     startMeals = selectMeals;
                                     newDay = selectDay;
@@ -573,8 +582,9 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                           : const SizedBox(),
                       MealPeriodSelector(
                         defaultMeals: startMeals.isNotEmpty ? startMeals : [],
-                        startDate: _startDate!,
-                        endDate: _endDate!,
+                        startDate: _startDate ?? DateTime.now(),
+                        endDate: _endDate ?? DateTime.now(),
+                        selectedDay: newDay,
                         onRecurrenceChanged: handleRecurrence,
                         onSelectionChanged: (allocations) {
                           setState(() {
@@ -585,11 +595,10 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                         recipes: myRecipes,
                       ),
                       const SizedBox(height: 16),
-                      const SizedBox(height: 16),
                       SizedBox(
                         width: double.infinity,
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
@@ -612,12 +621,28 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                               for (final meal in meals) {
                                 print(
                                     '---------------------Save to Hive meal draft box ----------------$meal');
-                                await hiveService.updateMealForDate(
-                                    newDay!, meal, context);
+                                print(
+                                    '------------$_startDate---$_endDate---$newDay---$meal');
+                                // Ensure that _startDate, _endDate, newDay, and meal are not null before calling updateMealForDate
+                                if (_startDate != null &&
+                                    _endDate != null &&
+                                    newDay != null) {
+                                  await hiveService.updateMealForDate(
+                                    _startDate!,
+                                    _endDate!,
+                                    newDay!,
+                                    meal,
+                                    context,
+                                  );
+                                } else {
+                                  // Handle the case where one or more values are null
+                                  print(
+                                      'Error: One or more required values are null.');
+                                }
                               }
 
                               // Move to the next day regardless of recurrence
-                              _moveToNextDay(); // Always move to the next day
+                              _moveToNextDay();
                             },
                             child: _isLoading
                                 ? const CircularProgressIndicator(
@@ -646,25 +671,43 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          onPressed: _completeSchedule,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white),
+                          onPressed: () async {
+                            ///Delay for sometime then after show bottom  sheet with meal plan preview
+                            Future.delayed(
+                              const Duration(milliseconds: 3000),
+                            );
+
+                            final mealPlan = MealPlan(
+                              id: widget.mealPlan.id,
+                              name: _mealPlanNameController.text,
+                              duration: _selectedDuration,
+                              startDate: _startDate,
+                              endDate: _endDate,
+                              meals: _selectedRecipeAllocations,
+                              trainees: _selectedTrainees
+                                  .map((trainee) => trainee.id)
+                                  .toList(),
+                              createdBy: ref.read(userProvider)!.id,
+                            );
+                            showMealPlanPreviewUpdateBottomSheet(
+                                context, mealPlan);
+                          },
                           child: _isLoading
                               ? const CircularProgressIndicator(
                                   color: Colors.white,
-                                  strokeWidth: 2,
                                 )
                               : const Padding(
                                   padding: EdgeInsets.all(8.0),
                                   child: Text(
-                                    'Save Meal Plan',
+                                    'Preview Update Meal Plan',
                                     style: TextStyle(
                                         fontWeight: FontWeight.w500,
-                                        fontSize: 20),
+                                        fontSize: 16),
                                   ),
                                 ),
                         ),

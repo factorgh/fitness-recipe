@@ -187,6 +187,35 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     // Format the selected time as a string
     String formattedTime = DateFormat('hh:mm a').format(allocatedTime);
 
+    // Check if recurrence is set
+    if (recurrence == null) {
+      // Prompt the user to save the meal for the specific date
+      bool? saveForSpecificDate = await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Save Meal for Specific Date'),
+            content: const Text(
+                'You have not set a recurrence. Do you want to save this meal for today?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Yes'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('No'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (saveForSpecificDate != true) {
+        return;
+      }
+    }
+
     setState(() {
       // Create a new meal allocation
       Meal allocation = Meal(
@@ -194,7 +223,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
         mealType: mealPeriod,
         recipes: [selectedRecipe.id!],
         timeOfDay: formattedTime,
-        recurrence: recurrence,
+        recurrence: null,
       );
 
       // Initialize _selectedMeals if it doesn't exist for the current meal period
@@ -234,7 +263,16 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     final hiveService = HiveService();
 
     // Remove the meal from Hive for the selected date and meal period
-    await hiveService.deleteMealForDate(widget.selectedDay!, mealPeriod);
+    print('-------------------SelectedDate and meal period--------------');
+    print(widget.selectedDay);
+    print(mealPeriod);
+    if (widget.selectedDay != null) {
+      await hiveService.deleteMealForDate(widget.selectedDay!, mealPeriod);
+    } else {
+      // Handle the case where either widget.selectedDay or mealPeriod is null
+      print('Error: Either widget.selectedDay or mealPeriod is null.');
+      // Optionally, show an error message or provide a fallback
+    }
 
     setState(() {
       // Remove the recipe ID from the list of recipe IDs in the UI (_selectedMeals)
@@ -260,8 +298,6 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     });
     return allocations;
   }
-
-  // Recurrence fxn
 
   void _handleRecurrenceSelection() async {
     final Map<String, dynamic>? recurrenceData =
