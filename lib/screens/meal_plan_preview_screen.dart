@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously, unrelated_type_equality_checks, unused_element
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -48,6 +49,7 @@ class _MealPlanPreviewBottomSheetState
   HiveService hiveService = HiveService();
   List<Meal> transMeal = <Meal>[];
   MealPlanService mealPlanService = MealPlanService();
+  bool _isLoading = false;
 
   final RecipeService recipeService = RecipeService();
   @override
@@ -75,41 +77,45 @@ class _MealPlanPreviewBottomSheetState
   }
 
   Future<void> _handleCreatePlan() async {
-    // Read the user from the provider
-    final user = ref.read(userProvider);
-
-    // Check if the user is null
-    if (user == null) {
-      print('User is null. Cannot create a meal plan.');
-      // Show an error dialog or navigate back
-      return;
-    }
-
-    // Check if widget.mealPlan is null or has any required fields missing
-    final mealPlan = widget.mealPlan;
-    if (mealPlan.startDate == null || mealPlan.endDate == null) {
-      print('Meal plan properties are missing or null.');
-      // Show an error dialog or navigate back
-      return;
-    }
-
-    // Create a new meal plan
-    final newMealPlan = MealPlan(
-      name: mealPlan.name,
-      startDate: mealPlan.startDate!,
-      endDate: mealPlan.endDate!,
-      duration: mealPlan.duration,
-      trainees: mealPlan.trainees,
-      meals: transMeal,
-      createdBy: user.id,
-    );
-
-    print(
-        '---------------------------------Meal plan body to db---------------');
-    print(newMealPlan);
-    print('------------------------end of meal plan body-------------------');
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
+      // Read the user from the provider
+      final user = ref.read(userProvider);
+
+      // Check if the user is null
+      if (user == null) {
+        print('User is null. Cannot create a meal plan.');
+        // Show an error dialog or navigate back
+        return;
+      }
+
+      // Check if widget.mealPlan is null or has any required fields missing
+      final mealPlan = widget.mealPlan;
+      if (mealPlan.startDate == null || mealPlan.endDate == null) {
+        print('Meal plan properties are missing or null.');
+        // Show an error dialog or navigate back
+        return;
+      }
+
+      // Create a new meal plan
+      final newMealPlan = MealPlan(
+        name: mealPlan.name,
+        startDate: mealPlan.startDate,
+        endDate: mealPlan.endDate,
+        duration: mealPlan.duration,
+        trainees: mealPlan.trainees,
+        meals: transMeal,
+        createdBy: user.id,
+      );
+
+      print(
+          '---------------------------------Meal plan body to db---------------');
+      print(newMealPlan);
+      print('------------------------end of meal plan body-------------------');
+
       // Save the meal plan to the database
       await mealPlanService.createMealPlan(newMealPlan, context);
 
@@ -118,22 +124,36 @@ class _MealPlanPreviewBottomSheetState
       // Navigate back to the meal plan list
       Navigator.pop(context);
       Navigator.pop(context);
+      Navigator.pop(context);
     } catch (e) {
-      print("Error creating meal plan: $e");
+      if (e is DioException) {
+        print('DioException occurred: ${e.message}');
+        if (e.response != null) {
+          print('Response data: ${e.response?.data}');
+          print('Response status code: ${e.response?.statusCode}');
+        }
+      } else {
+        print('Error creating meal plan: ${e.toString()}');
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
-  Future<Recipe> fetchRecipe(String recipeId) async {
+  Future<Recipe?> fetchRecipe(String recipeId) async {
     try {
       final recipe = await recipeService.getRecipeById(recipeId);
       if (recipe != null) {
         return recipe;
       } else {
-        throw Exception('Recipe not found');
+        print('Recipe with ID $recipeId not found');
+        return null;
       }
     } catch (e) {
       print('Error fetching recipe with ID $recipeId: $e');
-      rethrow;
+      return null;
     }
   }
 
@@ -226,16 +246,22 @@ class _MealPlanPreviewBottomSheetState
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  )),
-                              onPressed: () async {
-                                await _handleCreatePlan();
-                              },
-                              child: const Text('Complete plan')),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                )),
+                            onPressed: _isLoading
+                                ? null
+                                : () async {
+                                    await _handleCreatePlan();
+                                  },
+                            child: _isLoading
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white)
+                                : const Text('Complete meal plan'),
+                          ),
                         )
                       ],
                     ),
@@ -426,14 +452,19 @@ class _MealPlanPreviewBottomSheetState
                       } else if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');
                       } else if (snapshot.hasData) {
+                        final recipes = snapshot.data ?? [];
                         return Column(
-                          children: snapshot.data!
+                          children: recipes
                               .map((recipe) => Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: ListTile(
                                       leading: CircleAvatar(
-                                        backgroundImage:
-                                            NetworkImage(recipe.imageUrl),
+                                        // ignore: unnecessary_null_comparison
+                                        backgroundImage: recipe.imageUrl != null
+                                            ? NetworkImage(recipe.imageUrl)
+                                            : const AssetImage(
+                                                    'assets/images/default_recipe.png')
+                                                as ImageProvider,
                                         backgroundColor: Colors.transparent,
                                       ),
                                       title: Text(recipe.title),
@@ -445,7 +476,7 @@ class _MealPlanPreviewBottomSheetState
                         return const Text('No recipes available.');
                       }
                     },
-                  ),
+                  )
                 ],
               );
             }).toList(),
@@ -460,7 +491,9 @@ class _MealPlanPreviewBottomSheetState
     for (String id in recipeIds) {
       try {
         final recipe = await fetchRecipe(id);
-        recipes.add(recipe);
+        if (recipe != null) {
+          recipes.add(recipe);
+        }
       } catch (e) {
         print('Failed to fetch recipe $id: $e');
       }

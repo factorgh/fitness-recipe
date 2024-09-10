@@ -12,39 +12,58 @@ class MealPlanService {
   final alerts = NativeAlerts();
 
   // Create a new meal plan
-
-  Future<MealPlan> createMealPlan(
+  Future<MealPlan?> createMealPlan(
       MealPlan mealPlan, BuildContext context) async {
     try {
       print('-----------------------Plan creation----------------------');
-      print(mealPlan);
+      print(mealPlan.toJson()); // Log the JSON payload
+
       final response =
           await client.dio.post('/meal-plans', data: mealPlan.toJson());
 
-      // Deserialize the response to a MealPlan object
-      MealPlan createdMealPlan = MealPlan.fromJson(response.data);
+      // Check response status code for detailed error info
+      print('Response status code: ${response.statusCode}');
+      print('Response data: ${response.data}');
 
-      // Schedule notifications after successfully creating the meal plan
-      final notificationService = NotificationService();
-      await notificationService.scheduleMealPlanNotifications(
-        mealPlanId: createdMealPlan.id!,
-        creationDate: DateTime.now(),
-        recipeAllocations: createdMealPlan.meals,
-        trainees: createdMealPlan.trainees,
-      );
-      NativeAlerts()
-          .showSuccessAlert(context, "Meal plan created successfully");
+      if (response.statusCode == 201) {
+        MealPlan createdMealPlan = MealPlan.fromJson(response.data);
 
-      return createdMealPlan;
-    } catch (e) {
-      // Log the error (you can also use any logging library)
+        // Safeguard notification scheduling
+        try {
+          final notificationService = NotificationService();
+          await notificationService.scheduleMealPlanNotifications(
+            mealPlanId: createdMealPlan.id ?? '',
+            creationDate: DateTime.now(),
+            recipeAllocations: createdMealPlan.meals,
+            trainees: createdMealPlan.trainees,
+          );
+        } catch (notificationError) {
+          debugPrint('Error scheduling notifications: $notificationError');
+          NativeAlerts().showErrorAlert(context,
+              'Meal plan created but failed to schedule notifications.');
+        }
+
+        NativeAlerts()
+            .showSuccessAlert(context, "Meal plan created successfully");
+        return createdMealPlan;
+      } else if (response.statusCode == 400) {
+        NativeAlerts().showErrorAlert(context,
+            'Failed to create meal plan. Please check days or duration or trainees on plan to avoid conflicts.');
+        throw Exception('Failed to create meal plan: ${response.data}');
+      } else {
+        NativeAlerts().showErrorAlert(
+            context, 'An unexpected error occurred. Please try again.');
+        throw Exception('Unexpected error: ${response.statusCode}');
+      }
+    } catch (e, stackTrace) {
       debugPrint('Error creating meal plan: $e');
+      debugPrint('Stack trace: $stackTrace');
 
-      // Display a snackbar with a user-friendly error message
-      NativeAlerts().showErrorAlert(context,
-          'Failed to create meal plan. Please check days or duration or trainees on plan to avoid conflicts.');
-      // Re-throw the error if you want to handle it further up the call stack
-      throw Exception('Failed to create meal plan: $e');
+      NativeAlerts().showErrorAlert(
+          context, 'Failed to create meal plan. Please try again later.');
+
+      // Avoid rethrowing unless absolutely necessary
+      return null;
     }
   }
 

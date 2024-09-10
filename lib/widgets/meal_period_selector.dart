@@ -14,6 +14,7 @@ class MealPeriodSelector extends ConsumerStatefulWidget {
   final void Function(List<Meal>) onSelectionChanged;
   final List<Recipe> recipes;
   final void Function(Recurrence) onRecurrenceChanged;
+  final void Function()? saveToDraft;
 
   final List<Meal>? defaultMeals;
   final DateTime? selectedDay;
@@ -26,6 +27,7 @@ class MealPeriodSelector extends ConsumerStatefulWidget {
     required this.recipes,
     required this.startDate,
     required this.endDate,
+    this.saveToDraft,
     this.defaultMeals,
     this.selectedDay,
     super.key,
@@ -187,35 +189,6 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     // Format the selected time as a string
     String formattedTime = DateFormat('hh:mm a').format(allocatedTime);
 
-    // Check if recurrence is set
-    if (recurrence == null) {
-      // Prompt the user to save the meal for the specific date
-      bool? saveForSpecificDate = await showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Save Meal for Specific Date'),
-            content: const Text(
-                'You have not set a recurrence. Do you want to save this meal for today?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Yes'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('No'),
-              ),
-            ],
-          );
-        },
-      );
-
-      if (saveForSpecificDate != true) {
-        return;
-      }
-    }
-
     setState(() {
       // Create a new meal allocation
       Meal allocation = Meal(
@@ -223,7 +196,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
         mealType: mealPeriod,
         recipes: [selectedRecipe.id!],
         timeOfDay: formattedTime,
-        recurrence: null,
+        recurrence: recurrence,
       );
 
       // Initialize _selectedMeals if it doesn't exist for the current meal period
@@ -542,6 +515,18 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                                 color: Colors.redAccent),
                             onPressed: () => _handleRecurrenceSelection(),
                           ),
+                          GestureDetector(
+                            onTap: () {
+                              _showSaveDialog();
+                            },
+                            child: const Tooltip(
+                              message: 'Save', // Tooltip message
+                              child: Icon(
+                                Icons.upload,
+                                color: Colors.blueAccent,
+                              ),
+                            ),
+                          ),
                         ],
                       );
                     } else {
@@ -554,6 +539,33 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
           ],
         );
       }).toList(),
+    );
+  }
+
+  void _showSaveDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Save Changes'),
+          content: const Text('Do you want to save for the current date?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Save'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                widget.saveToDraft?.call(); // Perform the save action
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 

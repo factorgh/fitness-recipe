@@ -92,7 +92,7 @@ class MealPlansNotifier extends StateNotifier<MealPlansState> {
       final newMealPlan =
           await _mealPlanService.createMealPlan(mealPlan, context);
       if (state is MealPlansLoaded) {
-        _allMealPlans = [..._allMealPlans, newMealPlan];
+        _allMealPlans = [..._allMealPlans, newMealPlan!];
         filterByDuration('Does Not Repeat'); // Reset filter after adding
       }
     } catch (e) {

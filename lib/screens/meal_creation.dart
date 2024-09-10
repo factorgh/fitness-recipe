@@ -43,7 +43,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
   List<Meal> newMeals = [];
 
-  final List<Meal> _selectedRecipeAllocations = [];
+  List<Meal> _selectedRecipeAllocations = [];
   Recurrence? chosenRecurrence;
 
   final TextEditingController _searchController = TextEditingController();
@@ -366,7 +366,42 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 //     }).toList();
 //   }
 
-  // Convert meals from hive back
+// Handle Save to the draft
+
+  void handleSaveToDraft() async {
+    final hiveService = HiveService();
+
+    // Convert selected recipe allocations to HiveMeals
+    final meals = convertMealsToHiveMeals(
+      _selectedRecipeAllocations,
+      chosenRecurrence,
+    );
+
+    print(
+        '-------------------------Save to hive meal draft box ----------------$meals');
+    for (final meal in meals) {
+      print(
+          '---------------------Save to Hive meal draft box ----------------$meal');
+      print('------------$_startDate---$_endDate---$newDay---$meal');
+      // Ensure that _startDate, _endDate, newDay, and meal are not null before calling updateMealForDate
+      if (_startDate != null && _endDate != null && newDay != null) {
+        await hiveService.updateMealForDate(
+          _startDate!,
+          _endDate!,
+          newDay!,
+          meal,
+          context,
+        );
+
+        setState(() {
+          _selectedRecipeAllocations = [];
+        });
+      } else {
+        // Handle the case where one or more values are null
+        print('Error: One or more required values are null.');
+      }
+    }
+  }
 
   List<Meal> convertHiveMealsToMeals(List<HiveMeal> meals) {
     // Chosen recurrence
@@ -386,8 +421,18 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   }
 
   void _moveToNextDay() {
+    if (newDay == null) return;
+
+    final nextDay = newDay!.add(const Duration(days: 1));
+
+    if (nextDay.isBefore(_startDate!) || nextDay.isAfter(_endDate!)) {
+      // Optionally, show an error or handle the case where the day is out of range
+      print('Selected date is out of range.');
+      return;
+    }
+
     setState(() {
-      newDay = newDay!.add(const Duration(days: 1));
+      newDay = nextDay;
     });
   }
 
@@ -686,6 +731,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                       onRecurrenceChanged: handleRecurrence,
                       onSelectionChanged: _handleRecipeSelectionChanged,
                       defaultMeals: startMeals.isNotEmpty ? startMeals : [],
+                      saveToDraft: handleSaveToDraft,
                     )
                   : const SizedBox(),
               const SizedBox(
@@ -699,44 +745,8 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white),
                 onPressed: () async {
-                  // Save meal to hive with the date
-                  final hiveService = HiveService();
-
-                  // Convert selected recipe allocations to HiveMeals
-                  final meals = convertMealsToHiveMeals(
-                    _selectedRecipeAllocations,
-                    chosenRecurrence,
-                  );
-
-                  print(
-                      '-------------------------Save to hive meal draft box ----------------$meals');
-                  for (final meal in meals) {
-                    print(
-                        '---------------------Save to Hive meal draft box ----------------$meal');
-                    print(
-                        '------------$_startDate---$_endDate---$newDay---$meal');
-                    // Ensure that _startDate, _endDate, newDay, and meal are not null before calling updateMealForDate
-                    if (_startDate != null &&
-                        _endDate != null &&
-                        newDay != null) {
-                      await hiveService.updateMealForDate(
-                        _startDate!,
-                        _endDate!,
-                        newDay!,
-                        meal,
-                        context,
-                      );
-                    } else {
-                      // Handle the case where one or more values are null
-                      print('Error: One or more required values are null.');
-                    }
-                  }
-
                   // After saving data to hive move to next day
                   _moveToNextDay();
-
-                  // Refrehs the UI
-                  setState(() {});
                 },
                 child: _isLoading
                     ? const CircularProgressIndicator(

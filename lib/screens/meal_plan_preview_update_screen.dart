@@ -48,6 +48,7 @@ class _MealPlanPreviewBottomSheetState
   HiveService hiveService = HiveService();
   List<Meal> transMeal = <Meal>[];
   MealPlanService mealPlanService = MealPlanService();
+  bool _isLoading = false; // Add a loading state variable
 
   final RecipeService recipeService = RecipeService();
   @override
@@ -75,17 +76,19 @@ class _MealPlanPreviewBottomSheetState
   }
 
   Future<void> _handleCreatePlan() async {
-    // Read the user from the provider
-    final user = ref.read(userProvider);
+    setState(() {
+      _isLoading = true; // Set loading state to true
+    });
 
-    // Check if the user is null
+    final user = ref.read(userProvider);
     if (user == null) {
       print('User is null. Cannot create a meal plan.');
-      // You can show an error dialog here or navigate back
+      setState(() {
+        _isLoading = false; // Set loading state to false on error
+      });
       return;
     }
 
-    // Create a new meal plan
     final newMealPlan = MealPlan(
       name: widget.mealPlan.name,
       startDate: widget.mealPlan.startDate,
@@ -102,7 +105,6 @@ class _MealPlanPreviewBottomSheetState
     print('------------------------end of meal plan body-------------------');
 
     try {
-      // Save the meal plan to the database
       await mealPlanService.updateMealPlan(
         widget.mealPlan.id!,
         newMealPlan,
@@ -110,11 +112,15 @@ class _MealPlanPreviewBottomSheetState
 
       await hiveService.clearMealDraftBox();
 
-      // Navigate back to the meal plan list
+      Navigator.pop(context);
       Navigator.pop(context);
       Navigator.pop(context);
     } catch (e) {
       print("Error creating meal plan: $e");
+    } finally {
+      setState(() {
+        _isLoading = false; // Set loading state to false after operation
+      });
     }
   }
 
@@ -221,16 +227,22 @@ class _MealPlanPreviewBottomSheetState
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  )),
-                              onPressed: () async {
-                                await _handleCreatePlan();
-                              },
-                              child: const Text('Update meal plan')),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                )),
+                            onPressed: _isLoading
+                                ? null
+                                : () async {
+                                    await _handleCreatePlan();
+                                  },
+                            child: _isLoading
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white)
+                                : const Text('Update meal plan'),
+                          ),
                         )
                       ],
                     ),
