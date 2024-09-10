@@ -36,6 +36,23 @@ class HiveMeal extends HiveObject {
     this.recurrence,
     required this.date,
   });
+  HiveMeal copyWith({
+    String? mealType,
+    String? timeOfDay,
+    bool? isDraft,
+    List<String>? recipes,
+    HiveRecurrence? recurrence,
+    DateTime? date,
+  }) {
+    return HiveMeal(
+      mealType: mealType ?? this.mealType,
+      timeOfDay: timeOfDay ?? this.timeOfDay,
+      isDraft: isDraft ?? this.isDraft,
+      recipes: recipes ?? this.recipes, // Corrected to handle list of strings
+      recurrence: recurrence ?? this.recurrence,
+      date: date ?? this.date,
+    );
+  }
 
   @override
   String toString() {

@@ -1,5 +1,6 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, use_build_context_synchronously
 
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 import 'hive_recurrence.dart'; // Ensure you have this import
@@ -237,10 +238,38 @@ class HiveService {
   }
 
   // Edit meals for date
-  Future<void> updateMealForDate(DateTime date, HiveMeal updatedMeal) async {
+  Future<void> updateMealForDate(
+      DateTime date, HiveMeal updatedMeal, BuildContext context) async {
     final box = await Hive.openBox<HiveMeal>('mealDraftBox');
-    await box.put(
-        '${date.toIso8601String()}_${updatedMeal.mealType}', updatedMeal);
+
+    // If recurrence is not null, show confirmation dialog
+    if (updatedMeal.recurrence != null) {
+      bool confirmOverride = await showConfirmationDialog(
+        context: context,
+        title: 'Confirm Override',
+        message: 'Do you want to override this meal for all recurring days?',
+      );
+
+      if (confirmOverride) {
+        // If confirmed, update meals according to recurrence
+        await updateRecurringMealsInDraft(
+          meal: updatedMeal,
+          date: date,
+          updateOption: 'future',
+          startDate:
+              date, // Assuming startDate and endDate are determined elsewhere
+          endDate: date, // Modify as needed for your use case
+        );
+      } else {
+        // If not confirmed, update only the specified date
+        await box.put(
+            '${date.toIso8601String()}_${updatedMeal.mealType}', updatedMeal);
+      }
+    } else {
+      // If no recurrence, just update for the specific date
+      await box.put(
+          '${date.toIso8601String()}_${updatedMeal.mealType}', updatedMeal);
+    }
   }
 
   // Delete meal for a specific date
@@ -306,4 +335,144 @@ class HiveService {
     // Close the box
     await box.close();
   }
+
+  Future<void> updateRecurringMealsInDraft({
+    required HiveMeal meal,
+    required DateTime date,
+    required String updateOption, // "single", "future", or "all"
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    final box = await Hive.openBox<HiveMeal>('mealDraftBox');
+
+    // If "single", only update the meal for the selected date.
+    if (updateOption == 'single') {
+      await box.put('${date.toIso8601String()}_${meal.mealType}', meal);
+      return; // Exit since no further changes are needed.
+    }
+
+    // Generate recurring dates for the meal within the given range
+    List<DateTime> dates =
+        generateRecurringDates(meal.recurrence!, startDate, endDate);
+
+    // If "future", update meals from the current date onward.
+    if (updateOption == 'future') {
+      for (var d in dates) {
+        if (d.isAfter(date) || d.isAtSameMomentAs(date)) {
+          // Update only meals from the current date onward
+          await box.put('${d.toIso8601String()}_${meal.mealType}',
+              meal.copyWith(date: d));
+        }
+      }
+    }
+
+    // If "all", update meals for all matching dates.
+    if (updateOption == 'all') {
+      for (var d in dates) {
+        // Update all dates in the recurrence
+        await box.put(
+            '${d.toIso8601String()}_${meal.mealType}', meal.copyWith(date: d));
+      }
+    }
+  }
+
+  // Update a particular dates meal
+  Future<void> updateMealForSingleDate({
+    required HiveMeal meal,
+    required DateTime date,
+  }) async {
+    final box = await Hive.openBox<HiveMeal>('mealDraftBox');
+
+    HiveMeal updatedMeal = meal.copyWith(date: date);
+
+    await box.put('${date.toIso8601String()}_${meal.mealType}', updatedMeal);
+  }
+
+  Future<void> saveMeals({
+    required List<HiveMeal> meals,
+    required String updateOption, // "single", "future", or "all"
+    required DateTime date,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    final box = await Hive.openBox<HiveMeal>('mealDraftBox');
+
+    // Iterate through each meal passed to the function
+    for (var meal in meals) {
+      // If "single", only save the meal for the specified date
+      if (updateOption == 'single') {
+        await box.put('${date.toIso8601String()}_${meal.mealType}',
+            meal.copyWith(date: date));
+        continue; // Skip further processing for this meal
+      }
+
+      // Generate the list of recurring dates for this meal's recurrence rule
+      List<DateTime> recurringDates =
+          generateRecurringDates(meal.recurrence!, startDate, endDate);
+
+      // If "future", save meals for dates starting from the given date onward
+      if (updateOption == 'future') {
+        final futureDates = recurringDates
+            .where((d) => d.isAfter(date) || d.isAtSameMomentAs(date))
+            .toList();
+        for (var futureDate in futureDates) {
+          final updatedMeal = meal.copyWith(date: futureDate);
+          await box.put(
+              '${futureDate.toIso8601String()}_${meal.mealType}', updatedMeal);
+        }
+        continue;
+      }
+
+      // If "all", save meals for all dates in the recurrence range
+      if (updateOption == 'all') {
+        for (var recurringDate in recurringDates) {
+          final updatedMeal = meal.copyWith(date: recurringDate);
+          await box.put('${recurringDate.toIso8601String()}_${meal.mealType}',
+              updatedMeal);
+        }
+      }
+    }
+  }
+
+  // Push list of meals to the draft on the inititial render
+  Future<void> saveMealListToDraftBox(List<HiveMeal> meals) async {
+    print('----------------------All Meals to Draft--------------------');
+    print(meals);
+
+    final box = await Hive.openBox<HiveMeal>('mealDraftBox');
+
+    // Iterate through the list of meals
+    for (var meal in meals) {
+      // Use the meal's date and type as a unique key for storage
+      await box.put('${meal.date!.toIso8601String()}_${meal.mealType}', meal);
+    }
+  }
+}
+
+Future<bool> showConfirmationDialog({
+  required String title,
+  required String message,
+  required BuildContext context,
+}) async {
+  // Replace this with your actual dialog implementation
+  return await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Yes'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('No'),
+              ),
+            ],
+          );
+        },
+      ) ??
+      false;
 }

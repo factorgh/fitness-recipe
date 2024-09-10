@@ -117,7 +117,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     _updateHighlightedDates();
     fetchAllUserRecipes();
     getTraineesFollowingTrainer();
-    // getDraftMealPlan();
+
     // Initialize HiveService outside of initState
     _initializeHiveService();
   }
@@ -479,7 +479,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
                 final List<Meal> meals = [];
 
-                // Create stor instance
+                // Create store instance
 
                 for (Meal meal in _selectedRecipeAllocations) {
                   meals.add(Meal(

@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
@@ -12,10 +14,12 @@ import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
 
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/conversions/hive_conversions.dart';
+import 'package:voltican_fitness/utils/hive/hive_class.dart';
+import 'package:voltican_fitness/utils/hive/hive_meal.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
-import 'package:voltican_fitness/widgets/week_range_selector.dart';
 
 class MealUpdateScreen extends ConsumerStatefulWidget {
   final MealPlan mealPlan;
@@ -34,27 +38,102 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
   List<User> _allTrainees = [];
   List<User> _searchResults = [];
   final List<User> _selectedTrainees = [];
+  final List<DateTime> _highlightedDates = [];
   bool _isLoading = false;
-  List<String> _weekDays = [];
-  final List<Meal> _selectedRecipeAllocations = [];
+  Recurrence? chosenRecurrence;
 
+  final List<Meal> _selectedRecipeAllocations = [];
+  List<Meal> _draftMeals = [];
+  List<Meal> startMeals = [];
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _mealPlanNameController = TextEditingController();
 
   List<Recipe> myRecipes = [];
+  DateTime? newDay;
 
   final RecipeService recipeService = RecipeService();
   final TrainerService trainerService = TrainerService();
+  final HiveService _hiveService = HiveService();
 
   @override
   void initState() {
     super.initState();
+    _updateHighlightedDates();
+    _initializeHiveService();
 
-    // Prepopulate form with passed MealPlan object
     fetchInitialData();
+
+// Save meal plans to meal to allow user to update
+    _saveMealsToDraftOnInitialization();
 
     fetchAllUserRecipes();
     getTraineesFollowingTrainer();
+  }
+
+  void _saveMealsToDraftOnInitialization() async {
+    print(
+        '---------------------Meals from meal plan on update screen------------------');
+    print(widget.mealPlan.meals);
+    // Iterate over the meal plan's meals
+    final hiveMeals = widget.mealPlan.meals.map((meal) {
+      final hiveRecurrence = meal.recurrence != null
+          ? convertToHiveRecurrence(meal.recurrence!)
+          : null; // Handle null case
+
+      // Create the HiveMeal object with the converted recurrence
+      return HiveMeal(
+        mealType: meal.mealType,
+        timeOfDay: meal.timeOfDay,
+        isDraft: meal.isDraft!,
+        recipes: meal.recipes!,
+        recurrence: hiveRecurrence,
+        date: meal.date,
+      );
+    }).toList();
+
+    // Convert the list of meals to HiveMeals and save them
+    await _hiveService.saveMealListToDraftBox(hiveMeals);
+  }
+
+  void _updateHighlightedDates() {
+    if (_startDate != null && _endDate != null) {
+      _highlightedDates.clear();
+      DateTime date = _startDate!;
+      while (date.isBefore(_endDate!.add(const Duration(days: 1)))) {
+        _highlightedDates.add(date);
+        date = date.add(const Duration(days: 1));
+      }
+    }
+  }
+
+  Future<void> _initializeHiveService() async {
+    final hiveService = HiveService();
+    await hiveService.init();
+
+    setState(() {});
+  }
+
+  bool _isWithinRange(DateTime day) {
+    if (_startDate != null && _endDate != null) {
+      return day.isAfter(_startDate!.subtract(const Duration(days: 1))) &&
+          day.isBefore(_endDate!.add(const Duration(days: 1)));
+    }
+    return true;
+  }
+
+  void getMealsFromDraftByDate(DateTime date) async {
+    try {
+      final meals = _draftMeals.filter((meal) => meal.date == date).toList();
+      print(
+          '------------------------------meal from draft that matches the date-------------------');
+      print(meals);
+      setState(() {
+        // Update meals safely
+        startMeals = meals;
+      });
+    } catch (e) {
+      print('Error fetching meals by date: $e');
+    }
   }
 
   Future<void> fetchInitialData() async {
@@ -79,6 +158,38 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
     }
   }
 
+  void _moveToNextDay() {
+    if (newDay != null) {
+      setState(() {
+        newDay = newDay!.add(const Duration(days: 1));
+      });
+    } else {
+      print('newDay is null');
+    }
+  }
+
+  void _handleRecipeSelectionChanged(List<Meal> selectedAllocations) {
+    print("Recurrence");
+
+    for (Meal meal in selectedAllocations) {
+      print("------------Meal Allocation------------");
+      print("Meal Type: ${meal.mealType}");
+      print("Date: ${meal.date}");
+      print("Allocated Time: ${meal.timeOfDay}");
+      print('Alloacted recurrences: ${meal.recurrence}');
+      print("Recipes:");
+    }
+
+    setState(() {
+      _selectedRecipeAllocations.clear();
+      _selectedRecipeAllocations.addAll(selectedAllocations);
+    });
+
+    print(
+      '------------------allocations------------------$_selectedRecipeAllocations',
+    );
+  }
+
   Future<void> getTraineesFollowingTrainer() async {
     try {
       final user = ref.read(userProvider);
@@ -101,8 +212,6 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
     _endDate = mealPlan.endDate;
 
     _selectedRecipeAllocations.addAll(mealPlan.meals);
-    print(
-        '----------------Prepopulated-----------------------------$_weekDays');
 
     List<User> selectedTrainees = [];
 
@@ -172,7 +281,7 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
     final user = ref.read(userProvider);
     if (_formKey.currentState!.validate()) {
       final mealUpdate = MealPlan(
-        id: widget.mealPlan.id, // Use the ID from the passed MealPlan object
+        id: widget.mealPlan.id,
         name: _mealPlanNameController.text,
         duration: _selectedDuration,
         startDate: _startDate,
@@ -272,6 +381,16 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
     return startDate.add(period);
   }
 
+  void handleRecurrence(Recurrence recurrenceData) {
+    print(
+        '---------------------recurrence before preview------------$recurrenceData');
+
+    setState(() {
+      //
+      chosenRecurrence = recurrenceData;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -289,6 +408,38 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _searchController,
+                        decoration: const InputDecoration(
+                          labelText: 'Search Trainees',
+                        ),
+                        onChanged: _searchTrainees,
+                      ),
+                      if (_searchResults.isNotEmpty)
+                        ..._searchResults.map(
+                          (trainee) => ListTile(
+                            title: Text(trainee.fullName),
+                            subtitle: Text(trainee.username),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.add),
+                              onPressed: () => _addTrainee(trainee),
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 16),
+                      if (_selectedTrainees.isNotEmpty)
+                        ..._selectedTrainees.map(
+                          (trainee) => ListTile(
+                            title: Text(trainee.fullName),
+                            subtitle: Text(trainee.username),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.remove),
+                              onPressed: () => _removeTrainee(trainee),
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 20),
                       TextFormField(
                         controller: _mealPlanNameController,
                         decoration: const InputDecoration(
@@ -358,61 +509,139 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                         ],
                       ),
                       const SizedBox(height: 16),
+                      _endDate != null
+                          ? TableCalendar(
+                              firstDay: DateTime(2000),
+                              lastDay: DateTime(2100),
+                              focusedDay: newDay ?? DateTime.now(),
+                              rangeStartDay: _startDate,
+                              rangeEndDay: _endDate,
+                              rowHeight: 43,
+                              calendarBuilders: CalendarBuilders(
+                                selectedBuilder: (context, date, _) {
+                                  return Container(
+                                    margin: const EdgeInsets.all(4.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors
+                                          .red, // Highlight selected date in red
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                    child: Center(
+                                        child: Text(date.day
+                                            .toString())), // Display day number
+                                  );
+                                },
+                              ),
+                              selectedDayPredicate: (day) =>
+                                  isSameDay(day, newDay),
+                              onDaySelected: (DateTime selectDay,
+                                  DateTime focusDay) async {
+                                final hiveService = HiveService();
+
+                                if (_isWithinRange(selectDay)) {
+                                  // Fetch meals for the selected day from the meal draft
+                                  final meals = await hiveService
+                                      .fetchMealsForDate(selectDay);
+
+                                  print(
+                                      '----------------------mealsByDate--------------------');
+                                  print(meals);
+
+                                  // Convert Hive meals to normal meals if there are any, or assign an empty list of type Meal
+                                  final selectMeals = meals.isNotEmpty
+                                      ? convertHiveMealsToMeals(meals)
+                                      : <Meal>[];
+
+                                  // Update the state with the selected day and fetched meals
+                                  setState(() {
+                                    startMeals = selectMeals;
+                                    newDay = selectDay;
+                                  });
+
+                                  setState(() {});
+                                  // Debugging information
+                                  print('Selected Day: $selectDay');
+                                  print('Start Meals: $startMeals');
+                                }
+                              },
+                              headerStyle: const HeaderStyle(
+                                formatButtonVisible: false,
+                                titleCentered: true,
+                              ),
+                              availableGestures: AvailableGestures.all,
+                            )
+                          : const SizedBox(),
                       MealPeriodSelector(
-                        startDate: _startDate!, endDate: _endDate!,
-                        onRecurrenceChanged: (reccurreneDta) {},
+                        defaultMeals: startMeals.isNotEmpty ? startMeals : [],
+                        startDate: _startDate!,
+                        endDate: _endDate!,
+                        onRecurrenceChanged: handleRecurrence,
                         onSelectionChanged: (allocations) {
                           setState(() {
                             _selectedRecipeAllocations.clear();
                             _selectedRecipeAllocations.addAll(allocations);
                           });
                         },
-                        recipes:
-                            myRecipes, // Ensure `myRecipes` is a list of `Recipe` objects
+                        recipes: myRecipes,
                       ),
                       const SizedBox(height: 16),
-                      WeekRangeSelector(
-                        initialSelectedDays:
-                            _weekDays, // Prepopulate with selected days
-                        onSelectionChanged: (selectedDays) {
-                          setState(() {
-                            _weekDays = selectedDays;
-                          });
-                        },
-                      ),
                       const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _searchController,
-                        decoration: const InputDecoration(
-                          labelText: 'Search Trainees',
-                        ),
-                        onChanged: _searchTrainees,
-                      ),
-                      const SizedBox(height: 16),
-                      if (_searchResults.isNotEmpty)
-                        ..._searchResults.map(
-                          (trainee) => ListTile(
-                            title: Text(trainee.fullName),
-                            subtitle: Text(trainee.username),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.add),
-                              onPressed: () => _addTrainee(trainee),
+                      SizedBox(
+                        width: double.infinity,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
                             ),
+                            onPressed: () async {
+                              // Create an instance of HiveService
+                              final hiveService = HiveService();
+
+                              // Convert selected recipe allocations to HiveMeals
+                              final meals = convertMealsToHiveMeals(
+                                _selectedRecipeAllocations,
+                                chosenRecurrence,
+                              );
+
+                              // Save each meal to Hive for the specified date
+                              for (final meal in meals) {
+                                print(
+                                    '---------------------Save to Hive meal draft box ----------------$meal');
+                                await hiveService.updateMealForDate(
+                                    newDay!, meal, context);
+                              }
+
+                              // Move to the next day regardless of recurrence
+                              _moveToNextDay(); // Always move to the next day
+                            },
+                            child: _isLoading
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : const Padding(
+                                    padding: EdgeInsets.all(12.0),
+                                    child: Text(
+                                      'Continue to Next Day',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
                           ),
                         ),
-                      const SizedBox(height: 16),
-                      if (_selectedTrainees.isNotEmpty)
-                        ..._selectedTrainees.map(
-                          (trainee) => ListTile(
-                            title: Text(trainee.fullName),
-                            subtitle: Text(trainee.username),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.remove),
-                              onPressed: () => _removeTrainee(trainee),
-                            ),
-                          ),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Divider(
+                          color: Colors.black,
                         ),
-                      const SizedBox(height: 32),
+                      ),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -420,8 +649,7 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                             backgroundColor: Colors.red,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  10), // Set to 0 for a perfect rectangle
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
                           onPressed: _completeSchedule,

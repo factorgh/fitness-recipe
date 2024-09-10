@@ -73,21 +73,26 @@ List<Recipe> convertHiveRecipeToRecipes(List<HiveRecipe> recipes) {
 }
 
 // Convert to Hive Meals
+
 List<HiveMeal> convertMealsToHiveMeals(
-    List<Meal> meals, Recurrence chosenRecurrence) {
+    List<Meal> meals, Recurrence? chosenRecurrence) {
+  // Allow nullable Recurrence
   // Chosen recurrence
   print('---------------------chosen recurrence');
   print(chosenRecurrence);
+
   return meals.map((meal) {
     return HiveMeal(
-        mealType: meal.mealType,
-        recipes: meal.recipes!,
-        isDraft: true,
-        timeOfDay: meal.timeOfDay,
-        date: meal.date,
-        recurrence: convertToHiveRecurrence(chosenRecurrence)
-        // etc.
-        );
+      mealType: meal.mealType,
+      recipes: meal.recipes!,
+      isDraft: true,
+      timeOfDay: meal.timeOfDay,
+      date: meal.date,
+      recurrence: chosenRecurrence != null
+          ? convertToHiveRecurrence(chosenRecurrence)
+          : null,
+      // etc.
+    );
   }).toList();
 }
 
