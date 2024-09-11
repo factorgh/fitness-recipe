@@ -260,6 +260,11 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
   }) {
     final assignedTraineesIds = assignedTrainees.map((t) => t.id).toSet();
 
+    if (trainees.isEmpty) {
+      return const Center(
+        child: Text('No trainees found'),
+      );
+    }
     return ListView.builder(
       itemCount: trainees.length,
       itemBuilder: (context, index) {
@@ -355,6 +360,13 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
     Function(String)? removeFollower,
     bool isFollowingView = false,
   }) {
+    if (trainers.isEmpty) {
+      return Center(
+        child: Text(isFollowingView
+            ? 'You are not following any trainers'
+            : 'No followers found'),
+      );
+    }
     return ListView.builder(
       itemCount: trainers.length,
       itemBuilder: (context, index) {

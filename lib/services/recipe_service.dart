@@ -11,7 +11,6 @@ import 'package:voltican_fitness/utils/show_snackbar.dart';
 
 class RecipeService {
   final DioClient client = DioClient();
-
   Future<void> createRecipe(
     BuildContext context,
     Recipe recipe,
@@ -30,28 +29,36 @@ class RecipeService {
     }
 
     try {
-      // Get Cloudinary instance
-      final cloudinary = CloudinaryPublic('daq5dsnqy', 'jqx9kpde');
-      // Upload image to Cloudinary
-      CloudinaryResponse uploadResult = await cloudinary.uploadFile(
-          CloudinaryFile.fromFile(recipe.imageUrl, folder: 'voltican_fitness'));
-      final image = uploadResult.secureUrl;
-      print('Image URL: $image');
+      String imageUrl = recipe.imageUrl;
+
+      // Check if image URL is a local file path (i.e., from the file picker)
+      if (!imageUrl.startsWith('http')) {
+        // It's a local file, so upload it to Cloudinary
+        final cloudinary = CloudinaryPublic('daq5dsnqy', 'jqx9kpde');
+        CloudinaryResponse uploadResult = await cloudinary.uploadFile(
+            CloudinaryFile.fromFile(imageUrl, folder: 'voltican_fitness'));
+        imageUrl = uploadResult.secureUrl;
+        print('Uploaded Image URL: $imageUrl');
+      } else {
+        print('Using existing Cloudinary URL: $imageUrl');
+      }
 
       // Create new recipe object
       final myRecipe = Recipe(
-          title: recipe.title,
-          description: recipe.description,
-          ingredients: recipe.ingredients,
-          instructions: recipe.instructions,
-          facts: recipe.facts,
-          status: recipe.status,
-          imageUrl: image,
-          createdBy: recipe.createdBy,
-          period: recipe.period,
-          ratings: [],
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now());
+        title: recipe.title,
+        description: recipe.description,
+        ingredients: recipe.ingredients,
+        instructions: recipe.instructions,
+        facts: recipe.facts,
+        status: recipe.status,
+        imageUrl:
+            imageUrl, // Use the secure URL from Cloudinary or the existing one
+        createdBy: recipe.createdBy,
+        period: recipe.period,
+        ratings: [],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
 
       print('Recipe: $myRecipe');
       // Save recipe to DB
@@ -63,7 +70,6 @@ class RecipeService {
           context: context,
           onSuccess: () {
             showSnack(context, 'Recipe created successfully!');
-
             Navigator.pop(context);
           });
     } catch (e) {

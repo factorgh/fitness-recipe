@@ -121,6 +121,13 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
       _isLoading = true;
     });
 
+    print('-------------------Make recipe own Details---------------');
+    if (_selectedImage != null) {
+      print('--------${_selectedImage!.path}');
+    } else {
+      print('--------No image selected');
+    }
+
     try {
       await recipeService.createRecipe(
         context,
@@ -132,7 +139,9 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
           status: status!,
           facts: _nutritionalFactsController.text,
           period: selectedMealPeriod!,
-          imageUrl: _selectedImage!.path,
+          imageUrl: _selectedImage != null
+              ? _selectedImage!.path
+              : widget.recipe.imageUrl, // Use empty string if no image
           createdBy: user.id,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
