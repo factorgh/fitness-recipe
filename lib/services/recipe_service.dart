@@ -291,11 +291,11 @@ class RecipeService {
         onSuccess(recipes);
       } else {
         // Handle server errors or unexpected responses
-        showSnack(context, 'Failed to fetch recipes for user');
+        print(
+            '------------Server error failed to fetch recipes for user $userId');
       }
     } catch (e) {
       print('Error fetching recipes for user: $e');
-      showSnack(context, 'Failed to fetch recipes for user');
     }
   }
 

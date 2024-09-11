@@ -377,29 +377,36 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
       chosenRecurrence,
     );
 
-    print(
-        '-------------------------Save to hive meal draft box ----------------$meals');
-    for (final meal in meals) {
+    // Only work on the last meal added
+    if (meals.isNotEmpty) {
+      final lastMeal = meals.last;
+
       print(
-          '---------------------Save to Hive meal draft box ----------------$meal');
-      print('------------$_startDate---$_endDate---$newDay---$meal');
-      // Ensure that _startDate, _endDate, newDay, and meal are not null before calling updateMealForDate
+          '---------------------Save last meal to Hive meal draft box ----------------$lastMeal');
+      print('------------$_startDate---$_endDate---$newDay---$lastMeal');
+
+      // Ensure that _startDate, _endDate, newDay, and lastMeal are not null before calling updateMealForDate
       if (_startDate != null && _endDate != null && newDay != null) {
         await hiveService.updateMealForDate(
           _startDate!,
           _endDate!,
           newDay!,
-          meal,
+          lastMeal,
           context,
         );
 
         setState(() {
           _selectedRecipeAllocations = [];
         });
+
+        print('-----------------------Recipe allocations after save----------');
+        print(_selectedRecipeAllocations);
       } else {
         // Handle the case where one or more values are null
         print('Error: One or more required values are null.');
       }
+    } else {
+      print('Error: No meals to save.');
     }
   }
 
@@ -434,6 +441,9 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     setState(() {
       newDay = nextDay;
     });
+
+    // Refresh the UI
+    setState(() {});
   }
 
   @override
@@ -445,32 +455,32 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         actions: [
-          IconButton(
-              onPressed: () async {
-                // Fetching a MealPlan
-                final hiveService = HiveService();
-                final fetchMeals = await hiveService.fetchAllMeals();
-                print('--------------all-------$fetchMeals');
+          // IconButton(
+          //     onPressed: () async {
+          //       // Fetching a MealPlan
+          //       final hiveService = HiveService();
+          //       final fetchMeals = await hiveService.fetchAllMeals();
+          //       print('--------------all-------$fetchMeals');
 
-                // check hive box state
-                final hiveState = hiveService.isMealBoxEmpty();
-                print('----------------hiveState----------------$hiveState');
+          //       // check hive box state
+          //       final hiveState = hiveService.isMealBoxEmpty();
+          //       print('----------------hiveState----------------$hiveState');
 
-                final List<Meal> meals = [];
+          //       final List<Meal> meals = [];
 
-                // Create store instance
+          //       // Create store instance
 
-                for (Meal meal in _selectedRecipeAllocations) {
-                  meals.add(Meal(
-                    mealType: meal.mealType,
-                    date: newDay!,
-                    timeOfDay: meal.timeOfDay,
-                    recipes: meal.recipes,
-                    recurrence: chosenRecurrence,
-                  ));
-                }
-              },
-              icon: const Icon(Icons.add)),
+          //       for (Meal meal in _selectedRecipeAllocations) {
+          //         meals.add(Meal(
+          //           mealType: meal.mealType,
+          //           date: newDay!,
+          //           timeOfDay: meal.timeOfDay,
+          //           recipes: meal.recipes,
+          //           recurrence: chosenRecurrence,
+          //         ));
+          //       }
+          //     },
+          //     icon: const Icon(Icons.add)),
           IconButton(
               onPressed: () async {
                 final hiveService = HiveService();

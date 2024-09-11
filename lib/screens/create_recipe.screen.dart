@@ -340,6 +340,9 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                               }
                             },
                           ),
+                    const SizedBox(
+                      width: 10,
+                    ),
                     CustomButton(
                       size: 10,
                       width: 150,
