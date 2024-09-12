@@ -50,7 +50,6 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    print(checkIfFollowing());
     setState(() {
       isFollowing = checkIfFollowing() ?? true;
     });
@@ -64,6 +63,7 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
       onSuccess: (fetchedUser) {
         setState(() {
           user = fetchedUser;
+          isFollowing = checkIfFollowing() ?? false;
         });
       },
     );
@@ -194,40 +194,41 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
     }
   }
 
-  Widget _buildFollowButton() {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.black,
-      ),
-      onPressed: isLoading ? null : _handleFollowButtonPress,
-      child: isLoading
-          ? const SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.0,
-                color: Colors.white,
-              ),
-            )
-          : Text(
-              isFollowing ? 'Unfollow' : 'Follow',
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-                color: Colors.black,
-              ),
-            ),
-    );
-  }
+  // Widget _buildFollowButton() {
+  //   return ElevatedButton(
+  //     style: ElevatedButton.styleFrom(
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(8.0),
+  //       ),
+  //       backgroundColor: Colors.blueAccent,
+  //       foregroundColor: Colors.black,
+  //     ),
+  //     onPressed: isLoading ? null : _handleFollowButtonPress,
+  //     child: isLoading
+  //         ? const SizedBox(
+  //             height: 20,
+  //             width: 20,
+  //             child: CircularProgressIndicator(
+  //               strokeWidth: 2.0,
+  //               color: Colors.white,
+  //             ),
+  //           )
+  //         : Text(
+  //             isFollowing ? 'Unfollow' : 'Follow',
+  //             style: const TextStyle(
+  //               fontSize: 15,
+  //               fontWeight: FontWeight.w800,
+  //               color: Colors.black,
+  //             ),
+  //           ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
     final isMyFollowing = checkIfFollowing() ?? false;
-    print(isMyFollowing);
+    print(
+        '----------------------------Value of is myFollowing-------------$isMyFollowing');
 
     final me = ref.read(userProvider);
 
@@ -280,7 +281,8 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                           Column(
                             children: [
                               if (me!.role == "1") ...[
-                                _buildFollowButton(), // Show Follow button if the user is a trainer
+                                _buildFollowButton(me,
+                                    isMyFollowing), // Show Follow button if the user is a trainer
                               ] else if (me.role == "0") ...[
                                 _buildRequestButton(me,
                                     isMyFollowing), // Show Request button if the user is a trainee
@@ -321,74 +323,73 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
     );
   }
 
-  // Button to handle "Follow" feature for trainers
-  // Widget _buildFollowButton(User me) {
-  //   return ElevatedButton(
-  //     style: ElevatedButton.styleFrom(
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.circular(8.0),
-  //       ),
-  //       backgroundColor: Colors.blueAccent,
-  //       foregroundColor: Colors.black,
-  //     ),
-  //     onPressed: isLoading
-  //         ? null
-  //         : () async {
-  //             setState(() {
-  //               isLoading = true;
-  //             });
+  Widget _buildFollowButton(User me, bool isMyFollow) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        backgroundColor: Colors.blueAccent,
+        foregroundColor: Colors.black,
+      ),
+      onPressed: isLoading
+          ? null
+          : () async {
+              setState(() {
+                isLoading = true;
+              });
 
-  //             try {
-  //               if (isFollowing) {
-  //                 // Show bottom sheet for unfollow confirmation
-  //                 _showUnfollowConfirmationBottomSheet(
-  //                   context,
-  //                   () async {
-  //                     await ref
-  //                         .read(followersProvider(widget.userId).notifier)
-  //                         .unfollowTrainer(me.id, widget.userId);
-  //                     setState(() {
-  //                       isFollowing = false;
-  //                     });
-  //                     ref.refresh(followingTrainersProvider(me.id));
-  //                   },
-  //                 );
-  //               } else {
-  //                 await ref
-  //                     .read(followersProvider(widget.userId).notifier)
-  //                     .followTrainer(me.id, widget.userId, context);
-  //                 setState(() {
-  //                   isFollowing = true;
-  //                 });
-  //                 ref.refresh(followingTrainersProvider(me.id));
-  //               }
-  //             } catch (error) {
-  //               print("Error: $error");
-  //             } finally {
-  //               setState(() {
-  //                 isLoading = false;
-  //               });
-  //             }
-  //           },
-  //     child: isLoading
-  //         ? const SizedBox(
-  //             height: 20,
-  //             width: 20,
-  //             child: CircularProgressIndicator(
-  //               strokeWidth: 2.0,
-  //               color: Colors.white,
-  //             ),
-  //           )
-  //         : Text(
-  //             isFollowing ? 'Unfollow' : 'Follow',
-  //             style: const TextStyle(
-  //               fontSize: 15,
-  //               fontWeight: FontWeight.w800,
-  //               color: Colors.black,
-  //             ),
-  //           ),
-  //   );
-  // }
+              try {
+                if (isFollowing) {
+                  // Show bottom sheet for unfollow confirmation
+                  _showUnfollowConfirmationBottomSheet(
+                    context,
+                    () async {
+                      await ref
+                          .read(followersProvider(widget.userId).notifier)
+                          .unfollowTrainer(me.id, widget.userId);
+                      setState(() {
+                        isFollowing = false;
+                      });
+                      ref.refresh(followingTrainersProvider(me.id));
+                    },
+                  );
+                } else {
+                  await ref
+                      .read(followersProvider(widget.userId).notifier)
+                      .followTrainer(me.id, widget.userId, context);
+                  setState(() {
+                    isFollowing = true;
+                  });
+                  ref.refresh(followingTrainersProvider(me.id));
+                }
+              } catch (error) {
+                print("Error: $error");
+              } finally {
+                setState(() {
+                  isLoading = false;
+                });
+              }
+            },
+      child: isLoading
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.0,
+                color: Colors.white,
+              ),
+            )
+          : Text(
+              isFollowing ? 'Unfollow' : 'Follow',
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                color: Colors.black,
+              ),
+            ),
+    );
+  }
 
   // Button to handle "Request" feature for trainees
   Widget _buildRequestButton(User me, bool isFollowing) {
