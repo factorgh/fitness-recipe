@@ -414,16 +414,29 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     // Chosen recurrence
     print('---------------------chosen recurrence');
     print(chosenRecurrence);
+
     return meals.map((meal) {
+      // Ensure date and recurrence are not null
+      final mealDate = meal.date;
+      final mealRecurrence = meal.recurrence;
+
+      if (mealDate == null) {
+        print('Error: Meal date is null');
+        // Handle the case where date is null, perhaps by skipping or setting a default value
+      }
+
       return Meal(
-          mealType: meal.mealType,
-          recipes: meal.recipes,
-          isDraft: true,
-          timeOfDay: meal.timeOfDay,
-          date: meal.date!,
-          recurrence: convertFromHiveRecurrence(meal.recurrence!)
-          // etc.
-          );
+        mealType: meal.mealType,
+        recipes: meal.recipes,
+        isDraft: true,
+        timeOfDay: meal.timeOfDay,
+        date: mealDate ??
+            DateTime.now(), // Provide a default value or handle null case
+        recurrence: mealRecurrence != null
+            ? convertFromHiveRecurrence(mealRecurrence)
+            : null, // Handle null recurrence appropriately
+        // etc.
+      );
     }).toList();
   }
 

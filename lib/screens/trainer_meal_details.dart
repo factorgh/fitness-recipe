@@ -58,9 +58,9 @@ class _TrainerMealDetailScreenState
         ?.any((trainer) => trainer.id == widget.meal.createdBy);
   }
 
-  void _fetchUser() {
+  void _fetchUser() async {
     try {
-      AuthService().getUser(
+      await AuthService().getUser(
         userId: widget.meal.createdBy,
         onSuccess: (fetchedUser) {
           setState(() {
@@ -68,6 +68,8 @@ class _TrainerMealDetailScreenState
           });
         },
       );
+      print('-----------------------print owner deatils---------------------');
+      print(owner);
     } catch (e) {
       // Handle unexpected errors here
       showSnack(context, 'An unexpected error occurred');
@@ -315,8 +317,11 @@ class _TrainerMealDetailScreenState
                           fontSize: 23,
                           fontWeight: FontWeight.w500,
                         ),
+                        overflow: TextOverflow.ellipsis, // Add this line
+                        maxLines:
+                            1, // Optional: Limits the text to a single line
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 20),
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -333,7 +338,7 @@ class _TrainerMealDetailScreenState
                                 direction: Axis.horizontal,
                                 allowHalfRating: true,
                                 itemCount: 5,
-                                itemSize: 20,
+                                itemSize: 12,
                                 itemPadding:
                                     const EdgeInsets.symmetric(horizontal: 4.0),
                                 itemBuilder: (context, _) => const Icon(
@@ -360,48 +365,50 @@ class _TrainerMealDetailScreenState
                     ],
                   ),
                   const SizedBox(height: 10),
-                  owner != null
-                      ? owner!.imageUrl != null
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Recipe by",
-                                  style: TextStyle(fontWeight: FontWeight.w500),
-                                ),
-                                const SizedBox(height: 5),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 30,
-                                      backgroundImage:
-                                          NetworkImage(owner!.imageUrl!),
-                                      onBackgroundImageError:
-                                          (error, stackTrace) {
-                                        // Handle image loading errors here
-                                      },
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          owner!.username,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ],
-                                    ),
-                                    const Spacer(),
-                                    // Contact section goes here
-                                  ],
-                                ),
-                              ],
-                            )
-                          : const SizedBox()
-                      : const SizedBox(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Recipe by",
+                        style: TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage: owner != null &&
+                                    owner!.imageUrl != null &&
+                                    owner!.imageUrl!.isNotEmpty
+                                ? NetworkImage(owner!.imageUrl!)
+                                : const AssetImage(
+                                    'assets/images/default_profile.png'),
+                          ),
+
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                owner != null ? owner!.fullName : 'Loading...',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                owner != null ? owner!.username : '',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
+
+                          const Spacer(),
+                          // Contact section goes here
+                        ],
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 30),
                   const Text(
                     'Description',
