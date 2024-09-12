@@ -482,14 +482,47 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
           //     },
           //     icon: const Icon(Icons.add)),
           IconButton(
-              onPressed: () async {
+            onPressed: () async {
+              bool confirmClear = await showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text(
+                      'Clear your meal draft',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    content: const Text(
+                        'Are you sure you want to clear all meals from the draft?'),
+                    actions: <Widget>[
+                      TextButton(
+                        child: const Text('Cancel'),
+                        onPressed: () {
+                          Navigator.of(context)
+                              .pop(false); // Close the dialog without clearing
+                        },
+                      ),
+                      TextButton(
+                        child: const Text('Confirm'),
+                        onPressed: () {
+                          Navigator.of(context).pop(true); // Confirm clearing
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              if (confirmClear == true) {
                 final hiveService = HiveService();
                 await hiveService.clearMealDraftBox();
-
                 print(
                     '------------------------Meal Draft box cleared-------------');
-              },
-              icon: const Icon(Icons.delete))
+
+                // Refresh the ui
+              }
+            },
+            icon: const Icon(Icons.delete),
+          )
         ],
       ),
       body: Padding(

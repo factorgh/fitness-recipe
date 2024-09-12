@@ -185,91 +185,95 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                                 fontSize: 12, fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(height: 5),
+                          isMyFollowing
+                              ? const SizedBox
+                                  .shrink() // Hide button if already following
+                              : ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    backgroundColor: Colors.blueAccent,
+                                    foregroundColor: Colors.black,
+                                  ),
+                                  onPressed: isLoading
+                                      ? null
+                                      : () async {
+                                          setState(() {
+                                            isLoading = true;
+                                          });
 
-                          //
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              backgroundColor: Colors.blueAccent,
-                              foregroundColor: Colors.black,
-                            ),
-                            onPressed: isLoading
-                                ? null
-                                : () async {
-                                    setState(() {
-                                      isLoading = true;
-                                    });
-
-                                    try {
-                                      if (isFollowing) {
-                                        await ref
-                                            .read(followersProvider(
-                                                    widget.userId.isNotEmpty
-                                                        ? widget.userId
-                                                        : '')
-                                                .notifier)
-                                            .unfollowTrainer(
-                                                me!.id, widget.userId);
-                                        setState(() {
-                                          isFollowing = false;
-                                        });
-                                      } else {
-                                        if (me!.role == "1") {
-                                          await ref
-                                              .read(followersProvider(
-                                                      widget.userId.isNotEmpty
+                                          try {
+                                            if (isFollowing) {
+                                              await ref
+                                                  .read(followersProvider(widget
+                                                              .userId.isNotEmpty
                                                           ? widget.userId
                                                           : '')
-                                                  .notifier)
-                                              .followTrainer(me.id,
-                                                  widget.userId, context);
-                                          setState(() {
-                                            isFollowing = true;
-                                          });
-                                        } else if (me.role == "0") {
-                                          await emailService.sendEmail(
-                                              user!.email, me.email);
-                                          alerts.showSuccessAlert(context,
-                                              "Request sent successfully");
-                                          setState(() {
-                                            sent = true;
-                                          });
-                                        }
-                                      }
-                                    } catch (error) {
-                                      // Handle error
-                                    } finally {
-                                      setState(() {
-                                        isLoading = false;
-                                      });
-                                    }
-                                  },
-                            child: isLoading
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.0,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : Text(
-                                    me!.role == "1"
-                                        ? (isFollowing ? 'Unfollow' : "Follow")
-                                        : (sent
-                                            ? "Request sent"
-                                            : "Send a request"),
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w800,
-                                      color: me.role == "1"
-                                          ? Colors.black
-                                          : Colors.white,
-                                    ),
-                                  ),
-                          ),
+                                                      .notifier)
+                                                  .unfollowTrainer(
+                                                      me!.id, widget.userId);
+                                              setState(() {
+                                                isFollowing = false;
+                                              });
+                                            } else {
+                                              if (me!.role == "1") {
+                                                await ref
+                                                    .read(followersProvider(
+                                                            widget.userId
+                                                                    .isNotEmpty
+                                                                ? widget.userId
+                                                                : '')
+                                                        .notifier)
+                                                    .followTrainer(me.id,
+                                                        widget.userId, context);
+                                                setState(() {
+                                                  isFollowing = true;
+                                                });
+                                              } else if (me.role == "0") {
+                                                await emailService.sendEmail(
+                                                    user!.email, me.email);
+                                                alerts.showSuccessAlert(context,
+                                                    "Request sent successfully");
+                                                setState(() {
+                                                  sent = true;
+                                                });
+                                              }
+                                            }
+                                          } catch (error) {
+                                            // Handle error
+                                          } finally {
+                                            setState(() {
+                                              isLoading = false;
+                                            });
+                                          }
+                                        },
+                                  child: isLoading
+                                      ? const SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.0,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : Text(
+                                          me!.role == "1"
+                                              ? (isFollowing
+                                                  ? 'Unfollow'
+                                                  : "Follow")
+                                              : (sent
+                                                  ? "Request sent"
+                                                  : "Send a request"),
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w800,
+                                            color: me.role == "1"
+                                                ? Colors.black
+                                                : Colors.white,
+                                          ),
+                                        ),
+                                ),
                         ],
                       ),
                     ],

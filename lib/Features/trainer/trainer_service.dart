@@ -187,11 +187,14 @@ class TrainerService {
             .map((traineeData) => User.fromJson(traineeData))
             .toList();
       } else {
-        throw Exception('Failed to load assigned trainees');
+        print(
+            'Failed to load assigned trainees, status code: ${response.statusCode}');
+        return []; // Return an empty list or handle the failure more gracefully
       }
     } catch (e) {
       print('Error in getAssignedTrainees: $e');
-      throw Exception('Failed to load assigned trainees');
+      // Return an empty list or you could return null or an error message if needed
+      return [];
     }
   }
 

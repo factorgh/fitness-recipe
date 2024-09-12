@@ -29,6 +29,7 @@ class _TrainerMealDetailScreenState
   bool isFollowing = false;
   final AuthService authService = AuthService();
   User? user;
+  User? trainer;
 
   Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
@@ -138,10 +139,12 @@ class _TrainerMealDetailScreenState
       userId: widget.meal.createdBy,
       onSuccess: (fetchedUser) {
         setState(() {
-          user = fetchedUser;
+          trainer = fetchedUser;
         });
       },
     );
+    print('------------------------User fetched------------------------');
+    print(trainer);
   }
 
   @override
@@ -276,27 +279,35 @@ class _TrainerMealDetailScreenState
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const CircleAvatar(
+                          CircleAvatar(
                             radius: 30,
-                            backgroundImage:
-                                AssetImage('assets/images/pf2.jpg'),
+                            backgroundImage: trainer != null &&
+                                    trainer!.imageUrl != null &&
+                                    trainer!.imageUrl!.isNotEmpty
+                                ? NetworkImage(trainer!.imageUrl!)
+                                : const AssetImage(
+                                    'assets/images/default_profile.png'),
                           ),
+
                           const SizedBox(width: 10),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                user!.fullName,
+                                trainer != null
+                                    ? trainer!.fullName
+                                    : 'Loading...',
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w500),
                               ),
                               Text(
-                                user.username,
+                                trainer != null ? trainer!.username : '',
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w400),
                               ),
                             ],
                           ),
+
                           const Spacer(),
                           // Contact section goes here
                         ],
@@ -408,7 +419,7 @@ class _TrainerMealDetailScreenState
                       Navigator.of(context).pop();
                       await ref
                           .read(savedRecipesProvider.notifier)
-                          .saveRecipe(user.id, widget.meal);
+                          .saveRecipe(user!.id, widget.meal);
                       showSnack(context, 'Recipe has been saved successfully');
                     },
                     splashColor: Colors.purple,

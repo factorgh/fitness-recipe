@@ -104,7 +104,7 @@ class _TraineeProfileScreenState extends ConsumerState<TraineeProfileScreen> {
               const SizedBox(height: 50),
               TrainerCodeWidget(
                 trainerId: trainerId ?? '',
-                trainerName: trainerName ?? 'No trainer available',
+                trainerName: trainerName ?? 'Loading ...',
               ),
             ],
           ),
