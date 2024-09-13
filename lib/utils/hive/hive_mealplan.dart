@@ -1,10 +1,10 @@
 import 'package:hive/hive.dart';
 import 'hive_meal.dart'; // Ensure you have this import
 
-part 'mealplan.g.dart'; // This file will be generated
+part 'hive_mealplan.g.dart'; // This file will be generated
 
 @HiveType(typeId: 1)
-class MealPlan extends HiveObject {
+class HiveMealPlan extends HiveObject {
   @HiveField(0)
   final String? id;
 
@@ -41,7 +41,7 @@ class MealPlan extends HiveObject {
   @HiveField(11)
   bool? isDraft;
 
-  MealPlan({
+  HiveMealPlan({
     this.id,
     required this.name,
     required this.duration,

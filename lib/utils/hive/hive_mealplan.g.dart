@@ -1,29 +1,29 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'mealplan.dart';
+part of 'hive_mealplan.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class MealPlanAdapter extends TypeAdapter<MealPlan> {
+class HiveMealPlanAdapter extends TypeAdapter<HiveMealPlan> {
   @override
   final int typeId = 1;
 
   @override
-  MealPlan read(BinaryReader reader) {
+  HiveMealPlan read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return MealPlan(
+    return HiveMealPlan(
       id: fields[0] as String?,
       name: fields[1] as String,
       duration: fields[2] as String,
       startDate: fields[3] as DateTime?,
       endDate: fields[4] as DateTime?,
       datesArray: (fields[5] as List?)?.cast<DateTime>(),
-      isDraft: fields[11] as bool,
+      isDraft: fields[11] as bool?,
       meals: (fields[6] as List?)?.cast<HiveMeal>(),
       trainees: (fields[7] as List).cast<String>(),
       createdBy: fields[8] as String,
@@ -33,7 +33,7 @@ class MealPlanAdapter extends TypeAdapter<MealPlan> {
   }
 
   @override
-  void write(BinaryWriter writer, MealPlan obj) {
+  void write(BinaryWriter writer, HiveMealPlan obj) {
     writer
       ..writeByte(12)
       ..writeByte(0)
@@ -68,7 +68,7 @@ class MealPlanAdapter extends TypeAdapter<MealPlan> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MealPlanAdapter &&
+      other is HiveMealPlanAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

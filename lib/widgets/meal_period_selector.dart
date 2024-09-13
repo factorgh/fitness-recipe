@@ -15,6 +15,7 @@ class MealPeriodSelector extends ConsumerStatefulWidget {
   final List<Recipe> recipes;
   final void Function(Recurrence) onRecurrenceChanged;
   final void Function()? saveToDraft;
+  final Recurrence? chosenRecurrence;
 
   final List<Meal>? defaultMeals;
   final DateTime? selectedDay;
@@ -30,6 +31,7 @@ class MealPeriodSelector extends ConsumerStatefulWidget {
     this.saveToDraft,
     this.defaultMeals,
     this.selectedDay,
+    this.chosenRecurrence,
     super.key,
   });
 
@@ -517,12 +519,14 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                           ),
                           GestureDetector(
                             onTap: () {
-                              _showSaveDialog();
+                              widget.chosenRecurrence != null
+                                  ? _showRecurrSaveDialog()
+                                  : _showSaveDialog();
                             },
                             child: const Tooltip(
                               message: 'Save', // Tooltip message
                               child: Icon(
-                                Icons.upload,
+                                Icons.save_alt,
                                 color: Colors.blueAccent,
                               ),
                             ),
@@ -548,7 +552,34 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Save Changes'),
-          content: const Text('Save this meal?'),
+          content: const Text('Save meal for the specific date and time?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                widget.saveToDraft?.call(); // Perform the save action
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showRecurrSaveDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Save Changes'),
+          content: const Text('Save meal for selected recurring period?'),
           actions: <Widget>[
             TextButton(
               child: const Text('No'),

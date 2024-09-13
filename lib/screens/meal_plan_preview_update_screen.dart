@@ -111,6 +111,7 @@ class _MealPlanPreviewBottomSheetState
       );
 
       await hiveService.clearMealDraftBox();
+      await hiveService.clearMealPlanDraftBox();
 
       Navigator.pop(context);
       Navigator.pop(context);

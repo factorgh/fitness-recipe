@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 import 'hive_recurrence.dart'; // Ensure you have this import
-import 'mealplan.dart'; // Ensure you have this import
+import 'hive_mealplan.dart'; // Ensure you have this import
 import 'hive_meal.dart'; // Ensure you have this import
 
 class HiveService {
@@ -17,15 +17,17 @@ class HiveService {
   // Box<MealPlan>? _mealPlanBox;
   Box<HiveRecurrence>? _recurrenceBox;
   Box<HiveMeal>? _mealBox;
+  Box<HiveMealPlan>? _mealPlanBox;
 
   Future<void> init() async {
     // _mealPlanBox = await Hive.openBox<MealPlan>('mealPlans');
     _recurrenceBox = await Hive.openBox<HiveRecurrence>('recurrences');
     _mealBox = await Hive.openBox<HiveMeal>('meals');
+    _mealPlanBox = await Hive.openBox<HiveMealPlan>('mealPlan');
   }
 
   // Create or Update MealPlan
-  // Future<void> saveMealPlan(MealPlan mealPlan) async {
+  // Future<void> saveMealPlan(HiveMealPlan mealPlan) async {
   //   try {
   //     print('---------------------------meal plan passed------------');
   //     print(mealPlan.id);
@@ -44,17 +46,16 @@ class HiveService {
   //   return _mealPlanBox?.get(id);
   // }
 
-  // Get all MealPlans
-  // Future<List<MealPlan>> getAllMealPlans() async {
-  //   final box = _mealPlanBox; // Retrieve your Box instance
-  //   if (box == null) {
-  //     return []; // Return an empty list if the box is null
-  //   }
+  Future<List<HiveMealPlan>> getAllMealPlans() async {
+    final box = _mealPlanBox; // Retrieve your Box instance
+    if (box == null) {
+      return []; // Return an empty list if the box is null
+    }
 
-  //   // Asynchronous operation to fetch all values
-  //   final mealPlans = box.values.toList();
-  //   return mealPlans;
-  // }
+    // Asynchronous operation to fetch all values
+    final mealPlans = box.values.toList();
+    return mealPlans;
+  }
 
   // Check if MealPlan box is empty
   // bool isMealPlanBoxEmpty() {
@@ -114,18 +115,18 @@ class HiveService {
   }
 
   // Draft system for meal plan
-  Future<void> saveDraftMealPlan(MealPlan mealPlan) async {
-    final box = await Hive.openBox<MealPlan>('mealPlanDraftBox');
+  Future<void> saveDraftMealPlan(HiveMealPlan mealPlan) async {
+    final box = await Hive.openBox<HiveMealPlan>('mealPlanDraftBox');
     await box.put('draftMealPlan', mealPlan); // Save a draft meal plan
   }
 
-  Future<MealPlan?> getDraftMealPlan() async {
-    final box = await Hive.openBox<MealPlan>('mealPlanDraftBox');
+  Future<HiveMealPlan?> getDraftMealPlan() async {
+    final box = await Hive.openBox<HiveMealPlan>('mealPlanDraftBox');
     return box.get('draftMealPlan');
   }
 
   Future<void> deleteDraftMealPlan() async {
-    final box = await Hive.openBox<MealPlan>('mealPlanDraftBox');
+    final box = await Hive.openBox<HiveMealPlan>('mealPlanDraftBox');
     await box.delete('draftMealPlan');
   }
 
@@ -267,42 +268,109 @@ class HiveService {
   // Edit meals for date
   Future<void> updateMealForDate(DateTime startDate, DateTime endDate,
       DateTime date, HiveMeal updatedMeal, BuildContext context) async {
-    print(
-        '-----------------------Data check for updating meal----------------------');
-    print('---------${updatedMeal.recurrence}-----------');
-
     final box = await Hive.openBox<HiveMeal>('mealDraftBox');
 
-    // If recurrence is not null, show confirmation dialog
+    print('--------------------------Updated Meal------------------------');
+    print(updatedMeal);
+
+    // Check if recurrence is present
     if (updatedMeal.recurrence != null) {
-      bool confirmOverride = await showConfirmationDialog(
+      bool saveForAll = await showConfirmationDialog(
         context: context,
-        title: 'Confirm Override',
-        message:
-            'Do you want to override the "${updatedMeal.mealType}" meal at '
-            '${updatedMeal.timeOfDay} for all recurring days?',
+        title: 'Save for Recurring Dates?',
+        message: 'Do you want to save the meal for all recurring dates?',
       );
 
-      if (confirmOverride) {
-        // If confirmed, update meals according to recurrence
-        await updateRecurringMealsInDraft(
-          meal: updatedMeal,
-          date: date,
-          updateOption: 'future',
-          startDate: startDate,
-          endDate: endDate,
-        );
-      } else {
-        // If not confirmed, update only the specified date
-        final updatedMealWithDate = updatedMeal.copyWith(date: date);
+      if (saveForAll) {
+        // Generate recurrence dates before filtering
+        List<DateTime> recurrenceDates =
+            generateRecurringDates(updatedMeal.recurrence!, startDate, endDate);
 
-        await box.put('${date.toIso8601String()}_${updatedMeal.mealType}',
-            updatedMealWithDate);
+        // Filter to only include future dates after the selected date
+        recurrenceDates = recurrenceDates
+            .where((recurrenceDate) => recurrenceDate.isAfter(date))
+            .toList();
+
+        print(
+            '----------------------------Filtered Recurrence Dates-------------');
+        print(recurrenceDates);
+
+        bool overrideAll = false;
+        bool skipAll = false;
+
+        for (final recurrenceDate in recurrenceDates) {
+          if (overrideAll) {
+            // Override all remaining dates
+            final updatedMealWithDate =
+                updatedMeal.copyWith(date: recurrenceDate);
+            await box.put(
+                '${recurrenceDate.toIso8601String()}_${updatedMeal.mealType}',
+                updatedMealWithDate);
+            continue;
+          }
+
+          if (skipAll) {
+            // Skip all remaining dates
+            break;
+          }
+
+          final existingMeal = box.get(
+              '${recurrenceDate.toIso8601String()}_${updatedMeal.mealType}');
+
+          if (existingMeal != null &&
+              existingMeal.timeOfDay == updatedMeal.timeOfDay) {
+            // Ask user for each date if they want to override, skip, etc.
+            String? option = await showOverrideOptionsDialog(
+              context: context,
+              date: recurrenceDate,
+              mealType: updatedMeal.mealType,
+              timeOfDay: updatedMeal.timeOfDay,
+            );
+
+            if (option == 'override') {
+              final updatedMealWithDate =
+                  updatedMeal.copyWith(date: recurrenceDate);
+              await box.put(
+                  '${recurrenceDate.toIso8601String()}_${updatedMeal.mealType}',
+                  updatedMealWithDate);
+            } else if (option == 'override all') {
+              // Set flag to override all remaining dates
+              overrideAll = true;
+              final updatedMealWithDate =
+                  updatedMeal.copyWith(date: recurrenceDate);
+              await box.put(
+                  '${recurrenceDate.toIso8601String()}_${updatedMeal.mealType}',
+                  updatedMealWithDate);
+            } else if (option == 'skip all') {
+              // Set flag to skip all remaining dates
+              skipAll = true;
+            }
+            // If user selects 'skip', we simply move to the next date
+          } else {
+            // If no existing meal, save new meal for this date
+            final updatedMealWithDate =
+                updatedMeal.copyWith(date: recurrenceDate);
+            await box.put(
+                '${recurrenceDate.toIso8601String()}_${updatedMeal.mealType}',
+                updatedMealWithDate);
+          }
+        }
+      } else {
+        // Ask if they want to save for the current date only
+        bool saveForCurrent = await showConfirmationDialog(
+          context: context,
+          title: 'Save for Current Date?',
+          message: 'Do you want to save the meal only for the current date?',
+        );
+        if (saveForCurrent) {
+          final updatedMealWithDate = updatedMeal.copyWith(date: date);
+          await box.put('${date.toIso8601String()}_${updatedMeal.mealType}',
+              updatedMealWithDate);
+        }
       }
     } else {
-      // If no recurrence, just update for the specific date
+      // No recurrence, update the meal for the current date only
       final updatedMealWithDate = updatedMeal.copyWith(date: date);
-
       await box.put('${date.toIso8601String()}_${updatedMeal.mealType}',
           updatedMealWithDate);
     }
@@ -315,7 +383,7 @@ class HiveService {
   }
 
   // Sync meal to database
-  Future<void> syncMealsToMongoDB(MealPlan mealPlan) async {
+  Future<void> syncMealsToMongoDB(HiveMealPlan mealPlan) async {
     final box = await Hive.openBox<HiveMeal>('mealDraftBox');
     List<HiveMeal> finalMeals = [];
 
@@ -364,6 +432,17 @@ class HiveService {
   Future<void> clearMealDraftBox() async {
     // Open the Hive box
     var box = await Hive.openBox<HiveMeal>('mealDraftBox');
+
+    // Clear the box
+    await box.clear();
+
+    // Close the box
+    await box.close();
+  }
+
+  Future<void> clearMealPlanDraftBox() async {
+    // Open the Hive box
+    var box = await Hive.openBox<HiveMeal>('mealPlanDraftBox');
 
     // Clear the box
     await box.clear();
@@ -517,4 +596,42 @@ Future<bool> showConfirmationDialog({
         },
       ) ??
       false;
+}
+
+Future<String?> showOverrideOptionsDialog({
+  required BuildContext context,
+  required DateTime date,
+  required String mealType,
+  required String timeOfDay,
+}) async {
+  return showDialog<String>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Override Meal for $mealType on ${date.toLocal()}?'),
+        content: Text(
+          'There is already a "$mealType" meal at $timeOfDay on ${date.toLocal().toString().split(' ')[0]}.\n'
+          'Would you like to override it or skip this date?',
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'skip'),
+            child: const Text('Skip this date'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'override'),
+            child: const Text('Override this date'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'skip all'),
+            child: const Text('Skip all remaining'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'override all'),
+            child: const Text('Override all remaining'),
+          ),
+        ],
+      );
+    },
+  );
 }

@@ -17,6 +17,7 @@ import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/conversions/hive_conversions.dart';
 import 'package:voltican_fitness/utils/hive/hive_class.dart';
 import 'package:voltican_fitness/utils/hive/hive_meal.dart';
+import 'package:voltican_fitness/utils/hive/hive_mealplan.dart';
 import 'package:voltican_fitness/utils/hive/hive_recurrence.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
@@ -69,8 +70,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
       print("Allocated Time: ${meal.timeOfDay}");
       print('Alloacted recurrences: ${meal.recurrence}');
       print("Recipes:");
-
-
     }
 
     setState(() {
@@ -78,8 +77,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
       _selectedRecipeAllocations.addAll(selectedAllocations);
       chosenRecurrence = null;
     });
-
-
 
     print(
       '------------------allocations------------------$_selectedRecipeAllocations',
@@ -124,6 +121,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
     // Initialize HiveService outside of initState
     _initializeHiveService();
+    setDraftMealPlan();
   }
 
   Future<void> _initializeHiveService() async {
@@ -371,7 +369,74 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 //     }).toList();
 //   }
 
-// Handle Save to the draft
+// Handle Save  meal plan to the draft
+  Future<void> _saveMealPlanToDraft() async {
+    final HiveService hiveService = HiveService();
+
+    // Create the meal plan object
+
+    final HiveMealPlan newPlan = HiveMealPlan(
+      name: _mealPlanNameController.text,
+      duration: _selectedDuration,
+      startDate: _startDate,
+      endDate: _endDate,
+      meals: [],
+      trainees: _selectedTrainees.map((trainee) => trainee.id).toList(),
+      createdBy: ref.read(userProvider)!.id,
+      isDraft: true,
+    );
+    await hiveService.saveDraftMealPlan(newPlan);
+  }
+
+  // Handle get draft meal plan
+  Future<HiveMealPlan?> _getDraftMealPlan() async {
+    final hiveService = HiveService();
+    return await hiveService.getDraftMealPlan();
+  }
+
+  //Get all trainees following trainer
+
+  void setDraftMealPlan() async {
+    await getTraineesFollowingTrainer();
+    // Get meal plan from draft'
+    final mealPlan = await _getDraftMealPlan();
+    // Prepopulate the draft data
+    if (mealPlan == null) {
+      print('No draft meal plan found');
+      return;
+    }
+    setState(() {
+      _mealPlanNameController.text = mealPlan.name;
+      _selectedDuration = mealPlan.duration;
+      _startDate = mealPlan.startDate;
+      _endDate = mealPlan.endDate;
+      List<User> selectedTrainees = [];
+
+      print(
+          '------------------------MealPlan trainees------------------------${mealPlan.trainees}');
+      for (String id in mealPlan.trainees) {
+        // Find the corresponding user
+        List<User> matchedUsers =
+            _allTrainees.where((trainee) => trainee.id == id).toList();
+
+        // Only add if a matching user is found
+        if (matchedUsers.isNotEmpty) {
+          selectedTrainees.add(matchedUsers.first);
+        }
+      }
+
+      if (selectedTrainees.isEmpty) {
+        print('Warning: No matching trainees found');
+      }
+      print(
+          '-------------------selected trainees-------------------$selectedTrainees');
+      _selectedTrainees.addAll(selectedTrainees);
+
+      newDay = _startDate;
+    });
+
+    // Prepopulate the data on initial render
+  }
 
   void handleSaveToDraft() async {
     final hiveService = HiveService();
@@ -445,8 +510,9 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     }).toList();
   }
 
-  void _moveToNextDay() {
+  void _moveToNextDay() async {
     if (newDay == null) return;
+    final HiveService hiveService = HiveService();
 
     final nextDay = newDay!.add(const Duration(days: 1));
 
@@ -456,12 +522,19 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
       return;
     }
 
+    final meals = await hiveService.fetchMealsForDate(nextDay);
+
+    print('----------------------mealsByDate--------------------');
+    print(meals);
+
+    // Convert Hive meals to normal meals if there are any, or assign an empty list of type Meal
+    final selectMeals =
+        meals.isNotEmpty ? convertHiveMealsToMeals(meals) : <Meal>[];
+
     setState(() {
       newDay = nextDay;
+      startMeals = selectMeals;
     });
-
-    // Refresh the UI
-    setState(() {});
   }
 
   @override
@@ -479,6 +552,11 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
           //       final hiveService = HiveService();
           //       final fetchMeals = await hiveService.fetchAllMeals();
           //       print('--------------all-------$fetchMeals');
+
+          //       // check draft meal plan
+          //       final HiveMealPlan? draftMealPlan = await _getDraftMealPlan();
+          //       print('-----------------------all meal plans--------------');
+          //       print(draftMealPlan);
 
           //       // check hive box state
           //       final hiveState = hiveService.isMealBoxEmpty();
@@ -499,6 +577,49 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
           //       }
           //     },
           //     icon: const Icon(Icons.add)),
+          IconButton(
+            onPressed: () async {
+              bool confirmSave = await showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text(
+                      'Save Meal Plan',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    content: const Text('Do you want to save your meal plan?'),
+                    actions: <Widget>[
+                      TextButton(
+                        child: const Text('Cancel'),
+                        onPressed: () {
+                          Navigator.of(context)
+                              .pop(false); // Close the dialog without saving
+                        },
+                      ),
+                      TextButton(
+                        child: const Text('Confirm'),
+                        onPressed: () {
+                          Navigator.of(context).pop(true); // Confirm saving
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              if (confirmSave == true) {
+                await _saveMealPlanToDraft(); // Adjust this with your save method
+                print('------------------------Meal Plan Saved-------------');
+
+                // Refresh the UI after saving
+                setState(() {});
+              }
+            },
+            icon: const Icon(
+              Icons.save_alt,
+              color: Colors.blue,
+            ), // Save icon
+          ),
           IconButton(
             onPressed: () async {
               bool confirmClear = await showDialog(
@@ -540,7 +661,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                 setState(() {});
               }
             },
-            icon: const Icon(Icons.delete),
+            icon: const Icon(Icons.remove_circle),
           )
         ],
       ),
@@ -786,6 +907,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
               const SizedBox(height: 20),
               newDay != null
                   ? MealPeriodSelector(
+                      chosenRecurrence: chosenRecurrence,
                       startDate: _startDate!,
                       endDate: _endDate!,
                       selectedDay: newDay,
@@ -837,8 +959,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white),
                 onPressed: () async {
-                  // createPlan();
-
                   ///Delay for sometime then after show bottom  sheet with meal plan preview
                   Future.delayed(
                     const Duration(milliseconds: 3000),
