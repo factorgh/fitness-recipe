@@ -145,7 +145,8 @@ class HiveService {
 
         case 'weekly':
         case 'bi_weekly':
-          for (int day in recurrence.customDays!) {
+        case 'custom_weekly':
+          for (int day in recurrence.customDays ?? []) {
             DateTime customDate = currentDate.add(
               Duration(days: (day - currentDate.weekday + 7) % 7),
             );
@@ -161,22 +162,8 @@ class HiveService {
           );
           break;
 
-        case 'custom_weekly':
-          for (int customDay in recurrence.customDays!) {
-            DateTime customDate = currentDate.add(
-              Duration(days: (customDay - currentDate.weekday + 7) % 7),
-            );
-            if (customDate.isBefore(endDate) ||
-                customDate.isAtSameMomentAs(endDate)) {
-              recurringDates.add(customDate);
-            }
-          }
-          currentDate =
-              currentDate.add(const Duration(days: 7)); // Move to the next week
-          break;
-
         case 'monthly':
-          for (int customDay in recurrence.customDays!) {
+          for (int customDay in recurrence.customDays ?? []) {
             DateTime tempDate = currentDate;
             while (tempDate.month == currentDate.month) {
               if ((tempDate.weekday == customDay) &&
@@ -193,10 +180,23 @@ class HiveService {
       }
     }
 
-    // Add endDate if it fits the recurrence pattern
-    if (currentDate.isAtSameMomentAs(endDate)) {
-      recurringDates.add(endDate);
+    // Add custom dates if they exist
+    if (recurrence.customDates != null) {
+      for (var customDate in recurrence.customDates!) {
+        if (customDate.isAfter(startDate) && customDate.isBefore(endDate)) {
+          recurringDates.add(customDate);
+        }
+      }
     }
+
+    // Remove any dates that are in the exceptions list
+    if (recurrence.exceptions != null) {
+      recurringDates
+          .removeWhere((date) => recurrence.exceptions!.contains(date));
+    }
+
+    // Ensure no duplicates (in case custom dates and generated dates overlap)
+    recurringDates = recurringDates.toSet().toList();
 
     return recurringDates;
   }

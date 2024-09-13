@@ -208,8 +208,9 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
             .where((entry) => entry.value)
             .map((entry) => entry.key + 1)
             .toList();
-        recurrenceData['customDates'] =
-            _selectedMonthlyDates.map((d) => d.toIso8601String()).toList();
+        recurrenceData['customDates'] = _selectedMonthlyDates
+            .map((d) => d.toUtc().toIso8601String()) // Convert to UTC with "Z"
+            .toList();
         break;
       case 'Bi-Weekly':
         recurrenceData['option'] = 'bi_weekly';
@@ -219,13 +220,15 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
             .where((entry) => entry.value)
             .map((entry) => entry.key + 1)
             .toList();
-        recurrenceData['customDates'] =
-            _selectedMonthlyDates.map((d) => d.toIso8601String()).toList();
+        recurrenceData['customDates'] = _selectedMonthlyDates
+            .map((d) => d.toUtc().toIso8601String()) // Convert to UTC with "Z"
+            .toList();
         break;
       case 'Monthly':
         recurrenceData['option'] = 'monthly';
-        recurrenceData['customDates'] =
-            _selectedMonthlyDates.map((d) => d.toIso8601String()).toList();
+        recurrenceData['customDates'] = _selectedMonthlyDates
+            .map((d) => d.toUtc().toIso8601String()) // Convert to UTC with "Z"
+            .toList();
         recurrenceData['customDays'] = _daysOfWeekSelected
             .asMap()
             .entries
@@ -241,15 +244,18 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
             .where((entry) => entry.value)
             .map((entry) => entry.key + 1)
             .toList();
-        recurrenceData['customDates'] =
-            _selectedMonthlyDates.map((d) => d.toIso8601String()).toList();
+        recurrenceData['customDates'] = _selectedMonthlyDates
+            .map((d) => d.toUtc().toIso8601String()) // Convert to UTC with "Z"
+            .toList();
         break;
     }
 
     // Add exceptions if present
     if (_exceptions.isNotEmpty) {
-      recurrenceData['exceptions'] =
-          _exceptions.map((date) => date.toIso8601String()).toList();
+      recurrenceData['exceptions'] = _exceptions
+          .map((date) =>
+              date.toUtc().toIso8601String()) // Ensure exceptions also have "Z"
+          .toList();
     }
 
     // Save and return recurrence data

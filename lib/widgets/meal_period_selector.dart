@@ -548,16 +548,16 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Save Changes'),
-          content: const Text('Do you want to save for the current date?'),
+          content: const Text('Save this meal?'),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text('No'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text('Save'),
+              child: const Text('Yes'),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
                 widget.saveToDraft?.call(); // Perform the save action

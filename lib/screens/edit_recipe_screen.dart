@@ -59,6 +59,12 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
     }
     selectedMealPeriod = widget.recipe.period;
     status = widget.recipe.status;
+
+    isPrivate = (status == 'private');
+    setState(() {});
+    print('---------------------recipe status--------------');
+    print(isPrivate);
+    print(widget.recipe.status);
   }
 
   Future<void> _takePicture() async {

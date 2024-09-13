@@ -69,12 +69,17 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
       print("Allocated Time: ${meal.timeOfDay}");
       print('Alloacted recurrences: ${meal.recurrence}');
       print("Recipes:");
+
+
     }
 
     setState(() {
       _selectedRecipeAllocations.clear();
       _selectedRecipeAllocations.addAll(selectedAllocations);
+      chosenRecurrence = null;
     });
+
+
 
     print(
       '------------------allocations------------------$_selectedRecipeAllocations',
@@ -532,6 +537,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     '------------------------Meal Draft box cleared-------------');
 
                 // Refresh the ui
+                setState(() {});
               }
             },
             icon: const Icon(Icons.delete),
