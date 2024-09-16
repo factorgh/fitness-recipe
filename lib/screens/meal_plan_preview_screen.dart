@@ -120,7 +120,6 @@ class _MealPlanPreviewBottomSheetState
       await mealPlanService.createMealPlan(newMealPlan, context);
 
       await hiveService.clearMealDraftBox();
-      await hiveService.clearMealPlanDraftBox();
 
       // Navigate back to the meal plan list
       Navigator.pop(context);

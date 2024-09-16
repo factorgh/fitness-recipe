@@ -616,7 +616,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
               }
             },
             icon: const Icon(
-              Icons.save_alt,
+              Icons.save,
               color: Colors.blue,
             ), // Save icon
           ),
@@ -974,6 +974,11 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                         _selectedTrainees.map((trainee) => trainee.id).toList(),
                     createdBy: ref.read(userProvider)!.id,
                   );
+
+                  // Clear meal plan from draft
+                  print('--------------Clear Meal plan draft --------------');
+                  await HiveService().clearMealPlanDraftBox();
+
                   showMealPlanPreviewBottomSheet(context, mealPlan);
                 },
                 child: _isLoading

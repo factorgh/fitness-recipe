@@ -526,7 +526,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                             child: const Tooltip(
                               message: 'Save', // Tooltip message
                               child: Icon(
-                                Icons.save_alt,
+                                Icons.save,
                                 color: Colors.blueAccent,
                               ),
                             ),

@@ -115,7 +115,6 @@ class _MealPlanPreviewBottomSheetState
 
       Navigator.pop(context);
       Navigator.pop(context);
-      Navigator.pop(context);
     } catch (e) {
       print("Error creating meal plan: $e");
     } finally {

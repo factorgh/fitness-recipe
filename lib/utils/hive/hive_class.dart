@@ -442,7 +442,8 @@ class HiveService {
 
   Future<void> clearMealPlanDraftBox() async {
     // Open the Hive box
-    var box = await Hive.openBox<HiveMeal>('mealPlanDraftBox');
+    var box = await Hive.openBox<HiveMealPlan>('mealPlanDraftBox');
+    print(box.values.toList());
 
     // Clear the box
     await box.clear();
