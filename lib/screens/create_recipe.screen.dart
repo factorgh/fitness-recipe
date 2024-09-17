@@ -133,7 +133,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
       appBar: AppBar(
         title: const Text(
           'Create A New Recipe',
-          style: TextStyle(fontWeight: FontWeight.w500),
+          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25),
         ),
         centerTitle: true,
         leading: IconButton(

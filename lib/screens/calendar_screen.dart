@@ -92,7 +92,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 const Text(
                   'Good Morning ',
                   style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 25,
                       fontWeight: FontWeight.w500,
                       color: Colors.black),
                 ),

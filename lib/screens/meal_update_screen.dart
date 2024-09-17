@@ -44,7 +44,7 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
   Recurrence? chosenRecurrence;
 
   List<Meal> _selectedRecipeAllocations = [];
-  List<Meal> _draftMeals = [];
+  final List<Meal> _draftMeals = [];
   List<Meal> startMeals = [];
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _mealPlanNameController = TextEditingController();

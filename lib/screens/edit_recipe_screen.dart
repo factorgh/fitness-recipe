@@ -250,7 +250,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Recipe',
-            style: TextStyle(fontWeight: FontWeight.w500)),
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25)),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.close),

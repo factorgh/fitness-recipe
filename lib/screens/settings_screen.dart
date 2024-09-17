@@ -39,12 +39,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         centerTitle: true,
         title: const Text(
           'Settings',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
         ),
       ),
       body: SafeArea(
         child: Container(
-          margin: const EdgeInsets.only(top: 20),
+          margin: const EdgeInsets.only(top: 15),
           child: ListView(
             padding: const EdgeInsets.all(16.0),
             children: <Widget>[
@@ -134,7 +134,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 15),
-            backgroundColor: Colors.red, // Background color
+            backgroundColor: Colors.redAccent, // Background color
             foregroundColor: Colors.white, // Text color
           ),
           onPressed: _logout,

@@ -145,10 +145,10 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                   border: Border.all(color: Colors.white, width: 2),
                 ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -166,7 +166,11 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                               ),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
                                   Text(
                                     'Hello, ${user?.username ?? ''}',
                                     style: const TextStyle(

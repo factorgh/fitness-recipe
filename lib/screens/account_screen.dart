@@ -118,7 +118,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                 });
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: Colors.redAccent,
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 textStyle:
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -132,7 +132,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                       style: TextStyle(color: Colors.white),
                     ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
                 // Show confirmation dialog before deleting
@@ -173,7 +173,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: Colors.redAccent,
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 textStyle:
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

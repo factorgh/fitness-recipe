@@ -94,7 +94,7 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
         leading: const SizedBox(),
         title: const Text(
           'Trainees & Trainers',
-          style: TextStyle(fontWeight: FontWeight.w500),
+          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25),
         ),
         centerTitle: true,
       ),
@@ -102,8 +102,8 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
         children: [
           TabBar(
             controller: tabController,
-            indicatorColor: Colors.red,
-            labelColor: Colors.red,
+            indicatorColor: Colors.redAccent,
+            labelColor: Colors.redAccent,
             unselectedLabelColor: Colors.black,
             tabs: const [
               Tab(text: 'Trainees'),

@@ -17,7 +17,10 @@ class _GeneralScreenState extends State<GeneralScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('General Settings'),
+        title: const Text(
+          'General Settings',
+          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25),
+        ),
         centerTitle: true,
       ),
       body: Padding(

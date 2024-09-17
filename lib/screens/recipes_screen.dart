@@ -140,7 +140,7 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
             children: [
               const Text(
                 "Recipes",
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
               ),
               Row(
                 children: [

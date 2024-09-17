@@ -82,7 +82,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text('Profile',
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25)),
         centerTitle: true,
       ),
       body: Padding(
@@ -141,7 +142,7 @@ class __ProfileHeaderState extends State<_ProfileHeader> {
               onTap: widget.onEdit,
               child: const CircleAvatar(
                 radius: 20,
-                backgroundColor: Colors.blue,
+                backgroundColor: Colors.redAccent,
                 child: Icon(Icons.edit, color: Colors.white, size: 20),
               ),
             ),
@@ -196,18 +197,24 @@ class _InfoField extends StatelessWidget {
 class _EditProfileButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const UpdateProfileScreen(),
-        ));
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => const UpdateProfileScreen(),
+          ));
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.redAccent,
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        child: const Text(
+          'Update Profile',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
-      child: const Text('Update Profile'),
     );
   }
 }

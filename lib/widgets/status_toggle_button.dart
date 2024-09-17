@@ -8,11 +8,11 @@ class StatusToggleButton extends StatefulWidget {
 }
 
 class _StatusToggleButtonState extends State<StatusToggleButton> {
-  bool isPublic = true; // Default state is public
+  bool isPublic = true;
 
   void _toggleButton() {
     setState(() {
-      isPublic = !isPublic; // Toggle the state
+      isPublic = !isPublic;
     });
   }
 
