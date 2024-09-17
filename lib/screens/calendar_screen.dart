@@ -92,7 +92,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 const Text(
                   'Good Morning ',
                   style: TextStyle(
-                      fontSize: 25,
+                      fontSize: 20,
                       fontWeight: FontWeight.w500,
                       color: Colors.black),
                 ),
@@ -105,12 +105,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     },
                     child: const Text(
                       'Add Meal Plan',
-                      style: TextStyle(fontSize: 12),
+                      style: TextStyle(fontSize: 12, color: Colors.redAccent),
                     )),
                 const SizedBox(width: 5),
               ],
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             TableCalendar(
               firstDay: DateTime.utc(2001, 7, 20),
               focusedDay: focusedDay,
@@ -149,7 +149,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     "View all Plans",
                     style: TextStyle(
                         fontSize: 16,
-                        color: Colors.blue,
+                        color: Colors.redAccent,
                         fontWeight: FontWeight.w500),
                   ),
                 ),

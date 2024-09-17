@@ -105,8 +105,17 @@ class _SearchScreenState extends State<SearchScreen> {
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold),
                                       ),
-                                      Text(
-                                          'Rating: ${recipe.averageRating.toStringAsFixed(1)}')
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                            size: 12,
+                                          ),
+                                          Text(
+                                              ' ${recipe.averageRating.toStringAsFixed(1)}'),
+                                        ],
+                                      )
                                     ],
                                   ),
                                 ],

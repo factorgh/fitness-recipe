@@ -48,7 +48,10 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
           leading: const SizedBox(),
           title: const Text(
             'Trainees & Trainers',
-            style: TextStyle(fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           centerTitle: true,
         ),

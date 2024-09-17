@@ -270,11 +270,11 @@ class _TraineeRecipeDetailScreenState
                   const SizedBox(height: 40),
                   const Text(
                     'Description',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                   Text(
                     widget.meal.description,
-                    style: const TextStyle(color: Colors.black54),
+                    style: const TextStyle(color: Colors.black54, fontSize: 12),
                   ),
                   const SizedBox(height: 20),
                   Container(
@@ -297,7 +297,7 @@ class _TraineeRecipeDetailScreenState
                       Text(
                         'Ingredients',
                         style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
+                            fontSize: 15, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -310,19 +310,12 @@ class _TraineeRecipeDetailScreenState
                         children: widget.meal.ingredients.map((ingredient) {
                           return Row(
                             children: [
-                              const Icon(
-                                Icons.check_circle_outline,
-                                color: Colors.green,
-                                size: 15,
-                              ),
                               const SizedBox(width: 8.0),
-                              Expanded(
-                                child: Text(
-                                  ingredient,
-                                  style: const TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                              Text(
+                                ingredient,
+                                style: const TextStyle(
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
                             ],
@@ -343,13 +336,14 @@ class _TraineeRecipeDetailScreenState
                       Text(
                         'Instructions',
                         style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
+                            fontSize: 15, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Text(
                     widget.meal.instructions,
+                    style: const TextStyle(fontSize: 12),
                   ),
                   // Nutritional facts
                   const SizedBox(height: 30),
@@ -363,12 +357,13 @@ class _TraineeRecipeDetailScreenState
                       SizedBox(width: 5),
                       Text('Nutritional Facts',
                           style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w500)),
+                              fontSize: 15, fontWeight: FontWeight.w600)),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Text(
                     widget.meal.facts,
+                    style: const TextStyle(fontSize: 12),
                   ),
                   const SizedBox(height: 30),
                   Reusablebutton(

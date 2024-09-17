@@ -15,7 +15,6 @@ import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
-import 'package:voltican_fitness/widgets/button.dart';
 import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class SavedTrainerMealDetailScreen extends ConsumerStatefulWidget {
@@ -227,7 +226,7 @@ class _TrainerMealDetailScreenState
                       CapitalizeFirstLetter(
                         text: widget.meal.title,
                         style: const TextStyle(
-                          fontSize: 25,
+                          fontSize: 20,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -283,7 +282,9 @@ class _TrainerMealDetailScreenState
                               children: [
                                 const Text(
                                   "Recipe by",
-                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600),
                                 ),
                                 const SizedBox(height: 5),
                                 Row(
@@ -321,11 +322,11 @@ class _TrainerMealDetailScreenState
                   const SizedBox(height: 30),
                   const Text(
                     'Description',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                   Text(
                     widget.meal.description,
-                    style: const TextStyle(color: Colors.black54),
+                    style: const TextStyle(color: Colors.black54, fontSize: 12),
                   ),
                   const SizedBox(height: 20),
                   Container(
@@ -344,11 +345,11 @@ class _TrainerMealDetailScreenState
                         size: 20,
                         color: Colors.orange,
                       ),
-                      SizedBox(width: 5),
+                      SizedBox(width: 10),
                       Text(
                         'Ingredients',
                         style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
+                            fontSize: 15, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -361,19 +362,12 @@ class _TrainerMealDetailScreenState
                         children: widget.meal.ingredients.map((ingredient) {
                           return Row(
                             children: [
-                              const Icon(
-                                Icons.check_circle_outline,
-                                color: Colors.green,
-                                size: 15,
-                              ),
                               const SizedBox(width: 8.0),
-                              Expanded(
-                                child: Text(
-                                  ingredient,
-                                  style: const TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                              Text(
+                                ingredient,
+                                style: const TextStyle(
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
                             ],
@@ -394,13 +388,17 @@ class _TrainerMealDetailScreenState
                       Text(
                         'Instructions',
                         style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
+                            fontSize: 15, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    widget.meal.instructions,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      widget.meal.instructions,
+                      style: const TextStyle(fontSize: 12),
+                    ),
                   ),
                   // Nutritional facts
                   const SizedBox(height: 30),
@@ -412,9 +410,11 @@ class _TrainerMealDetailScreenState
                         color: Colors.orange,
                       ),
                       SizedBox(width: 5),
-                      Text('Nutritional Facts',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w500)),
+                      Text(
+                        'Nutritional Facts',
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w600),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -423,20 +423,15 @@ class _TrainerMealDetailScreenState
                   ),
                   const SizedBox(height: 10),
                   user!.role == "1"
-                      ? InkWell(
-                          onTap: () {
+                      ? Reusablebutton(
+                          text: "Edit",
+                          onPressed: () {
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) =>
                                     EditRecipeScreen(recipe: widget.meal)));
-                          },
-                          splashColor: Colors.purple,
-                          child: const ButtonWidget(
-                              backColor: Colors.redAccent,
-                              text: 'Edit',
-                              textColor: Colors.white),
-                        )
+                          })
                       : const SizedBox(),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 5),
 
                   Reusablebutton(
                       text: "Remove",

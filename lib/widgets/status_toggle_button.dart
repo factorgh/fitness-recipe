@@ -40,7 +40,7 @@ class _StatusToggleButtonState extends State<StatusToggleButton> {
             child: Text(
               isPublic ? 'Make Information Private' : 'Make Information Public',
               style: TextStyle(
-                color: isPublic ? Colors.blue : Colors.red,
+                color: isPublic ? Colors.blue : Colors.redAccent,
                 fontSize: 16,
               ),
             ),

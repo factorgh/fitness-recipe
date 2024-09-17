@@ -482,8 +482,8 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : CustomButton(
                     textColor: Colors.white,
-                    size: 20,
-                    backColor: Colors.red,
+                    size: 15,
+                    backColor: Colors.redAccent,
                     width: double.infinity,
                     text: widget.recipe.id != null
                         ? 'Save Recipe'

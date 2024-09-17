@@ -110,7 +110,7 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
                     children: [
                       Container(
                         height: 30,
-                        width: 150,
+                        width: 50,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
@@ -121,11 +121,12 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
                               const SizedBox(width: 5),
                               const Icon(
                                 Icons.star,
-                                size: 20,
+                                size: 15,
                                 color: Colors.amber,
                               ),
+                              const SizedBox(width: 5),
                               Text(
-                                '${recipe.averageRating.toStringAsFixed(1)} (1k+ Reviews)',
+                                '${recipe.averageRating.toStringAsFixed(1)} ',
                                 style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 12,
@@ -137,18 +138,6 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
                         ),
                       ),
                       const SizedBox(width: 120),
-                      // Add Favorite Icon
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.favorite_border_outlined,
-                              color: Colors.black12, size: 20),
-                        ),
-                      ),
                     ],
                   ),
                 ],

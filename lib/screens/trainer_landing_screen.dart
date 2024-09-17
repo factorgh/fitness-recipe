@@ -237,20 +237,15 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
               const SizedBox(
                 height: 20,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       "Explore All Recipes",
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                    Text(
-                      "See All",
-                      style: TextStyle(
-                          color: Colors.red[600], fontWeight: FontWeight.w500),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -263,21 +258,15 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                 onCategorySelected: handleCategorySelected,
               ),
               // New recipe slider
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       "Popular",
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                    Text(
-                      "See All",
-                      style: TextStyle(
-                          color: Colors.red[800], fontWeight: FontWeight.w500),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -299,7 +288,7 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                     Text(
                       "Top Trainers",
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -308,8 +297,8 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
               SliderTrainerLanding(
                 ids: _topTrainerIds,
                 emails: _topTrainersEmail,
-                recipes: _topTrainers, // Pass the names of top trainers
-                images: _trainerImages, // Pass the list of trainer images
+                recipes: _topTrainers,
+                images: _trainerImages,
                 onTrainerSelected: handleTrainerSelected,
               ),
             ],
