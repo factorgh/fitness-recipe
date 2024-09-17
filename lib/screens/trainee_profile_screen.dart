@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, avoid_print
+// ignore_for_file: use_build_context_synchronously, avoid_print, unnecessary_null_comparison
 
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +9,7 @@ import 'package:voltican_fitness/providers/trainer_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/update_profile_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 import 'package:voltican_fitness/widgets/status_toggle_button.dart';
 import 'package:voltican_fitness/widgets/trainer_code.dart';
 
@@ -84,9 +85,14 @@ class _TraineeProfileScreenState extends ConsumerState<TraineeProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
+
+    final trainerData = ref.watch(followingTrainersProvider(user!.id));
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text(
+          'Profile',
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
+        ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -98,13 +104,25 @@ class _TraineeProfileScreenState extends ConsumerState<TraineeProfileScreen> {
                   imageUrl: user != null ? user.imageUrl : _imageUrl,
                   onEdit: _pickImage),
               const SizedBox(height: 20),
-              _ProfileInfo(user: user!),
+              _ProfileInfo(user: user),
               const SizedBox(height: 20),
               _EditProfileButton(),
               const SizedBox(height: 50),
-              TrainerCodeWidget(
-                trainerId: trainerId ?? '',
-                trainerName: trainerName ?? 'Loading ...',
+              trainerData.when(
+                data: (trainers) {
+                  final trainer = trainers.isNotEmpty ? trainers.first : null;
+                  return TrainerCodeWidget(
+                    trainerId: trainer?.id ?? '',
+                    trainerName: trainer?.fullName ?? 'No trainer found',
+                  );
+                },
+                loading: () => const Center(
+                    child: CircularProgressIndicator(
+                  color: Colors.redAccent,
+                  strokeWidth: 2,
+                )),
+                error: (error, stackTrace) =>
+                    const Text('Error loading trainer data'),
               ),
             ],
           ),
@@ -145,7 +163,7 @@ class __ProfileHeaderState extends State<_ProfileHeader> {
               onTap: widget.onEdit,
               child: const CircleAvatar(
                 radius: 20,
-                backgroundColor: Colors.blue,
+                backgroundColor: Colors.redAccent,
                 child: Icon(Icons.edit, color: Colors.white, size: 20),
               ),
             ),
@@ -201,18 +219,13 @@ class _InfoField extends StatelessWidget {
 class _EditProfileButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
+    return Reusablebutton(
+      text: "Update Profile",
       onPressed: () {
         Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => const UpdateProfileScreen(),
         ));
       },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-      ),
-      child: const Text('Update Profile'),
     );
   }
 }

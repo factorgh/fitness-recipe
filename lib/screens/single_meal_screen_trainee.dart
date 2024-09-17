@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
+import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
 import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:intl/intl.dart';
 
@@ -54,7 +55,7 @@ class SingleMealPlanScreenTrainee extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Meal Details',
-            style: TextStyle(fontWeight: FontWeight.w800)),
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25)),
         centerTitle: true,
       ),
       body: Padding(
@@ -103,10 +104,10 @@ class SingleMealPlanScreenTrainee extends ConsumerWidget {
                 children: [
                   Text(
                     entry.key,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[700],
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -144,19 +145,22 @@ class SingleMealPlanScreenTrainee extends ConsumerWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+        ),
+        SizedBox(
+          width: double.infinity,
+          height: 60,
+          child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: CapitalizeFirstLetter(
+                text: value,
+                style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500),
+              )),
         ),
         const SizedBox(height: 10),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              value,
-              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
       ],
     );
   }

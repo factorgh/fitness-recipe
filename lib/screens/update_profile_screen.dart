@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class UpdateProfileScreen extends ConsumerStatefulWidget {
   const UpdateProfileScreen({super.key});
@@ -106,23 +107,7 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
                 },
               ),
               const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    textStyle: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 15, horizontal: 30),
-                  ),
-                  onPressed: _updateProfile,
-                  child: const Text(
-                    'Update Profile',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
+              Reusablebutton(text: 'Update Profile', onPressed: _updateProfile)
             ],
           ),
         ),

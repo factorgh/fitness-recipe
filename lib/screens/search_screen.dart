@@ -39,7 +39,10 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.category),
+        title: Text(
+          widget.category,
+          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 25),
+        ),
         centerTitle: true,
       ),
       body: SafeArea(

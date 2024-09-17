@@ -12,9 +12,11 @@ import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/button.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class SavedTrainerMealDetailScreen extends ConsumerStatefulWidget {
   const SavedTrainerMealDetailScreen({super.key, required this.meal});
@@ -107,10 +109,11 @@ class _TrainerMealDetailScreenState
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Center(
-              child: Text(
-            'Leave your Review',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
-          )),
+            child: Text(
+              'Leave your Review',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -129,13 +132,8 @@ class _TrainerMealDetailScreenState
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Skip')),
+              child: const Text('Skip'),
             ),
-            const Spacer(),
             TextButton(
               onPressed: () {
                 String comment = commentController.text;
@@ -145,11 +143,7 @@ class _TrainerMealDetailScreenState
                 }
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Post')),
+              child: const Text('Post'),
             ),
           ],
         );
@@ -230,10 +224,10 @@ class _TrainerMealDetailScreenState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        widget.meal.title,
+                      CapitalizeFirstLetter(
+                        text: widget.meal.title,
                         style: const TextStyle(
-                          fontSize: 23,
+                          fontSize: 25,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -254,7 +248,7 @@ class _TrainerMealDetailScreenState
                                 direction: Axis.horizontal,
                                 allowHalfRating: true,
                                 itemCount: 5,
-                                itemSize: 20,
+                                itemSize: 15,
                                 itemPadding:
                                     const EdgeInsets.symmetric(horizontal: 4.0),
                                 itemBuilder: (context, _) => const Icon(
@@ -327,7 +321,7 @@ class _TrainerMealDetailScreenState
                   const SizedBox(height: 30),
                   const Text(
                     'Description',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                   ),
                   Text(
                     widget.meal.description,
@@ -347,39 +341,45 @@ class _TrainerMealDetailScreenState
                     children: [
                       Icon(
                         Icons.no_food_sharp,
-                        size: 25,
+                        size: 20,
                         color: Colors.orange,
                       ),
                       SizedBox(width: 5),
                       Text(
                         'Ingredients',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
+                  const SizedBox(height: 10),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: widget.meal.ingredients.map((ingredient) {
-                        return Row(
-                          children: [
-                            const Icon(
-                              Icons.check_circle_outline,
-                              color: Colors.green,
-                            ),
-                            const SizedBox(width: 12.0),
-                            Expanded(
-                              child: Text(
-                                ingredient,
-                                style: const TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w500,
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: SizedBox(
+                      // Adjust the height based on your needs
+                      child: Column(
+                        children: widget.meal.ingredients.map((ingredient) {
+                          return Row(
+                            children: [
+                              const Icon(
+                                Icons.check_circle_outline,
+                                color: Colors.green,
+                                size: 15,
+                              ),
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Text(
+                                  ingredient,
+                                  style: const TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
+                            ],
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -393,16 +393,14 @@ class _TrainerMealDetailScreenState
                       SizedBox(width: 5),
                       Text(
                         'Instructions',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      widget.meal.instructions,
-                    ),
+                  Text(
+                    widget.meal.instructions,
                   ),
                   // Nutritional facts
                   const SizedBox(height: 30),
@@ -414,17 +412,16 @@ class _TrainerMealDetailScreenState
                         color: Colors.orange,
                       ),
                       SizedBox(width: 5),
-                      Text(
-                        'Nutritional Facts',
-                        style: TextStyle(fontSize: 16),
-                      ),
+                      Text('Nutritional Facts',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w500)),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Text(
                     widget.meal.facts,
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 10),
                   user!.role == "1"
                       ? InkWell(
                           onTap: () {
@@ -434,33 +431,25 @@ class _TrainerMealDetailScreenState
                           },
                           splashColor: Colors.purple,
                           child: const ButtonWidget(
-                              backColor: Colors.red,
+                              backColor: Colors.redAccent,
                               text: 'Edit',
                               textColor: Colors.white),
                         )
                       : const SizedBox(),
                   const SizedBox(height: 10),
-                  InkWell(
-                    onTap: () async {
-                      final user = ref.read(userProvider);
-                      ref
-                          .read(savedRecipesProvider.notifier)
-                          .removeSavedRecipe(user!.id, widget.meal.id!);
 
-                      NativeAlerts().showSuccessAlert(
-                          context, 'Saved recipe removed successfully');
-                      Navigator.of(context).pop();
+                  Reusablebutton(
+                      text: "Remove",
+                      onPressed: () async {
+                        final user = ref.read(userProvider);
+                        ref
+                            .read(savedRecipesProvider.notifier)
+                            .removeSavedRecipe(user!.id, widget.meal.id!);
 
-                      // Navigator.of(context).push(MaterialPageRoute(
-                      //     builder: (context) => const AssignRecipeScreen()));
-                    },
-                    splashColor: Colors.purple,
-                    child: const ButtonWidget(
-                        backColor: Colors.red,
-                        text: 'Remove',
-                        textColor: Colors.white),
-                  ),
-                  const SizedBox(height: 10),
+                        NativeAlerts().showSuccessAlert(
+                            context, 'Saved recipe removed successfully');
+                        Navigator.of(context).pop();
+                      }),
                 ],
               ),
             ),

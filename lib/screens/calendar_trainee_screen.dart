@@ -100,7 +100,7 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
           centerTitle: true,
           title: const Text(
             'Meal Plan Calendar',
-            style: TextStyle(fontWeight: FontWeight.w800),
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25),
           ),
         ),
         body: SafeArea(
@@ -221,7 +221,7 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         color: Colors.black,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],

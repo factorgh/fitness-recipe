@@ -95,7 +95,12 @@ class _RecipeSliderState extends State<RecipeSlider> {
       children: [
         CachedNetworkImage(
           imageUrl: recipe['imageUrl']!,
-          placeholder: (context, url) => const CircularProgressIndicator(),
+          placeholder: (context, url) => const Center(
+            child: CircularProgressIndicator(
+              color: Colors.redAccent,
+              strokeWidth: 2,
+            ),
+          ),
           errorWidget: (context, url, error) => const Icon(Icons.error),
           width: double.infinity,
           height: double.infinity,

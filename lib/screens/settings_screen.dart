@@ -12,6 +12,7 @@ import 'package:voltican_fitness/screens/login_screen.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/screens/profile_screen.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -129,16 +130,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _buildLogoutButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            backgroundColor: Colors.redAccent, // Background color
-            foregroundColor: Colors.white, // Text color
-          ),
-          onPressed: _logout,
-          child: const Text('Logout')),
-    );
+    return Reusablebutton(text: "Logout", onPressed: _logout);
   }
 }
