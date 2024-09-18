@@ -16,6 +16,7 @@ import 'package:voltican_fitness/utils/hive/hive_class.dart';
 
 import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 void showMealPlanPreviewBottomSheet(
     BuildContext context, MealPlan mealplan) async {
@@ -89,14 +90,21 @@ class _MealPlanPreviewBottomSheetState
       if (user == null) {
         print('User is null. Cannot create a meal plan.');
         // Show an error dialog or navigate back
+        // Optionally use a SnackBar or Dialog to inform the user
+        showErrorDialog(
+            'User not logged in. Please log in to create a meal plan.');
         return;
       }
 
       // Check if widget.mealPlan is null or has any required fields missing
       final mealPlan = widget.mealPlan;
-      if (mealPlan.startDate == null || mealPlan.endDate == null) {
+      if (mealPlan.startDate == null ||
+          mealPlan.endDate == null ||
+          mealPlan.trainees.isEmpty ||
+          transMeal.isEmpty) {
         print('Meal plan properties are missing or null.');
         // Show an error dialog or navigate back
+        showErrorDialog('Meal plan details are incomplete.');
         return;
       }
 
@@ -119,12 +127,11 @@ class _MealPlanPreviewBottomSheetState
       // Save the meal plan to the database
       await mealPlanService.createMealPlan(newMealPlan, context);
 
+      // Clear the meal draft box
       await hiveService.clearMealDraftBox();
 
       // Navigate back to the meal plan list
-      Navigator.pop(context);
-      Navigator.pop(context);
-      Navigator.pop(context);
+      Navigator.of(context).popUntil((route) => route.isFirst);
     } catch (e) {
       if (e is DioException) {
         print('DioException occurred: ${e.message}');
@@ -135,11 +142,33 @@ class _MealPlanPreviewBottomSheetState
       } else {
         print('Error creating meal plan: ${e.toString()}');
       }
+      // Show an error dialog or SnackBar
+      showErrorDialog('An error occurred while creating the meal plan.');
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
+  }
+
+  void showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<Recipe?> fetchRecipe(String recipeId) async {
@@ -219,50 +248,46 @@ class _MealPlanPreviewBottomSheetState
                                   'Meal Plan Preview',
                                   style: TextStyle(
                                     fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 15),
                         _buildDetailCard(
                             "Meal Plan Name", widget.mealPlan.name),
+                        const SizedBox(height: 15),
                         _buildDetailCard(
                             "Duration Selected", widget.mealPlan.duration),
-
+                        const SizedBox(height: 15),
                         _buildDateRange(
                             widget.mealPlan.startDate, widget.mealPlan.endDate),
                         const Text(
                           'Meal Recurrence Set',
                           style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                              fontSize: 14, fontWeight: FontWeight.w500),
                         ),
                         _buildMealFromDraft(transMeal),
+                        const SizedBox(height: 15),
                         // _buildAllocatedMeals(groupedRecipes),
                         _buildTraineeCard(context, traineeDetailsAsyncValue),
                         const SizedBox(height: 30),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                )),
-                            onPressed: _isLoading
-                                ? null
-                                : () async {
-                                    await _handleCreatePlan();
-                                  },
-                            child: _isLoading
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white)
-                                : const Text('Complete meal plan'),
-                          ),
-                        )
+                        _isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.redAccent)
+                            : SizedBox(
+                                width: double.infinity,
+                                child: Reusablebutton(
+                                  text: 'Complete Plan',
+                                  onPressed: _isLoading
+                                      ? null
+                                      : () async {
+                                          await _handleCreatePlan();
+                                        },
+                                ),
+                              )
                       ],
                     ),
                   ),
@@ -299,6 +324,9 @@ class _MealPlanPreviewBottomSheetState
                     ),
                     const Spacer(),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          foregroundColor: Colors.white),
                       onPressed: () {
                         _showTraineeList(context, trainees);
                       },
@@ -341,7 +369,8 @@ class _MealPlanPreviewBottomSheetState
           ),
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Center(
+          child: CircularProgressIndicator(color: Colors.redAccent)),
       error: (error, stack) => const Text('Error loading trainees'),
     );
   }
@@ -382,12 +411,11 @@ class _MealPlanPreviewBottomSheetState
                   },
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context); // Close the bottom sheet
-                },
-                child: const Text('Close'),
-              ),
+              Reusablebutton(
+                  text: 'Close',
+                  onPressed: () {
+                    Navigator.pop(context);
+                  })
             ],
           ),
         );
@@ -397,7 +425,12 @@ class _MealPlanPreviewBottomSheetState
 
   Widget _buildMealFromDraft(List<Meal> convertedMeals) {
     if (convertedMeals.isEmpty) {
-      return const Center(child: Text('No meals available.'));
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 20.0),
+        child: Center(
+            child: Text('No meals available.',
+                style: TextStyle(fontWeight: FontWeight.w600))),
+      );
     }
 
     // Group meals by date
@@ -507,17 +540,13 @@ class _MealPlanPreviewBottomSheetState
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 10),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              value,
-              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-            ),
-          ),
+        Text(
+          value,
+          style: const TextStyle(
+              fontSize: 16, color: Colors.black, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 20),
       ],

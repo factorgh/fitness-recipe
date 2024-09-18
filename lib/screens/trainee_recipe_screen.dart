@@ -127,7 +127,7 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
             children: [
               const Text(
                 "All Recipes",
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
               ),
               Row(
                 children: [

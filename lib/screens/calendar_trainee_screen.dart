@@ -100,7 +100,7 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
           centerTitle: true,
           title: const Text(
             'Meal Plan Calendar',
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25),
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
           ),
         ),
         body: SafeArea(
@@ -219,7 +219,7 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
                     Text(
                       "My Meal Plans",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         color: Colors.black,
                         fontWeight: FontWeight.w500,
                       ),
@@ -243,7 +243,9 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
                   }),
                 if (selectedDay != null &&
                     mealPlansByDate[selectedDay!] == null)
-                  const Text('No meal plans for this day.')
+                  const Text(
+                    'No meal plans for this day.',
+                  )
               ],
             ),
           ),

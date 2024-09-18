@@ -342,12 +342,11 @@ void _showTraineeList(BuildContext context, List<User> trainees) {
                 },
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); // Close the bottom sheet
-              },
-              child: const Text('Close'),
-            ),
+            Reusablebutton(
+                text: 'Close',
+                onPressed: () {
+                  Navigator.pop(context);
+                })
           ],
         ),
       );

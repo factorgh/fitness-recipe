@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
+import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
 import 'package:voltican_fitness/utils/socket_io_setup.dart';
 import 'package:voltican_fitness/widgets/recipe_advert_slider.dart';
 
@@ -141,20 +142,20 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                           text: const TextSpan(
                             text: 'Hello, ',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 12,
                               color: Colors.redAccent,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
-                        Text(
-                          user?.username ?? '',
+                        CapitalizeFirstLetter(
+                          text: user?.username ?? '',
                           style: const TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 20,
                             color: Colors.black,
                           ),
-                        ),
+                        )
                       ],
                     ),
 
@@ -258,7 +259,10 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                                     children: [
                                       Icon(Icons.qr_code_scanner_outlined),
                                       SizedBox(width: 3),
-                                      Text("Scan Now")
+                                      Text(
+                                        "Scan Now",
+                                        style: TextStyle(color: Colors.white),
+                                      )
                                     ],
                                   )),
                             ),

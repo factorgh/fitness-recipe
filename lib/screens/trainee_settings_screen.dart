@@ -40,7 +40,7 @@ class _TraineeSettingsScreenState extends ConsumerState<TraineeSettingsScreen> {
         centerTitle: true,
         title: const Text(
           'Settings',
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
+          style: TextStyle(fontSize: 23, fontWeight: FontWeight.w500),
         ),
       ),
       body: SafeArea(

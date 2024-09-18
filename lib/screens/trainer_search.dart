@@ -105,8 +105,9 @@ class _TrainerSearchScreenState extends ConsumerState<TrainerSearchScreen> {
         leading: const SizedBox(),
         title: const Text(
           'Search Trainer',
-          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25),
+          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
         ),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
