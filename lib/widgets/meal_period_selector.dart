@@ -161,7 +161,12 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Invalid Time for $mealPeriod'),
+            title: Text(
+              'Invalid Time for $mealPeriod',
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             content: Text(
                 'Please select a time between ${startTime.format(context)} and ${endTime.format(context)} for $mealPeriod.'),
             actions: [
@@ -337,7 +342,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                     TextSpan(
                         text: ' Click here to create a meal',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w500,
                           overflow: TextOverflow.ellipsis,
                         )),
                   ],

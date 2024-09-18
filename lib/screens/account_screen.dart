@@ -54,7 +54,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
       appBar: AppBar(
         title: const Text(
           'Account Management',
-          style: TextStyle(fontWeight: FontWeight.w800),
+          style: TextStyle(fontWeight: FontWeight.w500),
         ),
         centerTitle: true,
       ),

@@ -6,6 +6,7 @@ import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
 import 'package:voltican_fitness/utils/socket_io_setup.dart';
 import 'package:voltican_fitness/widgets/category_slider.dart';
 import 'package:voltican_fitness/widgets/new_recipe_slider.dart';
@@ -171,13 +172,29 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Text(
-                                    'Hello, ${user?.username ?? ''}',
-                                    style: const TextStyle(
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      const Text(
+                                        'Hello ,',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      CapitalizeFirstLetter(
+                                        text: user?.username ?? '',
+                                        style: const TextStyle(
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    ],
                                   ),
                                   const Text(
                                     'Check amazing recipes and \nassign amzing meal plans..',
@@ -245,7 +262,7 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                     Text(
                       "Explore All Recipes",
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -266,7 +283,7 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                     Text(
                       "Popular",
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -288,7 +305,7 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                     Text(
                       "Top Trainers",
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),

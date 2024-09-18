@@ -49,7 +49,6 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
           title: const Text(
             'Trainees & Trainers',
             style: TextStyle(
-              fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
           ),

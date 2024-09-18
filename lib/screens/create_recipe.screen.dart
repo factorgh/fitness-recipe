@@ -117,7 +117,8 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
       await Future.delayed(Duration.zero, () {
         ref.read(userRecipesProvider.notifier).loadUserRecipes();
       });
-      // Optionally handle success (e.g., show a success message)
+
+      Navigator.pop(context);
     } catch (e) {
       // Handle any errors (e.g., show an error message)
     } finally {
@@ -228,7 +229,10 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                 return ListTile(
                   title: Text(ingredient),
                   trailing: IconButton(
-                    icon: const Icon(Icons.remove_circle_outline),
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.redAccent,
+                    ),
                     onPressed: () {
                       setState(() {
                         selectedIngredients.remove(ingredient);

@@ -212,11 +212,12 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
         ),
         title: const Text(
           'Trainer Profile',
-          style: TextStyle(fontWeight: FontWeight.w800),
+          style: TextStyle(fontWeight: FontWeight.w500),
         ),
       ),
       body: user == null
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(color: Colors.redAccent))
           : Column(
               children: [
                 Padding(

@@ -234,6 +234,34 @@ class AuthService {
     }
   }
 
+  Future<void> updateStatus({
+    required BuildContext context,
+    required String status,
+    required WidgetRef ref,
+    required String id,
+  }) async {
+    try {
+      dio.Response res = await client.dio.put(
+        "/users/$id",
+        data: {'status': status},
+      );
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          // Convert the response data to a User object
+          User updatedUser = User.fromJson(res.data);
+          // Update the user in the state after a successful update
+          ref.read(userProvider.notifier).setUser(updatedUser);
+        },
+      );
+    } catch (e) {
+      print('Error updating user: $e');
+      showSnack(context, 'Failed to update user');
+    }
+  }
+
   Future<void> updateImage({
     required BuildContext context,
     required String imageUrl,

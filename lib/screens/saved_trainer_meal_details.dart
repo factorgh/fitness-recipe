@@ -227,7 +227,7 @@ class _TrainerMealDetailScreenState
                         text: widget.meal.title,
                         style: const TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       const Spacer(),

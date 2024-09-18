@@ -21,6 +21,7 @@ import 'package:voltican_fitness/utils/hive/hive_mealplan.dart';
 import 'package:voltican_fitness/utils/hive/hive_recurrence.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class MealCreationScreen extends ConsumerStatefulWidget {
   final DateTime selectedDay;
@@ -38,7 +39,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   List<User> _allTrainees = [];
   List<User> _searchResults = [];
   final List<User> _selectedTrainees = [];
-  final bool _isLoading = false;
+
   final List<DateTime> _highlightedDates = [];
   List<Meal> startMeals = [];
 
@@ -543,7 +544,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
       appBar: AppBar(
         title: const Text(
           'Create Meal Plan',
-          style: TextStyle(fontWeight: FontWeight.w600),
+          style: TextStyle(fontWeight: FontWeight.w500),
         ),
         actions: [
           // IconButton(
@@ -628,7 +629,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                   return AlertDialog(
                     title: const Text(
                       'Clear your meal draft',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(fontWeight: FontWeight.w500),
                     ),
                     content: const Text(
                         'Are you sure you want to clear all meals from the draft?'),
@@ -661,7 +662,8 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                 setState(() {});
               }
             },
-            icon: const Icon(Icons.remove_circle),
+            icon: const Icon(Icons.remove_circle_outline_sharp,
+                color: Colors.redAccent),
           )
         ],
       ),
@@ -691,9 +693,16 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                 Column(
                   children: _searchResults.map((trainee) {
                     return ListTile(
-                      title: Text(trainee.fullName),
+                      title: Text(
+                        trainee.fullName,
+                        style: const TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.w600),
+                      ),
                       subtitle: Text(trainee.username),
                       trailing: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            foregroundColor: Colors.white),
                         onPressed: () => _addTrainee(trainee),
                         child: const Text('Add'),
                       ),
@@ -710,9 +719,16 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                 Column(
                   children: _selectedTrainees.map((trainee) {
                     return ListTile(
-                      title: Text(trainee.fullName),
+                      title: Text(
+                        trainee.fullName,
+                        style: const TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.w600),
+                      ),
                       subtitle: Text(trainee.username),
                       trailing: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            foregroundColor: Colors.white),
                         onPressed: () => _removeTrainee(trainee),
                         child: const Text('Remove'),
                       ),
@@ -921,29 +937,12 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
               const SizedBox(
                 height: 20,
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white),
+              Reusablebutton(
+                text: "Continue To Next Day",
                 onPressed: () async {
                   // After saving data to hive move to next day
                   _moveToNextDay();
                 },
-                child: _isLoading
-                    ? const CircularProgressIndicator(
-                        color: Colors.white,
-                      )
-                    : const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Continue to Next Day',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500, fontSize: 16),
-                        ),
-                      ),
               ),
               const Padding(
                 padding: EdgeInsets.all(8.0),
@@ -951,13 +950,8 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                   color: Colors.black,
                 ),
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white),
+              Reusablebutton(
+                text: 'Preview Meal Plan',
                 onPressed: () async {
                   ///Delay for sometime then after show bottom  sheet with meal plan preview
                   Future.delayed(
@@ -981,18 +975,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
                   showMealPlanPreviewBottomSheet(context, mealPlan);
                 },
-                child: _isLoading
-                    ? const CircularProgressIndicator(
-                        color: Colors.white,
-                      )
-                    : const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Preview Meal Plan',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500, fontSize: 16),
-                        ),
-                      ),
               ),
               const SizedBox(height: 20),
             ],

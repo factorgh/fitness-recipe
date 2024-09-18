@@ -9,6 +9,7 @@ import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/update_profile_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/widgets/copy_to_clipboard.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 import 'package:voltican_fitness/widgets/status_toggle_button.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -197,24 +198,13 @@ class _InfoField extends StatelessWidget {
 class _EditProfileButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const UpdateProfileScreen(),
-          ));
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.redAccent,
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        child: const Text(
-          'Update Profile',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
+    return Reusablebutton(
+      text: 'Update Profile',
+      onPressed: () {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const UpdateProfileScreen(),
+        ));
+      },
     );
   }
 }
