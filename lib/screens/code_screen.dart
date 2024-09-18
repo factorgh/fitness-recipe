@@ -9,9 +9,11 @@ import 'package:voltican_fitness/screens/login_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class CodeScreen extends ConsumerStatefulWidget {
-  const CodeScreen({super.key});
+  final String? userEmail;
+  const CodeScreen({super.key, this.userEmail});
 
   @override
   ConsumerState<CodeScreen> createState() => _CodeScreenState();
@@ -147,73 +149,74 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  GestureDetector(
-                    onTap: _logout,
-                    child: const Icon(
-                      Icons.logout,
-                      size: 20,
-                      color: Colors.red,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height / 3),
-              Column(
-                children: [
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Enter trainer's code",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: _logout,
+                      child: const Icon(
+                        Icons.logout,
+                        size: 20,
+                        color: Colors.red,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: TextField(
-                      controller: _codeController,
-                      decoration: InputDecoration(
-                        labelText: 'Enter your code',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5),
+                    ),
+                  ],
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height / 3),
+                Column(
+                  children: [
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Enter trainer's code",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: TextField(
+                        controller: _codeController,
+                        decoration: InputDecoration(
+                          labelText: 'Enter your code',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_codeController.text.trim().isNotEmpty) {
-                          getUserByCode(context, _codeController.text.trim());
-                        } else {
-                          NativeAlerts()
-                              .showErrorAlert(context, 'Please enter a code');
-                        }
-                      },
-                      child: isLoading
-                          ? const CircularProgressIndicator(
-                              color: Colors.white,
-                            )
-                          : const Text("Confirm code"),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ],
+                    const SizedBox(height: 20),
+                  ],
+                ),
+                Center(
+                    child: isLoading
+                        ? const CircularProgressIndicator(
+                            color: Colors.redAccent)
+                        : Reusablebutton(
+                            text: 'Confirm Code',
+                            onPressed: () {
+                              if (_codeController.text.trim().isNotEmpty) {
+                                getUserByCode(
+                                    context, _codeController.text.trim());
+                              } else {
+                                NativeAlerts().showErrorAlert(
+                                    context, 'Please enter a code');
+                              }
+                            },
+                          )),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),

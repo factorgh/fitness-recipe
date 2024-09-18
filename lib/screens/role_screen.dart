@@ -7,6 +7,7 @@ import 'package:voltican_fitness/screens/code_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/utils/code_generator.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 import 'package:voltican_fitness/widgets/role_widget.dart';
 
 class RoleScreen extends ConsumerStatefulWidget {
@@ -148,30 +149,16 @@ class _RoleScreenState extends ConsumerState<RoleScreen>
                 Padding(
                   padding: const EdgeInsets.only(bottom: 20),
                   child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed:
-                          isLoading ? null : () => goToTabsScreen(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
+                      width: double.infinity,
                       child: isLoading
                           ? const CircularProgressIndicator(
-                              color: Colors.white) // Show a loading spinner
-                          : const Text(
-                              'Proceed',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                    ),
-                  ),
+                              color: Colors.redAccent)
+                          : Reusablebutton(
+                              text: "Proceed",
+                              onPressed: isLoading
+                                  ? null
+                                  : () => goToTabsScreen(context),
+                            )),
                 ),
             ],
           ),

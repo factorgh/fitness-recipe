@@ -152,7 +152,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   },
                   splashColor: Colors.purple,
                   child: const ButtonWidget(
-                      backColor: Colors.red,
+                      backColor: Colors.redAccent,
                       text: 'Get Started',
                       textColor: Colors.white),
                 ),

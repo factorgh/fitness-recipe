@@ -1,12 +1,15 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:ui';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/screens/code_screen.dart';
 import 'package:voltican_fitness/screens/signup_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
-import 'package:voltican_fitness/widgets/button.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -31,6 +34,90 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _usernameController.dispose();
     super.dispose();
   }
+// Needed for the ImageFilter.blur method
+
+  void showAccessDeniedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing by tapping outside
+      builder: (BuildContext context) {
+        return Stack(
+          children: [
+            // Blurred background
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: Container(
+                color:
+                    Colors.black.withOpacity(0.3), // Semi-transparent overlay
+              ),
+            ),
+            // Dialog itself
+            AlertDialog(
+              title: const Text(
+                'Access Denied',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'You are not allowed to log in. You must follow a trainer.',
+                    style: TextStyle(
+                      fontSize: 13,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Do you have a trainer code or would you like to get one to follow a trainer?',
+                    style: TextStyle(
+                      fontSize: 14,
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text(
+                    'I Have a Code',
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                      fontSize: 16,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    // Navigate to the screen where the user can enter a trainer code
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CodeScreen(),
+                      ),
+                    );
+                  },
+                ),
+                TextButton(
+                  child: const Text(
+                    'Get Trainer Access',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 16,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    // Navigate to the trainer discovery/follow screen
+                  },
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _goToSignup(BuildContext ctx) {
     Navigator.of(ctx).push(
@@ -53,8 +140,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         );
       } on DioException catch (e) {
         if (e.response?.statusCode == 403) {
-          alerts.showErrorAlert(context,
-              'Access denied: You are not allowed to log in.You must follow a trainer');
+          showAccessDeniedDialog(context);
         } else {
           // Show the default error alert for other cases
           alerts.showErrorAlert(
@@ -205,20 +291,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               Column(
                 children: [
-                  InkWell(
-                    onTap: _isLoading
-                        ? null
-                        : () => _login(context), // Only pass context here
-                    child: _isLoading
-                        ? const CircularProgressIndicator(
-                            color: Colors.red,
-                          )
-                        : ButtonWidget(
-                            backColor: _isLoading ? Colors.grey : Colors.red,
-                            text: _isLoading ? 'Logging in...' : 'Login',
-                            textColor: Colors.white,
-                          ),
-                  ),
+                  _isLoading
+                      ? const CircularProgressIndicator(color: Colors.redAccent)
+                      : Reusablebutton(
+                          text: 'Login',
+                          onPressed: () {
+                            _login(context);
+                          },
+                        ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
