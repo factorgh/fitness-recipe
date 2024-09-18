@@ -385,6 +385,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                                       if (loadingProgress == null) return child;
                                       return Center(
                                         child: CircularProgressIndicator(
+                                          color: Colors.redAccent,
                                           value: loadingProgress
                                                       .expectedTotalBytes !=
                                                   null
@@ -500,7 +501,10 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                   builder: (BuildContext context,
                       AsyncSnapshot<List<String>> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator(); // Or any other loading indicator
+                      return const Center(
+                        child:
+                            CircularProgressIndicator(color: Colors.redAccent),
+                      ); // Or any other loading indicator
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else if (snapshot.hasData) {

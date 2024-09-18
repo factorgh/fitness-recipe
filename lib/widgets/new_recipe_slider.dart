@@ -163,7 +163,7 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
                           Text(
                             recipe.title,
                             style: const TextStyle(
-                              color: Colors.black87,
+                              color: Colors.black,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
@@ -178,7 +178,7 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
                               Text(
                                 "35 min", // Use recipe.duration
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                 ),

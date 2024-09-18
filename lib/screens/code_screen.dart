@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
+import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/login_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
@@ -12,8 +13,8 @@ import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class CodeScreen extends ConsumerStatefulWidget {
-  final String? userEmail;
-  const CodeScreen({super.key, this.userEmail});
+  final String? username;
+  const CodeScreen({super.key, this.username});
 
   @override
   ConsumerState<CodeScreen> createState() => _CodeScreenState();
@@ -24,11 +25,34 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
   final TextEditingController _codeController = TextEditingController();
   Map<String, dynamic>? user;
   bool isLoading = false;
+  final AuthService authService = AuthService();
+  User? userFromLogin;
+
+  @override
+  void initState() {
+    print('--------------------------${widget.username}----------------');
+    _fetchUser();
+    super.initState();
+  }
 
   @override
   void dispose() {
     _codeController.dispose();
     super.dispose();
+  }
+
+  void _fetchUser() async {
+    await authService.getUserByName(
+      username: widget.username!,
+      onSuccess: (fetchedUser) {
+        setState(() {
+          userFromLogin = fetchedUser;
+        });
+      },
+    );
+
+    print('----------------------user From Login-------------------');
+    print(userFromLogin);
   }
 
   Future<void> getUserByCode(BuildContext context, String code) async {
@@ -58,7 +82,10 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
   }
 
   void _showTrainerDetails(BuildContext context) {
-    if (user != null) {
+    final currentUser = ref.read(userProvider);
+    final selectedUser = userFromLogin ?? currentUser;
+
+    if (selectedUser != null && user != null) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -87,20 +114,35 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
                   const SizedBox(height: 10),
                   OutlinedButton(
                     onPressed: () async {
-                      final currentUserId = ref.read(userProvider)?.id;
                       final trainerId = user?['_id'];
 
-                      if (currentUserId != null && trainerId != null) {
+                      if (trainerId != null) {
                         try {
-                          await TrainerService()
-                              .followTrainer(currentUserId, trainerId, context);
+                          await TrainerService().followTrainer(
+                              selectedUser.id, trainerId, context);
 
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const TabsScreen(userRole: '0'),
-                            ),
-                          );
+                          if (userFromLogin != null) {
+                            // Set the user from login and navigate to the login screen
+                            ref
+                                .read(userProvider.notifier)
+                                .setUser(userFromLogin!);
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const LoginScreen(), // Navigate to HomeScreen
+                              ),
+                            );
+                          } else {
+                            // Navigate to TabsScreen if it's the current user from the provider
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const TabsScreen(userRole: '0'),
+                              ),
+                            );
+                          }
+
+                          // Show success alert
                           NativeAlerts().showSuccessAlert(context,
                               "Welcome to fitness recipe. We are excited to have you on board! Explore the app to discover amazing features and content tailored just for you.");
                         } catch (e) {
@@ -110,13 +152,15 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
                               context, 'Failed to follow trainer');
                         }
                       } else {
-                        Navigator.pop(
-                            context); // Close dialog if user or trainerId is null
+                        Navigator.pop(context);
                         NativeAlerts().showErrorAlert(
                             context, 'Failed to follow trainer: invalid data');
                       }
                     },
-                    child: const Text("Confirm trainer"),
+                    child: const Text(
+                      "Confirm trainer",
+                      style: TextStyle(color: Colors.redAccent),
+                    ),
                   ),
                 ],
               ),
@@ -124,6 +168,9 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
           );
         },
       );
+    } else {
+      // Handle the case where selectedUser or user is null
+      NativeAlerts().showErrorAlert(context, 'Invalid user or trainer data');
     }
   }
 

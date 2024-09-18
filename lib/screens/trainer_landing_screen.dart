@@ -149,64 +149,22 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.only(
+                        top: 15,
+                        left: 15,
+                        right: 15,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 30,
-                                backgroundImage: NetworkImage(
-                                  user?.imageUrl ??
-                                      'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png',
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      const Text(
-                                        'Hello ,',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      CapitalizeFirstLetter(
-                                        text: user?.username ?? '',
-                                        style: const TextStyle(
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  const Text(
-                                    'Check amazing recipes and \nassign amzing meal plans..',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage: NetworkImage(
+                              user?.imageUrl ??
+                                  'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png',
+                            ),
                           ),
+
                           // right side of row
                           badges.Badge(
                             position:
@@ -242,10 +200,46 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                             ),
                           ),
                         ],
+
+                        // Row end
                       ),
                     ),
-                    const SizedBox(
-                      height: 30,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15, top: 10),
+                      child: Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Hello, ',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                CapitalizeFirstLetter(
+                                  text: user?.username ?? '',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              ],
+                            ),
+                            const Text(
+                              'Check amazing recipes and assign amzing meal plans...',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 15),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),

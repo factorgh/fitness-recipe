@@ -93,7 +93,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const CodeScreen(),
+                        builder: (context) => CodeScreen(
+                          username: _usernameController.text.trim(),
+                        ),
                       ),
                     );
                   },

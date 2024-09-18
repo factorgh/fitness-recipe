@@ -275,8 +275,10 @@ class _MealPlanPreviewBottomSheetState
                         _buildTraineeCard(context, traineeDetailsAsyncValue),
                         const SizedBox(height: 30),
                         _isLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.redAccent)
+                            ? const Center(
+                                child: CircularProgressIndicator(
+                                    color: Colors.redAccent),
+                              )
                             : SizedBox(
                                 width: double.infinity,
                                 child: Reusablebutton(

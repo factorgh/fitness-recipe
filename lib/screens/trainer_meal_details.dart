@@ -282,9 +282,10 @@ class _TrainerMealDetailScreenState
                       CapitalizeFirstLetter(
                           text: widget.meal.title,
                           style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w800)),
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800)),
                       const Spacer(),
-                      const SizedBox(width: 20),
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),

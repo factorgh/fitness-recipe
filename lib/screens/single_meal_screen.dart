@@ -117,6 +117,10 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
                     ),
                     const Spacer(),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                        foregroundColor: Colors.white,
+                      ),
                       onPressed: () {
                         _showTraineeList(context, trainees);
                       },

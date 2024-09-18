@@ -359,6 +359,32 @@ class AuthService {
     }
   }
 
+  Future<void> getUserByName({
+    required Function(User) onSuccess,
+    required String username,
+  }) async {
+    try {
+      final response = await client.dio.get('/users/user/$username');
+
+      print('Response status code: ${response.statusCode}');
+      print('Response data: ${response.data}');
+
+      if (response.statusCode == 200) {
+        // Convert the response data to a User object
+        User user = User.fromJson(response.data);
+        print('Fetched User: $user');
+        onSuccess(user);
+      } else {
+        print('Failed to load user: ${response.statusCode}');
+        throw Exception('Failed to load user');
+      }
+    } catch (e) {
+      // Handle other errors here
+      print('Error fetching user: $e');
+      throw Exception('Failed to load user');
+    }
+  }
+
   Future<void> changePassword(
       {required BuildContext context,
       required String email,
