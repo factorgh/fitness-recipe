@@ -206,39 +206,36 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 15, top: 10),
-                      child: Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Hello, ',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white,
-                                  ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Hello, ',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
                                 ),
-                                CapitalizeFirstLetter(
-                                  text: user?.username ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              ],
-                            ),
-                            const Text(
-                              'Check amazing recipes and assign amzing meal plans...',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 15),
-                            ),
-                          ],
-                        ),
+                              ),
+                              CapitalizeFirstLetter(
+                                text: user?.username ?? '',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                ),
+                              )
+                            ],
+                          ),
+                          const Text(
+                            'Check amazing recipes and assign amzing meal plans...',
+                            style: TextStyle(color: Colors.white, fontSize: 15),
+                          ),
+                        ],
                       ),
                     ),
                   ],

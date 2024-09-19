@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
+import 'package:showcaseview/showcaseview.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'package:voltican_fitness/providers/user_provider.dart';
@@ -84,56 +85,60 @@ class _MyAppState extends ConsumerState<MyApp> {
     // Watch the user state from the userProvider
     final user = ref.watch(userProvider);
 
-    return MaterialApp(
-      theme: ThemeData(
-        // Set Poppins as the default font family
-        fontFamily: 'Poppins',
-        textTheme: const TextTheme(
-          displayLarge: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 72.0,
-              fontWeight: FontWeight.bold),
-          displayMedium: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 64.0,
-              fontWeight: FontWeight.bold),
-          displaySmall: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 48.0,
-              fontWeight: FontWeight.bold),
-          headlineMedium: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 34.0,
-              fontWeight: FontWeight.bold),
-          headlineSmall: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold),
-          titleLarge: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold),
-          bodyLarge: TextStyle(fontFamily: 'Poppins', fontSize: 16.0),
-          bodyMedium: TextStyle(fontFamily: 'Poppins', fontSize: 14.0),
-          titleMedium: TextStyle(fontFamily: 'Poppins', fontSize: 16.0),
-          titleSmall: TextStyle(fontFamily: 'Poppins', fontSize: 14.0),
-          bodySmall: TextStyle(fontFamily: 'Poppins', fontSize: 12.0),
-          labelLarge: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 14.0,
-              fontWeight: FontWeight.bold),
-          labelMedium: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 12.0,
-              fontWeight: FontWeight.bold),
-        ),
-      ),
-      debugShowCheckedModeBanner: false, // Hide the debug banner
-      home: user != null
-          ? TabsScreen(
-              userRole:
-                  user.role) // Navigate to TabsScreen if user is logged in
-          : const OnboardingScreen(), // Navigate to OnboardingScreen if no user is logged in
-    );
+    return ShowCaseWidget(builder: (context) {
+      return Builder(builder: (context) {
+        return MaterialApp(
+          theme: ThemeData(
+            // Set Poppins as the default font family
+            fontFamily: 'Poppins',
+            textTheme: const TextTheme(
+              displayLarge: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 72.0,
+                  fontWeight: FontWeight.bold),
+              displayMedium: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 64.0,
+                  fontWeight: FontWeight.bold),
+              displaySmall: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 48.0,
+                  fontWeight: FontWeight.bold),
+              headlineMedium: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 34.0,
+                  fontWeight: FontWeight.bold),
+              headlineSmall: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold),
+              titleLarge: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold),
+              bodyLarge: TextStyle(fontFamily: 'Poppins', fontSize: 16.0),
+              bodyMedium: TextStyle(fontFamily: 'Poppins', fontSize: 14.0),
+              titleMedium: TextStyle(fontFamily: 'Poppins', fontSize: 16.0),
+              titleSmall: TextStyle(fontFamily: 'Poppins', fontSize: 14.0),
+              bodySmall: TextStyle(fontFamily: 'Poppins', fontSize: 12.0),
+              labelLarge: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.bold),
+              labelMedium: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+          debugShowCheckedModeBanner: false, // Hide the debug banner
+          home: user != null
+              ? TabsScreen(
+                  userRole:
+                      user.role) // Navigate to TabsScreen if user is logged in
+              : const OnboardingScreen(), // Navigate to OnboardingScreen if no user is logged in
+        );
+      });
+    });
   }
 }

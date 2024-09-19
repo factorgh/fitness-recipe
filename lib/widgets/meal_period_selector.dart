@@ -16,6 +16,9 @@ class MealPeriodSelector extends ConsumerStatefulWidget {
   final void Function(Recurrence) onRecurrenceChanged;
   final void Function()? saveToDraft;
   final Recurrence? chosenRecurrence;
+  final GlobalKey? key4;
+  final GlobalKey? key5;
+  final GlobalKey? key6;
 
   final List<Meal>? defaultMeals;
   final DateTime? selectedDay;
@@ -32,6 +35,9 @@ class MealPeriodSelector extends ConsumerStatefulWidget {
     this.defaultMeals,
     this.selectedDay,
     this.chosenRecurrence,
+    this.key4,
+    this.key5,
+    this.key6,
     super.key,
   });
 
