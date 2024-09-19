@@ -550,6 +550,88 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     });
   }
 
+  void showInstructionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0), // Rounded corners
+          ),
+          title: const Text(
+            "Instruction Manual",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          content: const SizedBox(
+            height: 50,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "1. Select an highlighted date to add meal ",
+                  style: TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 10,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "2. Select ",
+                      style: TextStyle(
+                        fontSize: 10,
+                      ),
+                    ),
+                    Icon(
+                      Icons.refresh,
+                      color: Colors.redAccent,
+                      size: 14,
+                    ),
+                    Text(
+                      " to recurre before saving a meal ",
+                      style: TextStyle(
+                        overflow: TextOverflow.ellipsis,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "3. Select ",
+                      style: TextStyle(
+                        fontSize: 10,
+                      ),
+                    ),
+                    Icon(Icons.save, color: Colors.blue, size: 14),
+                    Text(
+                      " to save a meal to your draft",
+                      style: TextStyle(
+                        overflow: TextOverflow.ellipsis,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+          actions: [
+            Reusablebutton(
+                text: "Okay",
+                onPressed: () {
+                  Navigator.of(context).pop();
+                })
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -561,7 +643,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         actions: [
           Showcase(
               key: _key1,
-              description: 'Tap here to access settings',
+              description: 'Tap here to save your meal plan to draft',
               child: IconButton(
                 onPressed: () async {
                   bool confirmSave = await showDialog(
@@ -788,6 +870,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     }
                   });
                   _startShowcase();
+                  showInstructionDialog(context);
                 },
               ),
               const SizedBox(height: 20),

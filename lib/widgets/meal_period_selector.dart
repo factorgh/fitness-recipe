@@ -1,9 +1,11 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
+import 'package:voltican_fitness/screens/create_recipe.screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/hive/hive_class.dart';
 
@@ -341,20 +343,31 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       child: filteredRecipes.isEmpty
           ? Center(
               child: RichText(
-                text: TextSpan(
-                  text: ' No $mealPeriod available.',
-                  style: DefaultTextStyle.of(context).style,
-                  children: const <TextSpan>[
-                    TextSpan(
-                        text: ' Click here to create a meal',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          overflow: TextOverflow.ellipsis,
-                        )),
-                  ],
-                ),
+              text: TextSpan(
+                text: 'No meal period available.',
+                style: DefaultTextStyle.of(context).style,
+                children: <TextSpan>[
+                  TextSpan(
+                    text: ' Click here to create a meal',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color:
+                          Colors.blue, // Set color to indicate it's clickable
+                      decoration: TextDecoration
+                          .underline, // Optional: underline to indicate a link
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const CreateRecipeScreen(),
+                          ),
+                        );
+                      },
+                  ),
+                ],
               ),
-            )
+            ))
           : ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: filteredRecipes.length,
