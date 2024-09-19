@@ -58,6 +58,7 @@ class MyApp extends ConsumerStatefulWidget {
 
 class _MyAppState extends ConsumerState<MyApp> {
   final AuthService authService = AuthService();
+  final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
   @override
   void initState() {

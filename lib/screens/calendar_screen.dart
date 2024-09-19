@@ -44,6 +44,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     }
   }
 
+  Future<bool> _onWillPop() async {
+    await _fetchMealPlans(); // Refetch data when navigating back
+    return true; // Allow the pop operation
+  }
+
   @override
   Widget build(BuildContext context) {
     DateTime focusedDay = DateTime.now();
@@ -84,100 +89,110 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       mealPlansWidget = const Text('No meal plans available.');
     }
 
-    return Scaffold(
-      body: SafeArea(
-        child: Container(
-          width: double.maxFinite,
-          height: double.maxFinite,
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Good Morning ',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const Spacer(),
-                    OutlinedButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                MealCreationScreen(selectedDay: DateTime.now()),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        'Add Meal Plan',
-                        style: TextStyle(fontSize: 12, color: Colors.redAccent),
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                TableCalendar(
-                  firstDay: DateTime.utc(2001, 7, 20),
-                  focusedDay: focusedDay,
-                  lastDay: DateTime.utc(2040, 3, 20),
-                  selectedDayPredicate: (day) => isSameDay(day, selectedDay),
-                  onDaySelected: (DateTime focusDay, DateTime selectDay) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            MealCreationScreen(selectedDay: selectDay),
-                      ),
-                    );
-                    setState(() {
-                      focusedDay = focusDay;
-                      selectedDay = selectDay;
-                    });
-                  },
-                  headerStyle: const HeaderStyle(formatButtonVisible: false),
-                ),
-                const SizedBox(height: 30),
-                const Divider(color: Colors.black54, height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Latest plans",
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const AllMealPlan(),
+    // ignore: deprecated_member_use
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        body: SafeArea(
+          child: Container(
+            width: double.maxFinite,
+            height: double.maxFinite,
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Good Morning ',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
                         ),
                       ),
-                      child: const Text(
-                        "View all Plans",
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.redAccent,
-                            fontWeight: FontWeight.w500),
+                      const Spacer(),
+                      OutlinedButton(
+                        onPressed: () {
+                          Navigator.of(context)
+                              .push(
+                                MaterialPageRoute(
+                                  builder: (context) => MealCreationScreen(
+                                      selectedDay: DateTime.now()),
+                                ),
+                              )
+                              .then((_) =>
+                                  _fetchMealPlans()); // Refetch on return
+                        },
+                        child: const Text(
+                          'Add Meal Plan',
+                          style:
+                              TextStyle(fontSize: 12, color: Colors.redAccent),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  width: double.maxFinite,
-                  child: SingleChildScrollView(child: mealPlansWidget),
-                ),
-              ],
+                      const SizedBox(width: 5),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  TableCalendar(
+                    firstDay: DateTime.utc(2001, 7, 20),
+                    focusedDay: focusedDay,
+                    lastDay: DateTime.utc(2040, 3, 20),
+                    selectedDayPredicate: (day) => isSameDay(day, selectedDay),
+                    onDaySelected: (DateTime focusDay, DateTime selectDay) {
+                      Navigator.of(context)
+                          .push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  MealCreationScreen(selectedDay: selectDay),
+                            ),
+                          )
+                          .then((_) => _fetchMealPlans()); // Refetch on return
+                      setState(() {
+                        focusedDay = focusDay;
+                        selectedDay = selectDay;
+                      });
+                    },
+                    headerStyle: const HeaderStyle(formatButtonVisible: false),
+                  ),
+                  const SizedBox(height: 30),
+                  const Divider(color: Colors.black54, height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Latest plans",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const AllMealPlan(),
+                          ),
+                        ),
+                        child: const Text(
+                          "View all Plans",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.redAccent,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    width: double.maxFinite,
+                    child: SingleChildScrollView(child: mealPlansWidget),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

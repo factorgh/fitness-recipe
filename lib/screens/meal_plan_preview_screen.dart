@@ -89,21 +89,18 @@ class _MealPlanPreviewBottomSheetState
       // Check if the user is null
       if (user == null) {
         print('User is null. Cannot create a meal plan.');
-        // Show an error dialog or navigate back
-        // Optionally use a SnackBar or Dialog to inform the user
         showErrorDialog(
             'User not logged in. Please log in to create a meal plan.');
         return;
       }
 
-      // Check if widget.mealPlan is null or has any required fields missing
+      // Check if widget.mealPlan is null or has missing properties
       final mealPlan = widget.mealPlan;
       if (mealPlan.startDate == null ||
           mealPlan.endDate == null ||
           mealPlan.trainees.isEmpty ||
           transMeal.isEmpty) {
         print('Meal plan properties are missing or null.');
-        // Show an error dialog or navigate back
         showErrorDialog('Meal plan details are incomplete.');
         return;
       }
@@ -124,17 +121,15 @@ class _MealPlanPreviewBottomSheetState
       print(newMealPlan);
       print('------------------------end of meal plan body-------------------');
 
+      // Clear the meal draft box
+      await hiveService.clearMealDraftBox();
       // Save the meal plan to the database
       await mealPlanService.createMealPlan(newMealPlan, context);
 
-      // Clear the meal draft box
-      await hiveService.clearMealDraftBox();
+      // Show a success notification
 
-      // Navigate back to the meal plan list
-      // Navigator.of(context).popUntil((route) => route.isFirst);
       Navigator.pop(context);
       Navigator.pop(context);
-      Navigator.of(context);
     } catch (e) {
       if (e is DioException) {
         print('DioException occurred: ${e.message}');
@@ -145,7 +140,7 @@ class _MealPlanPreviewBottomSheetState
       } else {
         print('Error creating meal plan: ${e.toString()}');
       }
-      // Show an error dialog or SnackBar
+      // Show an error dialog
       showErrorDialog('An error occurred while creating the meal plan.');
     } finally {
       setState(() {
