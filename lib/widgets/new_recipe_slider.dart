@@ -1,11 +1,9 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 
 class NewRecipeSlider extends StatefulWidget {
-  final List<Recipe> recipes; // Updated to List<Recipe>
+  final List<Recipe> recipes;
   final Function(Recipe) onCategorySelected;
 
   const NewRecipeSlider({
@@ -49,24 +47,18 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.recipes.isEmpty
-        ? SizedBox(
-            height: 150,
-            child: Center(
-              child: Text(
-                'No recipes available',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ),
-          )
-        : Container(
-            height: 200, // Adjust height as needed
-            padding: const EdgeInsets.symmetric(horizontal: 5),
-            child: ListView.builder(
+    return Container(
+      height: 200, // Adjust height as needed
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: widget.recipes.isEmpty
+          ? ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: 5, // Number of placeholder items
+              itemBuilder: (context, index) {
+                return _buildPlaceholderItem();
+              },
+            )
+          : ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: widget.recipes.length,
               itemBuilder: (context, index) {
@@ -76,13 +68,10 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
                 );
               },
             ),
-          );
+    );
   }
 
   Widget _buildRecipeItem(BuildContext context, Recipe recipe) {
-    final userName = userNames[recipe.createdBy] ?? 'Unknown';
-    print(userName);
-
     return GestureDetector(
       onTap: () => widget.onCategorySelected(recipe),
       child: Container(
@@ -93,6 +82,7 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
+                color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(20),
                 image: DecorationImage(
                   image: NetworkImage(recipe.imageUrl),
@@ -112,7 +102,7 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
                         height: 30,
                         width: 50,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Colors.white54,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Center(
@@ -150,7 +140,7 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
               child: Container(
                 height: 70,
                 decoration: BoxDecoration(
-                  color: Colors.white54,
+                  color: Colors.white60,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -202,6 +192,24 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderItem() {
+    return Container(
+      width: 330, // Adjust width as needed
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.grey[300],
+      ),
+      child: Center(
+        child: Icon(
+          Icons.image, // Placeholder icon
+          size: 100,
+          color: Colors.grey[600],
         ),
       ),
     );
