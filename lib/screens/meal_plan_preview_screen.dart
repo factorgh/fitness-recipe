@@ -131,7 +131,10 @@ class _MealPlanPreviewBottomSheetState
       await hiveService.clearMealDraftBox();
 
       // Navigate back to the meal plan list
-      Navigator.of(context).popUntil((route) => route.isFirst);
+      // Navigator.of(context).popUntil((route) => route.isFirst);
+      Navigator.pop(context);
+      Navigator.pop(context);
+      Navigator.of(context);
     } catch (e) {
       if (e is DioException) {
         print('DioException occurred: ${e.message}');

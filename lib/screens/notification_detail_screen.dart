@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/all_meal_plan_trainee.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class NotificationDetailsPage extends ConsumerWidget {
   final String notiText;
@@ -35,7 +36,7 @@ class NotificationDetailsPage extends ConsumerWidget {
         ),
         title: const Text(
           'Notification Details',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
         ),
         centerTitle: true,
         actions: [
@@ -61,7 +62,7 @@ class NotificationDetailsPage extends ConsumerWidget {
             Text(
               type,
               style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                    color: Colors.blueGrey,
+                    color: Colors.black,
                     fontWeight: FontWeight.w600,
                   ),
             ),
@@ -69,17 +70,18 @@ class NotificationDetailsPage extends ConsumerWidget {
             Text(
               notiText,
               style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.redAccent,
               ),
             ),
             const SizedBox(height: 24),
             Text(
               'Sent by: $createdBy',
               style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
+                fontSize: 16,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
@@ -87,56 +89,42 @@ class NotificationDetailsPage extends ConsumerWidget {
               'Received on: ${DateFormat.yMMMMd().format(createdAt)} at ${DateFormat.jm().format(createdAt)}',
               style: const TextStyle(
                 fontSize: 14,
-                color: Colors.grey,
+                color: Colors.redAccent,
               ),
             ),
             const SizedBox(height: 24),
-            Text(
-              'Status',
-              style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Icon(
-                  isRead ? Icons.done : Icons.markunread,
-                  color: isRead ? Colors.green : Colors.red,
-                  size: 24,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  isRead ? 'Read' : 'Unread',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: isRead ? Colors.green : Colors.red,
-                  ),
-                ),
-              ],
-            ),
+            // Text(
+            //   'Status',
+            //   style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+            //         color: Colors.black,
+            //         fontWeight: FontWeight.w600,
+            //       ),
+            // ),
+            // const SizedBox(height: 12),
+            // Row(
+            //   children: [
+            //     Icon(
+            //       isRead ? Icons.done : Icons.markunread,
+            //       color: isRead ? Colors.green : Colors.red,
+            //       size: 24,
+            //     ),
+            //     const SizedBox(width: 8),
+            //     Text(
+            //       isRead ? 'Read' : 'Unread',
+            //       style: TextStyle(
+            //         fontSize: 16,
+            //         fontWeight: FontWeight.w500,
+            //         color: isRead ? Colors.green : Colors.red,
+            //       ),
+            //     ),
+            //   ],
+            // ),
             const Spacer(),
-            Center(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 37, 52, 39),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                ),
+            Reusablebutton(
+                text: "Back",
                 onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text(
-                  'Back',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-            ),
+                  Navigator.of(context).pop();
+                })
           ],
         ),
       ),

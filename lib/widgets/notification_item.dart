@@ -52,7 +52,7 @@ class NotificationItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    notiText,
+                    '${notiText.split(' ').take(5).join(' ')}...', // Take only the first 5 words
                     style: const TextStyle(
                       color: Colors.black87,
                       fontSize: 16,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/Features/mealplan/services/mealplan_service.dart';
@@ -59,6 +60,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   final RecipeService recipeService = RecipeService();
   final TrainerService trainerService = TrainerService();
   DateTime? newDay;
+  bool _hasShowcased = false;
 
   MealPlan? mealPlanDraft;
 
@@ -133,9 +135,20 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     _initializeHiveService();
     setDraftMealPlan();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ShowCaseWidget.of(context).startShowCase([_key1, _key2, _key3]);
-    });
+// Showcase handler
+    _checkAndShowcase();
+  }
+
+  Future<void> _checkAndShowcase() async {
+    final prefs = await SharedPreferences.getInstance();
+    _hasShowcased = prefs.getBool('hasShowcased') ?? false;
+
+    if (!_hasShowcased) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ShowCaseWidget.of(context).startShowCase([_key1, _key2, _key3]);
+        prefs.setBool('hasShowcased', true);
+      });
+    }
   }
 
   Future<void> _initializeHiveService() async {
@@ -731,6 +744,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
                   // Refresh the ui
                   setState(() {});
+                  _moveToNextDay();
                 }
               },
               icon: const Icon(Icons.remove_circle_outline_sharp,

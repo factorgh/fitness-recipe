@@ -43,6 +43,7 @@ class MealPlanService {
               'Meal plan created but failed to schedule notifications.');
         }
 
+        Navigator.of(context).pop();
         NativeAlerts()
             .showSuccessAlert(context, "Meal plan created successfully");
         return createdMealPlan;
