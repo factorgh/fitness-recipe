@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voltican_fitness/providers/internet_connect.dart';
 import 'package:voltican_fitness/screens/code_screen.dart';
 import 'package:voltican_fitness/screens/signup_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
@@ -132,6 +133,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       setState(() {
         _isLoading = true;
       });
+
+      // Check for internet connectivity
+      final connectivityState = ref.read(connectivityProvider);
+      if (!connectivityState.isConnected) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No internet connection'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+
+        return; // Exit the method early
+      }
 
       try {
         await authService.signIn(

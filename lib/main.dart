@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,7 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:showcaseview/showcaseview.dart';
 import 'package:timezone/data/latest.dart' as tz;
-
+import 'package:voltican_fitness/providers/internet_connect.dart'; // Your connectivity provider
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/onboarding_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
@@ -59,6 +61,8 @@ class MyApp extends ConsumerStatefulWidget {
 class _MyAppState extends ConsumerState<MyApp> {
   final AuthService authService = AuthService();
   final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
 
   @override
   void initState() {
@@ -68,6 +72,22 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     // Schedule a test notification
     _scheduleTestNotification();
+  }
+
+  // Helper method to show SnackBar
+  void showCustomSnackBar(String message, Color color) {
+    scaffoldMessengerKey.currentState
+      ?..hideCurrentSnackBar() // Hide the current SnackBar
+      ..showSnackBar(
+        SnackBar(
+          backgroundColor: color,
+          content: Text(
+            message,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          // Adjust duration as needed
+        ),
+      );
   }
 
   void _scheduleTestNotification() async {
@@ -83,14 +103,36 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    // Listen for connectivity changes and show a SnackBar
+    ref.listen<ConnectivityState>(connectivityProvider, (previous, next) {
+      if (next.isConnected != previous?.isConnected) {
+        // Print connection status to console
+
+        print(
+            'Connection Status----------------------------------------: ${next.isConnected ? 'Connected' : 'Disconnected'}');
+
+        Future.delayed(Duration.zero, () {
+          if (mounted) {
+            if (next.isConnected) {
+              print('---------------Connected-------------------');
+              showCustomSnackBar('Connected to the internet', Colors.green);
+            } else {
+              print('----------------Disconnected----------------');
+              showCustomSnackBar('No internet connection', Colors.red);
+            }
+          }
+        });
+      }
+    });
+
     // Watch the user state from the userProvider
     final user = ref.watch(userProvider);
 
     return ShowCaseWidget(builder: (context) {
       return Builder(builder: (context) {
         return MaterialApp(
+          scaffoldMessengerKey: scaffoldMessengerKey,
           theme: ThemeData(
-            // Set Poppins as the default font family
             fontFamily: 'Poppins',
             textTheme: const TextTheme(
               displayLarge: TextStyle(
@@ -132,12 +174,16 @@ class _MyAppState extends ConsumerState<MyApp> {
                   fontWeight: FontWeight.bold),
             ),
           ),
-          debugShowCheckedModeBanner: false, // Hide the debug banner
-          home: user != null
-              ? TabsScreen(
-                  userRole:
-                      user.role) // Navigate to TabsScreen if user is logged in
-              : const OnboardingScreen(), // Navigate to OnboardingScreen if no user is logged in
+          debugShowCheckedModeBanner: false,
+          home: Scaffold(
+            body: Stack(
+              children: [
+                user != null
+                    ? TabsScreen(userRole: user.role)
+                    : const OnboardingScreen(),
+              ],
+            ),
+          ),
         );
       });
     });

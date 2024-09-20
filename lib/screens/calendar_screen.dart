@@ -38,7 +38,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       });
     } catch (e) {
       setState(() {
-        _error = 'Failed to load meal plans';
+        _error = 'No meal plans';
         _isLoading = false;
       });
     }
