@@ -63,6 +63,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
+  String? lastSnackbarMessage;
 
   @override
   void initState() {
@@ -74,12 +75,33 @@ class _MyAppState extends ConsumerState<MyApp> {
     _scheduleTestNotification();
   }
 
+  void initializeConnectivityListener() {
+    ref.listen<ConnectivityState>(connectivityProvider, (previous, next) {
+      if (next.isConnected != previous?.isConnected) {
+        String message = next.isConnected
+            ? 'Connected to the internet'
+            : 'No internet connection';
+
+        // Only show the Snackbar if the message has changed
+        if (message != lastSnackbarMessage) {
+          lastSnackbarMessage = message; // Update the last message
+          showCustomSnackBar(
+              message, next.isConnected ? Colors.green : Colors.red);
+        }
+      }
+    });
+  }
+
   // Helper method to show SnackBar
-  void showCustomSnackBar(String message, Color color) {
+  void showCustomSnackBar(
+    String message,
+    Color? color,
+  ) {
     scaffoldMessengerKey.currentState
       ?..hideCurrentSnackBar() // Hide the current SnackBar
       ..showSnackBar(
         SnackBar(
+          duration: const Duration(seconds: 1),
           backgroundColor: color,
           content: Text(
             message,
@@ -115,16 +137,30 @@ class _MyAppState extends ConsumerState<MyApp> {
           if (mounted) {
             if (next.isConnected) {
               print('---------------Connected-------------------');
-              showCustomSnackBar('Connected to the internet', Colors.green);
+              showCustomSnackBar('Connected to the internet', Colors.black54);
             } else {
               print('----------------Disconnected----------------');
-              showCustomSnackBar('No internet connection', Colors.red);
+              showCustomSnackBar('No internet connection', Colors.redAccent);
             }
           }
         });
       }
     });
 
+    ref.listen<ConnectivityState>(connectivityProvider, (previous, next) {
+      if (next.isConnected != previous?.isConnected) {
+        String message = next.isConnected
+            ? 'Connected to the internet'
+            : 'No internet connection';
+
+        // Only show the Snackbar if the message has changed
+        if (message != lastSnackbarMessage) {
+          lastSnackbarMessage = message; // Update the last message
+          showCustomSnackBar(
+              message, next.isConnected ? Colors.black45 : Colors.red);
+        }
+      }
+    });
     // Watch the user state from the userProvider
     final user = ref.watch(userProvider);
 
