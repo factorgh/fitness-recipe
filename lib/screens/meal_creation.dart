@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/Features/mealplan/services/mealplan_service.dart';
 import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
@@ -21,6 +23,7 @@ import 'package:voltican_fitness/utils/hive/hive_mealplan.dart';
 import 'package:voltican_fitness/utils/hive/hive_recurrence.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class MealCreationScreen extends ConsumerStatefulWidget {
   final DateTime selectedDay;
@@ -38,7 +41,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   List<User> _allTrainees = [];
   List<User> _searchResults = [];
   final List<User> _selectedTrainees = [];
-  final bool _isLoading = false;
+
   final List<DateTime> _highlightedDates = [];
   List<Meal> startMeals = [];
 
@@ -49,6 +52,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _mealPlanNameController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   Map<String, List<Map<String, dynamic>>> selectedMeals = {};
   List<Recipe> myRecipes = [];
@@ -56,9 +60,17 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   final RecipeService recipeService = RecipeService();
   final TrainerService trainerService = TrainerService();
   DateTime? newDay;
+  bool _hasShowcased = false;
 
   MealPlan? mealPlanDraft;
 
+  // Showacse Global keys
+  final GlobalKey _key1 = GlobalKey(); //Showcase for Save meal plan to draft
+
+  final GlobalKey _key2 = GlobalKey(); //Showacse for Clear from draft
+  final GlobalKey _key3 = GlobalKey(); //Showacse for higlitedDate
+  final GlobalKey _key4 = GlobalKey(); //Showcase for add new recipe
+  final GlobalKey _key5 = GlobalKey(); //Showacse for recurrence
   // Callback function to handle selection changes
   void _handleRecipeSelectionChanged(List<Meal> selectedAllocations) {
     print("Recurrence");
@@ -122,6 +134,21 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     // Initialize HiveService outside of initState
     _initializeHiveService();
     setDraftMealPlan();
+
+// Showcase handler
+    _checkAndShowcase();
+  }
+
+  Future<void> _checkAndShowcase() async {
+    final prefs = await SharedPreferences.getInstance();
+    _hasShowcased = prefs.getBool('hasShowcased') ?? false;
+
+    if (!_hasShowcased) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ShowCaseWidget.of(context).startShowCase([_key1, _key2, _key3]);
+        prefs.setBool('hasShowcased', true);
+      });
+    }
   }
 
   Future<void> _initializeHiveService() async {
@@ -136,6 +163,23 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     _searchController.dispose();
     _mealPlanNameController.dispose();
     super.dispose();
+  }
+
+  void _startShowcase() async {
+    // Scroll to the item you want to showcase
+    await _scrollToItem();
+
+    // Start the showcase after scrolling
+    final showcase = ShowCaseWidget.of(context);
+    showcase.startShowCase([_key3, _key4, _key5]);
+  }
+
+  Future<void> _scrollToItem() async {
+    _scrollController.animateTo(
+      100.0,
+      duration: const Duration(seconds: 2),
+      curve: Curves.easeInOut,
+    );
   }
 
 // Highlighted dates logic
@@ -351,24 +395,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         customDays: recurrence.customDays);
   }
 
-// //Convert to hive meals
-//   List<HiveMeal> convertMealsToHiveMeals(List<Meal> meals) {
-//     // Chosen recurrence
-//     print('---------------------chosen recurrence');
-//     print(chosenRecurrence);
-//     return meals.map((meal) {
-//       return HiveMeal(
-//           mealType: meal.mealType,
-//           recipes: meal.recipes!,
-//           isDraft: true,
-//           timeOfDay: meal.timeOfDay,
-//           date: meal.date,
-//           recurrence: convertToHiveRecurrence(chosenRecurrence!)
-//           // etc.
-//           );
-//     }).toList();
-//   }
-
 // Handle Save  meal plan to the draft
   Future<void> _saveMealPlanToDraft() async {
     final HiveService hiveService = HiveService();
@@ -537,131 +563,193 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     });
   }
 
+  void showInstructionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0), // Rounded corners
+          ),
+          title: const Text(
+            "Instruction Manual",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          content: const SizedBox(
+            height: 50,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "1. Select an highlighted date to add meal ",
+                  style: TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 10,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "2. Select ",
+                      style: TextStyle(
+                        fontSize: 10,
+                      ),
+                    ),
+                    Icon(
+                      Icons.refresh,
+                      color: Colors.redAccent,
+                      size: 14,
+                    ),
+                    Text(
+                      " to recurre before saving a meal ",
+                      style: TextStyle(
+                        overflow: TextOverflow.ellipsis,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "3. Select ",
+                      style: TextStyle(
+                        fontSize: 10,
+                      ),
+                    ),
+                    Icon(Icons.save, color: Colors.blue, size: 14),
+                    Text(
+                      " to save a meal to your draft",
+                      style: TextStyle(
+                        overflow: TextOverflow.ellipsis,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+          actions: [
+            Reusablebutton(
+                text: "Okay",
+                onPressed: () {
+                  Navigator.of(context).pop();
+                })
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'Create Meal Plan',
-          style: TextStyle(fontWeight: FontWeight.w600),
+          style: TextStyle(fontWeight: FontWeight.w500),
         ),
         actions: [
-          // IconButton(
-          //     onPressed: () async {
-          //       // Fetching a MealPlan
-          //       final hiveService = HiveService();
-          //       final fetchMeals = await hiveService.fetchAllMeals();
-          //       print('--------------all-------$fetchMeals');
-
-          //       // check draft meal plan
-          //       final HiveMealPlan? draftMealPlan = await _getDraftMealPlan();
-          //       print('-----------------------all meal plans--------------');
-          //       print(draftMealPlan);
-
-          //       // check hive box state
-          //       final hiveState = hiveService.isMealBoxEmpty();
-          //       print('----------------hiveState----------------$hiveState');
-
-          //       final List<Meal> meals = [];
-
-          //       // Create store instance
-
-          //       for (Meal meal in _selectedRecipeAllocations) {
-          //         meals.add(Meal(
-          //           mealType: meal.mealType,
-          //           date: newDay!,
-          //           timeOfDay: meal.timeOfDay,
-          //           recipes: meal.recipes,
-          //           recurrence: chosenRecurrence,
-          //         ));
-          //       }
-          //     },
-          //     icon: const Icon(Icons.add)),
-          IconButton(
-            onPressed: () async {
-              bool confirmSave = await showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text(
-                      'Save Meal Plan',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    content: const Text('Do you want to save your meal plan?'),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Cancel'),
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pop(false); // Close the dialog without saving
-                        },
-                      ),
-                      TextButton(
-                        child: const Text('Confirm'),
-                        onPressed: () {
-                          Navigator.of(context).pop(true); // Confirm saving
-                        },
-                      ),
-                    ],
+          Showcase(
+              key: _key1,
+              description: 'Tap here to save your meal plan to draft',
+              child: IconButton(
+                onPressed: () async {
+                  bool confirmSave = await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text(
+                          'Save Meal Plan',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        content:
+                            const Text('Do you want to save your meal plan?'),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Cancel'),
+                            onPressed: () {
+                              Navigator.of(context).pop(
+                                  false); // Close the dialog without saving
+                            },
+                          ),
+                          TextButton(
+                            child: const Text('Confirm'),
+                            onPressed: () {
+                              Navigator.of(context).pop(true); // Confirm saving
+                            },
+                          ),
+                        ],
+                      );
+                    },
                   );
+
+                  if (confirmSave == true) {
+                    await _saveMealPlanToDraft(); // Adjust this with your save method
+                    print(
+                        '------------------------Meal Plan Saved-------------');
+
+                    // Refresh the UI after saving
+                    setState(() {});
+                  }
                 },
-              );
-
-              if (confirmSave == true) {
-                await _saveMealPlanToDraft(); // Adjust this with your save method
-                print('------------------------Meal Plan Saved-------------');
-
-                // Refresh the UI after saving
-                setState(() {});
-              }
-            },
-            icon: const Icon(
-              Icons.save,
-              color: Colors.blue,
-            ), // Save icon
-          ),
-          IconButton(
-            onPressed: () async {
-              bool confirmClear = await showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text(
-                      'Clear your meal draft',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    content: const Text(
-                        'Are you sure you want to clear all meals from the draft?'),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Cancel'),
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pop(false); // Close the dialog without clearing
-                        },
+                icon: const Icon(
+                  Icons.save,
+                  color: Colors.blue,
+                ), // Save icon
+              )),
+          Showcase(
+            key: _key2,
+            description: 'Tap here to clear your meal draft',
+            child: IconButton(
+              onPressed: () async {
+                bool confirmClear = await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text(
+                        'Clear your meal draft',
+                        style: TextStyle(fontWeight: FontWeight.w500),
                       ),
-                      TextButton(
-                        child: const Text('Confirm'),
-                        onPressed: () {
-                          Navigator.of(context).pop(true); // Confirm clearing
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
+                      content: const Text(
+                          'Are you sure you want to clear all meals from the draft?'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(context).pop(
+                                false); // Close the dialog without clearing
+                          },
+                        ),
+                        TextButton(
+                          child: const Text('Confirm'),
+                          onPressed: () {
+                            Navigator.of(context).pop(true); // Confirm clearing
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
 
-              if (confirmClear == true) {
-                final hiveService = HiveService();
-                await hiveService.clearMealDraftBox();
-                print(
-                    '------------------------Meal Draft box cleared-------------');
+                if (confirmClear == true) {
+                  final hiveService = HiveService();
+                  await hiveService.clearMealDraftBox();
+                  print(
+                      '------------------------Meal Draft box cleared-------------');
 
-                // Refresh the ui
-                setState(() {});
-              }
-            },
-            icon: const Icon(Icons.remove_circle),
+                  // Refresh the ui
+                  setState(() {});
+                  _moveToNextDay();
+                }
+              },
+              icon: const Icon(Icons.remove_circle_outline_sharp,
+                  color: Colors.redAccent),
+            ),
           )
         ],
       ),
@@ -670,6 +758,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         child: Form(
           key: _formKey,
           child: ListView(
+            controller: _scrollController,
             children: [
               const Text(
                 "Add Trainees",
@@ -691,9 +780,16 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                 Column(
                   children: _searchResults.map((trainee) {
                     return ListTile(
-                      title: Text(trainee.fullName),
+                      title: Text(
+                        trainee.fullName,
+                        style: const TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.w600),
+                      ),
                       subtitle: Text(trainee.username),
                       trailing: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            foregroundColor: Colors.white),
                         onPressed: () => _addTrainee(trainee),
                         child: const Text('Add'),
                       ),
@@ -710,9 +806,16 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                 Column(
                   children: _selectedTrainees.map((trainee) {
                     return ListTile(
-                      title: Text(trainee.fullName),
+                      title: Text(
+                        trainee.fullName,
+                        style: const TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.w600),
+                      ),
                       subtitle: Text(trainee.username),
                       trailing: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            foregroundColor: Colors.white),
                         onPressed: () => _removeTrainee(trainee),
                         child: const Text('Remove'),
                       ),
@@ -780,6 +883,8 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                       _endDate = null;
                     }
                   });
+                  _startShowcase();
+                  showInstructionDialog(context);
                 },
               ),
               const SizedBox(height: 20),
@@ -903,7 +1008,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                       ),
                       availableGestures: AvailableGestures.all,
                     )
-                  : const SizedBox(),
+                  : const SizedBox.shrink(),
               const SizedBox(height: 20),
               newDay != null
                   ? MealPeriodSelector(
@@ -921,29 +1026,12 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
               const SizedBox(
                 height: 20,
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white),
+              Reusablebutton(
+                text: "Continue To Next Day",
                 onPressed: () async {
                   // After saving data to hive move to next day
                   _moveToNextDay();
                 },
-                child: _isLoading
-                    ? const CircularProgressIndicator(
-                        color: Colors.white,
-                      )
-                    : const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Continue to Next Day',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500, fontSize: 16),
-                        ),
-                      ),
               ),
               const Padding(
                 padding: EdgeInsets.all(8.0),
@@ -951,13 +1039,8 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                   color: Colors.black,
                 ),
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white),
+              Reusablebutton(
+                text: 'Preview Meal Plan',
                 onPressed: () async {
                   ///Delay for sometime then after show bottom  sheet with meal plan preview
                   Future.delayed(
@@ -981,18 +1064,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
                   showMealPlanPreviewBottomSheet(context, mealPlan);
                 },
-                child: _isLoading
-                    ? const CircularProgressIndicator(
-                        color: Colors.white,
-                      )
-                    : const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Preview Meal Plan',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500, fontSize: 16),
-                        ),
-                      ),
               ),
               const SizedBox(height: 20),
             ],

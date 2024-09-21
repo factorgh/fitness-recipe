@@ -12,6 +12,7 @@ import 'package:voltican_fitness/screens/login_screen.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/screens/profile_screen.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -39,12 +40,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         centerTitle: true,
         title: const Text(
           'Settings',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
         ),
       ),
       body: SafeArea(
         child: Container(
-          margin: const EdgeInsets.only(top: 20),
+          margin: const EdgeInsets.only(top: 15),
           child: ListView(
             padding: const EdgeInsets.all(16.0),
             children: <Widget>[
@@ -129,16 +130,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _buildLogoutButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            backgroundColor: Colors.red, // Background color
-            foregroundColor: Colors.white, // Text color
-          ),
-          onPressed: _logout,
-          child: const Text('Logout')),
-    );
+    return Reusablebutton(text: "Logout", onPressed: _logout);
   }
 }

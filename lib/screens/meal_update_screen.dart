@@ -21,6 +21,7 @@ import 'package:voltican_fitness/utils/hive/hive_meal.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/meal_period_selector.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class MealUpdateScreen extends ConsumerStatefulWidget {
   final MealPlan mealPlan;
@@ -44,7 +45,7 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
   Recurrence? chosenRecurrence;
 
   List<Meal> _selectedRecipeAllocations = [];
-  List<Meal> _draftMeals = [];
+  final List<Meal> _draftMeals = [];
   List<Meal> startMeals = [];
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _mealPlanNameController = TextEditingController();
@@ -448,7 +449,7 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Update Meal Plan',
-            style: TextStyle(fontWeight: FontWeight.w800)),
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20)),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -640,35 +641,14 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.white,
-                            ),
-                            onPressed: () async {
-                              // Move to the next day regardless of recurrence
-                              _moveToNextDay();
-                            },
-                            child: _isLoading
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white,
-                                  )
-                                : const Padding(
-                                    padding: EdgeInsets.all(12.0),
-                                    child: Text(
-                                      'Continue to Next Day',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                          ),
-                        ),
+                            padding: const EdgeInsets.all(4.0),
+                            child: Reusablebutton(
+                              text: "Continue To Next Day",
+                              onPressed: () async {
+                                // Move to the next day regardless of recurrence
+                                _moveToNextDay();
+                              },
+                            )),
                       ),
                       const Padding(
                         padding: EdgeInsets.all(8.0),
@@ -676,51 +656,32 @@ class _MealUpdateScreenState extends ConsumerState<MealUpdateScreen> {
                           color: Colors.black,
                         ),
                       ),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.white),
-                          onPressed: () async {
-                            ///Delay for sometime then after show bottom  sheet with meal plan preview
-                            Future.delayed(
-                              const Duration(milliseconds: 3000),
-                            );
+                      _isLoading
+                          ? const CircularProgressIndicator()
+                          : Reusablebutton(
+                              text: 'Preview Update Meal Plan',
+                              onPressed: () async {
+                                ///Delay for sometime then after show bottom  sheet with meal plan preview
+                                Future.delayed(
+                                  const Duration(milliseconds: 3000),
+                                );
 
-                            final mealPlan = MealPlan(
-                              id: widget.mealPlan.id,
-                              name: _mealPlanNameController.text,
-                              duration: _selectedDuration,
-                              startDate: _startDate,
-                              endDate: _endDate,
-                              meals: _selectedRecipeAllocations,
-                              trainees: _selectedTrainees
-                                  .map((trainee) => trainee.id)
-                                  .toList(),
-                              createdBy: ref.read(userProvider)!.id,
-                            );
-                            showMealPlanPreviewUpdateBottomSheet(
-                                context, mealPlan);
-                          },
-                          child: _isLoading
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                              : const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Preview Update Meal Plan',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16),
-                                  ),
-                                ),
-                        ),
-                      ),
+                                final mealPlan = MealPlan(
+                                  id: widget.mealPlan.id,
+                                  name: _mealPlanNameController.text,
+                                  duration: _selectedDuration,
+                                  startDate: _startDate,
+                                  endDate: _endDate,
+                                  meals: _selectedRecipeAllocations,
+                                  trainees: _selectedTrainees
+                                      .map((trainee) => trainee.id)
+                                      .toList(),
+                                  createdBy: ref.read(userProvider)!.id,
+                                );
+                                showMealPlanPreviewUpdateBottomSheet(
+                                    context, mealPlan);
+                              },
+                            ),
                       const SizedBox(height: 32),
                     ],
                   ),

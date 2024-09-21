@@ -234,6 +234,34 @@ class AuthService {
     }
   }
 
+  Future<void> updateStatus({
+    required BuildContext context,
+    required String status,
+    required WidgetRef ref,
+    required String id,
+  }) async {
+    try {
+      dio.Response res = await client.dio.put(
+        "/users/$id",
+        data: {'status': status},
+      );
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          // Convert the response data to a User object
+          User updatedUser = User.fromJson(res.data);
+          // Update the user in the state after a successful update
+          ref.read(userProvider.notifier).setUser(updatedUser);
+        },
+      );
+    } catch (e) {
+      print('Error updating user: $e');
+      showSnack(context, 'Failed to update user');
+    }
+  }
+
   Future<void> updateImage({
     required BuildContext context,
     required String imageUrl,
@@ -311,6 +339,32 @@ class AuthService {
   }) async {
     try {
       final response = await client.dio.get('/users/$userId');
+
+      print('Response status code: ${response.statusCode}');
+      print('Response data: ${response.data}');
+
+      if (response.statusCode == 200) {
+        // Convert the response data to a User object
+        User user = User.fromJson(response.data);
+        print('Fetched User: $user');
+        onSuccess(user);
+      } else {
+        print('Failed to load user: ${response.statusCode}');
+        throw Exception('Failed to load user');
+      }
+    } catch (e) {
+      // Handle other errors here
+      print('Error fetching user: $e');
+      throw Exception('Failed to load user');
+    }
+  }
+
+  Future<void> getUserByName({
+    required Function(User) onSuccess,
+    required String username,
+  }) async {
+    try {
+      final response = await client.dio.get('/users/user/$username');
 
       print('Response status code: ${response.statusCode}');
       print('Response data: ${response.data}');

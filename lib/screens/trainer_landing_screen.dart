@@ -6,6 +6,7 @@ import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
 import 'package:voltican_fitness/utils/socket_io_setup.dart';
 import 'package:voltican_fitness/widgets/category_slider.dart';
 import 'package:voltican_fitness/widgets/new_recipe_slider.dart';
@@ -145,47 +146,25 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                   border: Border.all(color: Colors.white, width: 2),
                 ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.only(
+                        top: 15,
+                        left: 15,
+                        right: 15,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 30,
-                                backgroundImage: NetworkImage(
-                                  user?.imageUrl ??
-                                      'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png',
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Hello, ${user?.username ?? ''}',
-                                    style: const TextStyle(
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const Text(
-                                    'Check amazing recipes and \nassign amzing meal plans..',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage: NetworkImage(
+                              user?.imageUrl ??
+                                  'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png',
+                            ),
                           ),
+
                           // right side of row
                           badges.Badge(
                             position:
@@ -221,10 +200,43 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                             ),
                           ),
                         ],
+
+                        // Row end
                       ),
                     ),
-                    const SizedBox(
-                      height: 30,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15, top: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Hello, ',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              CapitalizeFirstLetter(
+                                text: user?.username ?? '',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                ),
+                              )
+                            ],
+                          ),
+                          const Text(
+                            'Check amazing recipes and assign amzing meal plans...',
+                            style: TextStyle(color: Colors.white, fontSize: 15),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -233,20 +245,15 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
               const SizedBox(
                 height: 20,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       "Explore All Recipes",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                    Text(
-                      "See All",
-                      style: TextStyle(
-                          color: Colors.red[600], fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -259,21 +266,15 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
                 onCategorySelected: handleCategorySelected,
               ),
               // New recipe slider
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       "Popular",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                    Text(
-                      "See All",
-                      style: TextStyle(
-                          color: Colors.red[800], fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -304,8 +305,8 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
               SliderTrainerLanding(
                 ids: _topTrainerIds,
                 emails: _topTrainersEmail,
-                recipes: _topTrainers, // Pass the names of top trainers
-                images: _trainerImages, // Pass the list of trainer images
+                recipes: _topTrainers,
+                images: _trainerImages,
                 onTrainerSelected: handleTrainerSelected,
               ),
             ],

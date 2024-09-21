@@ -24,7 +24,7 @@ class RoleItemWidget extends StatelessWidget {
           border: Border.all(
             width: isSelected ? 5 : 3,
             color: isSelected
-                ? Colors.red
+                ? Colors.redAccent
                 : const Color.fromARGB(255, 250, 233, 233),
           ),
         ),

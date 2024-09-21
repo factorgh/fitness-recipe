@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/screens/login_screen.dart';
 import 'package:voltican_fitness/screens/signup_screen.dart';
@@ -14,10 +15,43 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   List images = ['onboarding_1.png', 'onboarding_2.png', 'onboarding_3.png'];
   List mainContent = [
     'Personalized Nutrition,',
-    'Stay on track,Everybite',
-    'Nutrition made easy,One bite'
+    'Stay on track, Every bite',
+    'Nutrition made easy, One bite'
   ];
-  List subContent = ['Tailored for you', 'count', 'at a time'];
+  List subContent = ['Tailored for you', 'Count', 'At a time'];
+
+  late PageController _pageController;
+  int _currentPage = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: 0);
+
+    // Auto slide every 3 seconds with a smooth transition
+    _timer = Timer.periodic(const Duration(seconds: 5), (Timer timer) {
+      if (_currentPage < images.length - 1) {
+        _currentPage++;
+      } else {
+        _currentPage = 0;
+      }
+
+      _pageController.animateToPage(
+        _currentPage,
+        duration:
+            const Duration(milliseconds: 800), // Smooth transition duration
+        curve: Curves.easeInOut, // Smooth transition curve
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _timer?.cancel();
+    super.dispose();
+  }
 
   void _login(BuildContext ctx) {
     Navigator.of(context).push(
@@ -41,6 +75,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: Stack(
         children: [
           PageView.builder(
+            controller: _pageController,
             itemCount: images.length,
             itemBuilder: (_, index) {
               return Container(
@@ -101,18 +136,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             right: 20,
             child: Column(
               children: [
-                // InkWell(
-                //   onTap: () {
-                //     _signUp(context);
-                //   },
-                //   splashColor: Colors.purple,
-                //   child: const CustomButton(
-                //       size: 20,
-                //       width: 50,
-                //       backColor: Colors.red,
-                //       text: 'Skip',
-                //       textColor: Colors.white),
-                // ),
                 GestureDetector(
                   onTap: () {
                     _signUp(context);
@@ -129,7 +152,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   },
                   splashColor: Colors.purple,
                   child: const ButtonWidget(
-                      backColor: Colors.red,
+                      backColor: Colors.redAccent,
                       text: 'Get Started',
                       textColor: Colors.white),
                 ),

@@ -32,9 +32,16 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.example.voltican_fitness"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
+  lintOptions {
+        // Set this to true to abort the build on lint errors
+        abortOnError false
+        // Use the baseline file for lint
+        baseline file("lint-baseline.xml")
+        
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -46,7 +53,7 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 33
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
         multiDexEnabled = true

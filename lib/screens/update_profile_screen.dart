@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class UpdateProfileScreen extends ConsumerStatefulWidget {
   const UpdateProfileScreen({super.key});
@@ -54,7 +56,11 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Update Profile')),
+      appBar: AppBar(
+          title: const Text(
+        'Update Profile',
+        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25),
+      )),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -101,10 +107,7 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
                 },
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _updateProfile,
-                child: const Text('Update Profile'),
-              ),
+              Reusablebutton(text: 'Update Profile', onPressed: _updateProfile)
             ],
           ),
         ),

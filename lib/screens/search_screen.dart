@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/screens/trainer_meal_details.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
 
 class SearchScreen extends StatefulWidget {
   final String category;
@@ -17,11 +18,38 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   late Future<List<Recipe>> _recipesFuture;
+  List<Recipe> _allRecipes = [];
+  List<Recipe> _filteredRecipes = [];
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _recipesFuture = RecipeService().fetchRecipesByMealPeriod(widget.category);
+    _fetchRecipes();
+    _searchController.addListener(_filterRecipes);
+  }
+
+  Future<void> _fetchRecipes() async {
+    try {
+      final recipes = await _recipesFuture;
+      setState(() {
+        _allRecipes = recipes;
+        _filteredRecipes = recipes; // Initially display all recipes
+      });
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  void _filterRecipes() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredRecipes = _allRecipes.where((recipe) {
+        final titleLower = recipe.title.toLowerCase();
+        return titleLower.contains(query);
+      }).toList();
+    });
   }
 
   void handleRecipeSelected(Recipe recipe) {
@@ -36,10 +64,19 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.category),
+        title: Text(
+          widget.category,
+          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+        ),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -48,6 +85,7 @@ class _SearchScreenState extends State<SearchScreen> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: TextField(
+                controller: _searchController,
                 decoration: InputDecoration(
                   hintText: 'Search',
                   border: OutlineInputBorder(
@@ -68,11 +106,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Center(child: Text('No recipes found'));
                   } else {
-                    final recipes = snapshot.data!;
                     return ListView.builder(
-                      itemCount: recipes.length,
+                      itemCount: _filteredRecipes.length,
                       itemBuilder: (context, index) {
-                        final recipe = recipes[index];
+                        final recipe = _filteredRecipes[index];
                         return GestureDetector(
                           onTap: () => handleRecipeSelected(recipe),
                           child: Card(
@@ -96,14 +133,18 @@ class _SearchScreenState extends State<SearchScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        recipe.title,
-                                        style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Text(
-                                          'Rating: ${recipe.averageRating.toStringAsFixed(1)}')
+                                      CapitalizeFirstLetter(text: recipe.title),
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                            size: 12,
+                                          ),
+                                          Text(
+                                              ' ${recipe.averageRating.toStringAsFixed(1)}'),
+                                        ],
+                                      )
                                     ],
                                   ),
                                 ],

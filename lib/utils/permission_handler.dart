@@ -1,0 +1,10 @@
+import 'package:permission_handler/permission_handler.dart';
+
+Future<void> requestNotificationPermission() async {
+  if (await Permission.notification.isDenied) {
+    await Permission.notification.request();
+  }
+}
+
+// Call this function before triggering location services or notifications
+

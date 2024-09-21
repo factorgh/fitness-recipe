@@ -145,7 +145,10 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red, // Set the button color
                     ),
-                    child: const Text("Unfollow"),
+                    child: const Text(
+                      "Unfollow",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
@@ -194,36 +197,6 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
     }
   }
 
-  // Widget _buildFollowButton() {
-  //   return ElevatedButton(
-  //     style: ElevatedButton.styleFrom(
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.circular(8.0),
-  //       ),
-  //       backgroundColor: Colors.blueAccent,
-  //       foregroundColor: Colors.black,
-  //     ),
-  //     onPressed: isLoading ? null : _handleFollowButtonPress,
-  //     child: isLoading
-  //         ? const SizedBox(
-  //             height: 20,
-  //             width: 20,
-  //             child: CircularProgressIndicator(
-  //               strokeWidth: 2.0,
-  //               color: Colors.white,
-  //             ),
-  //           )
-  //         : Text(
-  //             isFollowing ? 'Unfollow' : 'Follow',
-  //             style: const TextStyle(
-  //               fontSize: 15,
-  //               fontWeight: FontWeight.w800,
-  //               color: Colors.black,
-  //             ),
-  //           ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     final isMyFollowing = checkIfFollowing() ?? false;
@@ -242,11 +215,12 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
         ),
         title: const Text(
           'Trainer Profile',
-          style: TextStyle(fontWeight: FontWeight.w800),
+          style: TextStyle(fontWeight: FontWeight.w500),
         ),
       ),
       body: user == null
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(color: Colors.redAccent))
           : Column(
               children: [
                 Padding(
@@ -398,10 +372,10 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
         : ElevatedButton(
             style: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
+                borderRadius: BorderRadius.circular(12.0),
               ),
-              backgroundColor: Colors.blueAccent,
-              foregroundColor: Colors.black,
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
             ),
             onPressed: isLoading
                 ? null
@@ -419,6 +393,8 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                       });
                     } catch (error) {
                       print("Error: $error");
+                      alerts.showErrorAlert(
+                          context, "Request Not sent.Account is private");
                     } finally {
                       setState(() {
                         isLoading = false;

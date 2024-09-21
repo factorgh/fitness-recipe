@@ -9,9 +9,10 @@ import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
+import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
 
 import 'package:voltican_fitness/utils/show_snackbar.dart';
-import 'package:voltican_fitness/widgets/button.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class TraineeRecipeDetailScreen extends ConsumerStatefulWidget {
   const TraineeRecipeDetailScreen({super.key, required this.meal});
@@ -98,10 +99,11 @@ class _TraineeRecipeDetailScreenState
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Center(
-              child: Text(
-            'Leave your Review',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
-          )),
+            child: Text(
+              'Leave your Review',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -120,13 +122,8 @@ class _TraineeRecipeDetailScreenState
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Skip')),
+              child: const Text('Skip'),
             ),
-            const Spacer(),
             TextButton(
               onPressed: () {
                 String comment = commentController.text;
@@ -136,11 +133,7 @@ class _TraineeRecipeDetailScreenState
                 }
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Post')),
+              child: const Text('Post'),
             ),
           ],
         );
@@ -222,10 +215,10 @@ class _TraineeRecipeDetailScreenState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        widget.meal.title,
+                      CapitalizeFirstLetter(
+                        text: widget.meal.title,
                         style: const TextStyle(
-                          fontSize: 23,
+                          fontSize: 25,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -273,16 +266,15 @@ class _TraineeRecipeDetailScreenState
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
 
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 40),
                   const Text(
                     'Description',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                   Text(
                     widget.meal.description,
-                    style: const TextStyle(color: Colors.black54),
+                    style: const TextStyle(color: Colors.black54, fontSize: 12),
                   ),
                   const SizedBox(height: 20),
                   Container(
@@ -298,37 +290,32 @@ class _TraineeRecipeDetailScreenState
                     children: [
                       Icon(
                         Icons.no_food_sharp,
-                        size: 25,
+                        size: 20,
                         color: Colors.orange,
                       ),
-                      SizedBox(width: 5),
+                      SizedBox(width: 10),
                       Text(
                         'Ingredients',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: SizedBox(
-                      height: 100, // Adjust the height based on your needs
+                      // Adjust the height based on your needs
                       child: Column(
                         children: widget.meal.ingredients.map((ingredient) {
                           return Row(
                             children: [
-                              const Icon(
-                                Icons.check_circle_outline,
-                                color: Colors.green,
-                              ),
-                              const SizedBox(width: 12.0),
-                              Expanded(
-                                child: Text(
-                                  ingredient,
-                                  style: const TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                              const SizedBox(width: 8.0),
+                              Text(
+                                ingredient,
+                                style: const TextStyle(
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
                             ],
@@ -348,13 +335,15 @@ class _TraineeRecipeDetailScreenState
                       SizedBox(width: 5),
                       Text(
                         'Instructions',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Text(
                     widget.meal.instructions,
+                    style: const TextStyle(fontSize: 12),
                   ),
                   // Nutritional facts
                   const SizedBox(height: 30),
@@ -366,20 +355,21 @@ class _TraineeRecipeDetailScreenState
                         color: Colors.orange,
                       ),
                       SizedBox(width: 5),
-                      Text(
-                        'Nutritional Facts',
-                        style: TextStyle(fontSize: 16),
-                      ),
+                      Text('Nutritional Facts',
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.w600)),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Text(
                     widget.meal.facts,
+                    style: const TextStyle(fontSize: 12),
                   ),
                   const SizedBox(height: 30),
-                  InkWell(
-                    onTap: () async {
-                      // Check if recipe is already saved
+                  Reusablebutton(
+                    text: 'Save',
+                    onPressed: () async {
+// Check if recipe is already saved
                       if (savedRecipes.contains(widget.meal)) {
                         showSnack(context, 'Recipe is already saved');
                         return;
@@ -390,11 +380,6 @@ class _TraineeRecipeDetailScreenState
                           .saveRecipe(user!.id, widget.meal);
                       showSnack(context, 'Recipe has been saved successfully');
                     },
-                    splashColor: Colors.purple,
-                    child: const ButtonWidget(
-                        backColor: Colors.red,
-                        text: 'Save',
-                        textColor: Colors.white),
                   ),
                   const SizedBox(height: 30),
                 ],

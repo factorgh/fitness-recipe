@@ -10,9 +10,8 @@ import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/providers/user_recipes.dart';
 
-import 'package:voltican_fitness/screens/meal_creation.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
-import 'package:voltican_fitness/widgets/custom_button.dart';
+import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class CreateRecipeScreen extends ConsumerStatefulWidget {
   const CreateRecipeScreen({super.key});
@@ -31,6 +30,8 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
   String? selectedMealPeriod;
   bool isPrivate = false;
   String? status;
+  List<String> ingredientOptions = [];
+  List<String> selectedIngredients = [];
 
   final List<String> mealPeriods = [
     'Breakfast',
@@ -41,9 +42,10 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
 
   final TextEditingController _mealNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _ingredientsController = TextEditingController();
   final TextEditingController _instructionsController = TextEditingController();
   final TextEditingController _nutritionalFactsController =
+      TextEditingController();
+  final TextEditingController _newIngredientController =
       TextEditingController();
 
   void _takePicture() async {
@@ -62,9 +64,9 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
   void dispose() {
     _mealNameController.dispose();
     _descriptionController.dispose();
-    _ingredientsController.dispose();
     _instructionsController.dispose();
     _nutritionalFactsController.dispose();
+    _newIngredientController.dispose();
     super.dispose();
   }
 
@@ -101,7 +103,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
           context,
           Recipe(
               title: _mealNameController.text,
-              ingredients: _ingredientsController.text.split(","),
+              ingredients: selectedIngredients,
               instructions: _instructionsController.text,
               description: _descriptionController.text,
               facts: _nutritionalFactsController.text,
@@ -115,7 +117,8 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
       await Future.delayed(Duration.zero, () {
         ref.read(userRecipesProvider.notifier).loadUserRecipes();
       });
-      // Optionally handle success (e.g., show a success message)
+
+      Navigator.pop(context);
     } catch (e) {
       // Handle any errors (e.g., show an error message)
     } finally {
@@ -133,7 +136,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
       appBar: AppBar(
         title: const Text(
           'Create A New Recipe',
-          style: TextStyle(fontWeight: FontWeight.w500),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -222,14 +225,49 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
               const SizedBox(height: 20),
               _buildSectionTitle('Ingredients'),
               const SizedBox(height: 10),
-              _buildMultilineTextField(
-                controller: _ingredientsController,
-                hintText:
-                    'Which ingredients were used in this recipe?..Example 2 cups of rice,1 teaspoon of salt,..',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the ingredients .';
+              ...selectedIngredients.map((ingredient) {
+                return ListTile(
+                  title: Text(ingredient),
+                  trailing: IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.redAccent,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        selectedIngredients.remove(ingredient);
+                        ingredientOptions.remove(ingredient);
+                      });
+                    },
+                  ),
+                );
+              }),
+              _buildTextField(
+                controller: _newIngredientController,
+                hintText: 'Add new ingredient',
+                onEditingComplete: () {
+                  final newIngredient = _newIngredientController.text.trim();
+                  if (newIngredient.isNotEmpty &&
+                      !ingredientOptions.contains(newIngredient)) {
+                    setState(() {
+                      ingredientOptions.add(newIngredient);
+                      selectedIngredients.add(newIngredient);
+                      _newIngredientController.clear();
+                    });
                   }
+                },
+                onFieldSubmitted: (value) {
+                  final newIngredient = value.trim();
+                  if (newIngredient.isNotEmpty &&
+                      !ingredientOptions.contains(newIngredient)) {
+                    setState(() {
+                      ingredientOptions.add(newIngredient);
+                      selectedIngredients.add(newIngredient);
+                      _newIngredientController.clear();
+                    });
+                  }
+                },
+                validator: (String? value) {
                   return null;
                 },
               ),
@@ -293,9 +331,8 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                   'Selected recipe category: $selectedMealPeriod',
                   style: const TextStyle(fontSize: 16),
                 ),
-
               const SizedBox(height: 20),
-              // Swictch for recipe status
+              // Switch for recipe status
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -320,51 +357,13 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
                 ],
               ),
               const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _isLoading
-                        ? const CircularProgressIndicator()
-                        : CustomButton(
-                            size: 10,
-                            width: 150,
-                            backColor: Colors.red,
-                            text: 'Save and Complete',
-                            textColor: Colors.white,
-                            onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                await _createRecipe(user!);
-                                Navigator.of(context).pop();
-                              }
-                            },
-                          ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    CustomButton(
-                      size: 10,
-                      width: 150,
-                      backColor: Colors.red,
-                      text: 'Save and Assign',
-                      textColor: Colors.white,
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          await _createRecipe(user!);
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => MealCreationScreen(
-                                selectedDay: DateTime.now(),
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : Reusablebutton(
+                      text: "Create Recipe",
+                      onPressed: () {
+                        _createRecipe(user!);
+                      })
             ],
           ),
         ),
@@ -372,49 +371,47 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
     );
   }
 
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+    );
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
-    required String? Function(String?)? validator,
+    required FormFieldValidator<String> validator,
+    VoidCallback? onEditingComplete,
+    ValueChanged<String>? onFieldSubmitted,
   }) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
+        border: const OutlineInputBorder(),
         hintText: hintText,
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
       ),
       validator: validator,
+      onEditingComplete: onEditingComplete,
+      onFieldSubmitted: onFieldSubmitted,
     );
   }
 
   Widget _buildMultilineTextField({
     required TextEditingController controller,
     required String hintText,
-    required String? Function(String?)? validator,
+    required FormFieldValidator<String> validator,
   }) {
     return TextFormField(
       controller: controller,
-      maxLines: 3,
-      keyboardType: TextInputType.multiline,
       decoration: InputDecoration(
+        border: const OutlineInputBorder(),
         hintText: hintText,
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
       ),
       validator: validator,
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-      ),
+      maxLines: 5,
+      keyboardType: TextInputType.multiline,
     );
   }
 }
