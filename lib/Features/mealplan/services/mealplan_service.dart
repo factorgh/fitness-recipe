@@ -47,12 +47,10 @@ class MealPlanService {
             .showSuccessAlert(context, "Meal plan created successfully");
         return createdMealPlan;
       } else if (response.statusCode == 400) {
-        Future.delayed(const Duration(seconds: 5));
         NativeAlerts().showErrorAlert(context,
             'Failed to create meal plan. Please check days or duration or trainees on plan to avoid conflicts.');
         throw Exception('Failed to create meal plan: ${response.data}');
       } else {
-        Future.delayed(const Duration(seconds: 5));
         NativeAlerts().showErrorAlert(
             context, 'An unexpected error occurred. Please try again.');
         throw Exception('Unexpected error: ${response.statusCode}');

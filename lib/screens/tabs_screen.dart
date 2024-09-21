@@ -115,7 +115,7 @@ class _TabsScreenState extends State<TabsScreen> {
         onTap: _selectPage,
         currentIndex: _activePageIndex,
         unselectedItemColor: Colors.black54,
-        selectedItemColor: Colors.redAccent,
+        selectedItemColor: Colors.red,
         backgroundColor: const Color.fromARGB(255, 233, 242, 246),
         items: _bottomNavBarItems,
       ),

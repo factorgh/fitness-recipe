@@ -53,7 +53,7 @@ class RecipeItem extends StatelessWidget {
                     height: 30,
                     padding: const EdgeInsets.all(3),
                     decoration: BoxDecoration(
-                      color: Colors.redAccent,
+                      color: Colors.orangeAccent,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(

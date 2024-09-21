@@ -8,9 +8,8 @@ import 'package:voltican_fitness/providers/user_recipes.dart';
 
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
 import 'package:voltican_fitness/screens/meal_creation.dart';
-import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
 
-import 'package:voltican_fitness/widgets/reusable_button.dart';
+import 'package:voltican_fitness/widgets/button.dart';
 
 class MealDetailScreen extends ConsumerStatefulWidget {
   const MealDetailScreen({super.key, required this.meal});
@@ -162,30 +161,25 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      CapitalizeFirstLetter(
-                          text: widget.meal.title,
-                          style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w800)),
+                      Text(
+                        widget.meal.title,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       const Spacer(),
                     ],
                   ),
                   const SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   const Text(
                     'Description',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                   ),
                   Text(
                     widget.meal.description,
-                    style: const TextStyle(color: Colors.black54, fontSize: 12),
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    width: double.infinity,
-                    height: 0.5,
-                    decoration: BoxDecoration(
-                      color: Colors.black12,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                    style: const TextStyle(color: Colors.black54),
                   ),
                   const SizedBox(height: 20),
                   Row(
@@ -194,11 +188,11 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                       const Text(
                         'Status',
                         style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w600),
+                            fontSize: 18, fontWeight: FontWeight.w500),
                       ),
                       Text(
                         widget.meal.status,
-                        style: const TextStyle(fontSize: 12),
+                        style: const TextStyle(fontSize: 16),
                       ),
                     ],
                   ),
@@ -207,38 +201,41 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                     children: [
                       Icon(
                         Icons.no_food_sharp,
-                        size: 20,
+                        size: 25,
                         color: Colors.orange,
                       ),
-                      SizedBox(width: 10),
+                      SizedBox(width: 5),
                       Text(
                         'Ingredients',
                         style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w600),
+                            fontSize: 18, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: SizedBox(
-                      // Adjust the height based on your needs
-                      child: Column(
-                        children: widget.meal.ingredients.map((ingredient) {
-                          return Row(
-                            children: [
-                              const SizedBox(width: 8.0),
-                              Text(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: widget.meal.ingredients.map((ingredient) {
+                        return Row(
+                          children: [
+                            const Icon(
+                              Icons.check_circle_outline,
+                              color: Colors.green,
+                            ),
+                            const SizedBox(width: 12.0),
+                            Expanded(
+                              child: Text(
                                 ingredient,
                                 style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.w400,
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                            ],
-                          );
-                        }).toList(),
-                      ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -253,7 +250,7 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                       Text(
                         'Instructions',
                         style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w600),
+                            fontSize: 18, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -262,51 +259,70 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       widget.meal.instructions,
-                      style: const TextStyle(fontSize: 12),
                     ),
                   ),
                   const SizedBox(height: 30),
                   const Row(
                     children: [
                       Icon(
-                        Icons.fact_check,
+                        Icons.text_snippet,
                         size: 25,
                         color: Colors.orange,
                       ),
                       SizedBox(width: 5),
                       Text(
-                        'Nutritional Facts',
+                        'Nutritional facts',
                         style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w600),
+                            fontSize: 18, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    widget.meal.facts,
-                    style: const TextStyle(fontSize: 12),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      widget.meal.facts,
+                    ),
                   ),
-                  const SizedBox(height: 20),
-                  Reusablebutton(
-                      text: "Update",
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => EditRecipeScreen(
-                                  recipe: widget.meal,
-                                )));
-                      }),
-                  Reusablebutton(
-                      text: "Assign",
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => MealCreationScreen(
-                                selectedDay: DateTime.now())));
-                      }),
-                  Reusablebutton(
-                      text: 'Delete',
-                      onPressed: () {
-                        _showDeleteConfirmationDialog(context);
-                      }),
+                  const SizedBox(height: 30),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => EditRecipeScreen(
+                                recipe: widget.meal,
+                              )));
+                    },
+                    splashColor: Colors.purple,
+                    child: const ButtonWidget(
+                        backColor: Colors.red,
+                        text: 'Update',
+                        textColor: Colors.white),
+                  ),
+                  const SizedBox(height: 10),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              MealCreationScreen(selectedDay: DateTime.now())));
+                    },
+                    splashColor: Colors.purple,
+                    child: const ButtonWidget(
+                        backColor: Colors.red,
+                        text: 'Assign',
+                        textColor: Colors.white),
+                  ),
+                  const SizedBox(height: 10),
+                  InkWell(
+                    onTap: () {
+                      _showDeleteConfirmationDialog(context);
+                    },
+                    splashColor: Colors.purple,
+                    child: const ButtonWidget(
+                        backColor: Colors.red,
+                        text: 'Delete',
+                        textColor: Colors.white),
+                  ),
+                  const SizedBox(height: 10),
                 ],
               ),
             ),

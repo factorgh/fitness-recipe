@@ -1,11 +1,9 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/screens/create_recipe.screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:voltican_fitness/utils/hive/hive_class.dart';
 
@@ -18,9 +16,6 @@ class MealPeriodSelector extends ConsumerStatefulWidget {
   final void Function(Recurrence) onRecurrenceChanged;
   final void Function()? saveToDraft;
   final Recurrence? chosenRecurrence;
-  final GlobalKey? key4;
-  final GlobalKey? key5;
-  final GlobalKey? key6;
 
   final List<Meal>? defaultMeals;
   final DateTime? selectedDay;
@@ -37,9 +32,6 @@ class MealPeriodSelector extends ConsumerStatefulWidget {
     this.defaultMeals,
     this.selectedDay,
     this.chosenRecurrence,
-    this.key4,
-    this.key5,
-    this.key6,
     super.key,
   });
 
@@ -169,12 +161,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text(
-              'Invalid Time for $mealPeriod',
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            title: Text('Invalid Time for $mealPeriod'),
             content: Text(
                 'Please select a time between ${startTime.format(context)} and ${endTime.format(context)} for $mealPeriod.'),
             actions: [
@@ -343,31 +330,20 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
       child: filteredRecipes.isEmpty
           ? Center(
               child: RichText(
-              text: TextSpan(
-                text: 'No meal period available.',
-                style: DefaultTextStyle.of(context).style,
-                children: <TextSpan>[
-                  TextSpan(
-                    text: ' Click here to create a meal',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color:
-                          Colors.blue, // Set color to indicate it's clickable
-                      decoration: TextDecoration
-                          .underline, // Optional: underline to indicate a link
-                    ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const CreateRecipeScreen(),
-                          ),
-                        );
-                      },
-                  ),
-                ],
+                text: TextSpan(
+                  text: ' No $mealPeriod available.',
+                  style: DefaultTextStyle.of(context).style,
+                  children: const <TextSpan>[
+                    TextSpan(
+                        text: ' Click here to create a meal',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          overflow: TextOverflow.ellipsis,
+                        )),
+                  ],
+                ),
               ),
-            ))
+            )
           : ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: filteredRecipes.length,
@@ -404,7 +380,6 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                                       if (loadingProgress == null) return child;
                                       return Center(
                                         child: CircularProgressIndicator(
-                                          color: Colors.redAccent,
                                           value: loadingProgress
                                                       .expectedTotalBytes !=
                                                   null
@@ -520,10 +495,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                   builder: (BuildContext context,
                       AsyncSnapshot<List<String>> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child:
-                            CircularProgressIndicator(color: Colors.redAccent),
-                      ); // Or any other loading indicator
+                      return const CircularProgressIndicator(); // Or any other loading indicator
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else if (snapshot.hasData) {

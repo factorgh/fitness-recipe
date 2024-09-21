@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/notify_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
-import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
 import 'package:voltican_fitness/utils/socket_io_setup.dart';
 import 'package:voltican_fitness/widgets/recipe_advert_slider.dart';
 
@@ -135,28 +134,22 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        RichText(
-                          text: const TextSpan(
-                            text: 'Hello, ',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.redAccent,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        CapitalizeFirstLetter(
-                          text: user?.username ?? '',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
+                    RichText(
+                      text: TextSpan(
+                        text: 'Hello, ',
+                        style: const TextStyle(
                             fontSize: 20,
                             color: Colors.black,
-                          ),
-                        )
-                      ],
+                            fontWeight: FontWeight.w700),
+                        children: <TextSpan>[
+                          TextSpan(
+                              text: user?.username,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 20,
+                                  color: Colors.grey)),
+                        ],
+                      ),
                     ),
 
                     // right side of row
@@ -204,7 +197,7 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                 child: Stack(
                   children: [
                     Container(
-                      height: 190,
+                      height: 200,
                       width: 360,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
@@ -259,10 +252,7 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                                     children: [
                                       Icon(Icons.qr_code_scanner_outlined),
                                       SizedBox(width: 3),
-                                      Text(
-                                        "Scan Now",
-                                        style: TextStyle(color: Colors.white),
-                                      )
+                                      Text("Scan Now")
                                     ],
                                   )),
                             ),
@@ -288,26 +278,29 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                     Text(
                       "Top Trainers",
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
               ),
               // Trainers
 
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: SliderTrainerLanding(
-                  ids: _topTrainerIds,
-                  emails: _topTrainersEmail,
-                  recipes: _topTrainers, // Pass the names of top trainers
-                  images: _trainerImages, // Pass the list of trainer images
-                  onTrainerSelected: handleTrainerSelected,
-                ),
+              SliderTrainerLanding(
+                ids: _topTrainerIds,
+                emails: _topTrainersEmail,
+                recipes: _topTrainers, // Pass the names of top trainers
+                images: _trainerImages, // Pass the list of trainer images
+                onTrainerSelected: handleTrainerSelected,
               ),
-
+              // TopTrainerSlider(
+              //   ids:
+              //   recipes: _topTrainers,
+              //   onTrainerSelected: handleTrainerSelected,
+              //   images: _trainerImages,
+              //   emails: _topTrainersEmail,
+              // ),
               const SizedBox(
-                height: 20,
+                height: 10,
               ),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -318,14 +311,11 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
                       "Latest Nutritional News",
                       style: TextStyle(
                         fontSize: 20,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(
-                height: 5,
               ),
               const RecipeSlider(),
               const SizedBox(

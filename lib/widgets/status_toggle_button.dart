@@ -1,42 +1,19 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
 
-class StatusToggleButton extends ConsumerStatefulWidget {
+class StatusToggleButton extends StatefulWidget {
   const StatusToggleButton({super.key});
 
   @override
   _StatusToggleButtonState createState() => _StatusToggleButtonState();
 }
 
-class _StatusToggleButtonState extends ConsumerState<StatusToggleButton> {
-  bool isPublic = true;
-  void _toggleButton() async {
-    setState(() {
-      isPublic = !isPublic;
-    });
+class _StatusToggleButtonState extends State<StatusToggleButton> {
+  bool isPublic = true; // Default state is public
 
-    try {
-      final AuthService authService = AuthService();
-      final userId = ref.read(userProvider)?.id;
-      await authService.updateStatus(
-          ref: ref,
-          context: context,
-          status: isPublic ? 'public' : 'private',
-          id: userId!);
-    } catch (e) {
-      // Handle error, possibly revert status
-      setState(() {
-        isPublic = !isPublic; // Revert status on failure
-      });
-      // Show a snackbar or dialog to notify the user
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update status.')),
-      );
-    }
+  void _toggleButton() {
+    setState(() {
+      isPublic = !isPublic; // Toggle the state
+    });
   }
 
   @override
@@ -63,7 +40,7 @@ class _StatusToggleButtonState extends ConsumerState<StatusToggleButton> {
             child: Text(
               isPublic ? 'Make Information Private' : 'Make Information Public',
               style: TextStyle(
-                color: isPublic ? Colors.blue : Colors.redAccent,
+                color: isPublic ? Colors.blue : Colors.red,
                 fontSize: 16,
               ),
             ),

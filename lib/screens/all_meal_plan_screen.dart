@@ -51,8 +51,8 @@ class _AllMealPlanState extends ConsumerState<AllMealPlan> {
               return DropdownButton<String>(
                 elevation: 3,
                 style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.redAccent,
+                    fontSize: 12,
+                    color: Colors.orange,
                     fontWeight: FontWeight.w500),
                 value: _selectedDuration,
                 items: [

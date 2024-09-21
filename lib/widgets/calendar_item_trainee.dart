@@ -127,7 +127,7 @@ class CalendarItemTrainee extends ConsumerWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.redAccent,
+                        backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
                       ),
                       child: const Text('View Details'),

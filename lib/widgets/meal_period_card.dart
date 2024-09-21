@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/screens/trainee_recipe_detail_screen.dart';
-import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
 
 class MealPeriodCard extends StatelessWidget {
   const MealPeriodCard(
@@ -42,16 +41,16 @@ class MealPeriodCard extends StatelessWidget {
                   backgroundImage: NetworkImage(image),
                 ),
                 const SizedBox(
-                  height: 8,
+                  height: 10,
                 ),
-                CapitalizeFirstLetter(
-                  text: mealPeriod,
+                Text(
+                  mealPeriod,
                   style: const TextStyle(
                     fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.redAccent,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
-                )
+                ),
               ],
             ),
 
@@ -71,7 +70,7 @@ class MealPeriodCard extends StatelessWidget {
                         time1,
                         style: const TextStyle(
                           fontSize: 14,
-                          color: Colors.redAccent,
+                          color: Colors.black54,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -81,18 +80,12 @@ class MealPeriodCard extends StatelessWidget {
                     height: 20,
                   ),
                   OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.redAccent),
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) =>
                                 TraineeRecipeDetailScreen(meal: recipe!)));
                       },
-                      child: const Text(
-                        'View recipe ',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.w500),
-                      ))
+                      child: const Text('View recipe '))
                 ],
               ),
             ),

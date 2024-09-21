@@ -38,7 +38,7 @@ class CopyToClipboardWidget extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
-                      color: Colors.redAccent),
+                      color: Colors.orange),
                 ),
                 Text(textToCopy,
                     style: const TextStyle(

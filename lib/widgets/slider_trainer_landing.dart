@@ -1,6 +1,9 @@
+// ignore_for_file: unused_element
+
 import 'package:flutter/material.dart';
 import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
 
+// import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
 class SliderTrainerLanding extends StatelessWidget {
   final List<String> recipes;
   final List<String> emails;
@@ -59,6 +62,7 @@ class SliderTrainerLanding extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).pop();
                       _showSnackBarAndSendRequest(context);
+                      // Add your request logic here
                     },
                     child: const Text("Send Request"),
                   ),
@@ -88,23 +92,10 @@ class SliderTrainerLanding extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: recipes.isEmpty
-            ? 5
-            : recipes.length, // Show 5 placeholders if recipes are empty
+        itemCount: recipes.length,
         itemBuilder: (context, index) {
-          if (recipes.isEmpty) {
-            // Display placeholder avatars if no recipes are available
-            return _buildPlaceholderItem();
-          } else {
-            // Display actual items if recipes are available
-            return _buildTrainerItem(
-              context,
-              recipes[index],
-              images[index],
-              emails[index],
-              ids[index],
-            );
-          }
+          return _buildTrainerItem(context, recipes[index], images[index],
+              emails[index], ids[index]);
         },
       ),
     );
@@ -115,13 +106,11 @@ class SliderTrainerLanding extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TrainerProfileScreen(
-              userId: id,
-            ),
-          ),
-        );
+            context,
+            MaterialPageRoute(
+                builder: (context) => TrainerProfileScreen(
+                      userId: id,
+                    )));
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 5),
@@ -129,40 +118,17 @@ class SliderTrainerLanding extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 40,
+              backgroundColor: Colors.black12,
               backgroundImage: NetworkImage(imagePath),
             ),
             const SizedBox(
               height: 10,
             ),
-            Text(
-              trainer,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-            ),
+            Text(trainer,
+                style:
+                    const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildPlaceholderItem() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: Colors.grey[300], // Placeholder background color
-            child:
-                Icon(Icons.person, color: Colors.grey[600]), // Placeholder icon
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Text(
-            'Loading...',
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-          ),
-        ],
       ),
     );
   }

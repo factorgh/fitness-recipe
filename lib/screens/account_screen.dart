@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class AccountScreen extends ConsumerStatefulWidget {
   const AccountScreen({super.key});
@@ -54,7 +53,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
       appBar: AppBar(
         title: const Text(
           'Account Management',
-          style: TextStyle(fontWeight: FontWeight.w500),
+          style: TextStyle(fontWeight: FontWeight.w800),
         ),
         centerTitle: true,
       ),
@@ -102,87 +101,88 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 40),
-            _isLoading
-                ? const CircularProgressIndicator(
-                    color: Colors.redAccent,
-                  )
-                : Reusablebutton(
-                    text: "Change Password",
-                    onPressed: () async {
-                      setState(() {
-                        _isLoading = true;
-                      });
-                      await authService.changePassword(
-                          context: context,
-                          email: _emailController.text.trim(),
-                          oldPassword: _passwordController.text.trim(),
-                          newPassword: _newPasswordController.text.trim());
-                      setState(() {
-                        _isLoading = false;
-                      });
-                    },
-                  )
-
-            // ElevatedButton(
-
-            //   style: ElevatedButton.styleFrom(
-            //     backgroundColor: Colors.redAccent,
-            //     padding: const EdgeInsets.symmetric(vertical: 15),
-            //     textStyle:
-            //         const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            //   ),
-            //   child: _isLoading
-            //       ? const CircularProgressIndicator(
-            //           color: Colors.white,
-            //         )
-            //       : const Text(
-            //           'Change Password',
-            //           style: TextStyle(color: Colors.white),
-            //         ),
-            // ),
-            ,
-            Reusablebutton(
-                text: 'Delete Account',
-                onPressed: () async {
-                  // Show confirmation dialog before deleting
-                  bool? confirmDelete = await showDialog(
+            const SizedBox(height: 16),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () async {
+                setState(() {
+                  _isLoading = true;
+                });
+                await authService.changePassword(
                     context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Confirm Delete'),
-                        content: const Text(
-                            'Are you sure you want to delete your account? This action cannot be undone.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pop(false); // Return false when canceled
-                            },
-                            child: const Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pop(true); // Return true when confirmed
-                            },
-                            child: const Text('Delete'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                    email: _emailController.text.trim(),
+                    oldPassword: _passwordController.text.trim(),
+                    newPassword: _newPasswordController.text.trim());
+                setState(() {
+                  _isLoading = false;
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                textStyle:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              child: _isLoading
+                  ? const CircularProgressIndicator(
+                      color: Colors.white,
+                    )
+                  : const Text(
+                      'Change Password',
+                      style: TextStyle(color: Colors.white),
+                    ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () async {
+                // Show confirmation dialog before deleting
+                bool? confirmDelete = await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Confirm Delete'),
+                      content: const Text(
+                          'Are you sure you want to delete your account? This action cannot be undone.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pop(false); // Return false when canceled
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pop(true); // Return true when confirmed
+                          },
+                          child: const Text('Delete'),
+                        ),
+                      ],
+                    );
+                  },
+                );
 
-                  // If the user confirmed, proceed with deletion
-                  if (confirmDelete == true) {
-                    if (user != null) {
-                      await authService.deleteUser(
-                          context: context, id: user.id);
-                    } else {
-                      NativeAlerts().showErrorAlert(context, 'User not found');
-                    }
+                // If the user confirmed, proceed with deletion
+                if (confirmDelete == true) {
+                  if (user != null) {
+                    await authService.deleteUser(context: context, id: user.id);
+                  } else {
+                    NativeAlerts().showErrorAlert(context, 'User not found');
                   }
-                })
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                textStyle:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              child: const Text(
+                'Delete Account',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           ],
         ),
       ),

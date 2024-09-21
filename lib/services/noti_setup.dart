@@ -162,6 +162,22 @@ class NotificationService {
     // Schedule daily reminders based on recipe allocation
     for (var allocation in recipeAllocations) {
       String allocatedTime = allocation.timeOfDay;
+
+      // Schedule notifications for each trainee on specific days
+      //     for (var trainee in trainees) {
+      //       for (var day in days) {
+      //         DateTime scheduledDate = _nextInstanceOfDay(allocatedTime, day);
+
+      //         await scheduleNotification(
+      //           id: _generateNotificationId(),
+      //           title: 'Meal Reminder',
+      //           body:
+      //               'You have a meal plan scheduled at ${allocatedTime.hour}:${allocatedTime.minute}.',
+      //           scheduledDate: scheduledDate,
+      //           payload: 'meal_plan_$mealPlanId',
+      //         );
+      //       }
+      //     }
     }
   }
 

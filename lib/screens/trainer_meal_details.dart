@@ -12,7 +12,6 @@ import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
-import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
 import 'package:voltican_fitness/utils/native_alert.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:voltican_fitness/widgets/button.dart';
@@ -264,6 +263,39 @@ class _TrainerMealDetailScreenState
                     widget.meal.imageUrl,
                     fit: BoxFit.cover,
                   ),
+                  user!.role != '0'
+                      ? Positioned(
+                          right: 10,
+                          top: 40,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.red,
+                                  backgroundColor: Colors.white,
+                                ),
+                                onPressed: _toggleFollow,
+                                child: Row(
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(
+                                        isFollowing
+                                            ? Icons.person_remove
+                                            : Icons.person_add,
+                                        color: Colors.black,
+                                        size: 30,
+                                      ),
+                                      onPressed: _toggleFollow,
+                                    ),
+                                    Text(isFollowing ? 'Unfollow' : 'Follow'),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : const SizedBox(),
                 ],
               ),
             ),
@@ -279,13 +311,17 @@ class _TrainerMealDetailScreenState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CapitalizeFirstLetter(
-                          text: widget.meal.title,
-                          style: const TextStyle(
-                              overflow: TextOverflow.ellipsis,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w800)),
-                      const Spacer(),
+                      Text(
+                        widget.meal.title,
+                        style: const TextStyle(
+                          fontSize: 23,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis, // Add this line
+                        maxLines:
+                            1, // Optional: Limits the text to a single line
+                      ),
+                      const SizedBox(width: 20),
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -334,8 +370,7 @@ class _TrainerMealDetailScreenState
                     children: [
                       const Text(
                         "Recipe by",
-                        style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w600),
+                        style: TextStyle(fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(height: 5),
                       Row(
@@ -370,22 +405,6 @@ class _TrainerMealDetailScreenState
 
                           const Spacer(),
                           // Contact section goes here
-                          user!.role != '0'
-                              ? OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0, vertical: 8.0),
-                                    minimumSize:
-                                        const Size(80, 30), // width, height
-                                  ),
-                                  onPressed: _toggleFollow,
-                                  child: Text(
-                                    isFollowing ? 'Unfollow' : 'Follow',
-                                    style: const TextStyle(
-                                        fontSize: 12, color: Colors.redAccent),
-                                  ),
-                                )
-                              : const SizedBox(),
                         ],
                       ),
                     ],
@@ -393,11 +412,11 @@ class _TrainerMealDetailScreenState
                   const SizedBox(height: 30),
                   const Text(
                     'Description',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                   ),
                   Text(
                     widget.meal.description,
-                    style: const TextStyle(color: Colors.black54, fontSize: 12),
+                    style: const TextStyle(color: Colors.black54),
                   ),
                   const SizedBox(height: 20),
                   Container(
@@ -413,31 +432,36 @@ class _TrainerMealDetailScreenState
                     children: [
                       Icon(
                         Icons.no_food_sharp,
-                        size: 20,
+                        size: 25,
                         color: Colors.orange,
                       ),
-                      SizedBox(width: 10),
+                      SizedBox(width: 5),
                       Text(
                         'Ingredients',
-                        style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w600),
+                        style: TextStyle(fontSize: 16),
                       ),
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: SizedBox(
-                      // Adjust the height based on your needs
+                      height: 100, // Adjust the height based on your needs
                       child: Column(
                         children: widget.meal.ingredients.map((ingredient) {
                           return Row(
                             children: [
-                              const SizedBox(width: 8.0),
-                              Text(
-                                ingredient,
-                                style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.w400,
+                              const Icon(
+                                Icons.check_circle_outline,
+                                color: Colors.green,
+                              ),
+                              const SizedBox(width: 12.0),
+                              Expanded(
+                                child: Text(
+                                  ingredient,
+                                  style: const TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
                             ],
@@ -457,8 +481,7 @@ class _TrainerMealDetailScreenState
                       SizedBox(width: 5),
                       Text(
                         'Instructions',
-                        style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w600),
+                        style: TextStyle(fontSize: 16),
                       ),
                     ],
                   ),
@@ -467,7 +490,6 @@ class _TrainerMealDetailScreenState
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       widget.meal.instructions,
-                      style: const TextStyle(fontSize: 12),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -481,15 +503,13 @@ class _TrainerMealDetailScreenState
                       SizedBox(width: 5),
                       Text(
                         'Nutritional Facts',
-                        style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w600),
+                        style: TextStyle(fontSize: 16),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Text(
                     widget.meal.facts,
-                    style: const TextStyle(fontSize: 12),
                   ),
                   const SizedBox(height: 30),
                   user.role != '0'
@@ -501,7 +521,7 @@ class _TrainerMealDetailScreenState
                           },
                           splashColor: Colors.purple,
                           child: const ButtonWidget(
-                              backColor: Colors.redAccent,
+                              backColor: Colors.red,
                               text: 'Edit and Save',
                               textColor: Colors.white),
                         )
@@ -518,7 +538,7 @@ class _TrainerMealDetailScreenState
                     },
                     splashColor: Colors.purple,
                     child: const ButtonWidget(
-                        backColor: Colors.redAccent,
+                        backColor: Colors.red,
                         text: 'Save',
                         textColor: Colors.white),
                   ),

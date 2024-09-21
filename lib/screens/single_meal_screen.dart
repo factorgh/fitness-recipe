@@ -10,7 +10,6 @@ import 'package:voltican_fitness/providers/trainer_provider.dart';
 import 'package:voltican_fitness/screens/meal_update_screen.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
 import 'package:intl/intl.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class SingleMealPlanDetailScreen extends ConsumerWidget {
   final MealPlan mealPlan;
@@ -64,7 +63,7 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text(
           'Meal Plan Details',
-          style: TextStyle(fontWeight: FontWeight.w500),
+          style: TextStyle(fontWeight: FontWeight.w800),
         ),
         centerTitle: true,
       ),
@@ -75,18 +74,28 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
             _buildDetailCard("Meal Plan Name", mealPlan.name),
             _buildDetailCard("Duration Selected", mealPlan.duration),
             _buildDateRange(mealPlan.startDate, mealPlan.endDate),
-            const Text('Meal Allocations'),
             _buildMealFromDraft(mealPlan.meals),
             _buildTraineeCard(context, traineeDetailsAsyncValue),
             const SizedBox(height: 30),
-            Reusablebutton(
-              text: "Update",
+            ElevatedButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) =>
                         MealUpdateScreen(mealPlan: mealPlan)));
               },
-            )
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Update',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
           ],
         ),
       ),
@@ -117,10 +126,6 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
                     ),
                     const Spacer(),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.redAccent,
-                        foregroundColor: Colors.white,
-                      ),
                       onPressed: () {
                         _showTraineeList(context, trainees);
                       },
@@ -211,13 +216,17 @@ class SingleMealPlanDetailScreen extends ConsumerWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),
-        Text(
-          value,
-          style: const TextStyle(
-              fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              value,
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            ),
+          ),
         ),
         const SizedBox(height: 20),
       ],
@@ -346,11 +355,12 @@ void _showTraineeList(BuildContext context, List<User> trainees) {
                 },
               ),
             ),
-            Reusablebutton(
-                text: 'Close',
-                onPressed: () {
-                  Navigator.pop(context);
-                })
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the bottom sheet
+              },
+              child: const Text('Close'),
+            ),
           ],
         ),
       );

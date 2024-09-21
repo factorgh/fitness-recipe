@@ -28,6 +28,12 @@ class _TrainerSearchScreenState extends ConsumerState<TrainerSearchScreen> {
       TrainerService(); // Instantiate your service directly
 
   @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     _debounce?.cancel();
@@ -43,34 +49,6 @@ class _TrainerSearchScreenState extends ConsumerState<TrainerSearchScreen> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _searchController.addListener(_onSearchChanged);
-    _loadAllTrainers();
-  }
-
-  Future<void> _loadAllTrainers() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      final trainers =
-          await _trainerService.getAllTrainers(); // Fetch all trainers
-      setState(() {
-        _trainers = trainers;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to load trainers: $e';
-        _isLoading = false;
-      });
-    }
-  }
-
   Future<void> _searchTrainers(String query) async {
     setState(() {
       _isLoading = true;
@@ -78,14 +56,7 @@ class _TrainerSearchScreenState extends ConsumerState<TrainerSearchScreen> {
     });
 
     try {
-      List<User> trainers;
-      if (query.isEmpty) {
-        trainers = await _trainerService
-            .getAllTrainers(); // Fetch all trainers if query is empty
-      } else {
-        trainers = await _trainerService.searchTrainers(query);
-      }
-
+      final trainers = await _trainerService.searchTrainers(query);
       setState(() {
         _trainers = trainers;
         _isLoading = false;
@@ -103,11 +74,7 @@ class _TrainerSearchScreenState extends ConsumerState<TrainerSearchScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: const SizedBox(),
-        title: const Text(
-          'Search Trainer',
-          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
-        ),
-        centerTitle: true,
+        title: const Text('Search Trainers'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -128,6 +95,12 @@ class _TrainerSearchScreenState extends ConsumerState<TrainerSearchScreen> {
                   ),
                 ),
                 const SizedBox(width: 10),
+                IconButton(
+                  icon: const Icon(Icons.sort),
+                  onPressed: () {
+                    // Add your sorting logic here
+                  },
+                ),
               ],
             ),
             const SizedBox(height: 20),
@@ -137,28 +110,7 @@ class _TrainerSearchScreenState extends ConsumerState<TrainerSearchScreen> {
                   : _error != null
                       ? Center(child: Text(_error!))
                       : _trainers.isEmpty
-                          ? const Center(
-                              child: Expanded(
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: 30,
-                                  ),
-                                  Text(
-                                    'No trainers found.',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 20),
-                                  ),
-                                  Text(
-                                    'Enter a trainer name to search.',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 10),
-                                  ),
-                                ],
-                              ),
-                            ))
+                          ? const Center(child: Text('No trainers found.'))
                           : ListView.builder(
                               itemCount: _trainers.length,
                               itemBuilder: (context, index) {

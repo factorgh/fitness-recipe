@@ -2,12 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
+
 import 'package:voltican_fitness/screens/code_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/utils/code_generator.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 import 'package:voltican_fitness/widgets/role_widget.dart';
 
 class RoleScreen extends ConsumerStatefulWidget {
@@ -17,8 +16,7 @@ class RoleScreen extends ConsumerStatefulWidget {
   ConsumerState<RoleScreen> createState() => _RoleScreenState();
 }
 
-class _RoleScreenState extends ConsumerState<RoleScreen>
-    with WidgetsBindingObserver {
+class _RoleScreenState extends ConsumerState<RoleScreen> {
   String? selectedRole;
   AuthService authService = AuthService();
   final CodeGenerator codeGenerator = CodeGenerator();
@@ -27,33 +25,11 @@ class _RoleScreenState extends ConsumerState<RoleScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance
-        .addObserver(this); // Add the observer for app lifecycle
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance
-        .removeObserver(this); // Remove the observer when widget is disposed
-    super.dispose();
-  }
-
-  // This method will handle app lifecycle changes
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.detached ||
-        state == AppLifecycleState.paused) {
-      // If no role is selected and the app is closed or backgrounded, reset the user provider
-      if (selectedRole == null) {
-        ref.read(userProvider.notifier).clearUser();
-      }
-    }
-    super.didChangeAppLifecycleState(state);
   }
 
   Future<void> goToTabsScreen(BuildContext ctx) async {
     setState(() {
-      isLoading = true;
+      isLoading = true; // Set loading state to true
     });
 
     try {
@@ -149,16 +125,30 @@ class _RoleScreenState extends ConsumerState<RoleScreen>
                 Padding(
                   padding: const EdgeInsets.only(bottom: 20),
                   child: SizedBox(
-                      width: double.infinity,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed:
+                          isLoading ? null : () => goToTabsScreen(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                       child: isLoading
                           ? const CircularProgressIndicator(
-                              color: Colors.redAccent)
-                          : Reusablebutton(
-                              text: "Proceed",
-                              onPressed: isLoading
-                                  ? null
-                                  : () => goToTabsScreen(context),
-                            )),
+                              color: Colors.white) // Show a loading spinner
+                          : const Text(
+                              'Proceed',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
                 ),
             ],
           ),

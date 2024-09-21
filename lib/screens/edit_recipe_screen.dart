@@ -29,9 +29,6 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
   String? status;
   bool isPrivate = false;
 
-  List<String> ingredientOptions = [];
-  List<String> selectedIngredients = [];
-
   final List<String> mealPeriods = [
     'Breakfast',
     'Lunch',
@@ -53,7 +50,8 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
     super.initState();
     _mealNameController.text = widget.recipe.title;
     _descriptionController.text = widget.recipe.description;
-    selectedIngredients = widget.recipe.ingredients; // Convert list to string
+    _ingredientsController.text =
+        widget.recipe.ingredients.join(","); // Convert list to string
     _instructionsController.text = widget.recipe.instructions;
     _nutritionalFactsController.text = widget.recipe.facts;
     if (widget.recipe.imageUrl.isNotEmpty) {
@@ -252,7 +250,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Recipe',
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25)),
+            style: TextStyle(fontWeight: FontWeight.w500)),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.close),
@@ -353,51 +351,24 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            ...selectedIngredients.map((ingredient) {
-              return ListTile(
-                title: Text(ingredient),
-                trailing: IconButton(
-                  icon: const Icon(
-                    Icons.close,
-                    color: Colors.redAccent,
+            Container(
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.black38),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: TextFormField(
+                  controller: _ingredientsController,
+                  maxLines: null,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Enter ingredients separated by commas',
+                    contentPadding: EdgeInsets.symmetric(vertical: 15),
                   ),
-                  onPressed: () {
-                    setState(() {
-                      selectedIngredients.remove(ingredient);
-                      ingredientOptions.remove(ingredient);
-                    });
-                  },
                 ),
-              );
-            }),
-            _buildTextField(
-              controller: _ingredientsController,
-              hintText: 'Add new ingredient',
-              onEditingComplete: () {
-                final newIngredient = _ingredientsController.text.trim();
-                if (newIngredient.isNotEmpty &&
-                    !ingredientOptions.contains(newIngredient)) {
-                  setState(() {
-                    ingredientOptions.add(newIngredient);
-                    selectedIngredients.add(newIngredient);
-                    _ingredientsController.clear();
-                  });
-                }
-              },
-              onFieldSubmitted: (value) {
-                final newIngredient = value.trim();
-                if (newIngredient.isNotEmpty &&
-                    !ingredientOptions.contains(newIngredient)) {
-                  setState(() {
-                    ingredientOptions.add(newIngredient);
-                    selectedIngredients.add(newIngredient);
-                    _ingredientsController.clear();
-                  });
-                }
-              },
-              validator: (String? value) {
-                return null;
-              },
+              ),
             ),
             const SizedBox(height: 20),
             Text(
@@ -511,8 +482,8 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : CustomButton(
                     textColor: Colors.white,
-                    size: 15,
-                    backColor: Colors.redAccent,
+                    size: 20,
+                    backColor: Colors.red,
                     width: double.infinity,
                     text: widget.recipe.id != null
                         ? 'Save Recipe'
@@ -525,27 +496,4 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
       ),
     );
   }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required FormFieldValidator<String> validator,
-    VoidCallback? onEditingComplete,
-    ValueChanged<String>? onFieldSubmitted,
-  }) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        border: const OutlineInputBorder(),
-        hintText: hintText,
-      ),
-      validator: validator,
-      onEditingComplete: onEditingComplete,
-      onFieldSubmitted: onFieldSubmitted,
-    );
-  }
 }
-
-
-
-// -----------------------------------------------------

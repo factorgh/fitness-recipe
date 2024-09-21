@@ -212,20 +212,4 @@ class TrainerService {
       throw Exception('Failed to remove follower');
     }
   }
-
-  Future<List<User>> getAllTrainers() async {
-    try {
-      final response = await client.dio.get('/users/trainers');
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
-        return data.map((json) => User.fromJson(json)).toList();
-      } else {
-        throw Exception('Failed to retrieve trainers');
-      }
-    } catch (e) {
-      print('Error in getAllTrainers: $e');
-      throw Exception('Failed to retrieve trainers');
-    }
-  }
 }

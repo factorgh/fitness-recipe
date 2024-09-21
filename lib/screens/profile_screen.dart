@@ -9,7 +9,6 @@ import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/update_profile_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/widgets/copy_to_clipboard.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 import 'package:voltican_fitness/widgets/status_toggle_button.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -83,8 +82,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile',
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25)),
+        title: const Text('Profile'),
         centerTitle: true,
       ),
       body: Padding(
@@ -143,7 +141,7 @@ class __ProfileHeaderState extends State<_ProfileHeader> {
               onTap: widget.onEdit,
               child: const CircleAvatar(
                 radius: 20,
-                backgroundColor: Colors.redAccent,
+                backgroundColor: Colors.blue,
                 child: Icon(Icons.edit, color: Colors.white, size: 20),
               ),
             ),
@@ -198,13 +196,18 @@ class _InfoField extends StatelessWidget {
 class _EditProfileButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Reusablebutton(
-      text: 'Update Profile',
+    return ElevatedButton(
       onPressed: () {
         Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => const UpdateProfileScreen(),
         ));
       },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+      child: const Text('Update Profile'),
     );
   }
 }

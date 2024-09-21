@@ -2,12 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/providers/internet_connect.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
+import 'package:voltican_fitness/widgets/button.dart';
 import 'package:voltican_fitness/widgets/or_divider.dart';
 import 'package:voltican_fitness/screens/login_screen.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -48,21 +47,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         _isLoading = true;
       });
 
-// Check for internet connectivity
-      final connectivityState = ref.read(connectivityProvider);
-      if (!connectivityState.isConnected) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No internet connection'),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
-        setState(() {
-          _isLoading = false;
-        });
-
-        return; // Exit the method early
-      }
       try {
         await authService.signup(
           ref: ref,
@@ -99,7 +83,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 style: TextStyle(
                   fontSize: 25,
                   color: Colors.black,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 5),
@@ -144,16 +128,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           : null,
                     ),
                     const SizedBox(height: 20),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text('Password',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 15,
-                                color: Colors.black45)),
-                      ],
-                    ),
                     TextFormField(
                       controller: _passwordController,
                       obscureText: !_isPasswordVisible,
@@ -190,9 +164,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     ),
                     const SizedBox(height: 20),
                     _isLoading
-                        ? const CircularProgressIndicator(
-                            color: Colors.redAccent)
-                        : Reusablebutton(text: 'SignUp', onPressed: signup),
+                        ? const CircularProgressIndicator()
+                        : GestureDetector(
+                            onTap: signup,
+                            child: const ButtonWidget(
+                              backColor: Colors.red,
+                              text: 'Signup',
+                              textColor: Colors.white,
+                            ),
+                          ),
                     const SizedBox(height: 20),
                   ],
                 ),

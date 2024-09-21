@@ -127,7 +127,7 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
             children: [
               const Text(
                 "All Recipes",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               Row(
                 children: [
@@ -136,7 +136,7 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: Colors.redAccent,
+                      color: Colors.red,
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Row(
@@ -174,8 +174,8 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
           const SizedBox(height: 10),
           TabBar(
             controller: _tabController,
-            indicatorColor: Colors.redAccent,
-            labelColor: Colors.redAccent,
+            indicatorColor: Colors.red,
+            labelColor: Colors.red,
             unselectedLabelColor: Colors.black,
             tabs: const [
               Tab(text: 'Explore'),

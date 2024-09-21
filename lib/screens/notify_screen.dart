@@ -49,15 +49,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       appBar: AppBar(
         title: const Text(
           'Notifications',
-          style: TextStyle(fontWeight: FontWeight.w500),
+          style: TextStyle(fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.clear_all),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: FutureBuilder<List<AppNotification>>(
         future: _notificationsFuture,

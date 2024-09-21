@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 Future<Map<String, dynamic>?> showRecurrenceBottomSheet(
     BuildContext context, DateTime startDate, DateTime endDate) async {
@@ -318,11 +317,12 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
 
               const SizedBox(height: 20),
               Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Reusablebutton(
-                    text: 'Confirm',
-                    onPressed: _saveRecurrence,
-                  )),
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: _saveRecurrence,
+                  child: const Text('Confirm'),
+                ),
+              ),
             ],
           ),
         ),
