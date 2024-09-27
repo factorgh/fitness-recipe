@@ -288,21 +288,19 @@ class HiveService {
       final box = await Hive.openBox<HiveMeal>('mealDraftBox');
       List<HiveMeal> mealsForDate = [];
 
-      // Format the date without time and timezone
-      // String dateKey = formatDateWithoutTime(date);
-
-      // print('----------formated date------------');
-      // print(dateKey);
-
-      // Retrieve meals for predefined meal types
       for (var mealType in ['Breakfast', 'Lunch', 'Dinner', 'Snack']) {
         HiveMeal? meal = box.get('${date.toIso8601String()}_$mealType');
-        mealsForDate.add(meal!);
+        if (meal != null) {
+          mealsForDate.add(meal);
+        } else {
+          print('No meal found for $mealType on ${date.toIso8601String()}');
+        }
       }
 
       return mealsForDate;
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('Error fetching meals: $e');
+      print('Stack trace: $stackTrace');
       return []; // Return an empty list if an error occurs
     }
   }
