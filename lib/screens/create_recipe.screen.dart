@@ -71,9 +71,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
   }
 
   Future<void> _createRecipe(User user) async {
-    if (!_formKey.currentState!.validate() ||
-        _selectedImage == null ||
-        selectedMealPeriod == null) {
+    if (!_formKey.currentState!.validate()) {
       showDialog(
         context: context,
         builder: (context) {
