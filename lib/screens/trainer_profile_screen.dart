@@ -115,7 +115,7 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
             children: [
               Text(
                 "Unfollow Trainer",
-                style: Theme.of(context).textTheme.headlineMedium,
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 16),
               Text(
@@ -143,7 +143,11 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                           ref.read(userProvider)!.id));
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red, // Set the button color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      backgroundColor: Colors.redAccent,
+                      foregroundColor: Colors.white,
                     ),
                     child: const Text(
                       "Unfollow",
@@ -244,7 +248,7 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                           Text(
                             user!.fullName,
                             style: const TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w500),
+                                fontSize: 18, fontWeight: FontWeight.w500),
                           ),
                           Text(
                             user!.email,
@@ -288,7 +292,7 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                       : const Center(
                           child: Text(
                             'No recipes found for this trainer.',
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
+                            style: TextStyle(fontSize: 18, color: Colors.black),
                           ),
                         ),
                 ),
@@ -301,10 +305,10 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(12.0),
         ),
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.black,
+        backgroundColor: Colors.redAccent,
+        foregroundColor: Colors.white,
       ),
       onPressed: isLoading
           ? null
@@ -359,7 +363,7 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w800,
-                color: Colors.black,
+                color: Colors.white,
               ),
             ),
     );

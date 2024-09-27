@@ -151,11 +151,9 @@ class _RoleScreenState extends ConsumerState<RoleScreen>
                   child: SizedBox(
                       width: double.infinity,
                       child: isLoading
-                          ? const SizedBox(
-                              width: 100,
-                              height: 100,
+                          ? const Center(
                               child: CircularProgressIndicator(
-                                  color: Colors.redAccent),
+                                  strokeWidth: 2, color: Colors.redAccent),
                             )
                           : Reusablebutton(
                               text: "Proceed",

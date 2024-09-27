@@ -131,10 +131,19 @@ class HiveService {
   }
 
   // Ends here
-  List<DateTime> generateRecurringDates(
-      HiveRecurrence recurrence, DateTime startDate, DateTime endDate) {
+  List<DateTime> generateRecurringDates(HiveRecurrence recurrence,
+      DateTime startDate, DateTime endDate, DateTime? currentTime) {
     List<DateTime> recurringDates = [];
-    DateTime currentDate = startDate;
+    DateTime currentDate = currentTime!;
+
+    print('---------------------Date selected on calendar --------------');
+    print('---------------------Date selected on calendar --------------');
+    print('---------------------Date selected on calendar --------------');
+    print('---------------------Date selected on calendar --------------');
+    print('---------------------Date selected on calendar --------------');
+    print('---------------------Date selected on calendar --------------');
+
+    print(currentDate);
 
     while (currentDate.isBefore(endDate) ||
         currentDate.isAtSameMomentAs(endDate)) {
@@ -162,19 +171,50 @@ class HiveService {
                 : const Duration(days: 14),
           );
           break;
-
         case 'monthly':
-          for (int customDay in recurrence.customDays ?? []) {
-            DateTime tempDate = currentDate;
-            while (tempDate.month == currentDate.month) {
-              if ((tempDate.weekday == customDay) &&
-                  (tempDate.isBefore(endDate) ||
-                      tempDate.isAtSameMomentAs(endDate))) {
-                recurringDates.add(tempDate);
+          // Always add the currentDate if it's within the start and end dates
+          if (currentDate.isAfter(startDate) ||
+              currentDate.isAtSameMomentAs(startDate)) {
+            recurringDates.add(currentDate);
+          }
+
+          // If no customDays are provided, create for the currentDate only
+          if (recurrence.customDays == null || recurrence.customDays!.isEmpty) {
+            DateTime currentMonthDate =
+                DateTime(currentDate.year, currentDate.month, currentDate.day);
+
+            // Check if the currentMonthDate is within the startDate and endDate
+            while (currentMonthDate.isBefore(endDate) ||
+                currentMonthDate.isAtSameMomentAs(endDate)) {
+              if (currentMonthDate.isAfter(startDate) ||
+                  currentMonthDate.isAtSameMomentAs(startDate)) {
+                recurringDates.add(currentMonthDate);
               }
-              tempDate = tempDate.add(const Duration(days: 1));
+              // Move to the same day in the next month
+              currentMonthDate = DateTime(currentMonthDate.year,
+                  currentMonthDate.month + 1, currentMonthDate.day);
+            }
+          } else {
+            // Process custom days for monthly recurrence
+            for (int customDay in recurrence.customDays!) {
+              DateTime tempDate =
+                  DateTime(currentDate.year, currentDate.month, customDay);
+
+              // Check if the tempDate is within the start and end dates
+              while (tempDate.isBefore(endDate) ||
+                  tempDate.isAtSameMomentAs(endDate)) {
+                if (tempDate.isAfter(startDate) ||
+                    tempDate.isAtSameMomentAs(startDate)) {
+                  recurringDates.add(tempDate);
+                }
+                // Move to the same day in the next month
+                tempDate =
+                    DateTime(tempDate.year, tempDate.month + 1, customDay);
+              }
             }
           }
+
+          // Move to the next month after processing
           currentDate = DateTime(
               currentDate.year, currentDate.month + 1, currentDate.day);
           break;
@@ -210,8 +250,12 @@ class HiveService {
     // Iterate through each meal in the provided list
     for (var meal in meals) {
       // Generate the list of recurring dates for the current meal's recurrence rules
-      List<DateTime> dates =
-          generateRecurringDates(meal.recurrence!, startDate, endDate);
+      List<DateTime> dates = generateRecurringDates(
+        meal.recurrence!,
+        startDate,
+        endDate,
+        DateTime.now(),
+      );
 
       // Iterate through each date for the current meal
       for (var date in dates) {
@@ -253,9 +297,7 @@ class HiveService {
       // Retrieve meals for predefined meal types
       for (var mealType in ['Breakfast', 'Lunch', 'Dinner', 'Snack']) {
         HiveMeal? meal = box.get('${date.toIso8601String()}_$mealType');
-        if (meal != null) {
-          mealsForDate.add(meal);
-        }
+        mealsForDate.add(meal!);
       }
 
       return mealsForDate;
@@ -283,11 +325,15 @@ class HiveService {
 
       if (saveForAll) {
         // Generate recurrence dates before filtering
-        List<DateTime> recurrenceDates =
-            generateRecurringDates(updatedMeal.recurrence!, startDate, endDate);
+        List<DateTime> recurrenceDates = generateRecurringDates(
+            updatedMeal.recurrence!, startDate, endDate, date);
 
         // Filter to only include future dates after the selected date
         recurrenceDates = recurrenceDates
+            .map((recurrenceDate) {
+              // Convert to UTC if the date is not already in UTC
+              return recurrenceDate.toUtc();
+            })
             .where((recurrenceDate) => recurrenceDate.isAfter(date))
             .toList();
 
@@ -390,9 +436,7 @@ class HiveService {
     for (var date in mealPlan.datesArray!) {
       for (var mealType in ['Breakfast', 'Lunch', 'Dinner', 'Snack']) {
         HiveMeal? meal = box.get('${date.toIso8601String()}_$mealType');
-        if (meal != null) {
-          finalMeals.add(meal);
-        }
+        finalMeals.add(meal!);
       }
     }
 
@@ -469,7 +513,7 @@ class HiveService {
 
     // Generate recurring dates for the meal within the given range
     List<DateTime> dates =
-        generateRecurringDates(meal.recurrence!, startDate, endDate);
+        generateRecurringDates(meal.recurrence!, startDate, endDate, date);
 
     print('--------------------Recurring dates--------------------');
     print(dates);
@@ -529,8 +573,8 @@ class HiveService {
       }
 
       // Generate the list of recurring dates for this meal's recurrence rule
-      List<DateTime> recurringDates =
-          generateRecurringDates(meal.recurrence!, startDate, endDate);
+      List<DateTime> recurringDates = generateRecurringDates(
+          meal.recurrence!, startDate, endDate, DateTime.now());
 
       // If "future", save meals for dates starting from the given date onward
       if (updateOption == 'future') {
@@ -636,3 +680,76 @@ Future<String?> showOverrideOptionsDialog({
     },
   );
 }
+
+//
+
+// Ends here
+// List<DateTime> generateRecurringDates(
+//     HiveRecurrence recurrence, DateTime startDate, DateTime endDate) {
+//   List<DateTime> recurringDates = [];
+//   DateTime currentDate = startDate;
+
+//   while (
+//       currentDate.isBefore(endDate) || currentDate.isAtSameMomentAs(endDate)) {
+//     switch (recurrence.option) {
+//       case 'every_day':
+//         recurringDates.add(currentDate);
+//         currentDate = currentDate.add(const Duration(days: 1));
+//         break;
+
+//       case 'weekly':
+//       case 'bi_weekly':
+//       case 'custom_weekly':
+//         for (int day in recurrence.customDays ?? []) {
+//           DateTime customDate = currentDate.add(
+//             Duration(days: (day - currentDate.weekday + 7) % 7),
+//           );
+//           if (customDate.isBefore(endDate) ||
+//               customDate.isAtSameMomentAs(endDate)) {
+//             recurringDates.add(customDate);
+//           }
+//         }
+//         currentDate = currentDate.add(
+//           recurrence.option == 'weekly'
+//               ? const Duration(days: 7)
+//               : const Duration(days: 14),
+//         );
+//         break;
+
+//       case 'monthly':
+//         for (int customDay in recurrence.customDays ?? []) {
+//           DateTime tempDate = currentDate;
+//           while (tempDate.month == currentDate.month) {
+//             if ((tempDate.weekday == customDay) &&
+//                 (tempDate.isBefore(endDate) ||
+//                     tempDate.isAtSameMomentAs(endDate))) {
+//               recurringDates.add(tempDate);
+//             }
+//             tempDate = tempDate.add(const Duration(days: 1));
+//           }
+//         }
+//         currentDate =
+//             DateTime(currentDate.year, currentDate.month + 1, currentDate.day);
+//         break;
+//     }
+//   }
+
+//   // Add custom dates if they exist
+//   if (recurrence.customDates != null) {
+//     for (var customDate in recurrence.customDates!) {
+//       if (customDate.isAfter(startDate) && customDate.isBefore(endDate)) {
+//         recurringDates.add(customDate);
+//       }
+//     }
+//   }
+
+//   // Remove any dates that are in the exceptions list
+//   if (recurrence.exceptions != null) {
+//     recurringDates.removeWhere((date) => recurrence.exceptions!.contains(date));
+//   }
+
+//   // Ensure no duplicates (in case custom dates and generated dates overlap)
+//   recurringDates = recurringDates.toSet().toList();
+
+//   return recurringDates;
+// }

@@ -60,6 +60,16 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
   bool _hasSelectedDates =
       false; // To track if specific dates have been selected
 
+  bool _isMonthlySelectable() {
+    final difference = widget.endDate.difference(widget.startDate).inDays;
+    return difference > 30; // Enable monthly if more than a month
+  }
+
+  bool _isBiWeeklySelectable() {
+    final difference = widget.endDate.difference(widget.startDate).inDays;
+    return difference >= 14; // Enable bi-weekly if more than 2 weeks
+  }
+
   // Function to show confirmation dialog
   Future<void> _showOverrideConfirmationDialog(String type) async {
     return showDialog<void>(
@@ -284,6 +294,8 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
               const SizedBox(height: 20),
 
               // Recurrence Dropdown
+
+              // Recurrence Dropdown
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: DropdownButtonFormField<String>(
@@ -295,7 +307,11 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
                       });
                     }
                   },
-                  items: recurrenceOptions.map((String value) {
+                  items: recurrenceOptions.where((option) {
+                    if (option == 'Monthly') return _isMonthlySelectable();
+                    if (option == 'Bi-Weekly') return _isBiWeeklySelectable();
+                    return true; // Allow other options
+                  }).map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -307,10 +323,8 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
 
               // Render specific options for selected recurrence type
-              if (_selectedRecurrence == 'Daily') const SizedBox(),
               if (_selectedRecurrence == 'Weekly') _buildWeeklyOptions(),
               if (_selectedRecurrence == 'Monthly') _buildWeeklyOptions(),
               if (_selectedRecurrence == 'Custom') _buildWeeklyOptions(),
