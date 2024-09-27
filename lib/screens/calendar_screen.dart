@@ -1,10 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:table_calendar/table_calendar.dart';
 import 'package:voltican_fitness/Features/mealplan/services/mealplan_service.dart';
 import 'package:voltican_fitness/models/mealplan.dart';
-
 import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
 import 'package:voltican_fitness/screens/meal_creation.dart';
 import 'package:voltican_fitness/widgets/calendar_item.dart';
@@ -89,7 +89,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       mealPlansWidget = const Text('No meal plans available.');
     }
 
-    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(

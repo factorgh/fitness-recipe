@@ -356,7 +356,10 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
               ),
               const SizedBox(height: 20),
               _isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                      color: Colors.red,
+                    ))
                   : Reusablebutton(
                       text: "Create Recipe",
                       onPressed: () {
