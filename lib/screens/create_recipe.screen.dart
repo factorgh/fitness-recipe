@@ -29,7 +29,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
 
   String? selectedMealPeriod;
   bool isPrivate = false;
-  String? status;
+  String status = 'public';
   List<String> ingredientOptions = [];
   List<String> selectedIngredients = [];
 
@@ -105,7 +105,7 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
               instructions: _instructionsController.text,
               description: _descriptionController.text,
               facts: _nutritionalFactsController.text,
-              status: status!,
+              status: status,
               period: selectedMealPeriod!,
               imageUrl: _selectedImage!.path,
               createdBy: user.id,
