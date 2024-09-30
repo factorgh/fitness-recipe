@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, use_build_context_synchronously, unrelated_type_equality_checks, unused_element
+// ignore_for_file: avoid_print, use_build_context_synchronously, unrelated_type_equality_checks, unused_element, unused_result
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +8,7 @@ import 'package:voltican_fitness/Features/mealplan/services/mealplan_service.dar
 import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
+import 'package:voltican_fitness/providers/assigned_trainees_provider.dart';
 import 'package:voltican_fitness/providers/trainer_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
@@ -125,6 +126,7 @@ class _MealPlanPreviewBottomSheetState
       await hiveService.clearMealDraftBox();
       // Save the meal plan to the database
       await mealPlanService.createMealPlan(newMealPlan, context);
+      ref.refresh(assignedTraineesProvider(user.id));
 
       // Show a success notification
 

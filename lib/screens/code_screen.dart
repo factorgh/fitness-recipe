@@ -1,10 +1,11 @@
-// ignore_for_file: use_build_context_synchronously, avoid_print
+// ignore_for_file: use_build_context_synchronously, avoid_print, unused_result
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
 import 'package:voltican_fitness/models/user.dart';
+import 'package:voltican_fitness/providers/trainer_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/screens/login_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
@@ -120,6 +121,9 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
                         try {
                           await TrainerService().followTrainer(
                               selectedUser.id, trainerId, context);
+
+                          // Refresh trainers provider
+                          ref.refresh(followersProvider(trainerId));
 
                           if (userFromLogin != null) {
                             // Set the user from login and navigate to the login screen
