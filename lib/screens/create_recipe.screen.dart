@@ -334,9 +334,9 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    isPrivate ? 'Public' : 'Private',
-                    style: const TextStyle(
+                  const Text(
+                    'Private',
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
