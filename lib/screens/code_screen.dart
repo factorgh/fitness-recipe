@@ -138,6 +138,8 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
                             );
                           } else {
                             // Navigate to TabsScreen if it's the current user from the provider
+                            // Refresh trainers provider
+                            ref.refresh(followersProvider(trainerId));
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                 builder: (context) =>

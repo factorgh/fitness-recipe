@@ -18,6 +18,7 @@ import 'package:voltican_fitness/utils/hive/hive_class.dart';
 import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:voltican_fitness/providers/all_recipes_provider.dart';
 import 'package:voltican_fitness/widgets/reusable_button.dart';
+import 'package:voltican_fitness/providers/calendar_mealplan_prov.dart';
 
 void showMealPlanPreviewBottomSheet(
     BuildContext context, MealPlan mealplan) async {
@@ -126,7 +127,9 @@ class _MealPlanPreviewBottomSheetState
       await hiveService.clearMealDraftBox();
       // Save the meal plan to the database
       await mealPlanService.createMealPlan(newMealPlan, context);
+
       ref.refresh(assignedTraineesProvider(user.id));
+      ref.refresh(mealPlanProvider.notifier).fetchMealPlans();
 
       // Show a success notification
 
