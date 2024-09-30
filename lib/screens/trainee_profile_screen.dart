@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, avoid_print, unnecessary_null_comparison
+// ignore_for_file: use_build_context_synchronously, avoid_print, unnecessary_null_comparison, unused_result
 
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/material.dart';
@@ -64,6 +64,20 @@ class _TraineeProfileScreenState extends ConsumerState<TraineeProfileScreen> {
   void initState() {
     super.initState();
     _fetchTrainerName();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh the provider when the screen is visited again
+    _refreshTrainerData();
+  }
+
+  void _refreshTrainerData() {
+    final user = ref.read(userProvider);
+    if (user != null) {
+      ref.refresh(followingTrainersProvider(user.id)); // Force refresh
+    }
   }
 
   Future<void> _fetchTrainerName() async {

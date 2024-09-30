@@ -67,15 +67,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         child: Center(child: Text(_error!)),
       );
     } else if (_mealPlans != null && _mealPlans!.isNotEmpty) {
-      // Get the latest 3 meal plans
       final firstThreeMealPlans = _mealPlans!.take(3).toList();
 
       mealPlansWidget = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          const SizedBox(height: 10),
-          // Display the first 3 meal plans
           for (var mealPlan in firstThreeMealPlans) ...[
             CalendarItem(
               titleIcon: Icons.restaurant_menu,
@@ -123,8 +120,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                       selectedDay: DateTime.now()),
                                 ),
                               )
-                              .then((_) =>
-                                  _fetchMealPlans()); // Refetch on return
+                              .then((_) => _fetchMealPlans());
                         },
                         child: const Text(
                           'Add Meal Plan',
@@ -149,7 +145,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                   MealCreationScreen(selectedDay: selectDay),
                             ),
                           )
-                          .then((_) => _fetchMealPlans()); // Refetch on return
+                          .then((_) => _fetchMealPlans());
                       setState(() {
                         focusedDay = focusDay;
                         selectedDay = selectDay;
@@ -188,7 +184,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   ),
                   SizedBox(
                     width: double.maxFinite,
-                    child: SingleChildScrollView(child: mealPlansWidget),
+                    child: mealPlansWidget,
                   ),
                 ],
               ),

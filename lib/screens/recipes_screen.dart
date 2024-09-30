@@ -229,7 +229,7 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
             unselectedLabelColor: Colors.black,
             tabs: const [
               Tab(text: 'My Recipes'),
-              Tab(text: 'Others'),
+              Tab(text: 'Saved'),
               Tab(text: 'Explore'),
             ],
           ),

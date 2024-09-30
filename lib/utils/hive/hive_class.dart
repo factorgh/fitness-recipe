@@ -57,20 +57,6 @@ class HiveService {
     return mealPlans;
   }
 
-  // Check if MealPlan box is empty
-  // bool isMealPlanBoxEmpty() {
-  //   final box = _mealPlanBox;
-  //   if (box == null) {
-  //     return true; // Box is not initialized
-  //   }
-  //   return box.isEmpty;
-  // }
-
-  // // Delete MealPlan
-  // Future<void> deleteMealPlan(String id) async {
-  //   await _mealPlanBox?.delete(id);
-  // }
-
   // Create or Update HiveRecurrence
   Future<void> saveRecurrence(HiveRecurrence recurrence) async {
     await _recurrenceBox?.put(recurrence.date.toIso8601String(), recurrence);
@@ -131,97 +117,55 @@ class HiveService {
   }
 
   // Ends here
-  List<DateTime> generateRecurringDates(HiveRecurrence recurrence,
-      DateTime startDate, DateTime endDate, DateTime? currentTime) {
+  List<DateTime> generateRecurringDates(
+    HiveRecurrence recurrence,
+    DateTime startDate,
+    DateTime endDate,
+    DateTime? currentTime,
+  ) {
     List<DateTime> recurringDates = [];
-    DateTime currentDate = currentTime!;
+    DateTime currentDate =
+        currentTime ?? startDate; // Start from currentTime or startDate
 
     print('---------------------Date selected on calendar --------------');
-    print('---------------------Date selected on calendar --------------');
-    print('---------------------Date selected on calendar --------------');
-    print('---------------------Date selected on calendar --------------');
-    print('---------------------Date selected on calendar --------------');
-    print('---------------------Date selected on calendar --------------');
+    print('Start date: $startDate');
+    print('End date: $endDate');
+    print('Current date: $currentDate');
 
-    print(currentDate);
+    // Add startDate to the list if it's within the range
+    if (startDate.isBefore(endDate) || startDate.isAtSameMomentAs(endDate)) {
+      recurringDates.add(startDate);
+    }
 
+    // Now begin the recurrence calculation based on the type of recurrence
     while (currentDate.isBefore(endDate) ||
         currentDate.isAtSameMomentAs(endDate)) {
       switch (recurrence.option) {
         case 'every_day':
-          recurringDates.add(currentDate);
+          recurringDates.add(currentDate); // Add currentDate here
           currentDate = currentDate.add(const Duration(days: 1));
           break;
 
         case 'weekly':
         case 'bi_weekly':
         case 'custom_weekly':
-          for (int day in recurrence.customDays ?? []) {
-            DateTime customDate = currentDate.add(
-              Duration(days: (day - currentDate.weekday + 7) % 7),
-            );
-            if (customDate.isBefore(endDate) ||
-                customDate.isAtSameMomentAs(endDate)) {
-              recurringDates.add(customDate);
-            }
-          }
+          recurringDates.add(currentDate); // Add currentDate here
           currentDate = currentDate.add(
             recurrence.option == 'weekly'
                 ? const Duration(days: 7)
                 : const Duration(days: 14),
           );
           break;
+
         case 'monthly':
-          // Always add the currentDate if it's within the start and end dates
-          if (currentDate.isAfter(startDate) ||
-              currentDate.isAtSameMomentAs(startDate)) {
-            recurringDates.add(currentDate);
-          }
-
-          // If no customDays are provided, create for the currentDate only
-          if (recurrence.customDays == null || recurrence.customDays!.isEmpty) {
-            DateTime currentMonthDate =
-                DateTime(currentDate.year, currentDate.month, currentDate.day);
-
-            // Check if the currentMonthDate is within the startDate and endDate
-            while (currentMonthDate.isBefore(endDate) ||
-                currentMonthDate.isAtSameMomentAs(endDate)) {
-              if (currentMonthDate.isAfter(startDate) ||
-                  currentMonthDate.isAtSameMomentAs(startDate)) {
-                recurringDates.add(currentMonthDate);
-              }
-              // Move to the same day in the next month
-              currentMonthDate = DateTime(currentMonthDate.year,
-                  currentMonthDate.month + 1, currentMonthDate.day);
-            }
-          } else {
-            // Process custom days for monthly recurrence
-            for (int customDay in recurrence.customDays!) {
-              DateTime tempDate =
-                  DateTime(currentDate.year, currentDate.month, customDay);
-
-              // Check if the tempDate is within the start and end dates
-              while (tempDate.isBefore(endDate) ||
-                  tempDate.isAtSameMomentAs(endDate)) {
-                if (tempDate.isAfter(startDate) ||
-                    tempDate.isAtSameMomentAs(startDate)) {
-                  recurringDates.add(tempDate);
-                }
-                // Move to the same day in the next month
-                tempDate =
-                    DateTime(tempDate.year, tempDate.month + 1, customDay);
-              }
-            }
-          }
-
-          // Move to the next month after processing
+          recurringDates.add(currentDate); // Add currentDate here
           currentDate = DateTime(
               currentDate.year, currentDate.month + 1, currentDate.day);
           break;
       }
     }
 
-    // Add custom dates if they exist
+    // Add any custom dates if they exist
     if (recurrence.customDates != null) {
       for (var customDate in recurrence.customDates!) {
         if (customDate.isAfter(startDate) && customDate.isBefore(endDate)) {
@@ -238,6 +182,9 @@ class HiveService {
 
     // Ensure no duplicates (in case custom dates and generated dates overlap)
     recurringDates = recurringDates.toSet().toList();
+
+    // Sort the dates before returning
+    recurringDates.sort();
 
     return recurringDates;
   }
@@ -312,6 +259,9 @@ class HiveService {
 
     print('--------------------------Updated Meal------------------------');
     print(updatedMeal);
+    print(date);
+    print(startDate);
+    print(endDate);
 
     // Check if recurrence is present
     if (updatedMeal.recurrence != null) {
