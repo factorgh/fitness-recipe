@@ -218,7 +218,7 @@ class _TraineeRecipeDetailScreenState
                       CapitalizeFirstLetter(
                         text: widget.meal.title,
                         style: const TextStyle(
-                          fontSize: 25,
+                          fontSize: 18,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
