@@ -129,7 +129,7 @@ class _MealPlanPreviewBottomSheetState
       await mealPlanService.createMealPlan(newMealPlan, context);
 
       ref.refresh(assignedTraineesProvider(user.id));
-      ref.refresh(mealPlanProvider.notifier).fetchMealPlans();
+      ref.refresh(calmealPlanProvider.notifier).fetchMealPlans();
 
       // Show a success notification
 

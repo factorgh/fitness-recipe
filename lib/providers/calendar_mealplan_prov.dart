@@ -23,7 +23,7 @@ class CalendarMealplanProv extends StateNotifier<AsyncValue<List<MealPlan>>> {
 }
 
 // Create a provider for CalendarMealplanProv
-final mealPlanProvider =
+final calmealPlanProvider =
     StateNotifierProvider<CalendarMealplanProv, AsyncValue<List<MealPlan>>>(
         (ref) {
   return CalendarMealplanProv(MealPlanService());

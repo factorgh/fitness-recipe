@@ -9,6 +9,7 @@ import 'package:voltican_fitness/providers/trainer_provider.dart';
 // Make sure to import the provider file
 import 'package:voltican_fitness/screens/single_meal_screen.dart';
 import 'package:voltican_fitness/utils/show_snackbar.dart';
+import 'package:voltican_fitness/providers/calendar_mealplan_prov.dart';
 
 class CalendarItem extends ConsumerWidget {
   final MealPlan mealPlan;
@@ -55,6 +56,7 @@ class CalendarItem extends ConsumerWidget {
                 await notifier.deleteMealPlan(mealPlanId!);
                 Navigator.of(context).pop();
                 Future.delayed(Duration.zero, () {
+                  ref.read(calmealPlanProvider.notifier).fetchMealPlans();
                   ref.read(mealPlansProvider.notifier).fetchAllMealPlans();
                 });
 

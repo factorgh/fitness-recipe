@@ -12,7 +12,7 @@ class CalendarScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Listen to the mealPlanProvider
-    final mealPlansState = ref.watch(mealPlanProvider);
+    final mealPlansState = ref.watch(calmealPlanProvider);
     DateTime focusedDay = DateTime.now();
     DateTime? selectedDay;
 
@@ -79,7 +79,7 @@ class CalendarScreen extends ConsumerWidget {
                               ),
                             )
                             .then((_) => ref
-                                .read(mealPlanProvider.notifier)
+                                .read(calmealPlanProvider.notifier)
                                 .fetchMealPlans());
                       },
                       child: const Text(
@@ -105,7 +105,7 @@ class CalendarScreen extends ConsumerWidget {
                           ),
                         )
                         .then((_) => ref
-                            .read(mealPlanProvider.notifier)
+                            .read(calmealPlanProvider.notifier)
                             .fetchMealPlans());
                     focusedDay = focusDay;
                     selectedDay = selectDay;
