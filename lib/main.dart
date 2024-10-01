@@ -20,10 +20,22 @@ import 'package:voltican_fitness/utils/hive/hive_recurrence.dart';
 import 'package:voltican_fitness/utils/hive/rating.dart';
 import 'package:voltican_fitness/utils/hive/hive_recipe.dart';
 import 'package:voltican_fitness/utils/permission_handler.dart';
+import 'package:workmanager/workmanager.dart';
+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) {
+    // Define your task here
+    return Future.value(true);
+  });
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  Workmanager().initialize(
+    callbackDispatcher,
+    isInDebugMode: true, // Set to true for debugging.
+  );
   await requestNotificationPermission();
 
   // Get application documents directory for Hive storage

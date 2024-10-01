@@ -9,6 +9,7 @@ import 'package:voltican_fitness/models/mealplan.dart';
 import 'package:voltican_fitness/models/recipe.dart';
 import 'package:voltican_fitness/models/user.dart';
 import 'package:voltican_fitness/providers/assigned_trainees_provider.dart';
+import 'package:voltican_fitness/providers/meal_plan_provider.dart';
 import 'package:voltican_fitness/providers/trainer_provider.dart';
 import 'package:voltican_fitness/providers/user_provider.dart';
 import 'package:voltican_fitness/services/recipe_service.dart';
@@ -130,6 +131,7 @@ class _MealPlanPreviewBottomSheetState
 
       ref.refresh(assignedTraineesProvider(user.id));
       ref.refresh(calmealPlanProvider.notifier).fetchMealPlans();
+      ref.refresh(mealPlansProvider.notifier).fetchAllMealPlans();
 
       // Show a success notification
 
