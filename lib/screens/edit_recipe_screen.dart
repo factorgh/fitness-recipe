@@ -94,7 +94,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
         id: widget.recipe.id,
         title: _mealNameController.text,
         description: _descriptionController.text,
-        ingredients: _ingredientsController.text.split(","),
+        ingredients: selectedIngredients,
         instructions: _instructionsController.text,
         facts: _nutritionalFactsController.text,
         status: status!,
@@ -141,7 +141,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
         context,
         Recipe(
           title: _mealNameController.text,
-          ingredients: _ingredientsController.text.split(","),
+          ingredients: selectedIngredients,
           instructions: _instructionsController.text,
           description: _descriptionController.text,
           status: status!,
@@ -149,7 +149,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
           period: selectedMealPeriod!,
           imageUrl: _selectedImage != null
               ? _selectedImage!.path
-              : widget.recipe.imageUrl, // Use empty string if no image
+              : widget.recipe.imageUrl,
           createdBy: user.id,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
@@ -160,7 +160,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
           .removeSavedRecipe(user.id, widget.recipe.id!);
 
       await ref.read(userRecipesProvider.notifier).loadUserRecipes();
-      Navigator.of(context).pop(); // Navigate back after saving
+      Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to create recipe: $e')),
