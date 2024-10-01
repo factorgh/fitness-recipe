@@ -523,7 +523,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                       return const Center(
                         child:
                             CircularProgressIndicator(color: Colors.redAccent),
-                      ); // Or any other loading indicator
+                      );
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else if (snapshot.hasData) {
@@ -531,10 +531,21 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
                       String displayText = snapshot.data!.join(', ');
                       displayText += ' @ ${allocation.timeOfDay}';
 
+                      // Set the max length to show 2/3 of the characters
+                      int maxLength = (displayText.length * 2 / 3).round();
+                      String truncatedText = displayText.length > maxLength
+                          ? '${displayText.substring(0, maxLength)}...'
+                          : displayText;
+
                       return Row(
                         children: [
                           Chip(
-                            label: Text(displayText),
+                            label: Text(
+                              truncatedText,
+                              maxLines: 1, // Keep text in one line
+                              overflow: TextOverflow
+                                  .ellipsis, // Show ellipsis when text is too long
+                            ),
                             backgroundColor: Colors.blue.withOpacity(0.2),
                             deleteIcon: const Icon(Icons.cancel),
                             onDeleted: () => _removeRecipe(
