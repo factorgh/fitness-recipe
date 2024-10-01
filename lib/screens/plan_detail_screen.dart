@@ -15,7 +15,7 @@ class PlanDetailScreen extends StatefulWidget {
 }
 
 class _MealDetailScreenState extends State<PlanDetailScreen> {
-  double value = 3.8;
+  double value = 0.0;
   bool isPrivate = false;
   bool isFollowing = false;
 

@@ -13,7 +13,7 @@ class TraineePlanDetailScreen extends StatefulWidget {
 }
 
 class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
-  double value = 3.8;
+  double value = 0.0;
 
   Future<void> _showReviewConfirmationDialog(BuildContext context) async {
     final TextEditingController reviewController = TextEditingController();

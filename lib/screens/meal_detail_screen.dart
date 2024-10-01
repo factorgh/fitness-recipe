@@ -21,7 +21,7 @@ class MealDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
-  double value = 3.8;
+  double value = 0.0;
   bool isPrivate = false;
   bool isFollowing = false;
 

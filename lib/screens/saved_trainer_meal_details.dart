@@ -28,7 +28,7 @@ class SavedTrainerMealDetailScreen extends ConsumerStatefulWidget {
 
 class _TrainerMealDetailScreenState
     extends ConsumerState<SavedTrainerMealDetailScreen> {
-  double value = 3.8;
+  double value = 0.0;
   bool isPrivate = false;
   bool isFollowing = false;
   RecipeService recipeService = RecipeService();
@@ -242,7 +242,7 @@ class _TrainerMealDetailScreenState
                           child: Column(
                             children: [
                               RatingBar.builder(
-                                initialRating: 3,
+                                initialRating: value,
                                 minRating: 1,
                                 direction: Axis.horizontal,
                                 allowHalfRating: true,
@@ -275,51 +275,54 @@ class _TrainerMealDetailScreenState
                     ],
                   ),
                   const SizedBox(height: 10),
-                  owner != null
-                      ? owner!.imageUrl != null
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Recipe by",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                                const SizedBox(height: 5),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 30,
-                                      backgroundImage:
-                                          NetworkImage(owner!.imageUrl!),
-                                      onBackgroundImageError:
-                                          (error, stackTrace) {
-                                        // Handle image loading errors here
-                                      },
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          owner!.username,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ],
-                                    ),
-                                    const Spacer(),
-                                    // Contact section goes here
-                                  ],
-                                ),
-                              ],
-                            )
-                          : const SizedBox()
-                      : const SizedBox(),
-                  const SizedBox(height: 30),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Recipe by",
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage: owner != null &&
+                                    owner!.imageUrl != null &&
+                                    owner!.imageUrl!.isNotEmpty
+                                ? NetworkImage(owner!.imageUrl!)
+                                : const AssetImage(
+                                    'assets/images/default_profile.png'),
+                          ),
+
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                owner != null ? owner!.fullName : 'Loading...',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                owner != null ? owner!.username : '',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
+
+                          const Spacer(),
+                          // Contact section goes here
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
                   const Text(
                     'Description',
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),

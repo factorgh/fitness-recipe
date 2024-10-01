@@ -24,7 +24,7 @@ class TrainerMealDetailScreen extends ConsumerStatefulWidget {
 
 class _TrainerMealDetailScreenState
     extends ConsumerState<TrainerMealDetailScreen> {
-  double value = 3.8;
+  double value = 0.0;
   bool isPrivate = false;
   bool isFollowing = false;
   final AuthService authService = AuthService();

@@ -498,7 +498,7 @@ class _EditRecipeScreenState extends ConsumerState<EditRecipeScreen> {
                   onChanged: (value) {
                     setState(() {
                       isPrivate = value;
-                      status = isPrivate ? 'public' : 'private';
+                      status = isPrivate ? 'private' : 'public';
                     });
 
                     print(status);

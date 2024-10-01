@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, avoid_print, unused_element
+// ignore_for_file: use_build_context_synchronously, avoid_print, unused_element, unused_result
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -28,7 +28,7 @@ class TrainerMealDetailScreen extends ConsumerStatefulWidget {
 
 class _TrainerMealDetailScreenState
     extends ConsumerState<TrainerMealDetailScreen> {
-  double value = 3.8;
+  double value = 0.0;
   bool isPrivate = false;
   bool isFollowing = false;
   RecipeService recipeService = RecipeService();
@@ -181,12 +181,14 @@ class _TrainerMealDetailScreenState
                   widget.meal.createdBy.isNotEmpty ? widget.meal.createdBy : '')
               .notifier)
           .unfollowTrainer(me!.id, widget.meal.createdBy);
+      ref.refresh(followingTrainersProvider(me.id));
     } else {
       await ref
           .read(followersProvider(
                   widget.meal.createdBy.isNotEmpty ? widget.meal.createdBy : '')
               .notifier)
           .followTrainer(me!.id, widget.meal.createdBy, context);
+      ref.refresh(followingTrainersProvider(me.id));
     }
 
     setState(() {
