@@ -124,48 +124,72 @@ class HiveService {
     DateTime? currentTime,
   ) {
     List<DateTime> recurringDates = [];
-    DateTime currentDate =
-        currentTime ?? startDate; // Start from currentTime or startDate
+
+    // Determine the starting date
+    DateTime initialDate = (currentTime != null &&
+            (currentTime.isAtSameMomentAs(startDate) ||
+                currentTime.isAfter(startDate)) &&
+            currentTime.isBefore(endDate))
+        ? currentTime
+        : startDate;
 
     print('---------------------Date selected on calendar --------------');
     print('Start date: $startDate');
     print('End date: $endDate');
-    print('Current date: $currentDate');
+    print('Current time: $currentTime');
+    print('Initial currentDate: $initialDate');
 
-    // Add startDate to the list if it's within the range
-    if (startDate.isBefore(endDate) || startDate.isAtSameMomentAs(endDate)) {
-      recurringDates.add(startDate);
+    // Ensure the first date is added to the list
+    if (initialDate.isBefore(endDate) ||
+        initialDate.isAtSameMomentAs(endDate)) {
+      recurringDates.add(initialDate);
     }
 
-    // Now begin the recurrence calculation based on the type of recurrence
+    // Define the time interval for recurrence based on the option
+    Duration recurrenceInterval;
+
+    switch (recurrence.option) {
+      case 'every_day':
+        recurrenceInterval = const Duration(days: 1);
+        break;
+      case 'weekly':
+        recurrenceInterval = const Duration(days: 7);
+        break;
+      case 'bi_weekly':
+        recurrenceInterval = const Duration(days: 14);
+        break;
+      case 'custom_weekly':
+        recurrenceInterval = const Duration(days: 7);
+        break;
+      case 'monthly':
+        // Special handling for monthly recurrence
+        recurrenceInterval = Duration.zero; // Placeholder for monthly logic
+        break;
+      default:
+        return recurringDates; // Return if unrecognized option
+    }
+
+    // Generate the recurring dates
+    DateTime currentDate = initialDate;
+
     while (currentDate.isBefore(endDate) ||
         currentDate.isAtSameMomentAs(endDate)) {
-      switch (recurrence.option) {
-        case 'every_day':
-          recurringDates.add(currentDate); // Add currentDate here
-          currentDate = currentDate.add(const Duration(days: 1));
-          break;
+      // Move to the next date based on the recurrence type
+      if (recurrence.option == 'monthly') {
+        currentDate =
+            DateTime(currentDate.year, currentDate.month + 1, currentDate.day);
+      } else {
+        currentDate = currentDate.add(recurrenceInterval);
+      }
 
-        case 'weekly':
-        case 'bi_weekly':
-        case 'custom_weekly':
-          recurringDates.add(currentDate); // Add currentDate here
-          currentDate = currentDate.add(
-            recurrence.option == 'weekly'
-                ? const Duration(days: 7)
-                : const Duration(days: 14),
-          );
-          break;
-
-        case 'monthly':
-          recurringDates.add(currentDate); // Add currentDate here
-          currentDate = DateTime(
-              currentDate.year, currentDate.month + 1, currentDate.day);
-          break;
+      // Add the new date if it's still within the range
+      if (currentDate.isBefore(endDate) ||
+          currentDate.isAtSameMomentAs(endDate)) {
+        recurringDates.add(currentDate);
       }
     }
 
-    // Add any custom dates if they exist
+    // Handle custom dates if they exist within the range
     if (recurrence.customDates != null) {
       for (var customDate in recurrence.customDates!) {
         if (customDate.isAfter(startDate) && customDate.isBefore(endDate)) {
@@ -174,17 +198,12 @@ class HiveService {
       }
     }
 
-    // Remove any dates that are in the exceptions list
-    if (recurrence.exceptions != null) {
-      recurringDates
-          .removeWhere((date) => recurrence.exceptions!.contains(date));
-    }
-
-    // Ensure no duplicates (in case custom dates and generated dates overlap)
+    // Ensure the list has unique dates and is sorted
     recurringDates = recurringDates.toSet().toList();
-
-    // Sort the dates before returning
     recurringDates.sort();
+
+    print('----------------------------Filtered Recurrence Dates-------------');
+    print(recurringDates);
 
     return recurringDates;
   }
@@ -257,6 +276,9 @@ class HiveService {
       DateTime date, HiveMeal updatedMeal, BuildContext context) async {
     final box = await Hive.openBox<HiveMeal>('mealDraftBox');
 
+// Save meal for the current date
+
+    await updateMealForSingleDate(meal: updatedMeal, date: date);
     print('--------------------------Updated Meal------------------------');
     print(updatedMeal);
     print(date);

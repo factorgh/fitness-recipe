@@ -103,19 +103,21 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     Duration period;
     switch (duration) {
       case 'Week':
-        period = const Duration(days: 7);
+        period =
+            const Duration(days: 6); // 6 days since the start date is included
         break;
       case 'Month':
-        period = const Duration(days: 30);
+        period = const Duration(
+            days: 29); // Similarly, reduce by 1 day for all cases
         break;
       case 'Quarter':
-        period = const Duration(days: 90);
+        period = const Duration(days: 89);
         break;
       case 'Half-Year':
-        period = const Duration(days: 180);
+        period = const Duration(days: 179);
         break;
       case 'Year':
-        period = const Duration(days: 365);
+        period = const Duration(days: 364);
         break;
       default:
         return startDate; // Default to startDate if duration is not recognized

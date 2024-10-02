@@ -51,6 +51,7 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     with SingleTickerProviderStateMixin {
   final List<String> _mealPeriods = ['Breakfast', 'Lunch', 'Snack', 'Dinner'];
   final Map<String, List<Meal>> _selectedMeals = {};
+
   Recurrence? recurrence;
 
   RecipeService recipeService = RecipeService();
@@ -629,7 +630,8 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
             TextButton(
               child: const Text('Yes'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
+
                 widget.saveToDraft?.call(); // Perform the save action
               },
             ),
