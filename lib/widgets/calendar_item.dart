@@ -149,7 +149,10 @@ class CalendarItem extends ConsumerWidget {
                     ),
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => const Center(
+                    child: CircularProgressIndicator(
+                  color: Colors.redAccent,
+                )),
                 error: (error, stack) => const Text('Error loading trainees'),
               ),
               const SizedBox(height: 5),

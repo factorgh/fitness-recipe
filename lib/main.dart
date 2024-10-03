@@ -10,6 +10,7 @@ import 'package:showcaseview/showcaseview.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:voltican_fitness/providers/internet_connect.dart'; // Your connectivity provider
 import 'package:voltican_fitness/providers/user_provider.dart';
+
 import 'package:voltican_fitness/screens/onboarding_screen.dart';
 import 'package:voltican_fitness/screens/tabs_screen.dart';
 import 'package:voltican_fitness/services/auth_service.dart';
