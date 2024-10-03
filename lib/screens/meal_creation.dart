@@ -199,7 +199,12 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   // SelectDate logic
 
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
-    DateTime initialDate = DateTime.now();
+    DateTime now = DateTime.now();
+    DateTime today =
+        DateTime(now.year, now.month, now.day); // Strip time component
+    DateTime initialDate = today;
+
+    // Use the current selected date if available
     if (isStartDate && _startDate != null) {
       initialDate = _startDate!;
     } else if (!isStartDate && _endDate != null) {
@@ -208,13 +213,15 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
 
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: initialDate,
-      firstDate: DateTime(2000),
+      initialDate: initialDate.isAfter(today)
+          ? initialDate
+          : today, // Use today or future dates
+      firstDate: today, // Prevent past dates, but allow today
       lastDate: DateTime(2101),
     );
 
-    if (pickedDate != null &&
-        pickedDate != (isStartDate ? _startDate : _endDate)) {
+    // Ensure the picked date is valid (current or future date)
+    if (pickedDate != null && !pickedDate.isBefore(today)) {
       setState(() {
         if (isStartDate) {
           _startDate = pickedDate;
@@ -223,6 +230,14 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         }
         _updateHighlightedDates();
       });
+    } else if (pickedDate != null && pickedDate.isBefore(today)) {
+      // Provide feedback for selecting past dates
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You cannot select a date in the past'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 

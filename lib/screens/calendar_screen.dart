@@ -97,18 +97,33 @@ class CalendarScreen extends ConsumerWidget {
                   lastDay: DateTime.utc(2040, 3, 20),
                   selectedDayPredicate: (day) => isSameDay(day, selectedDay),
                   onDaySelected: (DateTime focusDay, DateTime selectDay) {
-                    Navigator.of(context)
-                        .push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                MealCreationScreen(selectedDay: selectDay),
-                          ),
-                        )
-                        .then((_) => ref
-                            .read(calmealPlanProvider.notifier)
-                            .fetchMealPlans());
-                    focusedDay = focusDay;
-                    selectedDay = selectDay;
+                    DateTime now = DateTime.now();
+                    DateTime today = DateTime(
+                        now.year, now.month, now.day); // Strip time component
+
+                    if (selectDay.isBefore(today)) {
+                      // Show feedback if trying to select a past date
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('You cannot select a date in the past'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    } else {
+                      // If the selected date is valid (current or future date)
+                      Navigator.of(context)
+                          .push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  MealCreationScreen(selectedDay: selectDay),
+                            ),
+                          )
+                          .then((_) => ref
+                              .read(calmealPlanProvider.notifier)
+                              .fetchMealPlans());
+                      focusedDay = focusDay;
+                      selectedDay = selectDay;
+                    }
                   },
                   headerStyle: const HeaderStyle(formatButtonVisible: false),
                 ),

@@ -189,7 +189,7 @@ class _TrainerSearchScreenState extends ConsumerState<TrainerSearchScreen> {
                                                 null
                                             ? NetworkImage(trainer.imageUrl!)
                                             : const AssetImage(
-                                                    'assets/images/default_avatar.png')
+                                                    'assets/images/default_profile.png')
                                                 as ImageProvider,
                                       ),
                                       title: Text(

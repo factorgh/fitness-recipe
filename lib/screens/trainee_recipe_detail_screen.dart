@@ -234,7 +234,7 @@ class _TraineeRecipeDetailScreenState
                           child: Column(
                             children: [
                               RatingBar.builder(
-                                initialRating: 3,
+                                initialRating: value,
                                 minRating: 1,
                                 direction: Axis.horizontal,
                                 allowHalfRating: true,
