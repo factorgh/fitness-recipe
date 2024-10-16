@@ -21,8 +21,8 @@ class _SplashScreenState extends State<SplashScreen> {
           decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(50),
-                  bottomRight: Radius.circular(50))),
+                  bottomLeft: Radius.circular(100),
+                  bottomRight: Radius.circular(100))),
           child: const Center(
             child: Text(
               "FitCibus",
