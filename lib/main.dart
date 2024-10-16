@@ -249,7 +249,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       title: 'Test Notification',
       body: 'This is a test notification scheduled for 10 seconds from now.',
       scheduledDate: DateTime.now().add(const Duration(seconds: 10)),
-      payload: 'test_payload', // Optional payload for handling notifications
+      payload: 'test_payload',
     );
   }
 }

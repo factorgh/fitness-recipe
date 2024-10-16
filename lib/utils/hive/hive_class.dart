@@ -153,7 +153,12 @@ class HiveService {
 
       for (var mealType in ['Breakfast', 'Lunch', 'Dinner', 'Snack']) {
         HiveMeal? meal = box.get('${date.toIso8601String()}_$mealType');
-        mealsForDate.add(meal!);
+
+        if (meal != null) {
+          mealsForDate.add(meal);
+        } else {
+          print('No meal found for $mealType on $date');
+        }
       }
 
       return mealsForDate;

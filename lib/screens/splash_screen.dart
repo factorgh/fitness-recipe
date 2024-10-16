@@ -14,7 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color(0xFFFFB3B3),
+        backgroundColor: const Color(0xFFFFD8D8),
         body: Container(
           width: double.infinity,
           height: MediaQuery.of(context).size.height * 0.8,
@@ -40,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     // Timer to delay the navigation
-    Timer(const Duration(seconds: 10), () {
+    Timer(const Duration(seconds: 3), () {
       if (mounted) {
         Navigator.pushAndRemoveUntil(
           context,
