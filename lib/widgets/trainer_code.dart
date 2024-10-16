@@ -1,10 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:fit_cibus/providers/trainer_provider.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/screens/code_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/providers/trainer_provider.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/code_screen.dart';
 
 class TrainerCodeWidget extends ConsumerStatefulWidget {
   final String trainerName;
@@ -17,49 +17,6 @@ class TrainerCodeWidget extends ConsumerStatefulWidget {
 }
 
 class _TrainerCodeWidgetState extends ConsumerState<TrainerCodeWidget> {
-  void _showConfirmationDialog(String trainerToUnfollowId) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Change Trainer"),
-          content: const Text(
-            "Do you want to change your trainer? Changing trainer will log you out of the current trainer's account.",
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("Cancel"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () async {
-                // Perform the unfollow operation
-                final trainerId = ref.read(userProvider)!.id;
-                await ref
-                    .read(followingTrainersProvider(trainerId).notifier)
-                    .unfollowTrainer(trainerId, trainerToUnfollowId);
-
-                await ref
-                    .read(followingTrainersProvider(trainerId).notifier)
-                    .fetchFollowingTrainers(trainerId);
-
-                // Navigate to the CodeScreen
-                Navigator.of(context).pop();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const CodeScreen()),
-                );
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -101,6 +58,49 @@ class _TrainerCodeWidgetState extends ConsumerState<TrainerCodeWidget> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showConfirmationDialog(String trainerToUnfollowId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Change Trainer"),
+          content: const Text(
+            "Do you want to change your trainer? Changing trainer will log you out of the current trainer's account.",
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () async {
+                // Perform the unfollow operation
+                final trainerId = ref.read(userProvider)!.id;
+                await ref
+                    .read(followingTrainersProvider(trainerId).notifier)
+                    .unfollowTrainer(trainerId, trainerToUnfollowId);
+
+                await ref
+                    .read(followingTrainersProvider(trainerId).notifier)
+                    .fetchFollowingTrainers(trainerId);
+
+                // Navigate to the CodeScreen
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CodeScreen()),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

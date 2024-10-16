@@ -1,11 +1,11 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
+import 'package:fit_cibus/classes/dio_client.dart';
+import 'package:fit_cibus/models/mealplan.dart';
+import 'package:fit_cibus/services/noti_setup.dart';
+import 'package:fit_cibus/utils/native_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:voltican_fitness/classes/dio_client.dart';
-import 'package:voltican_fitness/models/mealplan.dart';
-import 'package:voltican_fitness/services/noti_setup.dart';
-import 'package:voltican_fitness/utils/native_alert.dart';
 
 class MealPlanService {
   final DioClient client = DioClient();

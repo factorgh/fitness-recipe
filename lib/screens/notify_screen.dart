@@ -1,14 +1,14 @@
 // ignore_for_file: avoid_print
 
+import 'package:fit_cibus/models/notification.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/screens/notification_detail_screen.dart';
+import 'package:fit_cibus/services/notifications_service.dart';
+import 'package:fit_cibus/utils/socket_io_setup.dart';
+import 'package:fit_cibus/widgets/notification_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
-import 'package:voltican_fitness/models/notification.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/notification_detail_screen.dart';
-import 'package:voltican_fitness/services/notifications_service.dart';
-import 'package:voltican_fitness/utils/socket_io_setup.dart';
-import 'package:voltican_fitness/widgets/notification_item.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
@@ -21,27 +21,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   late NotificationServiceSub _notificationService;
   late SocketService _socketService;
   late Future<List<AppNotification>> _notificationsFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _notificationService = NotificationServiceSub();
-    _socketService = SocketService();
-    _socketService.initSocket();
-
-    final user = ref.read(userProvider);
-    if (user != null) {
-      _notificationsFuture = _notificationService.getNotifications(user.id);
-
-      _socketService.listenForNotifications(user.id, (notification) {
-        setState(() {
-          _notificationsFuture = _notificationService.getNotifications(user.id);
-        });
-      });
-    } else {
-      _notificationsFuture = Future.value([]);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,5 +103,26 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   void dispose() {
     _socketService.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationService = NotificationServiceSub();
+    _socketService = SocketService();
+    _socketService.initSocket();
+
+    final user = ref.read(userProvider);
+    if (user != null) {
+      _notificationsFuture = _notificationService.getNotifications(user.id);
+
+      _socketService.listenForNotifications(user.id, (notification) {
+        setState(() {
+          _notificationsFuture = _notificationService.getNotifications(user.id);
+        });
+      });
+    } else {
+      _notificationsFuture = Future.value([]);
+    }
   }
 }

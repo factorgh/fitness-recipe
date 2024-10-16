@@ -1,8 +1,9 @@
 import 'dart:io';
+
+import 'package:fit_cibus/screens/assign_recipe_screen.dart';
+import 'package:fit_cibus/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
-import 'package:voltican_fitness/widgets/button.dart';
 
 class RecipeScreen extends StatefulWidget {
   const RecipeScreen({super.key});
@@ -17,20 +18,6 @@ class _RecipeScreenState extends State<RecipeScreen> {
   final TextEditingController _mealNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _ingredientsController = TextEditingController();
-
-  void _takePicture() async {
-    final imagePicker = ImagePicker();
-    final pickedImage =
-        await imagePicker.pickImage(source: ImageSource.gallery);
-
-    if (pickedImage == null) {
-      return;
-    }
-
-    setState(() {
-      _selectedImage = File(pickedImage.path);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -271,5 +258,19 @@ class _RecipeScreenState extends State<RecipeScreen> {
         ),
       ),
     );
+  }
+
+  void _takePicture() async {
+    final imagePicker = ImagePicker();
+    final pickedImage =
+        await imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage == null) {
+      return;
+    }
+
+    setState(() {
+      _selectedImage = File(pickedImage.path);
+    });
   }
 }

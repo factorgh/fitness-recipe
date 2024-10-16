@@ -1,5 +1,5 @@
+import 'package:fit_cibus/models/recipe.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/models/recipe.dart';
 
 class SearchCategoryItem extends StatelessWidget {
   final Recipe recipe;

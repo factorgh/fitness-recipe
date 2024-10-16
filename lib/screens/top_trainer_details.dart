@@ -1,21 +1,19 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print, unused_element
 
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/providers/saved_recipe_provider.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/services/recipe_service.dart';
+import 'package:fit_cibus/utils/show_snackbar.dart';
+import 'package:fit_cibus/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-
-import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-
-import 'package:voltican_fitness/services/recipe_service.dart';
-import 'package:voltican_fitness/utils/show_snackbar.dart';
-import 'package:voltican_fitness/widgets/button.dart';
 
 class TopTrainerDetailsScreen extends ConsumerStatefulWidget {
-  const TopTrainerDetailsScreen({super.key, required this.meal});
   final Map<String, dynamic> meal;
+  const TopTrainerDetailsScreen({super.key, required this.meal});
 
   @override
   ConsumerState<TopTrainerDetailsScreen> createState() =>
@@ -27,125 +25,6 @@ class _TopTrainerDetailsScreen extends ConsumerState<TopTrainerDetailsScreen> {
   bool isPrivate = false;
   bool isFollowing = false;
   RecipeService recipeService = RecipeService();
-
-  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // User must tap button to dismiss
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Confirm Delete',
-            style: TextStyle(color: Colors.black87),
-          ),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                  'Are you sure you want to delete this item?',
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                // Perform the delete action
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _showRatingDialog() async {
-    final TextEditingController commentController = TextEditingController();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Rate and Comment'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RatingStars(
-                value: value,
-                onValueChanged: (v) {
-                  setState(() {
-                    value = v;
-                  });
-                },
-                starCount: 5,
-                starSize: 30,
-                starSpacing: 2,
-                valueLabelVisibility: false,
-                maxValue: 5,
-                starOffColor: const Color(0xffe7e8ea),
-                starColor: Colors.yellow,
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: commentController,
-                decoration: const InputDecoration(
-                  hintText: 'Write your comment here',
-                ),
-                maxLines: 3,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                String comment = commentController.text;
-                if (comment.isNotEmpty) {
-                  // Handle comment submission here
-                  showSnack(context, 'Comment submitted successfully');
-                }
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('Submit'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _toggleFollow() {
-    setState(() {
-      isFollowing = !isFollowing;
-    });
-
-    // Show the snack bar with the appropriate message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isFollowing
-              ? 'You are now following trainer'
-              : 'You have unfollowed trainer.',
-          style: const TextStyle(color: Colors.white),
-        ),
-        backgroundColor: isFollowing ? Colors.green : Colors.red,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -431,6 +310,125 @@ class _TopTrainerDetailsScreen extends ConsumerState<TopTrainerDetailsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to dismiss
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Delete',
+            style: TextStyle(color: Colors.black87),
+          ),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  'Are you sure you want to delete this item?',
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                // Perform the delete action
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showRatingDialog() async {
+    final TextEditingController commentController = TextEditingController();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Rate and Comment'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RatingStars(
+                value: value,
+                onValueChanged: (v) {
+                  setState(() {
+                    value = v;
+                  });
+                },
+                starCount: 5,
+                starSize: 30,
+                starSpacing: 2,
+                valueLabelVisibility: false,
+                maxValue: 5,
+                starOffColor: const Color(0xffe7e8ea),
+                starColor: Colors.yellow,
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: commentController,
+                decoration: const InputDecoration(
+                  hintText: 'Write your comment here',
+                ),
+                maxLines: 3,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String comment = commentController.text;
+                if (comment.isNotEmpty) {
+                  // Handle comment submission here
+                  showSnack(context, 'Comment submitted successfully');
+                }
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _toggleFollow() {
+    setState(() {
+      isFollowing = !isFollowing;
+    });
+
+    // Show the snack bar with the appropriate message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          isFollowing
+              ? 'You are now following trainer'
+              : 'You have unfollowed trainer.',
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: isFollowing ? Colors.green : Colors.red,
+        duration: const Duration(seconds: 2),
       ),
     );
   }

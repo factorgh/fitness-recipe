@@ -1,14 +1,13 @@
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/screens/assign_recipe_screen.dart';
+import 'package:fit_cibus/screens/edit_recipe_screen.dart';
+import 'package:fit_cibus/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
-import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
-import 'package:voltican_fitness/widgets/button.dart';
-
 class PlanDetailScreen extends StatefulWidget {
-  const PlanDetailScreen({super.key, required this.meal});
   final Recipe meal;
+  const PlanDetailScreen({super.key, required this.meal});
 
   @override
   State<PlanDetailScreen> createState() => _MealDetailScreenState();
@@ -18,45 +17,6 @@ class _MealDetailScreenState extends State<PlanDetailScreen> {
   double value = 0.0;
   bool isPrivate = false;
   bool isFollowing = false;
-
-  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // User must tap button to dismiss
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Confirm Delete',
-            style: TextStyle(color: Colors.black87),
-          ),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                  'Are you sure you want to delete this item?',
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                // Perform the delete action
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -338,6 +298,45 @@ class _MealDetailScreenState extends State<PlanDetailScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to dismiss
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Delete',
+            style: TextStyle(color: Colors.black87),
+          ),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  'Are you sure you want to delete this item?',
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                // Perform the delete action
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

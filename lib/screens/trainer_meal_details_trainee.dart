@@ -1,21 +1,19 @@
 // ignore_for_file: use_build_context_synchronously, unused_element, avoid_print
 
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/models/user.dart';
+import 'package:fit_cibus/providers/saved_recipe_provider.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/services/auth_service.dart';
+import 'package:fit_cibus/utils/show_snackbar.dart';
+import 'package:fit_cibus/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/models/user.dart';
-import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
-
-import 'package:voltican_fitness/utils/show_snackbar.dart';
-import 'package:voltican_fitness/widgets/button.dart';
-
 class TrainerMealDetailScreen extends ConsumerStatefulWidget {
-  const TrainerMealDetailScreen({super.key, required this.meal});
   final Recipe meal;
+  const TrainerMealDetailScreen({super.key, required this.meal});
 
   @override
   ConsumerState<TrainerMealDetailScreen> createState() =>
@@ -30,122 +28,6 @@ class _TrainerMealDetailScreenState
   final AuthService authService = AuthService();
   User? user;
   User? trainer;
-
-  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // User must tap button to dismiss
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Confirm Delete',
-            style: TextStyle(color: Colors.black87),
-          ),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                  'Are you sure you want to delete this item?',
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                // Perform the delete action
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _showRatingDialog() async {
-    final TextEditingController commentController = TextEditingController();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Center(
-              child: Text(
-            'Leave your Review',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
-          )),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 10),
-              TextField(
-                controller: commentController,
-                decoration: const InputDecoration(
-                  hintText: 'Write your review here',
-                ),
-                maxLines: 3,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Skip')),
-            ),
-            const Spacer(),
-            TextButton(
-              onPressed: () {
-                String comment = commentController.text;
-                if (comment.isNotEmpty) {
-                  // Handle comment submission here
-                  showSnack(context, 'Review submitted successfully');
-                }
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Post')),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUser();
-  }
-
-  void _fetchUser() {
-    authService.getUser(
-      userId: widget.meal.createdBy,
-      onSuccess: (fetchedUser) {
-        setState(() {
-          trainer = fetchedUser;
-        });
-      },
-    );
-    print('------------------------User fetched------------------------');
-    print(trainer);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -435,6 +317,122 @@ class _TrainerMealDetailScreenState
           ),
         ],
       ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUser();
+  }
+
+  void _fetchUser() {
+    authService.getUser(
+      userId: widget.meal.createdBy,
+      onSuccess: (fetchedUser) {
+        setState(() {
+          trainer = fetchedUser;
+        });
+      },
+    );
+    print('------------------------User fetched------------------------');
+    print(trainer);
+  }
+
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to dismiss
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Delete',
+            style: TextStyle(color: Colors.black87),
+          ),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  'Are you sure you want to delete this item?',
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                // Perform the delete action
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showRatingDialog() async {
+    final TextEditingController commentController = TextEditingController();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Center(
+              child: Text(
+            'Leave your Review',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+          )),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 10),
+              TextField(
+                controller: commentController,
+                decoration: const InputDecoration(
+                  hintText: 'Write your review here',
+                ),
+                maxLines: 3,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Skip')),
+            ),
+            const Spacer(),
+            TextButton(
+              onPressed: () {
+                String comment = commentController.text;
+                if (comment.isNotEmpty) {
+                  // Handle comment submission here
+                  showSnack(context, 'Review submitted successfully');
+                }
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Post')),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -1,11 +1,11 @@
 // ignore_for_file: avoid_print
 
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/screens/all_meal_plan_trainee.dart';
+import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/all_meal_plan_trainee.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class NotificationDetailsPage extends ConsumerWidget {
   final String notiText;

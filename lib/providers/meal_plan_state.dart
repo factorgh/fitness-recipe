@@ -1,5 +1,5 @@
+import 'package:fit_cibus/models/mealplan.dart';
 import 'package:flutter/foundation.dart';
-import 'package:voltican_fitness/models/mealplan.dart';
 
 @immutable
 abstract class MealPlansState {

@@ -1,15 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:fit_cibus/models/mealplan.dart';
+import 'package:fit_cibus/providers/calendar_mealplan_prov.dart';
+import 'package:fit_cibus/providers/meal_plan_provider.dart';
+import 'package:fit_cibus/providers/trainer_provider.dart';
+import 'package:fit_cibus/screens/single_meal_screen.dart';
+import 'package:fit_cibus/utils/show_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:voltican_fitness/models/mealplan.dart';
-import 'package:voltican_fitness/providers/meal_plan_provider.dart';
-import 'package:voltican_fitness/providers/trainer_provider.dart';
-// Make sure to import the provider file
-import 'package:voltican_fitness/screens/single_meal_screen.dart';
-import 'package:voltican_fitness/utils/show_snackbar.dart';
-import 'package:voltican_fitness/providers/calendar_mealplan_prov.dart';
 
 class CalendarItem extends ConsumerWidget {
   final MealPlan mealPlan;
@@ -20,54 +19,6 @@ class CalendarItem extends ConsumerWidget {
     required this.mealPlan,
     required this.titleIcon,
   });
-
-  Future<void> _showDeleteConfirmationDialog(
-      BuildContext context, WidgetRef ref) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // User must tap button to dismiss
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Confirm Delete',
-            style: TextStyle(color: Colors.black87),
-          ),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                  'Are you sure you want to delete this item?',
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () async {
-                final mealPlanId = mealPlan.id;
-                final notifier = ref.read(mealPlanProvider.notifier);
-                await notifier.deleteMealPlan(mealPlanId!);
-                Navigator.of(context).pop();
-                Future.delayed(Duration.zero, () {
-                  ref.read(calmealPlanProvider.notifier).fetchMealPlans();
-                  ref.read(mealPlansProvider.notifier).fetchAllMealPlans();
-                });
-
-                showSnack(context, "Meal Plan deleted successfully!");
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -194,6 +145,54 @@ class CalendarItem extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _showDeleteConfirmationDialog(
+      BuildContext context, WidgetRef ref) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to dismiss
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Delete',
+            style: TextStyle(color: Colors.black87),
+          ),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  'Are you sure you want to delete this item?',
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () async {
+                final mealPlanId = mealPlan.id;
+                final notifier = ref.read(mealPlanProvider.notifier);
+                await notifier.deleteMealPlan(mealPlanId!);
+                Navigator.of(context).pop();
+                Future.delayed(Duration.zero, () {
+                  ref.read(calmealPlanProvider.notifier).fetchMealPlans();
+                  ref.read(mealPlansProvider.notifier).fetchAllMealPlans();
+                });
+
+                showSnack(context, "Meal Plan deleted successfully!");
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

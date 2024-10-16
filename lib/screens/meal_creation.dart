@@ -1,29 +1,28 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
 
+import 'package:fit_cibus/Features/mealplan/services/mealplan_service.dart';
+import 'package:fit_cibus/Features/trainer/trainer_service.dart';
+import 'package:fit_cibus/models/mealplan.dart';
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/models/user.dart';
+import 'package:fit_cibus/providers/meal_plan_provider.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/screens/meal_plan_preview_screen.dart';
+import 'package:fit_cibus/services/recipe_service.dart';
+import 'package:fit_cibus/utils/conversions/hive_conversions.dart';
+import 'package:fit_cibus/utils/hive/hive_class.dart';
+import 'package:fit_cibus/utils/hive/hive_meal.dart';
+import 'package:fit_cibus/utils/hive/hive_mealplan.dart';
+import 'package:fit_cibus/utils/hive/hive_recurrence.dart';
+import 'package:fit_cibus/utils/show_snackbar.dart';
+import 'package:fit_cibus/widgets/meal_period_selector.dart';
+import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:voltican_fitness/Features/mealplan/services/mealplan_service.dart';
-import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
-import 'package:voltican_fitness/models/mealplan.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/models/user.dart';
-import 'package:voltican_fitness/providers/meal_plan_provider.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/meal_plan_preview_screen.dart';
-import 'package:voltican_fitness/services/recipe_service.dart';
-import 'package:voltican_fitness/utils/conversions/hive_conversions.dart';
-import 'package:voltican_fitness/utils/hive/hive_class.dart';
-import 'package:voltican_fitness/utils/hive/hive_meal.dart';
-import 'package:voltican_fitness/utils/hive/hive_mealplan.dart';
-import 'package:voltican_fitness/utils/hive/hive_recurrence.dart';
-import 'package:voltican_fitness/utils/show_snackbar.dart';
-import 'package:voltican_fitness/widgets/meal_period_selector.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class MealCreationScreen extends ConsumerStatefulWidget {
   final DateTime selectedDay;
@@ -71,597 +70,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   final GlobalKey _key3 = GlobalKey(); //Showacse for higlitedDate
   final GlobalKey _key4 = GlobalKey(); //Showcase for add new recipe
   final GlobalKey _key5 = GlobalKey(); //Showacse for recurrence
-  // Callback function to handle selection changes
-  void _handleRecipeSelectionChanged(List<Meal> selectedAllocations) {
-    print("Recurrence");
-
-    for (Meal meal in selectedAllocations) {
-      print("------------Meal Allocation------------");
-      print("Meal Type: ${meal.mealType}");
-      print("Date: ${meal.date}");
-      print("Allocated Time: ${meal.timeOfDay}");
-      print('Alloacted recurrences: ${meal.recurrence}');
-      print("Recipes:");
-    }
-
-    setState(() {
-      _selectedRecipeAllocations.clear();
-      _selectedRecipeAllocations.addAll(selectedAllocations);
-      chosenRecurrence = null;
-    });
-
-    print(
-      '------------------allocations------------------$_selectedRecipeAllocations',
-    );
-  }
-
-  void handleSelectionChange(List<String> selectedPeriods) {
-    setState(() {});
-  }
-
-  DateTime _calculateEndDate(DateTime startDate, String duration) {
-    Duration period;
-    switch (duration) {
-      case 'Week':
-        period =
-            const Duration(days: 6); // 6 days since the start date is included
-        break;
-      case 'Month':
-        period = const Duration(
-            days: 29); // Similarly, reduce by 1 day for all cases
-        break;
-      case 'Quarter':
-        period = const Duration(days: 89);
-        break;
-      case 'Half-Year':
-        period = const Duration(days: 179);
-        break;
-      case 'Year':
-        period = const Duration(days: 364);
-        break;
-      default:
-        return startDate; // Default to startDate if duration is not recognized
-    }
-    return startDate.add(period);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _startDate = widget.selectedDay;
-    _updateHighlightedDates();
-    fetchAllUserRecipes();
-    getTraineesFollowingTrainer();
-
-    // Initialize HiveService outside of initState
-    _initializeHiveService();
-    setDraftMealPlan();
-
-// Showcase handler
-    _checkAndShowcase();
-  }
-
-  Future<void> _checkAndShowcase() async {
-    final prefs = await SharedPreferences.getInstance();
-    _hasShowcased = prefs.getBool('hasShowcased') ?? false;
-
-    if (!_hasShowcased) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ShowCaseWidget.of(context).startShowCase([_key1, _key2, _key3]);
-        prefs.setBool('hasShowcased', true);
-      });
-    }
-  }
-
-  Future<void> _initializeHiveService() async {
-    final hiveService = HiveService();
-    await hiveService.init();
-
-    setState(() {});
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _mealPlanNameController.dispose();
-    super.dispose();
-  }
-
-  void _startShowcase() async {
-    // Scroll to the item you want to showcase
-    await _scrollToItem();
-
-    // Start the showcase after scrolling
-    final showcase = ShowCaseWidget.of(context);
-    showcase.startShowCase([_key3, _key4, _key5]);
-  }
-
-  Future<void> _scrollToItem() async {
-    _scrollController.animateTo(
-      100.0,
-      duration: const Duration(seconds: 2),
-      curve: Curves.easeInOut,
-    );
-  }
-
-// Highlighted dates logic
-  void _updateHighlightedDates() {
-    if (_startDate != null && _endDate != null) {
-      _highlightedDates.clear();
-      DateTime date = _startDate!;
-      while (date.isBefore(_endDate!.add(const Duration(days: 1)))) {
-        _highlightedDates.add(date);
-        date = date.add(const Duration(days: 1));
-      }
-    }
-  }
-
-  // SelectDate logic
-
-  Future<void> _selectDate(BuildContext context, bool isStartDate) async {
-    DateTime now = DateTime.now();
-    DateTime today =
-        DateTime(now.year, now.month, now.day); // Strip time component
-    DateTime initialDate = today;
-
-    // Use the current selected date if available
-    if (isStartDate && _startDate != null) {
-      initialDate = _startDate!;
-    } else if (!isStartDate && _endDate != null) {
-      initialDate = _endDate!;
-    }
-
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: initialDate.isAfter(today)
-          ? initialDate
-          : today, // Use today or future dates
-      firstDate: today, // Prevent past dates, but allow today
-      lastDate: DateTime(2101),
-    );
-
-    // Ensure the picked date is valid (current or future date)
-    if (pickedDate != null && !pickedDate.isBefore(today)) {
-      setState(() {
-        if (isStartDate) {
-          _startDate = pickedDate;
-        } else {
-          _endDate = pickedDate;
-        }
-        _updateHighlightedDates();
-      });
-    } else if (pickedDate != null && pickedDate.isBefore(today)) {
-      // Provide feedback for selecting past dates
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('You cannot select a date in the past'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
-  }
-
-  Future<void> fetchAllUserRecipes() async {
-    try {
-      myRecipes = await recipeService.fetchRecipesByUser();
-      setState(() {});
-    } catch (e) {
-      showSnack(context, 'Failed to load user recipes');
-    }
-  }
-
-  Future<void> getTraineesFollowingTrainer() async {
-    try {
-      final user = ref.read(userProvider);
-      if (user != null) {
-        _allTrainees =
-            await trainerService.getTraineesFollowingTrainer(user.id);
-        setState(() {});
-      } else {
-        showSnack(context, 'User not found');
-      }
-    } catch (e) {
-      showSnack(context, 'Failed to load trainees');
-    }
-  }
-
-  void _searchTrainees(String query) {
-    setState(() {
-      _searchResults = _allTrainees.where((trainee) {
-        final fullName = trainee.fullName.toLowerCase();
-        final username = trainee.username.toLowerCase();
-        final searchQuery = query.toLowerCase();
-
-        return fullName.contains(searchQuery) || username.contains(searchQuery);
-      }).toList();
-    });
-  }
-
-  void _addTrainee(User trainee) {
-    if (_selectedTrainees.contains(trainee)) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Duplicate Entry'),
-          content: const Text('This trainee has already been added.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-    } else {
-      setState(() {
-        _selectedTrainees.add(trainee);
-        _searchController.clear();
-        _searchResults.clear();
-      });
-    }
-  }
-
-  void _removeTrainee(User trainee) {
-    setState(() {
-      _selectedTrainees.remove(trainee);
-    });
-  }
-
-  void createPlan() {
-    _completeSchedule();
-  }
-
-  bool _isWithinRange(DateTime day) {
-    if (_startDate != null && _endDate != null) {
-      return day.isAfter(_startDate!.subtract(const Duration(days: 1))) &&
-          day.isBefore(_endDate!.add(const Duration(days: 1)));
-    }
-    return true;
-  }
-
-// Start of complete schedule
-  Future<void> _completeSchedule() async {
-    final user = ref.read(userProvider);
-    final List<Meal> meals = [];
-
-    if (user == null) {
-      print('---------user is null----');
-    }
-
-    for (Meal meal in _selectedRecipeAllocations) {
-      if (newDay == null) {
-        print('----------------------------newDay is null------------------');
-      }
-
-      meals.add(Meal(
-        mealType: meal.mealType,
-        date: newDay!,
-        timeOfDay: meal.timeOfDay,
-        recipes: meal.recipes,
-        recurrence: chosenRecurrence,
-      ));
-    }
-
-    print(
-        "\n================================meals================================$meals");
-
-    final mealPlan = MealPlan(
-        name: _mealPlanNameController.text,
-        duration: _selectedDuration,
-        startDate: _startDate,
-        endDate: _endDate,
-        meals: meals,
-        trainees: _selectedTrainees.map((trainee) => trainee.id).toList(),
-        createdBy: user!.id,
-        isDraft: false);
-    print('---------------------mealplan-------------$mealPlan');
-    ref.read(mealPlanProvider.notifier).createMealPlan(mealPlan, context);
-    Navigator.of(context).pop();
-  }
-
-// Handle recurrence here
-  void handleRecurrence(Recurrence recurrenceData) {
-    print(
-        '---------------------recurrence before preview------------$recurrenceData');
-
-    setState(() {
-      //
-      chosenRecurrence = recurrenceData;
-    });
-  }
-
-  // Hive implementations
-  void onSaveMeal() async {
-    final List<Meal> meals = [];
-    for (Meal meal in _selectedRecipeAllocations) {
-      print("------------Meal Allocation------------");
-
-      meals.add(Meal(
-        mealType: meal.mealType,
-        date: newDay!,
-        timeOfDay: meal.timeOfDay,
-        recipes: meal.recipes,
-        recurrence: chosenRecurrence,
-      ));
-    }
-  }
-
-  HiveRecurrence convertToHiveRecurrence(Recurrence recurrence) {
-    print('----------------Recurrence in conversion----------------');
-    print(recurrence);
-
-    return HiveRecurrence(
-        option: recurrence.option,
-        date: recurrence.date,
-        customDates: recurrence.customDates,
-        exceptions: recurrence.exceptions,
-        customDays: recurrence.customDays);
-  }
-
-  Recurrence convertFromHiveRecurrence(HiveRecurrence recurrence) {
-    print('----------------Recurrence in conversion----------------');
-    print(recurrence);
-
-    return Recurrence(
-        option: recurrence.option,
-        date: recurrence.date,
-        customDates: recurrence.customDates,
-        exceptions: recurrence.exceptions,
-        customDays: recurrence.customDays);
-  }
-
-// Handle Save  meal plan to the draft
-  Future<void> _saveMealPlanToDraft() async {
-    final HiveService hiveService = HiveService();
-
-    // Create the meal plan object
-
-    final HiveMealPlan newPlan = HiveMealPlan(
-      name: _mealPlanNameController.text,
-      duration: _selectedDuration,
-      startDate: _startDate,
-      endDate: _endDate,
-      meals: [],
-      trainees: _selectedTrainees.map((trainee) => trainee.id).toList(),
-      createdBy: ref.read(userProvider)!.id,
-      isDraft: true,
-    );
-    await hiveService.saveDraftMealPlan(newPlan);
-  }
-
-  // Handle get draft meal plan
-  Future<HiveMealPlan?> _getDraftMealPlan() async {
-    final hiveService = HiveService();
-    return await hiveService.getDraftMealPlan();
-  }
-
-  //Get all trainees following trainer
-
-  void setDraftMealPlan() async {
-    await getTraineesFollowingTrainer();
-    // Get meal plan from draft'
-    final mealPlan = await _getDraftMealPlan();
-    // Prepopulate the draft data
-    if (mealPlan == null) {
-      print('No draft meal plan found');
-      return;
-    }
-    setState(() {
-      _mealPlanNameController.text = mealPlan.name;
-      _selectedDuration = mealPlan.duration;
-      _startDate = mealPlan.startDate;
-      _endDate = mealPlan.endDate;
-      List<User> selectedTrainees = [];
-
-      print(
-          '------------------------MealPlan trainees------------------------${mealPlan.trainees}');
-      for (String id in mealPlan.trainees) {
-        // Find the corresponding user
-        List<User> matchedUsers =
-            _allTrainees.where((trainee) => trainee.id == id).toList();
-
-        // Only add if a matching user is found
-        if (matchedUsers.isNotEmpty) {
-          selectedTrainees.add(matchedUsers.first);
-        }
-      }
-
-      if (selectedTrainees.isEmpty) {
-        print('Warning: No matching trainees found');
-      }
-      print(
-          '-------------------selected trainees-------------------$selectedTrainees');
-      _selectedTrainees.addAll(selectedTrainees);
-
-      newDay = _startDate;
-    });
-
-    // Prepopulate the data on initial render
-  }
-
-  void handleSaveToDraft() async {
-    final hiveService = HiveService();
-
-    // Convert selected recipe allocations to HiveMeals
-    final meals = convertMealsToHiveMeals(
-      _selectedRecipeAllocations,
-      chosenRecurrence,
-    );
-
-    // Only work on the last meal added
-    if (meals.isNotEmpty) {
-      final lastMeal = meals.last;
-
-      print(
-          '---------------------Save last meal to Hive meal draft box ----------------$lastMeal');
-      print('------------$_startDate---$_endDate---$newDay---$lastMeal');
-
-      // Ensure that _startDate, _endDate, newDay, and lastMeal are not null before calling updateMealForDate
-      if (_startDate != null && _endDate != null && newDay != null) {
-        await hiveService.updateMealForDate(
-          _startDate!,
-          _endDate!,
-          newDay!,
-          lastMeal,
-          context,
-        );
-
-        setState(() {
-          _selectedRecipeAllocations = [];
-        });
-
-        print('-----------------------Recipe allocations after save----------');
-        print(_selectedRecipeAllocations);
-      } else {
-        // Handle the case where one or more values are null
-        print('Error: One or more required values are null.');
-      }
-    } else {
-      print('Error: No meals to save.');
-    }
-  }
-
-  List<Meal> convertHiveMealsToMeals(List<HiveMeal> meals) {
-    // Chosen recurrence
-    print('---------------------chosen recurrence');
-    print(chosenRecurrence);
-
-    return meals.map((meal) {
-      // Ensure date and recurrence are not null
-      final mealDate = meal.date;
-      final mealRecurrence = meal.recurrence;
-
-      if (mealDate == null) {
-        print('Error: Meal date is null');
-        // Handle the case where date is null, perhaps by skipping or setting a default value
-      }
-
-      return Meal(
-        mealType: meal.mealType,
-        recipes: meal.recipes,
-        isDraft: true,
-        timeOfDay: meal.timeOfDay,
-        date: mealDate ??
-            DateTime.now(), // Provide a default value or handle null case
-        recurrence: mealRecurrence != null
-            ? convertFromHiveRecurrence(mealRecurrence)
-            : null, // Handle null recurrence appropriately
-        // etc.
-      );
-    }).toList();
-  }
-
-  void _moveToNextDay() async {
-    if (newDay == null) return;
-    final HiveService hiveService = HiveService();
-
-    final nextDay = newDay!.add(const Duration(days: 1));
-
-    if (nextDay.isBefore(_startDate!) || nextDay.isAfter(_endDate!)) {
-      // Optionally, show an error or handle the case where the day is out of range
-      print('Selected date is out of range.');
-      return;
-    }
-
-    final meals = await hiveService.fetchMealsForDate(nextDay);
-
-    print('----------------------mealsByDate--------------------');
-    print(meals);
-
-    // Convert Hive meals to normal meals if there are any, or assign an empty list of type Meal
-    final selectMeals =
-        meals.isNotEmpty ? convertHiveMealsToMeals(meals) : <Meal>[];
-
-    setState(() {
-      newDay = nextDay;
-      startMeals = selectMeals;
-    });
-  }
-
-  void showInstructionDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0), // Rounded corners
-          ),
-          title: const Text(
-            "Instruction Manual",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-          content: const SizedBox(
-            height: 50,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "1. Select an highlighted date to add meal ",
-                  style: TextStyle(
-                    overflow: TextOverflow.ellipsis,
-                    fontSize: 10,
-                  ),
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "2. Select ",
-                      style: TextStyle(
-                        fontSize: 10,
-                      ),
-                    ),
-                    Icon(
-                      Icons.refresh,
-                      color: Colors.redAccent,
-                      size: 14,
-                    ),
-                    Text(
-                      " to recurre before saving a meal ",
-                      style: TextStyle(
-                        overflow: TextOverflow.ellipsis,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "3. Select ",
-                      style: TextStyle(
-                        fontSize: 10,
-                      ),
-                    ),
-                    Icon(Icons.save, color: Colors.blue, size: 14),
-                    Text(
-                      " to save a meal to your draft",
-                      style: TextStyle(
-                        overflow: TextOverflow.ellipsis,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-          actions: [
-            Reusablebutton(
-                text: "Okay",
-                onPressed: () {
-                  Navigator.of(context).pop();
-                })
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1088,5 +496,596 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
         ),
       ),
     );
+  }
+
+  Recurrence convertFromHiveRecurrence(HiveRecurrence recurrence) {
+    print('----------------Recurrence in conversion----------------');
+    print(recurrence);
+
+    return Recurrence(
+        option: recurrence.option,
+        date: recurrence.date,
+        customDates: recurrence.customDates,
+        exceptions: recurrence.exceptions,
+        customDays: recurrence.customDays);
+  }
+
+  List<Meal> convertHiveMealsToMeals(List<HiveMeal> meals) {
+    // Chosen recurrence
+    print('---------------------chosen recurrence');
+    print(chosenRecurrence);
+
+    return meals.map((meal) {
+      // Ensure date and recurrence are not null
+      final mealDate = meal.date;
+      final mealRecurrence = meal.recurrence;
+
+      if (mealDate == null) {
+        print('Error: Meal date is null');
+        // Handle the case where date is null, perhaps by skipping or setting a default value
+      }
+
+      return Meal(
+        mealType: meal.mealType,
+        recipes: meal.recipes,
+        isDraft: true,
+        timeOfDay: meal.timeOfDay,
+        date: mealDate ??
+            DateTime.now(), // Provide a default value or handle null case
+        recurrence: mealRecurrence != null
+            ? convertFromHiveRecurrence(mealRecurrence)
+            : null, // Handle null recurrence appropriately
+        // etc.
+      );
+    }).toList();
+  }
+
+  HiveRecurrence convertToHiveRecurrence(Recurrence recurrence) {
+    print('----------------Recurrence in conversion----------------');
+    print(recurrence);
+
+    return HiveRecurrence(
+        option: recurrence.option,
+        date: recurrence.date,
+        customDates: recurrence.customDates,
+        exceptions: recurrence.exceptions,
+        customDays: recurrence.customDays);
+  }
+
+  void createPlan() {
+    _completeSchedule();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _mealPlanNameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> fetchAllUserRecipes() async {
+    try {
+      myRecipes = await recipeService.fetchRecipesByUser();
+      setState(() {});
+    } catch (e) {
+      showSnack(context, 'Failed to load user recipes');
+    }
+  }
+
+  Future<void> getTraineesFollowingTrainer() async {
+    try {
+      final user = ref.read(userProvider);
+      if (user != null) {
+        _allTrainees =
+            await trainerService.getTraineesFollowingTrainer(user.id);
+        setState(() {});
+      } else {
+        showSnack(context, 'User not found');
+      }
+    } catch (e) {
+      showSnack(context, 'Failed to load trainees');
+    }
+  }
+
+  // Handle recurrence here
+  void handleRecurrence(Recurrence recurrenceData) {
+    print(
+        '---------------------recurrence before preview------------$recurrenceData');
+
+    setState(() {
+      //
+      chosenRecurrence = recurrenceData;
+    });
+  }
+
+  void handleSaveToDraft() async {
+    final hiveService = HiveService();
+
+    // Convert selected recipe allocations to HiveMeals
+    final meals = convertMealsToHiveMeals(
+      _selectedRecipeAllocations,
+      chosenRecurrence,
+    );
+
+    // Only work on the last meal added
+    if (meals.isNotEmpty) {
+      final lastMeal = meals.last;
+
+      print(
+          '---------------------Save last meal to Hive meal draft box ----------------$lastMeal');
+      print('------------$_startDate---$_endDate---$newDay---$lastMeal');
+
+      // Ensure that _startDate, _endDate, newDay, and lastMeal are not null before calling updateMealForDate
+      if (_startDate != null && _endDate != null && newDay != null) {
+        await hiveService.updateMealForDate(
+          _startDate!,
+          _endDate!,
+          newDay!,
+          lastMeal,
+          context,
+        );
+
+        setState(() {
+          _selectedRecipeAllocations = [];
+        });
+
+        print('-----------------------Recipe allocations after save----------');
+        print(_selectedRecipeAllocations);
+      } else {
+        // Handle the case where one or more values are null
+        print('Error: One or more required values are null.');
+      }
+    } else {
+      print('Error: No meals to save.');
+    }
+  }
+
+  void handleSelectionChange(List<String> selectedPeriods) {
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _startDate = widget.selectedDay;
+    _updateHighlightedDates();
+    fetchAllUserRecipes();
+    getTraineesFollowingTrainer();
+
+    // Initialize HiveService outside of initState
+    _initializeHiveService();
+    setDraftMealPlan();
+
+// Showcase handler
+    _checkAndShowcase();
+  }
+
+  // Hive implementations
+  void onSaveMeal() async {
+    final List<Meal> meals = [];
+    for (Meal meal in _selectedRecipeAllocations) {
+      print("------------Meal Allocation------------");
+
+      meals.add(Meal(
+        mealType: meal.mealType,
+        date: newDay!,
+        timeOfDay: meal.timeOfDay,
+        recipes: meal.recipes,
+        recurrence: chosenRecurrence,
+      ));
+    }
+  }
+
+  //Get all trainees following trainer
+
+  void setDraftMealPlan() async {
+    await getTraineesFollowingTrainer();
+    // Get meal plan from draft'
+    final mealPlan = await _getDraftMealPlan();
+    // Prepopulate the draft data
+    if (mealPlan == null) {
+      print('No draft meal plan found');
+      return;
+    }
+    setState(() {
+      _mealPlanNameController.text = mealPlan.name;
+      _selectedDuration = mealPlan.duration;
+      _startDate = mealPlan.startDate;
+      _endDate = mealPlan.endDate;
+      List<User> selectedTrainees = [];
+
+      print(
+          '------------------------MealPlan trainees------------------------${mealPlan.trainees}');
+      for (String id in mealPlan.trainees) {
+        // Find the corresponding user
+        List<User> matchedUsers =
+            _allTrainees.where((trainee) => trainee.id == id).toList();
+
+        // Only add if a matching user is found
+        if (matchedUsers.isNotEmpty) {
+          selectedTrainees.add(matchedUsers.first);
+        }
+      }
+
+      if (selectedTrainees.isEmpty) {
+        print('Warning: No matching trainees found');
+      }
+      print(
+          '-------------------selected trainees-------------------$selectedTrainees');
+      _selectedTrainees.addAll(selectedTrainees);
+
+      newDay = _startDate;
+    });
+
+    // Prepopulate the data on initial render
+  }
+
+  void showInstructionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0), // Rounded corners
+          ),
+          title: const Text(
+            "Instruction Manual",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          content: const SizedBox(
+            height: 50,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "1. Select an highlighted date to add meal ",
+                  style: TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 10,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "2. Select ",
+                      style: TextStyle(
+                        fontSize: 10,
+                      ),
+                    ),
+                    Icon(
+                      Icons.refresh,
+                      color: Colors.redAccent,
+                      size: 14,
+                    ),
+                    Text(
+                      " to recurre before saving a meal ",
+                      style: TextStyle(
+                        overflow: TextOverflow.ellipsis,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "3. Select ",
+                      style: TextStyle(
+                        fontSize: 10,
+                      ),
+                    ),
+                    Icon(Icons.save, color: Colors.blue, size: 14),
+                    Text(
+                      " to save a meal to your draft",
+                      style: TextStyle(
+                        overflow: TextOverflow.ellipsis,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+          actions: [
+            Reusablebutton(
+                text: "Okay",
+                onPressed: () {
+                  Navigator.of(context).pop();
+                })
+          ],
+        );
+      },
+    );
+  }
+
+  void _addTrainee(User trainee) {
+    if (_selectedTrainees.contains(trainee)) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Duplicate Entry'),
+          content: const Text('This trainee has already been added.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      setState(() {
+        _selectedTrainees.add(trainee);
+        _searchController.clear();
+        _searchResults.clear();
+      });
+    }
+  }
+
+  DateTime _calculateEndDate(DateTime startDate, String duration) {
+    Duration period;
+    switch (duration) {
+      case 'Week':
+        period =
+            const Duration(days: 6); // 6 days since the start date is included
+        break;
+      case 'Month':
+        period = const Duration(
+            days: 29); // Similarly, reduce by 1 day for all cases
+        break;
+      case 'Quarter':
+        period = const Duration(days: 89);
+        break;
+      case 'Half-Year':
+        period = const Duration(days: 179);
+        break;
+      case 'Year':
+        period = const Duration(days: 364);
+        break;
+      default:
+        return startDate; // Default to startDate if duration is not recognized
+    }
+    return startDate.add(period);
+  }
+
+  Future<void> _checkAndShowcase() async {
+    final prefs = await SharedPreferences.getInstance();
+    _hasShowcased = prefs.getBool('hasShowcased') ?? false;
+
+    if (!_hasShowcased) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ShowCaseWidget.of(context).startShowCase([_key1, _key2, _key3]);
+        prefs.setBool('hasShowcased', true);
+      });
+    }
+  }
+
+// Start of complete schedule
+  Future<void> _completeSchedule() async {
+    final user = ref.read(userProvider);
+    final List<Meal> meals = [];
+
+    if (user == null) {
+      print('---------user is null----');
+    }
+
+    for (Meal meal in _selectedRecipeAllocations) {
+      if (newDay == null) {
+        print('----------------------------newDay is null------------------');
+      }
+
+      meals.add(Meal(
+        mealType: meal.mealType,
+        date: newDay!,
+        timeOfDay: meal.timeOfDay,
+        recipes: meal.recipes,
+        recurrence: chosenRecurrence,
+      ));
+    }
+
+    print(
+        "\n================================meals================================$meals");
+
+    final mealPlan = MealPlan(
+        name: _mealPlanNameController.text,
+        duration: _selectedDuration,
+        startDate: _startDate,
+        endDate: _endDate,
+        meals: meals,
+        trainees: _selectedTrainees.map((trainee) => trainee.id).toList(),
+        createdBy: user!.id,
+        isDraft: false);
+    print('---------------------mealplan-------------$mealPlan');
+    ref.read(mealPlanProvider.notifier).createMealPlan(mealPlan, context);
+    Navigator.of(context).pop();
+  }
+
+// Handle get draft meal plan
+  Future<HiveMealPlan?> _getDraftMealPlan() async {
+    final hiveService = HiveService();
+    return await hiveService.getDraftMealPlan();
+  }
+
+  // Callback function to handle selection changes
+  void _handleRecipeSelectionChanged(List<Meal> selectedAllocations) {
+    print("Recurrence");
+
+    for (Meal meal in selectedAllocations) {
+      print("------------Meal Allocation------------");
+      print("Meal Type: ${meal.mealType}");
+      print("Date: ${meal.date}");
+      print("Allocated Time: ${meal.timeOfDay}");
+      print('Alloacted recurrences: ${meal.recurrence}');
+      print("Recipes:");
+    }
+
+    setState(() {
+      _selectedRecipeAllocations.clear();
+      _selectedRecipeAllocations.addAll(selectedAllocations);
+      chosenRecurrence = null;
+    });
+
+    print(
+      '------------------allocations------------------$_selectedRecipeAllocations',
+    );
+  }
+
+  Future<void> _initializeHiveService() async {
+    final hiveService = HiveService();
+    await hiveService.init();
+
+    setState(() {});
+  }
+
+  bool _isWithinRange(DateTime day) {
+    if (_startDate != null && _endDate != null) {
+      return day.isAfter(_startDate!.subtract(const Duration(days: 1))) &&
+          day.isBefore(_endDate!.add(const Duration(days: 1)));
+    }
+    return true;
+  }
+
+  void _moveToNextDay() async {
+    if (newDay == null) return;
+    final HiveService hiveService = HiveService();
+
+    final nextDay = newDay!.add(const Duration(days: 1));
+
+    if (nextDay.isBefore(_startDate!) || nextDay.isAfter(_endDate!)) {
+      // Optionally, show an error or handle the case where the day is out of range
+      print('Selected date is out of range.');
+      return;
+    }
+
+    final meals = await hiveService.fetchMealsForDate(nextDay);
+
+    print('----------------------mealsByDate--------------------');
+    print(meals);
+
+    // Convert Hive meals to normal meals if there are any, or assign an empty list of type Meal
+    final selectMeals =
+        meals.isNotEmpty ? convertHiveMealsToMeals(meals) : <Meal>[];
+
+    setState(() {
+      newDay = nextDay;
+      startMeals = selectMeals;
+    });
+  }
+
+  void _removeTrainee(User trainee) {
+    setState(() {
+      _selectedTrainees.remove(trainee);
+    });
+  }
+
+  // Handle Save  meal plan to the draft
+  Future<void> _saveMealPlanToDraft() async {
+    final HiveService hiveService = HiveService();
+
+    // Create the meal plan object
+
+    final HiveMealPlan newPlan = HiveMealPlan(
+      name: _mealPlanNameController.text,
+      duration: _selectedDuration,
+      startDate: _startDate,
+      endDate: _endDate,
+      meals: [],
+      trainees: _selectedTrainees.map((trainee) => trainee.id).toList(),
+      createdBy: ref.read(userProvider)!.id,
+      isDraft: true,
+    );
+    await hiveService.saveDraftMealPlan(newPlan);
+  }
+
+  Future<void> _scrollToItem() async {
+    _scrollController.animateTo(
+      100.0,
+      duration: const Duration(seconds: 2),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _searchTrainees(String query) {
+    setState(() {
+      _searchResults = _allTrainees.where((trainee) {
+        final fullName = trainee.fullName.toLowerCase();
+        final username = trainee.username.toLowerCase();
+        final searchQuery = query.toLowerCase();
+
+        return fullName.contains(searchQuery) || username.contains(searchQuery);
+      }).toList();
+    });
+  }
+
+  // SelectDate logic
+
+  Future<void> _selectDate(BuildContext context, bool isStartDate) async {
+    DateTime now = DateTime.now();
+    DateTime today =
+        DateTime(now.year, now.month, now.day); // Strip time component
+    DateTime initialDate = today;
+
+    // Use the current selected date if available
+    if (isStartDate && _startDate != null) {
+      initialDate = _startDate!;
+    } else if (!isStartDate && _endDate != null) {
+      initialDate = _endDate!;
+    }
+
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate.isAfter(today)
+          ? initialDate
+          : today, // Use today or future dates
+      firstDate: today, // Prevent past dates, but allow today
+      lastDate: DateTime(2101),
+    );
+
+    // Ensure the picked date is valid (current or future date)
+    if (pickedDate != null && !pickedDate.isBefore(today)) {
+      setState(() {
+        if (isStartDate) {
+          _startDate = pickedDate;
+        } else {
+          _endDate = pickedDate;
+        }
+        _updateHighlightedDates();
+      });
+    } else if (pickedDate != null && pickedDate.isBefore(today)) {
+      // Provide feedback for selecting past dates
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You cannot select a date in the past'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void _startShowcase() async {
+    // Scroll to the item you want to showcase
+    await _scrollToItem();
+
+    // Start the showcase after scrolling
+    final showcase = ShowCaseWidget.of(context);
+    showcase.startShowCase([_key3, _key4, _key5]);
+  }
+
+  // Highlighted dates logic
+  void _updateHighlightedDates() {
+    if (_startDate != null && _endDate != null) {
+      _highlightedDates.clear();
+      DateTime date = _startDate!;
+      while (date.isBefore(_endDate!.add(const Duration(days: 1)))) {
+        _highlightedDates.add(date);
+        date = date.add(const Duration(days: 1));
+      }
+    }
   }
 }

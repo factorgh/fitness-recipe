@@ -1,12 +1,12 @@
 // ignore_for_file: avoid_print
 
+import 'package:fit_cibus/models/mealplan.dart';
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/providers/all_recipes_provider.dart';
+import 'package:fit_cibus/utils/conversions/capitalize_first.dart';
+import 'package:fit_cibus/widgets/meal_period_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models/mealplan.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/providers/all_recipes_provider.dart';
-import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
-import 'package:voltican_fitness/widgets/meal_period_card.dart';
 import 'package:intl/intl.dart';
 
 class SingleMealPlanScreenTrainee extends ConsumerWidget {
@@ -79,20 +79,6 @@ class SingleMealPlanScreenTrainee extends ConsumerWidget {
         date1.day == date2.day;
   }
 
-  Widget _buildDateRange(DateTime? startDate, DateTime? endDate) {
-    if (startDate == null || endDate == null) {
-      return const SizedBox.shrink();
-    }
-
-    String formattedStartDate = _formatDate(startDate);
-    String formattedEndDate = _formatDate(endDate);
-
-    return _buildDetailCard(
-      "Meal Plan Duration",
-      '$formattedStartDate - $formattedEndDate',
-    );
-  }
-
   Widget _buildAllocatedMeals(
       Map<String, List<Map<String, dynamic>>> groupedMeals) {
     return Column(
@@ -133,10 +119,18 @@ class SingleMealPlanScreenTrainee extends ConsumerWidget {
     );
   }
 
-  String _formatTime(DateTime time) {
-    return time.hour > 12
-        ? '${time.hour - 12}:${time.minute.toString().padLeft(2, '0')} PM'
-        : '${time.hour}:${time.minute.toString().padLeft(2, '0')} AM';
+  Widget _buildDateRange(DateTime? startDate, DateTime? endDate) {
+    if (startDate == null || endDate == null) {
+      return const SizedBox.shrink();
+    }
+
+    String formattedStartDate = _formatDate(startDate);
+    String formattedEndDate = _formatDate(endDate);
+
+    return _buildDetailCard(
+      "Meal Plan Duration",
+      '$formattedStartDate - $formattedEndDate',
+    );
   }
 
   Widget _buildDetailCard(String title, String value) {
@@ -187,5 +181,11 @@ class SingleMealPlanScreenTrainee extends ConsumerWidget {
     String year = date.year.toString();
 
     return '$day${daySuffix(date.day)} $month, $year';
+  }
+
+  String _formatTime(DateTime time) {
+    return time.hour > 12
+        ? '${time.hour - 12}:${time.minute.toString().padLeft(2, '0')} PM'
+        : '${time.hour}:${time.minute.toString().padLeft(2, '0')} AM';
   }
 }

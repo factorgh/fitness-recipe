@@ -1,10 +1,11 @@
+import 'package:fit_cibus/providers/calendar_mealplan_prov.dart';
+import 'package:fit_cibus/screens/all_meal_plan_screen.dart';
+import 'package:fit_cibus/screens/meal_creation.dart';
+import 'package:fit_cibus/widgets/calendar_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
-import 'package:voltican_fitness/screens/meal_creation.dart';
-import 'package:voltican_fitness/widgets/calendar_item.dart';
-import 'package:voltican_fitness/providers/calendar_mealplan_prov.dart';
+
 
 class CalendarScreen extends ConsumerWidget {
   const CalendarScreen({super.key});

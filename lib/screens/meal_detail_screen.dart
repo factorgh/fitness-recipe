@@ -1,20 +1,17 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/providers/user_recipes.dart';
+import 'package:fit_cibus/screens/edit_recipe_screen.dart';
+import 'package:fit_cibus/screens/meal_creation.dart';
+import 'package:fit_cibus/utils/conversions/capitalize_first.dart';
+import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/providers/user_recipes.dart';
-
-import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
-import 'package:voltican_fitness/screens/meal_creation.dart';
-import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
-
-import 'package:voltican_fitness/widgets/reusable_button.dart';
-
 class MealDetailScreen extends ConsumerStatefulWidget {
-  const MealDetailScreen({super.key, required this.meal});
   final Recipe meal;
+  const MealDetailScreen({super.key, required this.meal});
 
   @override
   ConsumerState<MealDetailScreen> createState() => _MealDetailScreenState();
@@ -24,53 +21,6 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
   double value = 0.0;
   bool isPrivate = false;
   bool isFollowing = false;
-
-  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // User must tap button to dismiss
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Confirm Delete',
-            style: TextStyle(color: Colors.black87),
-          ),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                  'Are you sure you want to delete this item?',
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-                await ref
-                    .read(userRecipesProvider.notifier)
-                    .deleteRecipe(widget.meal.id!);
-                Navigator.of(context).pop();
-
-                // await Future.delayed(Duration.zero, () {
-                //   ref.read(userRecipesProvider.notifier).loadUserRecipes();
-                // });
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -313,6 +263,53 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to dismiss
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Delete',
+            style: TextStyle(color: Colors.black87),
+          ),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  'Are you sure you want to delete this item?',
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                await ref
+                    .read(userRecipesProvider.notifier)
+                    .deleteRecipe(widget.meal.id!);
+                Navigator.of(context).pop();
+
+                // await Future.delayed(Duration.zero, () {
+                //   ref.read(userRecipesProvider.notifier).loadUserRecipes();
+                // });
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

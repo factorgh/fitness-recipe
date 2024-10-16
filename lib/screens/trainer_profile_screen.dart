@@ -1,19 +1,20 @@
 // ignore_for_file: unused_result, use_build_context_synchronously, unused_element, avoid_print
 
 import 'dart:core';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/models/user.dart';
+import 'package:fit_cibus/providers/trainer_provider.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/screens/trainer_meal_details_trainee.dart';
+import 'package:fit_cibus/services/auth_service.dart';
+import 'package:fit_cibus/services/email_service.dart';
+import 'package:fit_cibus/services/recipe_service.dart';
+import 'package:fit_cibus/utils/native_alert.dart';
+import 'package:fit_cibus/widgets/recipe_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/models/user.dart';
-import 'package:voltican_fitness/providers/trainer_provider.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/trainer_meal_details_trainee.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
-import 'package:voltican_fitness/services/email_service.dart';
-import 'package:voltican_fitness/services/recipe_service.dart';
-import 'package:voltican_fitness/utils/native_alert.dart';
-import 'package:voltican_fitness/widgets/recipe_item.dart';
 
 class TrainerProfileScreen extends ConsumerStatefulWidget {
   final String userId;
@@ -39,167 +40,6 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
   bool isLoading = false;
   bool isFollowing = false;
   bool sent = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUser();
-    _fetchUserRecipes();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    setState(() {
-      isFollowing = checkIfFollowing() ?? true;
-    });
-
-    print('isFollowing: $isFollowing');
-  }
-
-  void _fetchUser() {
-    authService.getUser(
-      userId: widget.userId,
-      onSuccess: (fetchedUser) {
-        setState(() {
-          user = fetchedUser;
-          isFollowing = checkIfFollowing() ?? false;
-        });
-      },
-    );
-  }
-
-  void _fetchUserRecipes() {
-    recipeService.getRecipesByUser(
-      userId: widget.userId,
-      context: context,
-      onSuccess: (recipes) {
-        setState(() {
-          userRecipes = recipes;
-        });
-      },
-    );
-  }
-
-  void selectMeal(BuildContext context, Recipe meal) {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => TrainerMealDetailScreen(meal: meal),
-    ));
-  }
-
-  bool? checkIfFollowing() {
-    final me = ref.read(userProvider);
-    if (me == null) return null;
-
-    final followingTrainersAsync = ref.watch(followingTrainersProvider(me.id));
-    if (followingTrainersAsync.value == null || user == null) {
-      return null;
-    }
-
-    return followingTrainersAsync.value
-        ?.any((trainer) => trainer.id == user!.id);
-  }
-
-  void _showUnfollowConfirmationBottomSheet(
-      BuildContext context, VoidCallback onConfirm) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Unfollow Trainer",
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                "Are you sure you want to unfollow this trainer?",
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text("Cancel"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      onConfirm();
-                      setState(() {
-                        isFollowing = false;
-                      });
-                      ref.refresh(followingTrainersProvider(
-                          ref.read(userProvider)!.id));
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text(
-                      "Unfollow",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _handleFollowButtonPress() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    try {
-      final me = ref.read(userProvider);
-      if (me == null) return;
-
-      if (isFollowing) {
-        _showUnfollowConfirmationBottomSheet(
-          context,
-          () async {
-            await ref
-                .read(followersProvider(widget.userId).notifier)
-                .unfollowTrainer(me.id, widget.userId);
-            setState(() {
-              isFollowing = false;
-            });
-          },
-        );
-      } else {
-        await ref
-            .read(followersProvider(widget.userId).notifier)
-            .followTrainer(me.id, widget.userId, context);
-        setState(() {
-          isFollowing = true;
-        });
-      }
-    } catch (error) {
-      print("Error: $error");
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -299,6 +139,42 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
               ],
             ),
     );
+  }
+
+  bool? checkIfFollowing() {
+    final me = ref.read(userProvider);
+    if (me == null) return null;
+
+    final followingTrainersAsync = ref.watch(followingTrainersProvider(me.id));
+    if (followingTrainersAsync.value == null || user == null) {
+      return null;
+    }
+
+    return followingTrainersAsync.value
+        ?.any((trainer) => trainer.id == user!.id);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setState(() {
+      isFollowing = checkIfFollowing() ?? true;
+    });
+
+    print('isFollowing: $isFollowing');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUser();
+    _fetchUserRecipes();
+  }
+
+  void selectMeal(BuildContext context, Recipe meal) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => TrainerMealDetailScreen(meal: meal),
+    ));
   }
 
   Widget _buildFollowButton(User me, bool isMyFollow) {
@@ -423,5 +299,130 @@ class _TrainerProfileScreenState extends ConsumerState<TrainerProfileScreen> {
                     ),
                   ),
           );
+  }
+
+  void _fetchUser() {
+    authService.getUser(
+      userId: widget.userId,
+      onSuccess: (fetchedUser) {
+        setState(() {
+          user = fetchedUser;
+          isFollowing = checkIfFollowing() ?? false;
+        });
+      },
+    );
+  }
+
+  void _fetchUserRecipes() {
+    recipeService.getRecipesByUser(
+      userId: widget.userId,
+      context: context,
+      onSuccess: (recipes) {
+        setState(() {
+          userRecipes = recipes;
+        });
+      },
+    );
+  }
+
+  void _handleFollowButtonPress() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final me = ref.read(userProvider);
+      if (me == null) return;
+
+      if (isFollowing) {
+        _showUnfollowConfirmationBottomSheet(
+          context,
+          () async {
+            await ref
+                .read(followersProvider(widget.userId).notifier)
+                .unfollowTrainer(me.id, widget.userId);
+            setState(() {
+              isFollowing = false;
+            });
+          },
+        );
+      } else {
+        await ref
+            .read(followersProvider(widget.userId).notifier)
+            .followTrainer(me.id, widget.userId, context);
+        setState(() {
+          isFollowing = true;
+        });
+      }
+    } catch (error) {
+      print("Error: $error");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _showUnfollowConfirmationBottomSheet(
+      BuildContext context, VoidCallback onConfirm) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Unfollow Trainer",
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "Are you sure you want to unfollow this trainer?",
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("Cancel"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      onConfirm();
+                      setState(() {
+                        isFollowing = false;
+                      });
+                      ref.refresh(followingTrainersProvider(
+                          ref.read(userProvider)!.id));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      backgroundColor: Colors.redAccent,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text(
+                      "Unfollow",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

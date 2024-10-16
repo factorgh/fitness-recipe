@@ -1,11 +1,11 @@
 // ignore_for_file: use_build_context_synchronously, unused_element
 
+import 'package:fit_cibus/models/mealplan.dart';
+import 'package:fit_cibus/providers/meal_plan_provider.dart';
+import 'package:fit_cibus/screens/single_meal_screen_trainee.dart';
+import 'package:fit_cibus/utils/show_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models/mealplan.dart';
-import 'package:voltican_fitness/providers/meal_plan_provider.dart';
-import 'package:voltican_fitness/screens/single_meal_screen_trainee.dart';
-import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:intl/intl.dart'; // Import intl package for date formatting
 
 class CalendarItemTrainee extends ConsumerWidget {
@@ -23,48 +23,6 @@ class CalendarItemTrainee extends ConsumerWidget {
     required this.borderColor,
     required this.isFocused, // Initialize the color property
   });
-
-  Future<void> _showDeleteConfirmationDialog(
-      BuildContext context, WidgetRef ref) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Confirm Delete',
-            style: TextStyle(color: Colors.black87),
-          ),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Are you sure you want to delete this item?'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () async {
-                final mealPlanId = mealPlan.id;
-                final notifier = ref.read(mealPlanProvider.notifier);
-                await notifier.deleteMealPlan(mealPlanId!);
-                await Future.delayed(const Duration(milliseconds: 500));
-                Navigator.of(context).pop();
-                showSnack(context, "Meal Plan deleted successfully!");
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -140,6 +98,48 @@ class CalendarItemTrainee extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _showDeleteConfirmationDialog(
+      BuildContext context, WidgetRef ref) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Delete',
+            style: TextStyle(color: Colors.black87),
+          ),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want to delete this item?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () async {
+                final mealPlanId = mealPlan.id;
+                final notifier = ref.read(mealPlanProvider.notifier);
+                await notifier.deleteMealPlan(mealPlanId!);
+                await Future.delayed(const Duration(milliseconds: 500));
+                Navigator.of(context).pop();
+                showSnack(context, "Meal Plan deleted successfully!");
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -1,5 +1,5 @@
+import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 Future<Map<String, dynamic>?> showRecurrenceBottomSheet(
     BuildContext context, DateTime startDate, DateTime endDate) async {
@@ -60,50 +60,74 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
   bool _hasSelectedDates =
       false; // To track if specific dates have been selected
 
-  bool _isMonthlySelectable() {
-    final difference = widget.endDate.difference(widget.startDate).inDays;
-    return difference > 30; // Enable monthly if more than a month
-  }
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      child: Padding(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  "Select Meal Recurrence",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 20),
 
-  bool _isBiWeeklySelectable() {
-    final difference = widget.endDate.difference(widget.startDate).inDays;
-    return difference >= 14; // Enable bi-weekly if more than 2 weeks
-  }
+              // Recurrence Dropdown
 
-  // Function to show confirmation dialog
-  Future<void> _showOverrideConfirmationDialog(String type) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Override Selection'),
-          content: Text(
-              'Switching to $type will override your previous selection. Do you want to proceed?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
-              },
-            ),
-            TextButton(
-              child: const Text('Proceed'),
-              onPressed: () {
-                setState(() {
-                  // Clear both lists when switching
-                  _hasSelectedDays = (type == 'Days of the Week');
-                  _hasSelectedDates = (type == 'Specific Dates');
-                  _daysOfWeekSelected.fillRange(
-                      0, _daysOfWeekSelected.length, false);
-                  _selectedMonthlyDates.clear();
-                });
-                Navigator.of(context).pop(); // Dismiss the dialog
-              },
-            ),
-          ],
-        );
-      },
+              // Recurrence Dropdown
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: DropdownButtonFormField<String>(
+                  value: _selectedRecurrence,
+                  onChanged: (String? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        _selectedRecurrence = newValue;
+                      });
+                    }
+                  },
+                  items: recurrenceOptions.where((option) {
+                    if (option == 'Monthly') return _isMonthlySelectable();
+                    if (option == 'Bi-Weekly') return _isBiWeeklySelectable();
+                    return true; // Allow other options
+                  }).map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  decoration: const InputDecoration(
+                    labelText: 'Recurrence Type',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+
+              // Render specific options for selected recurrence type
+              if (_selectedRecurrence == 'Weekly') _buildWeeklyOptions(),
+              if (_selectedRecurrence == 'Monthly') _buildWeeklyOptions(),
+              if (_selectedRecurrence == 'Custom') _buildWeeklyOptions(),
+              if (_selectedRecurrence == 'Bi-Weekly') _buildWeeklyOptions(),
+
+              const SizedBox(height: 20),
+              Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Reusablebutton(
+                    text: 'Confirm',
+                    onPressed: _saveRecurrence,
+                  )),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -204,6 +228,16 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
     );
   }
 
+  bool _isBiWeeklySelectable() {
+    final difference = widget.endDate.difference(widget.startDate).inDays;
+    return difference >= 14; // Enable bi-weekly if more than 2 weeks
+  }
+
+  bool _isMonthlySelectable() {
+    final difference = widget.endDate.difference(widget.startDate).inDays;
+    return difference > 30; // Enable monthly if more than a month
+  }
+
   void _saveRecurrence() {
     final Map<String, dynamic> recurrenceData = {};
 
@@ -273,74 +307,40 @@ class _RecurrenceSelectionWidgetState extends State<RecurrenceSelectionWidget> {
     Navigator.pop(context, recurrenceData);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Padding(
-        padding:
-            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                  "Select Meal Recurrence",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Recurrence Dropdown
-
-              // Recurrence Dropdown
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: DropdownButtonFormField<String>(
-                  value: _selectedRecurrence,
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        _selectedRecurrence = newValue;
-                      });
-                    }
-                  },
-                  items: recurrenceOptions.where((option) {
-                    if (option == 'Monthly') return _isMonthlySelectable();
-                    if (option == 'Bi-Weekly') return _isBiWeeklySelectable();
-                    return true; // Allow other options
-                  }).map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  decoration: const InputDecoration(
-                    labelText: 'Recurrence Type',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-
-              // Render specific options for selected recurrence type
-              if (_selectedRecurrence == 'Weekly') _buildWeeklyOptions(),
-              if (_selectedRecurrence == 'Monthly') _buildWeeklyOptions(),
-              if (_selectedRecurrence == 'Custom') _buildWeeklyOptions(),
-              if (_selectedRecurrence == 'Bi-Weekly') _buildWeeklyOptions(),
-
-              const SizedBox(height: 20),
-              Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Reusablebutton(
-                    text: 'Confirm',
-                    onPressed: _saveRecurrence,
-                  )),
-            ],
-          ),
-        ),
-      ),
+  // Function to show confirmation dialog
+  Future<void> _showOverrideConfirmationDialog(String type) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Override Selection'),
+          content: Text(
+              'Switching to $type will override your previous selection. Do you want to proceed?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Proceed'),
+              onPressed: () {
+                setState(() {
+                  // Clear both lists when switching
+                  _hasSelectedDays = (type == 'Days of the Week');
+                  _hasSelectedDates = (type == 'Specific Dates');
+                  _daysOfWeekSelected.fillRange(
+                      0, _daysOfWeekSelected.length, false);
+                  _selectedMonthlyDates.clear();
+                });
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

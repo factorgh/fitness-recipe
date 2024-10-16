@@ -1,14 +1,13 @@
+import 'package:fit_cibus/models/recipe.dart';
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-import 'package:voltican_fitness/models/recipe.dart';
-
 class RecipeItemTrainer extends StatelessWidget {
+  final Recipe meal;
+
+  final void Function(Recipe meal) selectMeal;
   const RecipeItemTrainer(
       {super.key, required this.meal, required this.selectMeal});
-
-  final Recipe meal;
-  final void Function(Recipe meal) selectMeal;
 
   @override
   Widget build(BuildContext context) {

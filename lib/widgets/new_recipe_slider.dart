@@ -1,6 +1,6 @@
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/services/auth_service.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
 
 class NewRecipeSlider extends StatefulWidget {
   final List<Recipe> recipes;
@@ -19,31 +19,6 @@ class NewRecipeSlider extends StatefulWidget {
 class _NewRecipeSliderState extends State<NewRecipeSlider> {
   final AuthService authService = AuthService();
   Map<String, String> userNames = {}; // Store user names by user ID
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUsers();
-  }
-
-  void _fetchUsers() async {
-    final userIds = widget.recipes.map((recipe) {
-      return recipe.createdBy;
-    }).toSet();
-
-    final futures = userIds.map((userId) {
-      return authService.getUser(
-        userId: userId,
-        onSuccess: (fetchedUser) {
-          setState(() {
-            userNames[userId] = fetchedUser.username;
-          });
-        },
-      );
-    }).toList();
-
-    await Future.wait(futures);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +43,30 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
                 );
               },
             ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsers();
+  }
+
+  Widget _buildPlaceholderItem() {
+    return Container(
+      width: 330, // Adjust width as needed
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.grey[300],
+      ),
+      child: Center(
+        child: Icon(
+          Icons.image, // Placeholder icon
+          size: 100,
+          color: Colors.grey[600],
+        ),
+      ),
     );
   }
 
@@ -197,21 +196,22 @@ class _NewRecipeSliderState extends State<NewRecipeSlider> {
     );
   }
 
-  Widget _buildPlaceholderItem() {
-    return Container(
-      width: 330, // Adjust width as needed
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: Colors.grey[300],
-      ),
-      child: Center(
-        child: Icon(
-          Icons.image, // Placeholder icon
-          size: 100,
-          color: Colors.grey[600],
-        ),
-      ),
-    );
+  void _fetchUsers() async {
+    final userIds = widget.recipes.map((recipe) {
+      return recipe.createdBy;
+    }).toSet();
+
+    final futures = userIds.map((userId) {
+      return authService.getUser(
+        userId: userId,
+        onSuccess: (fetchedUser) {
+          setState(() {
+            userNames[userId] = fetchedUser.username;
+          });
+        },
+      );
+    }).toList();
+
+    await Future.wait(futures);
   }
 }

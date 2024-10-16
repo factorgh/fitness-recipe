@@ -2,10 +2,10 @@
 
 // ignore_for_file: avoid_print
 
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/services/recipe_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/services/recipe_service.dart';
 
 final RecipeService _recipeService = RecipeService();
 

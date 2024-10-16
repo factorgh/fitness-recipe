@@ -1,17 +1,17 @@
+import 'package:badges/badges.dart' as badges;
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/screens/notify_screen.dart';
+import 'package:fit_cibus/screens/trainer_meal_details_trainee.dart';
+import 'package:fit_cibus/services/auth_service.dart';
+import 'package:fit_cibus/services/recipe_service.dart';
+import 'package:fit_cibus/utils/conversions/capitalize_first.dart';
+import 'package:fit_cibus/utils/socket_io_setup.dart';
+import 'package:fit_cibus/widgets/category_slider.dart';
+import 'package:fit_cibus/widgets/new_recipe_slider.dart';
+import 'package:fit_cibus/widgets/slider_trainer_landing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/notify_screen.dart';
-import 'package:voltican_fitness/screens/trainer_meal_details.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
-import 'package:voltican_fitness/services/recipe_service.dart';
-import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
-import 'package:voltican_fitness/utils/socket_io_setup.dart';
-import 'package:voltican_fitness/widgets/category_slider.dart';
-import 'package:voltican_fitness/widgets/new_recipe_slider.dart';
-import 'package:voltican_fitness/widgets/slider_trainer_landing.dart';
-import 'package:badges/badges.dart' as badges;
 
 class TrainerLandingScreen extends ConsumerStatefulWidget {
   const TrainerLandingScreen({super.key});
@@ -32,71 +32,6 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
   List<Recipe> _recipes = [];
   late SocketService _socketService;
   int _notificationCount = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    authService.getMe(context: context, ref: ref);
-    _fetchTopTrainers();
-    _fetchTopRecipes();
-    _socketService = SocketService();
-    _socketService.initSocket();
-    _listenForNotifications();
-  }
-
-  void _listenForNotifications() {
-    final user = ref.read(userProvider);
-    if (user != null) {
-      _socketService.listenForNotifications(user.id, (notification) {
-        _incrementNotificationCount();
-      });
-    }
-  }
-
-  void _incrementNotificationCount() {
-    setState(() {
-      _notificationCount++;
-    });
-  }
-
-  void _resetNotificationCount() {
-    setState(() {
-      _notificationCount = 0;
-    });
-  }
-
-  void _fetchTopTrainers() {
-    authService.getTopTrainers(
-      context: context,
-      onSuccess: (trainers) {
-        setState(() {
-          _topTrainers =
-              trainers.map((trainer) => trainer['username'] as String).toList();
-          _topTrainersEmail =
-              trainers.map((trainer) => trainer['email'] as String).toList();
-          _topTrainerIds =
-              trainers.map((trainer) => trainer['_id'] as String).toList();
-
-          _trainerImages = trainers
-              .map((trainer) =>
-                  trainer['imageUrl'] as String? ??
-                  'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png')
-              .toList();
-        });
-      },
-    );
-  }
-
-  void _fetchTopRecipes() {
-    recipeService.getTopRatedRecipes(
-      context: context,
-      onSuccess: (recipes) {
-        setState(() {
-          _recipes = recipes.map((recipe) => recipe).toList();
-        });
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -314,5 +249,70 @@ class _TrainerLandingScreenState extends ConsumerState<TrainerLandingScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    authService.getMe(context: context, ref: ref);
+    _fetchTopTrainers();
+    _fetchTopRecipes();
+    _socketService = SocketService();
+    _socketService.initSocket();
+    _listenForNotifications();
+  }
+
+  void _fetchTopRecipes() {
+    recipeService.getTopRatedRecipes(
+      context: context,
+      onSuccess: (recipes) {
+        setState(() {
+          _recipes = recipes.map((recipe) => recipe).toList();
+        });
+      },
+    );
+  }
+
+  void _fetchTopTrainers() {
+    authService.getTopTrainers(
+      context: context,
+      onSuccess: (trainers) {
+        setState(() {
+          _topTrainers =
+              trainers.map((trainer) => trainer['username'] as String).toList();
+          _topTrainersEmail =
+              trainers.map((trainer) => trainer['email'] as String).toList();
+          _topTrainerIds =
+              trainers.map((trainer) => trainer['_id'] as String).toList();
+
+          _trainerImages = trainers
+              .map((trainer) =>
+                  trainer['imageUrl'] as String? ??
+                  'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png')
+              .toList();
+        });
+      },
+    );
+  }
+
+  void _incrementNotificationCount() {
+    setState(() {
+      _notificationCount++;
+    });
+  }
+
+  void _listenForNotifications() {
+    final user = ref.read(userProvider);
+    if (user != null) {
+      _socketService.listenForNotifications(user.id, (notification) {
+        _incrementNotificationCount();
+      });
+    }
+  }
+
+  void _resetNotificationCount() {
+    setState(() {
+      _notificationCount = 0;
+    });
   }
 }

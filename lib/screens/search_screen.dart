@@ -1,8 +1,8 @@
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/screens/trainer_meal_details_trainee.dart';
+import 'package:fit_cibus/services/recipe_service.dart';
+import 'package:fit_cibus/utils/conversions/capitalize_first.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/screens/trainer_meal_details.dart';
-import 'package:voltican_fitness/services/recipe_service.dart';
-import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
 
 class SearchScreen extends StatefulWidget {
   final String category;
@@ -21,53 +21,6 @@ class _SearchScreenState extends State<SearchScreen> {
   List<Recipe> _allRecipes = [];
   List<Recipe> _filteredRecipes = [];
   final TextEditingController _searchController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _recipesFuture = RecipeService().fetchRecipesByMealPeriod(widget.category);
-    _fetchRecipes();
-    _searchController.addListener(_filterRecipes);
-  }
-
-  Future<void> _fetchRecipes() async {
-    try {
-      final recipes = await _recipesFuture;
-      setState(() {
-        _allRecipes = recipes;
-        _filteredRecipes = recipes; // Initially display all recipes
-      });
-    } catch (e) {
-      // Handle error
-    }
-  }
-
-  void _filterRecipes() {
-    final query = _searchController.text.toLowerCase();
-    setState(() {
-      _filteredRecipes = _allRecipes.where((recipe) {
-        final titleLower = recipe.title.toLowerCase();
-        return titleLower.contains(query);
-      }).toList();
-    });
-  }
-
-  void handleRecipeSelected(Recipe recipe) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TrainerMealDetailScreen(
-          meal: recipe,
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -162,5 +115,52 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void handleRecipeSelected(Recipe recipe) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TrainerMealDetailScreen(
+          meal: recipe,
+        ),
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _recipesFuture = RecipeService().fetchRecipesByMealPeriod(widget.category);
+    _fetchRecipes();
+    _searchController.addListener(_filterRecipes);
+  }
+
+  Future<void> _fetchRecipes() async {
+    try {
+      final recipes = await _recipesFuture;
+      setState(() {
+        _allRecipes = recipes;
+        _filteredRecipes = recipes; // Initially display all recipes
+      });
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  void _filterRecipes() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredRecipes = _allRecipes.where((recipe) {
+        final titleLower = recipe.title.toLowerCase();
+        return titleLower.contains(query);
+      }).toList();
+    });
   }
 }

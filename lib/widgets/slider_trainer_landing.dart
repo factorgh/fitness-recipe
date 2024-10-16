@@ -1,5 +1,6 @@
+import 'package:fit_cibus/screens/trainer_profile_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
+
 
 class SliderTrainerLanding extends StatelessWidget {
   final List<String> recipes;
@@ -16,6 +17,102 @@ class SliderTrainerLanding extends StatelessWidget {
     required this.ids,
     required this.onTrainerSelected,
   });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 120, // Adjust height as needed
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: recipes.isEmpty
+            ? 5
+            : recipes.length, // Show 5 placeholders if recipes are empty
+        itemBuilder: (context, index) {
+          if (recipes.isEmpty) {
+            // Display placeholder avatars if no recipes are available
+            return _buildPlaceholderItem();
+          } else {
+            // Display actual items if recipes are available
+            return _buildTrainerItem(
+              context,
+              recipes[index],
+              images[index],
+              emails[index],
+              ids[index],
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderItem() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 5),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 40,
+            backgroundColor: Colors.grey[300], // Placeholder background color
+            child:
+                Icon(Icons.person, color: Colors.grey[600]), // Placeholder icon
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          const Text(
+            'Loading...',
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTrainerItem(BuildContext context, String trainer,
+      String imagePath, String email, String id) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TrainerProfileScreen(
+              userId: id,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 5),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundImage: NetworkImage(imagePath),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              trainer,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSnackBarAndSendRequest(BuildContext context) {
+    const snackBar = SnackBar(
+      content: Text('Request sent!'),
+      duration: Duration(seconds: 2),
+      backgroundColor: Colors.blue,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    // Implement your request logic here
+  }
 
   void _showTrainerDetails(
       BuildContext context, String name, String email, String image) {
@@ -68,102 +165,6 @@ class SliderTrainerLanding extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  void _showSnackBarAndSendRequest(BuildContext context) {
-    const snackBar = SnackBar(
-      content: Text('Request sent!'),
-      duration: Duration(seconds: 2),
-      backgroundColor: Colors.blue,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    // Implement your request logic here
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 120, // Adjust height as needed
-      padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: recipes.isEmpty
-            ? 5
-            : recipes.length, // Show 5 placeholders if recipes are empty
-        itemBuilder: (context, index) {
-          if (recipes.isEmpty) {
-            // Display placeholder avatars if no recipes are available
-            return _buildPlaceholderItem();
-          } else {
-            // Display actual items if recipes are available
-            return _buildTrainerItem(
-              context,
-              recipes[index],
-              images[index],
-              emails[index],
-              ids[index],
-            );
-          }
-        },
-      ),
-    );
-  }
-
-  Widget _buildTrainerItem(BuildContext context, String trainer,
-      String imagePath, String email, String id) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TrainerProfileScreen(
-              userId: id,
-            ),
-          ),
-        );
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 5),
-        child: Column(
-          children: [
-            CircleAvatar(
-              radius: 40,
-              backgroundImage: NetworkImage(imagePath),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              trainer,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPlaceholderItem() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: Colors.grey[300], // Placeholder background color
-            child:
-                Icon(Icons.person, color: Colors.grey[600]), // Placeholder icon
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Text(
-            'Loading...',
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
     );
   }
 }

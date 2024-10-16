@@ -1,15 +1,14 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
 
+import 'package:fit_cibus/models/mealplan.dart';
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/screens/create_recipe.screen.dart';
+import 'package:fit_cibus/services/recipe_service.dart';
+import 'package:fit_cibus/utils/hive/hive_class.dart';
+import 'package:fit_cibus/widgets/recurrence_sheet.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models/mealplan.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/screens/create_recipe.screen.dart';
-import 'package:voltican_fitness/services/recipe_service.dart';
-import 'package:voltican_fitness/utils/hive/hive_class.dart';
-
-import 'package:voltican_fitness/widgets/recurrence_sheet.dart';
 import 'package:intl/intl.dart';
 
 class MealPeriodSelector extends ConsumerStatefulWidget {
@@ -55,6 +54,64 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
   Recurrence? recurrence;
 
   RecipeService recipeService = RecipeService();
+  TabController? _tabController;
+
+  @override
+  Widget build(BuildContext context) {
+    print(
+        "-----------------------------recurrences-----------------------------$recurrence");
+
+    // Check if there are any meals selected by the user or from the defaultMeals
+    bool hasMeals = _selectedMeals.isNotEmpty ||
+        (widget.defaultMeals != null && widget.defaultMeals!.isNotEmpty);
+
+    return Column(
+      children: [
+        TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          tabs: _mealPeriods.map((mealPeriod) {
+            return Tab(text: mealPeriod);
+          }).toList(),
+        ),
+        SizedBox(
+          height: 220,
+          child: TabBarView(
+            controller: _tabController,
+            children: _mealPeriods.map((mealPeriod) {
+              return _buildRecipeSelector(mealPeriod);
+            }).toList(),
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // Conditionally show _buildSelectedMeals only if there are meals to display
+        if (hasMeals) _buildSelectedMeals(),
+      ],
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant MealPeriodSelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.defaultMeals != oldWidget.defaultMeals ||
+        widget.selectedDay != oldWidget.selectedDay) {
+      // Check if the data actually changed before updating
+      if (widget.defaultMeals?.toString() !=
+              oldWidget.defaultMeals?.toString() ||
+          widget.selectedDay != oldWidget.selectedDay) {
+        _initializeSelectedMeals();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController?.dispose();
+    super.dispose();
+  }
+
   Future<List<String>> fetchRecipeTitles(List<String> recipeIds) async {
     final List<String> titles = [];
 
@@ -73,254 +130,12 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     return titles;
   }
 
-  TabController? _tabController;
-
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: _mealPeriods.length, vsync: this);
 
     _initializeSelectedMeals();
-  }
-
-  @override
-  void didUpdateWidget(covariant MealPeriodSelector oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (widget.defaultMeals != oldWidget.defaultMeals ||
-        widget.selectedDay != oldWidget.selectedDay) {
-      // Check if the data actually changed before updating
-      if (widget.defaultMeals?.toString() !=
-              oldWidget.defaultMeals?.toString() ||
-          widget.selectedDay != oldWidget.selectedDay) {
-        _initializeSelectedMeals();
-      }
-    }
-  }
-
-//  Default meal initialization
-  void _initializeSelectedMeals() {
-    _selectedMeals.clear();
-    if (widget.defaultMeals != null && widget.defaultMeals!.isNotEmpty) {
-      for (var meal in widget.defaultMeals!) {
-        if (_selectedMeals[meal.mealType] == null) {
-          _selectedMeals[meal.mealType] = [];
-        }
-        _selectedMeals[meal.mealType]!.add(meal);
-      }
-    }
-    // Notify parent widget even if no meals are selected
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.onSelectionChanged(_convertToRecipeAllocations());
-    });
-  }
-
-  @override
-  void dispose() {
-    _tabController?.dispose();
-    super.dispose();
-  }
-
-  Future<void> _onRecipeTap(String recipeId, String mealPeriod) async {
-    TimeOfDay startTime;
-    TimeOfDay endTime;
-
-    switch (mealPeriod) {
-      case 'Breakfast':
-        startTime = const TimeOfDay(hour: 0, minute: 0);
-        endTime = const TimeOfDay(hour: 11, minute: 59);
-        break;
-      case 'Lunch':
-        startTime = const TimeOfDay(hour: 12, minute: 0);
-        endTime = const TimeOfDay(hour: 17, minute: 59);
-        break;
-      case 'Dinner':
-        startTime = const TimeOfDay(hour: 18, minute: 0);
-        endTime = const TimeOfDay(hour: 23, minute: 59);
-        break;
-      case 'Snack':
-      default:
-        startTime = const TimeOfDay(hour: 0, minute: 0);
-        endTime = const TimeOfDay(hour: 23, minute: 59);
-        break;
-    }
-
-    TimeOfDay? selectedTime = await showTimePicker(
-      context: context,
-      initialTime: startTime,
-      helpText: 'Select Time for $mealPeriod',
-      builder: (context, child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            alwaysUse24HourFormat: false,
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (selectedTime == null) {
-      return;
-    }
-
-    // Check if the selected time is within the allowed range
-    if (!_isTimeWithinRange(selectedTime, startTime, endTime)) {
-      // Show an error if the selected time is outside the valid range
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(
-              'Invalid Time for $mealPeriod',
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            content: Text(
-                'Please select a time between ${startTime.format(context)} and ${endTime.format(context)} for $mealPeriod.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    DateTime allocatedTime = DateTime(
-      DateTime.now().year,
-      DateTime.now().month,
-      DateTime.now().day,
-      selectedTime.hour,
-      selectedTime.minute,
-    );
-
-    Recipe? selectedRecipe = widget.recipes.firstWhere(
-      (recipe) => recipe.id == recipeId,
-    );
-
-    // Format the selected time as a string
-    String formattedTime = DateFormat('hh:mm a').format(allocatedTime);
-
-    setState(() {
-      // Create a new meal allocation
-      Meal allocation = Meal(
-        date: DateTime.now(),
-        mealType: mealPeriod,
-        recipes: [selectedRecipe.id!],
-        timeOfDay: formattedTime,
-        recurrence: recurrence,
-      );
-
-      // Initialize _selectedMeals if it doesn't exist for the current meal period
-      if (_selectedMeals[mealPeriod] == null) {
-        _selectedMeals[mealPeriod] = [];
-      }
-
-      // Add the new meal allocation based on the meal period
-      if (mealPeriod == 'Snack') {
-        // Allow multiple snack meals
-        _selectedMeals[mealPeriod]!.add(allocation);
-      } else {
-        // Replace the current meal for breakfast, lunch, or dinner
-        _selectedMeals[mealPeriod] = [allocation];
-      }
-
-      // Notify parent widget about the updated selections
-      widget.onSelectionChanged(_convertToRecipeAllocations());
-    });
-  }
-
-  bool _isTimeWithinRange(
-      TimeOfDay selectedTime, TimeOfDay startTime, TimeOfDay endTime) {
-    final now = DateTime.now();
-    final selectedDateTime = DateTime(
-        now.year, now.month, now.day, selectedTime.hour, selectedTime.minute);
-    final startDateTime = DateTime(
-        now.year, now.month, now.day, startTime.hour, startTime.minute);
-    final endDateTime =
-        DateTime(now.year, now.month, now.day, endTime.hour, endTime.minute);
-
-    return selectedDateTime.isAfter(startDateTime) &&
-        selectedDateTime.isBefore(endDateTime);
-  }
-
-  void _removeRecipe(String mealPeriod, String recipeId) async {
-    final hiveService = HiveService();
-
-    // Remove the meal from Hive for the selected date and meal period
-    print('-------------------SelectedDate and meal period--------------');
-    print(widget.selectedDay);
-    print(mealPeriod);
-    if (widget.selectedDay != null) {
-      await hiveService.deleteMealForDate(widget.selectedDay!, mealPeriod);
-    } else {
-      // Handle the case where either widget.selectedDay or mealPeriod is null
-      print('Error: Either widget.selectedDay or mealPeriod is null.');
-      // Optionally, show an error message or provide a fallback
-    }
-
-    setState(() {
-      // Remove the recipe ID from the list of recipe IDs in the UI (_selectedMeals)
-      _selectedMeals[mealPeriod]?.removeWhere((allocation) {
-        return allocation.recipes != null &&
-            allocation.recipes!.contains(recipeId);
-      });
-
-      // If the meal period has no more meals, remove the entire period
-      if (_selectedMeals[mealPeriod]?.isEmpty ?? false) {
-        _selectedMeals.remove(mealPeriod);
-      }
-
-      // Notify the parent widget of the change
-      widget.onSelectionChanged(_convertToRecipeAllocations());
-    });
-  }
-
-  List<Meal> _convertToRecipeAllocations() {
-    List<Meal> allocations = [];
-    _selectedMeals.forEach((mealPeriod, meals) {
-      allocations.addAll(meals);
-    });
-    return allocations;
-  }
-
-  void _handleRecurrenceSelection() async {
-    final Map<String, dynamic>? recurrenceData =
-        await showRecurrenceBottomSheet(
-            context, widget.startDate, widget.endDate);
-
-    if (recurrenceData != null) {
-      // Process the recurrence data
-      print('Selected Recurrence Data: $recurrenceData');
-
-      // Extracting recurrence option and custom days
-      final String recurrencyOption = recurrenceData['option'] ?? 'None';
-      final List<int> customDays =
-          List<int>.from(recurrenceData['customDays'] ?? []);
-
-      // Properly convert customDates to DateTime from string if needed
-      final List<DateTime> customDates =
-          (recurrenceData['customDates'] as List<dynamic>?)
-                  ?.map((date) => DateTime.parse(date as String))
-                  .toList() ??
-              [];
-
-      setState(() {
-        recurrence = Recurrence(
-          option: recurrencyOption,
-          date: DateTime.now(),
-          customDays: customDays,
-          customDates: customDates,
-        );
-      });
-
-      // Trigger the recurrence change callback
-      widget.onRecurrenceChanged(recurrence!);
-    }
   }
 
   Widget _buildRecipeSelector(String mealPeriod) {
@@ -586,31 +401,223 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     );
   }
 
-  void _showSaveDialog() {
-    showDialog(
+  List<Meal> _convertToRecipeAllocations() {
+    List<Meal> allocations = [];
+    _selectedMeals.forEach((mealPeriod, meals) {
+      allocations.addAll(meals);
+    });
+    return allocations;
+  }
+
+  void _handleRecurrenceSelection() async {
+    final Map<String, dynamic>? recurrenceData =
+        await showRecurrenceBottomSheet(
+            context, widget.startDate, widget.endDate);
+
+    if (recurrenceData != null) {
+      // Process the recurrence data
+      print('Selected Recurrence Data: $recurrenceData');
+
+      // Extracting recurrence option and custom days
+      final String recurrencyOption = recurrenceData['option'] ?? 'None';
+      final List<int> customDays =
+          List<int>.from(recurrenceData['customDays'] ?? []);
+
+      // Properly convert customDates to DateTime from string if needed
+      final List<DateTime> customDates =
+          (recurrenceData['customDates'] as List<dynamic>?)
+                  ?.map((date) => DateTime.parse(date as String))
+                  .toList() ??
+              [];
+
+      setState(() {
+        recurrence = Recurrence(
+          option: recurrencyOption,
+          date: DateTime.now(),
+          customDays: customDays,
+          customDates: customDates,
+        );
+      });
+
+      // Trigger the recurrence change callback
+      widget.onRecurrenceChanged(recurrence!);
+    }
+  }
+
+  //  Default meal initialization
+  void _initializeSelectedMeals() {
+    _selectedMeals.clear();
+    if (widget.defaultMeals != null && widget.defaultMeals!.isNotEmpty) {
+      for (var meal in widget.defaultMeals!) {
+        if (_selectedMeals[meal.mealType] == null) {
+          _selectedMeals[meal.mealType] = [];
+        }
+        _selectedMeals[meal.mealType]!.add(meal);
+      }
+    }
+    // Notify parent widget even if no meals are selected
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onSelectionChanged(_convertToRecipeAllocations());
+    });
+  }
+
+  bool _isTimeWithinRange(
+      TimeOfDay selectedTime, TimeOfDay startTime, TimeOfDay endTime) {
+    final now = DateTime.now();
+    final selectedDateTime = DateTime(
+        now.year, now.month, now.day, selectedTime.hour, selectedTime.minute);
+    final startDateTime = DateTime(
+        now.year, now.month, now.day, startTime.hour, startTime.minute);
+    final endDateTime =
+        DateTime(now.year, now.month, now.day, endTime.hour, endTime.minute);
+
+    return selectedDateTime.isAfter(startDateTime) &&
+        selectedDateTime.isBefore(endDateTime);
+  }
+
+  Future<void> _onRecipeTap(String recipeId, String mealPeriod) async {
+    TimeOfDay startTime;
+    TimeOfDay endTime;
+
+    switch (mealPeriod) {
+      case 'Breakfast':
+        startTime = const TimeOfDay(hour: 0, minute: 0);
+        endTime = const TimeOfDay(hour: 11, minute: 59);
+        break;
+      case 'Lunch':
+        startTime = const TimeOfDay(hour: 12, minute: 0);
+        endTime = const TimeOfDay(hour: 17, minute: 59);
+        break;
+      case 'Dinner':
+        startTime = const TimeOfDay(hour: 18, minute: 0);
+        endTime = const TimeOfDay(hour: 23, minute: 59);
+        break;
+      case 'Snack':
+      default:
+        startTime = const TimeOfDay(hour: 0, minute: 0);
+        endTime = const TimeOfDay(hour: 23, minute: 59);
+        break;
+    }
+
+    TimeOfDay? selectedTime = await showTimePicker(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Save Changes'),
-          content: const Text('Save meal for the specific date and time?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Yes'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                widget.saveToDraft?.call(); // Perform the save action
-              },
-            ),
-          ],
+      initialTime: startTime,
+      helpText: 'Select Time for $mealPeriod',
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            alwaysUse24HourFormat: false,
+          ),
+          child: child!,
         );
       },
     );
+
+    if (selectedTime == null) {
+      return;
+    }
+
+    // Check if the selected time is within the allowed range
+    if (!_isTimeWithinRange(selectedTime, startTime, endTime)) {
+      // Show an error if the selected time is outside the valid range
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(
+              'Invalid Time for $mealPeriod',
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            content: Text(
+                'Please select a time between ${startTime.format(context)} and ${endTime.format(context)} for $mealPeriod.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    DateTime allocatedTime = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+      selectedTime.hour,
+      selectedTime.minute,
+    );
+
+    Recipe? selectedRecipe = widget.recipes.firstWhere(
+      (recipe) => recipe.id == recipeId,
+    );
+
+    // Format the selected time as a string
+    String formattedTime = DateFormat('hh:mm a').format(allocatedTime);
+
+    setState(() {
+      // Create a new meal allocation
+      Meal allocation = Meal(
+        date: DateTime.now(),
+        mealType: mealPeriod,
+        recipes: [selectedRecipe.id!],
+        timeOfDay: formattedTime,
+        recurrence: recurrence,
+      );
+
+      // Initialize _selectedMeals if it doesn't exist for the current meal period
+      if (_selectedMeals[mealPeriod] == null) {
+        _selectedMeals[mealPeriod] = [];
+      }
+
+      // Add the new meal allocation based on the meal period
+      if (mealPeriod == 'Snack') {
+        // Allow multiple snack meals
+        _selectedMeals[mealPeriod]!.add(allocation);
+      } else {
+        // Replace the current meal for breakfast, lunch, or dinner
+        _selectedMeals[mealPeriod] = [allocation];
+      }
+
+      // Notify parent widget about the updated selections
+      widget.onSelectionChanged(_convertToRecipeAllocations());
+    });
+  }
+
+  void _removeRecipe(String mealPeriod, String recipeId) async {
+    final hiveService = HiveService();
+
+    // Remove the meal from Hive for the selected date and meal period
+    print('-------------------SelectedDate and meal period--------------');
+    print(widget.selectedDay);
+    print(mealPeriod);
+    if (widget.selectedDay != null) {
+      await hiveService.deleteMealForDate(widget.selectedDay!, mealPeriod);
+    } else {
+      // Handle the case where either widget.selectedDay or mealPeriod is null
+      print('Error: Either widget.selectedDay or mealPeriod is null.');
+      // Optionally, show an error message or provide a fallback
+    }
+
+    setState(() {
+      // Remove the recipe ID from the list of recipe IDs in the UI (_selectedMeals)
+      _selectedMeals[mealPeriod]?.removeWhere((allocation) {
+        return allocation.recipes != null &&
+            allocation.recipes!.contains(recipeId);
+      });
+
+      // If the meal period has no more meals, remove the entire period
+      if (_selectedMeals[mealPeriod]?.isEmpty ?? false) {
+        _selectedMeals.remove(mealPeriod);
+      }
+
+      // Notify the parent widget of the change
+      widget.onSelectionChanged(_convertToRecipeAllocations());
+    });
   }
 
   void _showRecurrSaveDialog() {
@@ -641,38 +648,30 @@ class _MealPeriodSelectorState extends ConsumerState<MealPeriodSelector>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    print(
-        "-----------------------------recurrences-----------------------------$recurrence");
-
-    // Check if there are any meals selected by the user or from the defaultMeals
-    bool hasMeals = _selectedMeals.isNotEmpty ||
-        (widget.defaultMeals != null && widget.defaultMeals!.isNotEmpty);
-
-    return Column(
-      children: [
-        TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabs: _mealPeriods.map((mealPeriod) {
-            return Tab(text: mealPeriod);
-          }).toList(),
-        ),
-        SizedBox(
-          height: 220,
-          child: TabBarView(
-            controller: _tabController,
-            children: _mealPeriods.map((mealPeriod) {
-              return _buildRecipeSelector(mealPeriod);
-            }).toList(),
-          ),
-        ),
-        const SizedBox(height: 20),
-
-        // Conditionally show _buildSelectedMeals only if there are meals to display
-        if (hasMeals) _buildSelectedMeals(),
-      ],
+  void _showSaveDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Save Changes'),
+          content: const Text('Save meal for the specific date and time?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                widget.saveToDraft?.call(); // Perform the save action
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

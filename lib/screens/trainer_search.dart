@@ -1,14 +1,15 @@
 // ignore_for_file: unused_element
 
 import 'dart:async';
+
+import 'package:fit_cibus/Features/trainer/trainer_service.dart';
+import 'package:fit_cibus/models/user.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/screens/trainer_profile_screen.dart';
+import 'package:fit_cibus/services/email_service.dart';
+import 'package:fit_cibus/utils/native_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/Features/trainer/trainer_service.dart'; // Import your service
-import 'package:voltican_fitness/models/user.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
-import 'package:voltican_fitness/services/email_service.dart';
-import 'package:voltican_fitness/utils/native_alert.dart'; // Import your model
 
 class TrainerSearchScreen extends ConsumerStatefulWidget {
   const TrainerSearchScreen({super.key});
@@ -26,77 +27,6 @@ class _TrainerSearchScreenState extends ConsumerState<TrainerSearchScreen> {
 
   final TrainerService _trainerService =
       TrainerService(); // Instantiate your service directly
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _debounce?.cancel();
-    super.dispose();
-  }
-
-  void _onSearchChanged() {
-    final query = _searchController.text;
-
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 300), () {
-      _searchTrainers(query);
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _searchController.addListener(_onSearchChanged);
-    _loadAllTrainers();
-  }
-
-  Future<void> _loadAllTrainers() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      final trainers =
-          await _trainerService.getAllTrainers(); // Fetch all trainers
-      setState(() {
-        _trainers = trainers;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to load trainers: $e';
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _searchTrainers(String query) async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      List<User> trainers;
-      if (query.isEmpty) {
-        trainers = await _trainerService
-            .getAllTrainers(); // Fetch all trainers if query is empty
-      } else {
-        trainers = await _trainerService.searchTrainers(query);
-      }
-
-      setState(() {
-        _trainers = trainers;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to load trainers: $e';
-        _isLoading = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -210,6 +140,77 @@ class _TrainerSearchScreenState extends ConsumerState<TrainerSearchScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onSearchChanged);
+    _loadAllTrainers();
+  }
+
+  Future<void> _loadAllTrainers() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final trainers =
+          await _trainerService.getAllTrainers(); // Fetch all trainers
+      setState(() {
+        _trainers = trainers;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Failed to load trainers: $e';
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _onSearchChanged() {
+    final query = _searchController.text;
+
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      _searchTrainers(query);
+    });
+  }
+
+  Future<void> _searchTrainers(String query) async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      List<User> trainers;
+      if (query.isEmpty) {
+        trainers = await _trainerService
+            .getAllTrainers(); // Fetch all trainers if query is empty
+      } else {
+        trainers = await _trainerService.searchTrainers(query);
+      }
+
+      setState(() {
+        _trainers = trainers;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Failed to load trainers: $e';
+        _isLoading = false;
+      });
+    }
   }
 
   void _showTrainerDetails(

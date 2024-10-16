@@ -1,8 +1,8 @@
+import 'package:fit_cibus/screens/trainer_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/trainer_profile_screen.dart';
 
 class AllTrainersScreen extends ConsumerWidget {
   const AllTrainersScreen({super.key});

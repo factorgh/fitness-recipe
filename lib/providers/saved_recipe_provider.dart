@@ -1,9 +1,9 @@
 // ignore_for_file: avoid_print
 
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/providers/recipe_service_provider.dart';
+import 'package:fit_cibus/services/recipe_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/providers/recipe_service_provider.dart';
-import 'package:voltican_fitness/services/recipe_service.dart';
 
 // StateNotifier for managing saved recipes
 class SavedRecipesNotifier extends StateNotifier<List<Recipe>> {

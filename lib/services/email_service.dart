@@ -1,8 +1,9 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
+
 import 'package:dio/dio.dart';
-import 'package:voltican_fitness/classes/dio_client.dart';
+import 'package:fit_cibus/classes/dio_client.dart';
 
 class EmailService {
   Future<void> sendEmail(

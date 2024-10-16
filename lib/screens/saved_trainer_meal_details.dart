@@ -1,25 +1,23 @@
 // ignore_for_file: use_build_context_synchronously, unused_element, avoid_print
 
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/models/user.dart';
+import 'package:fit_cibus/providers/saved_recipe_provider.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/screens/edit_recipe_screen.dart';
+import 'package:fit_cibus/services/auth_service.dart';
+import 'package:fit_cibus/services/recipe_service.dart';
+import 'package:fit_cibus/utils/conversions/capitalize_first.dart';
+import 'package:fit_cibus/utils/native_alert.dart';
+import 'package:fit_cibus/utils/show_snackbar.dart';
+import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/models/user.dart';
-import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-
-import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
-import 'package:voltican_fitness/services/recipe_service.dart';
-import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
-import 'package:voltican_fitness/utils/native_alert.dart';
-import 'package:voltican_fitness/utils/show_snackbar.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
-
 class SavedTrainerMealDetailScreen extends ConsumerStatefulWidget {
-  const SavedTrainerMealDetailScreen({super.key, required this.meal});
   final Recipe meal;
+  const SavedTrainerMealDetailScreen({super.key, required this.meal});
 
   @override
   ConsumerState<SavedTrainerMealDetailScreen> createState() =>
@@ -33,122 +31,6 @@ class _TrainerMealDetailScreenState
   bool isFollowing = false;
   RecipeService recipeService = RecipeService();
   User? owner;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUser();
-  }
-
-  void _fetchUser() {
-    try {
-      AuthService().getUser(
-        userId: widget.meal.createdBy,
-        onSuccess: (fetchedUser) {
-          setState(() {
-            owner = fetchedUser;
-          });
-        },
-      );
-    } catch (e) {
-      // Handle unexpected errors here
-      showSnack(context, 'An unexpected error occurred');
-    }
-  }
-
-  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // User must tap button to dismiss
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Confirm Removal',
-            style: TextStyle(color: Colors.black87),
-          ),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                  'Are you sure you want to remove this recipe?',
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: const Text('Remove'),
-              onPressed: () {
-                // Perform the delete action
-                final user = ref.read(userProvider);
-                ref
-                    .read(savedRecipesProvider.notifier)
-                    .removeSavedRecipe(user!.id, widget.meal.id!);
-                Navigator.of(context).pop();
-                showSnack(context, 'Saved recipe removed successfully');
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _showRatingDialog() async {
-    final TextEditingController commentController = TextEditingController();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Center(
-            child: Text(
-              'Leave your Review',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 10),
-              TextField(
-                controller: commentController,
-                decoration: const InputDecoration(
-                  hintText: 'Write your review here',
-                ),
-                maxLines: 3,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('Skip'),
-            ),
-            TextButton(
-              onPressed: () {
-                String comment = commentController.text;
-                if (comment.isNotEmpty) {
-                  // Handle comment submission here
-                  showSnack(context, 'Review submitted successfully');
-                }
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('Post'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -454,6 +336,122 @@ class _TrainerMealDetailScreenState
           ),
         ],
       ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUser();
+  }
+
+  void _fetchUser() {
+    try {
+      AuthService().getUser(
+        userId: widget.meal.createdBy,
+        onSuccess: (fetchedUser) {
+          setState(() {
+            owner = fetchedUser;
+          });
+        },
+      );
+    } catch (e) {
+      // Handle unexpected errors here
+      showSnack(context, 'An unexpected error occurred');
+    }
+  }
+
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to dismiss
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Removal',
+            style: TextStyle(color: Colors.black87),
+          ),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  'Are you sure you want to remove this recipe?',
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Remove'),
+              onPressed: () {
+                // Perform the delete action
+                final user = ref.read(userProvider);
+                ref
+                    .read(savedRecipesProvider.notifier)
+                    .removeSavedRecipe(user!.id, widget.meal.id!);
+                Navigator.of(context).pop();
+                showSnack(context, 'Saved recipe removed successfully');
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showRatingDialog() async {
+    final TextEditingController commentController = TextEditingController();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Center(
+            child: Text(
+              'Leave your Review',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 10),
+              TextField(
+                controller: commentController,
+                decoration: const InputDecoration(
+                  hintText: 'Write your review here',
+                ),
+                maxLines: 3,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Skip'),
+            ),
+            TextButton(
+              onPressed: () {
+                String comment = commentController.text;
+                if (comment.isNotEmpty) {
+                  // Handle comment submission here
+                  showSnack(context, 'Review submitted successfully');
+                }
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Post'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

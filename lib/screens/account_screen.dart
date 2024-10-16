@@ -1,11 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/services/auth_service.dart';
+import 'package:fit_cibus/utils/native_alert.dart';
+import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
-import 'package:voltican_fitness/utils/native_alert.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class AccountScreen extends ConsumerStatefulWidget {
   const AccountScreen({super.key});

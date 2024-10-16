@@ -1,6 +1,5 @@
+import 'package:fit_cibus/utils/hive/hive_recurrence.dart';
 import 'package:hive/hive.dart';
-
-import 'package:voltican_fitness/utils/hive/hive_recurrence.dart';
 
 part 'hive_meal.g.dart';
 

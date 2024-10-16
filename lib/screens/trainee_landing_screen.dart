@@ -1,16 +1,15 @@
 // ignore_for_file: avoid_print, unused_element
 
+import 'package:badges/badges.dart' as badges;
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/screens/notify_screen.dart';
+import 'package:fit_cibus/services/auth_service.dart';
+import 'package:fit_cibus/utils/conversions/capitalize_first.dart';
+import 'package:fit_cibus/utils/socket_io_setup.dart';
+import 'package:fit_cibus/widgets/recipe_advert_slider.dart';
+import 'package:fit_cibus/widgets/slider_trainer_landing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/notify_screen.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
-import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
-import 'package:voltican_fitness/utils/socket_io_setup.dart';
-import 'package:voltican_fitness/widgets/recipe_advert_slider.dart';
-
-import 'package:badges/badges.dart' as badges;
-import 'package:voltican_fitness/widgets/slider_trainer_landing.dart';
 
 class TraineeLandingScreen extends ConsumerStatefulWidget {
   const TraineeLandingScreen({super.key});
@@ -27,90 +26,6 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
   List<String> _topTrainerIds = [];
   late SocketService _socketService;
   int _notificationCount = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fetchTopTrainers();
-      _socketService = SocketService();
-      _socketService.initSocket();
-      _listenForNotifications();
-    });
-  }
-
-  void _listenForNotifications() {
-    _socketService.listenForNotifications(ref.read(userProvider)!.id,
-        (notification) {
-      _incrementNotificationCount();
-    });
-  }
-
-  void _incrementNotificationCount() {
-    setState(() {
-      _notificationCount++;
-    });
-  }
-
-  void _resetNotificationCount() {
-    setState(() {
-      _notificationCount = 0;
-    });
-  }
-
-  void _fetchTopTrainers() {
-    authService.getTopTrainers(
-      context: context,
-      onSuccess: (trainers) {
-        setState(() {
-          _topTrainers =
-              trainers.map((trainer) => trainer['username'] as String).toList();
-          _topTrainersEmail =
-              trainers.map((trainer) => trainer['username'] as String).toList();
-          _topTrainerIds =
-              trainers.map((trainer) => trainer['_id'] as String).toList();
-          _trainerImages = trainers
-              .map((trainer) =>
-                  trainer['imageUrl'] as String? ??
-                  'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png')
-              .toList();
-        });
-      },
-    );
-  }
-
-  void _showBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return SizedBox(
-          height: MediaQuery.of(context).size.height / 3,
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                const Text(
-                  'Stay fit with recipes for a better you',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  child: const Text('Continue your Adventure'),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void handleCategorySelected(String category) {
-    // Handle category selection
-    print('Selected category: $category');
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -335,6 +250,90 @@ class _TraineeLandingScreenState extends ConsumerState<TraineeLandingScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void handleCategorySelected(String category) {
+    // Handle category selection
+    print('Selected category: $category');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchTopTrainers();
+      _socketService = SocketService();
+      _socketService.initSocket();
+      _listenForNotifications();
+    });
+  }
+
+  void _fetchTopTrainers() {
+    authService.getTopTrainers(
+      context: context,
+      onSuccess: (trainers) {
+        setState(() {
+          _topTrainers =
+              trainers.map((trainer) => trainer['username'] as String).toList();
+          _topTrainersEmail =
+              trainers.map((trainer) => trainer['username'] as String).toList();
+          _topTrainerIds =
+              trainers.map((trainer) => trainer['_id'] as String).toList();
+          _trainerImages = trainers
+              .map((trainer) =>
+                  trainer['imageUrl'] as String? ??
+                  'https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png')
+              .toList();
+        });
+      },
+    );
+  }
+
+  void _incrementNotificationCount() {
+    setState(() {
+      _notificationCount++;
+    });
+  }
+
+  void _listenForNotifications() {
+    _socketService.listenForNotifications(ref.read(userProvider)!.id,
+        (notification) {
+      _incrementNotificationCount();
+    });
+  }
+
+  void _resetNotificationCount() {
+    setState(() {
+      _notificationCount = 0;
+    });
+  }
+
+  void _showBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height / 3,
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const Text(
+                  'Stay fit with recipes for a better you',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  child: const Text('Continue your Adventure'),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

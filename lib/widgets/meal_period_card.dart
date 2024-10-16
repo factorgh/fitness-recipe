@@ -1,9 +1,15 @@
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/screens/trainee_recipe_detail_screen.dart';
+import 'package:fit_cibus/utils/conversions/capitalize_first.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/screens/trainee_recipe_detail_screen.dart';
-import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
 
 class MealPeriodCard extends StatelessWidget {
+  final String mealPeriod;
+
+  final String time1;
+  final String time2;
+  final String image;
+  final Recipe? recipe;
   const MealPeriodCard(
       {super.key,
       required this.mealPeriod,
@@ -11,12 +17,6 @@ class MealPeriodCard extends StatelessWidget {
       required this.time2,
       required this.image,
       this.recipe});
-
-  final String mealPeriod;
-  final String time1;
-  final String time2;
-  final String image;
-  final Recipe? recipe;
 
   @override
   Widget build(BuildContext context) {

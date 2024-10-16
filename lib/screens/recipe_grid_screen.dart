@@ -1,6 +1,6 @@
+import 'package:fit_cibus/screens/add_meal_screen.dart';
+import 'package:fit_cibus/screens/assign_recipe_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/add_meal_screen.dart';
-import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
 
 class RecipeGridScreen extends StatefulWidget {
   const RecipeGridScreen({super.key});
@@ -75,37 +75,6 @@ class _RecipeGridScreenState extends State<RecipeGridScreen> {
     },
   ];
 
-  void _onRecipeTap(int index) {
-    setState(() {
-      _selectedRecipeIndex = index;
-    });
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(recipes[index]['name']!),
-        content: const Text('Do you want to assign this recipe?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const AssignRecipeScreen()));
-              // Assign logic goes here
-            },
-            child: const Text('Assign'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -173,6 +142,37 @@ class _RecipeGridScreenState extends State<RecipeGridScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  void _onRecipeTap(int index) {
+    setState(() {
+      _selectedRecipeIndex = index;
+    });
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(recipes[index]['name']!),
+        content: const Text('Do you want to assign this recipe?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const AssignRecipeScreen()));
+              // Assign logic goes here
+            },
+            child: const Text('Assign'),
+          ),
+        ],
       ),
     );
   }

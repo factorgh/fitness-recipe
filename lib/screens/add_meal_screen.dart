@@ -1,8 +1,8 @@
 import 'dart:io';
+import 'package:fit_cibus/screens/assign_recipe_screen.dart';
+import 'package:fit_cibus/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:voltican_fitness/screens/assign_recipe_screen.dart';
-import 'package:voltican_fitness/widgets/button.dart';
 
 class RecipeScreen extends StatefulWidget {
   const RecipeScreen({super.key});

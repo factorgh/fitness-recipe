@@ -1,6 +1,6 @@
+import 'package:fit_cibus/models/user.dart';
+import 'package:fit_cibus/services/auth_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models/user.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
 
 final userServiceProvider = Provider<AuthService>((ref) {
   return AuthService();

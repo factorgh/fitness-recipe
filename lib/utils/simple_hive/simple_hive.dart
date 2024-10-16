@@ -1,5 +1,5 @@
+import 'package:fit_cibus/models/mealplan.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:voltican_fitness/models/mealplan.dart';
 
 void addMealWithRecurrence(
     Meal meal, Recurrence recurrence, DateTime startDate) {

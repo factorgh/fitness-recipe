@@ -1,9 +1,8 @@
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/services/auth_service.dart';
+import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class UpdateProfileScreen extends ConsumerStatefulWidget {
   const UpdateProfileScreen({super.key});
@@ -17,41 +16,6 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
   late String _fullName;
   late String _username;
   late String _email;
-
-  @override
-  void initState() {
-    super.initState();
-    // Use ref.watch to ensure the state is reactive
-    final user = ref.read(userProvider);
-    _fullName = user?.fullName ?? '';
-    _username = user?.username ?? '';
-    _email = user?.email ?? '';
-  }
-
-  void _updateProfile() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-
-      final user = ref.read(userProvider);
-      if (user != null) {
-        // Perform the update
-        await AuthService().updateUser(
-          context: context,
-          ref: ref,
-          id: user.id,
-          fullName: _fullName,
-          username: _username,
-          email: _email,
-        );
-        // Update the userProvider with new data
-        ref.read(userProvider.notifier).updateUser(
-              fullName: _fullName,
-              username: _username,
-              email: _email,
-            );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,5 +77,40 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Use ref.watch to ensure the state is reactive
+    final user = ref.read(userProvider);
+    _fullName = user?.fullName ?? '';
+    _username = user?.username ?? '';
+    _email = user?.email ?? '';
+  }
+
+  void _updateProfile() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+
+      final user = ref.read(userProvider);
+      if (user != null) {
+        // Perform the update
+        await AuthService().updateUser(
+          context: context,
+          ref: ref,
+          id: user.id,
+          fullName: _fullName,
+          username: _username,
+          email: _email,
+        );
+        // Update the userProvider with new data
+        ref.read(userProvider.notifier).updateUser(
+              fullName: _fullName,
+              username: _username,
+              email: _email,
+            );
+      }
+    }
   }
 }

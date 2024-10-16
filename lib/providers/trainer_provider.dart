@@ -1,9 +1,9 @@
 // ignore_for_file: avoid_print
 
+import 'package:fit_cibus/Features/trainer/trainer_service.dart';
+import 'package:fit_cibus/models/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
-import 'package:voltican_fitness/models/user.dart';
 
 // State notifier for managing a list of followers with separate trainees and trainers
 class FollowersNotifier
@@ -25,7 +25,7 @@ class FollowersNotifier
         filteredFollowers =
             followers.where((user) => user.role == '1').toList();
       } else {
-        filteredFollowers = followers; // Show all if 'All' or any other filter
+        filteredFollowers = followers;
       }
 
       // Split filtered followers into trainees and trainers

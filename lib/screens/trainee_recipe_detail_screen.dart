@@ -1,22 +1,20 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print, unused_element
 
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/providers/saved_recipe_provider.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/services/recipe_service.dart';
+import 'package:fit_cibus/utils/conversions/capitalize_first.dart';
+import 'package:fit_cibus/utils/show_snackbar.dart';
+import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 // import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/services/recipe_service.dart';
-import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
-
-import 'package:voltican_fitness/utils/show_snackbar.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
-
 class TraineeRecipeDetailScreen extends ConsumerStatefulWidget {
-  const TraineeRecipeDetailScreen({super.key, required this.meal});
   final Recipe meal;
+  const TraineeRecipeDetailScreen({super.key, required this.meal});
 
   @override
   ConsumerState<TraineeRecipeDetailScreen> createState() =>
@@ -29,117 +27,6 @@ class _TraineeRecipeDetailScreenState
   bool isPrivate = false;
   bool isFollowing = false;
   RecipeService recipeService = RecipeService();
-
-  @override
-  void initState() {
-    _fetchSavedRecipes();
-    super.initState();
-  }
-
-  void _fetchSavedRecipes() {
-    final user = ref.read(userProvider);
-    if (user == null) {
-      print('Error: User is null');
-      return;
-    }
-    final userId = user.id;
-    ref.read(savedRecipesProvider.notifier).loadSavedRecipes(userId);
-  }
-
-  void _showCommentDialog() async {
-    final TextEditingController commentController = TextEditingController();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Leave a Comment'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Please leave a comment about the recipe:'),
-              TextField(
-                controller: commentController,
-                decoration: const InputDecoration(
-                  hintText: 'Write your comment here',
-                ),
-                maxLines: 3,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('Skip'),
-            ),
-            TextButton(
-              onPressed: () async {
-                String comment = commentController.text;
-                if (comment.isNotEmpty) {
-                  // For example, save the comment to your backend or local storage
-                  showSnack(context, 'Comment submitted successfully');
-                }
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('Submit'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _showRatingDialog() async {
-    final TextEditingController commentController = TextEditingController();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Center(
-            child: Text(
-              'Leave your Review',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 10),
-              TextField(
-                controller: commentController,
-                decoration: const InputDecoration(
-                  hintText: 'Write your review here',
-                ),
-                maxLines: 3,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('Skip'),
-            ),
-            TextButton(
-              onPressed: () {
-                String comment = commentController.text;
-                if (comment.isNotEmpty) {
-                  // Handle comment submission here
-                  showSnack(context, 'Review submitted successfully');
-                }
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('Post'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -388,6 +275,117 @@ class _TraineeRecipeDetailScreenState
           ),
         ],
       ),
+    );
+  }
+
+  @override
+  void initState() {
+    _fetchSavedRecipes();
+    super.initState();
+  }
+
+  void _fetchSavedRecipes() {
+    final user = ref.read(userProvider);
+    if (user == null) {
+      print('Error: User is null');
+      return;
+    }
+    final userId = user.id;
+    ref.read(savedRecipesProvider.notifier).loadSavedRecipes(userId);
+  }
+
+  void _showCommentDialog() async {
+    final TextEditingController commentController = TextEditingController();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Leave a Comment'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Please leave a comment about the recipe:'),
+              TextField(
+                controller: commentController,
+                decoration: const InputDecoration(
+                  hintText: 'Write your comment here',
+                ),
+                maxLines: 3,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Skip'),
+            ),
+            TextButton(
+              onPressed: () async {
+                String comment = commentController.text;
+                if (comment.isNotEmpty) {
+                  // For example, save the comment to your backend or local storage
+                  showSnack(context, 'Comment submitted successfully');
+                }
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showRatingDialog() async {
+    final TextEditingController commentController = TextEditingController();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Center(
+            child: Text(
+              'Leave your Review',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 10),
+              TextField(
+                controller: commentController,
+                decoration: const InputDecoration(
+                  hintText: 'Write your review here',
+                ),
+                maxLines: 3,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Skip'),
+            ),
+            TextButton(
+              onPressed: () {
+                String comment = commentController.text;
+                if (comment.isNotEmpty) {
+                  // Handle comment submission here
+                  showSnack(context, 'Review submitted successfully');
+                }
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Post'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

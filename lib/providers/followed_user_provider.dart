@@ -1,8 +1,8 @@
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/providers/recipe_service_provider.dart';
+import 'package:fit_cibus/services/recipe_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/providers/recipe_service_provider.dart';
-import 'package:voltican_fitness/services/recipe_service.dart';
 
 class FollowedUsersRecipesNotifier
     extends StateNotifier<AsyncValue<List<Recipe>>> {

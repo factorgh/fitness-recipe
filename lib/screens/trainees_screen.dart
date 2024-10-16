@@ -1,15 +1,14 @@
 // ignore_for_file: unused_result
 
+import 'package:fit_cibus/models/user.dart';
+import 'package:fit_cibus/providers/assigned_trainees_provider.dart';
+import 'package:fit_cibus/providers/trainer_provider.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models/user.dart';
-import 'package:voltican_fitness/providers/assigned_trainees_provider.dart';
 
-import 'package:voltican_fitness/providers/trainer_provider.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-
-final followingIdsProvider = StateProvider<List<String>>((ref) => []);
 final filterProvider = StateProvider<String>((ref) => 'Followers');
+final followingIdsProvider = StateProvider<List<String>>((ref) => []);
 final traineeFilterProvider = StateProvider<String>((ref) => 'All');
 
 class TraineesScreen extends ConsumerStatefulWidget {
@@ -22,18 +21,6 @@ class TraineesScreen extends ConsumerStatefulWidget {
 class _TraineesScreenState extends ConsumerState<TraineesScreen>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    tabController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -486,5 +473,17 @@ class _TraineesScreenState extends ConsumerState<TraineesScreen>
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(length: 2, vsync: this);
   }
 }

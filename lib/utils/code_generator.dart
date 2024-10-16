@@ -2,7 +2,21 @@
 
 import 'dart:math';
 
-import 'package:voltican_fitness/models/user.dart';
+import 'package:fit_cibus/models/user.dart';
+
+// Generates and sends codes to backend for all trainers
+void generateAndSendCodes(List<User> trainers) {
+  CodeGenerator codeGenerator = CodeGenerator();
+
+  for (var trainer in trainers) {
+    if (trainer.role == "1") {
+      String code = codeGenerator.generateCode(trainer.fullName);
+      // Send this code to the backend for storage
+      print('Generated code for ${trainer.fullName}: $code');
+      // Implement your backend call here
+    }
+  }
+}
 
 class CodeGenerator {
   final Set<int> _generatedNumbers = {};
@@ -27,19 +41,5 @@ class CodeGenerator {
 
     _generatedNumbers.add(number);
     return number;
-  }
-}
-
-// Generates and sends codes to backend for all trainers
-void generateAndSendCodes(List<User> trainers) {
-  CodeGenerator codeGenerator = CodeGenerator();
-
-  for (var trainer in trainers) {
-    if (trainer.role == "1") {
-      String code = codeGenerator.generateCode(trainer.fullName);
-      // Send this code to the backend for storage
-      print('Generated code for ${trainer.fullName}: $code');
-      // Implement your backend call here
-    }
   }
 }

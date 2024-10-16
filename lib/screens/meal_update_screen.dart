@@ -1,27 +1,26 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
 
+import 'package:fit_cibus/Features/trainer/trainer_service.dart';
+import 'package:fit_cibus/models/mealplan.dart';
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/models/user.dart';
+import 'package:fit_cibus/providers/meal_plan_provider.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/screens/all_meal_plan_screen.dart';
+import 'package:fit_cibus/screens/meal_plan_preview_update_screen.dart';
+import 'package:fit_cibus/services/recipe_service.dart';
+import 'package:fit_cibus/utils/conversions/hive_conversions.dart';
+import 'package:fit_cibus/utils/hive/hive_class.dart';
+import 'package:fit_cibus/utils/hive/hive_meal.dart';
+import 'package:fit_cibus/utils/native_alert.dart';
+import 'package:fit_cibus/utils/show_snackbar.dart';
+import 'package:fit_cibus/widgets/meal_period_selector.dart';
+import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
-import 'package:voltican_fitness/models/mealplan.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/models/user.dart';
-import 'package:voltican_fitness/providers/meal_plan_provider.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
-import 'package:voltican_fitness/screens/meal_plan_preview_update_screen.dart';
-
-import 'package:voltican_fitness/services/recipe_service.dart';
-import 'package:voltican_fitness/utils/conversions/hive_conversions.dart';
-import 'package:voltican_fitness/utils/hive/hive_class.dart';
-import 'package:voltican_fitness/utils/hive/hive_meal.dart';
-import 'package:voltican_fitness/utils/native_alert.dart';
-import 'package:voltican_fitness/utils/show_snackbar.dart';
-import 'package:voltican_fitness/widgets/meal_period_selector.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class MealUpdateScreen extends ConsumerStatefulWidget {
   final MealPlan mealPlan;

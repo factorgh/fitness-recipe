@@ -1,18 +1,16 @@
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/providers/all_recipes_provider.dart';
+import 'package:fit_cibus/providers/saved_recipe_provider.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/providers/user_recipes.dart';
+import 'package:fit_cibus/screens/create_recipe.screen.dart';
+import 'package:fit_cibus/screens/meal_detail_screen.dart';
+import 'package:fit_cibus/screens/saved_trainer_meal_details.dart';
+import 'package:fit_cibus/screens/trainer_meal_details_trainee.dart';
+import 'package:fit_cibus/widgets/recipe_item.dart';
+import 'package:fit_cibus/widgets/recipe_item_trainer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/providers/all_recipes_provider.dart';
-import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/providers/user_recipes.dart';
-import 'package:voltican_fitness/screens/create_recipe.screen.dart';
-import 'package:voltican_fitness/screens/meal_detail_screen.dart';
-import 'package:voltican_fitness/screens/saved_trainer_meal_details.dart';
-import 'package:voltican_fitness/screens/trainer_meal_details.dart';
-
-import 'package:voltican_fitness/widgets/recipe_item.dart';
-import 'package:voltican_fitness/widgets/recipe_item_trainer.dart';
 
 class MealPlanScreen extends ConsumerStatefulWidget {
   const MealPlanScreen({super.key});
@@ -26,100 +24,6 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
   late TabController _tabController;
   String _searchQuery = '';
   String _sortOption = 'A-Z'; // Set default sort option to A-Z
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-
-    // Load all necessary data using the providers
-    Future.microtask(() {
-      _loadData();
-    });
-  }
-
-  Future<void> _loadData() async {
-    final user = ref.read(userProvider);
-    ref.read(userRecipesProvider.notifier).loadUserRecipes();
-    ref.read(savedRecipesProvider.notifier).loadSavedRecipes(user!.id);
-    ref.read(allRecipesProvider.notifier).loadAllRecipes(context);
-  }
-
-  Future<void> _handleRefresh() async {
-    await _loadData();
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  void selectMeal(BuildContext context, Recipe meal) {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => MealDetailScreen(meal: meal),
-    ));
-  }
-
-  void selectRecipe(BuildContext context, Recipe meal) {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => TrainerMealDetailScreen(meal: meal),
-    ));
-  }
-
-  void selectSavedRecipe(BuildContext context, Recipe meal) {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => SavedTrainerMealDetailScreen(meal: meal),
-    ));
-  }
-
-  void _updateSearchQuery(String newQuery) {
-    setState(() {
-      _searchQuery = newQuery;
-    });
-  }
-
-  void _updateSortOption(String option) {
-    setState(() {
-      _sortOption = option;
-    });
-  }
-
-  List<Recipe> _filterRecipes(List<Recipe> recipes) {
-    if (_searchQuery.isEmpty) {
-      return recipes;
-    }
-    return recipes
-        .where((recipe) =>
-            recipe.title.toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
-  }
-
-  List<Recipe> _sortRecipes(List<Recipe> recipes) {
-    switch (_sortOption) {
-      case 'A-Z':
-        recipes.sort((a, b) => a.title.compareTo(b.title));
-        break;
-      case 'Z-A':
-        recipes.sort((a, b) => b.title.compareTo(a.title));
-        break;
-      case 'Most Rated':
-        recipes.sort((a, b) => b.averageRating.compareTo(a.averageRating));
-        break;
-      case 'Least Rated':
-        recipes.sort((a, b) => a.averageRating.compareTo(b.averageRating));
-        break;
-      case 'Most Recent':
-        recipes.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-        break;
-      case 'Least Recent':
-        recipes.sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
-        break;
-      default:
-        break;
-    }
-    return recipes;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -261,18 +165,53 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
     );
   }
 
-  Widget _buildUserRecipesTab(List<Recipe> userRecipes) {
-    if (userRecipes.isEmpty) {
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+
+    // Load all necessary data using the providers
+    Future.microtask(() {
+      _loadData();
+    });
+  }
+
+  void selectMeal(BuildContext context, Recipe meal) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => MealDetailScreen(meal: meal),
+    ));
+  }
+
+  void selectRecipe(BuildContext context, Recipe meal) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => TrainerMealDetailScreen(meal: meal),
+    ));
+  }
+
+  void selectSavedRecipe(BuildContext context, Recipe meal) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => SavedTrainerMealDetailScreen(meal: meal),
+    ));
+  }
+
+  Widget _buildAllRecipesTab(List<Recipe> allRecipes) {
+    if (allRecipes.isEmpty) {
       return const Center(child: Text('No recipes found'));
     }
 
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: userRecipes.length,
-      itemBuilder: (context, index) => RecipeItem(
-        meal: userRecipes[index],
+      itemCount: allRecipes.length,
+      itemBuilder: (context, index) => RecipeItemTrainer(
+        meal: allRecipes[index],
         selectMeal: (meal) {
-          selectMeal(context, meal);
+          selectRecipe(context, meal);
         },
       ),
     );
@@ -295,20 +234,79 @@ class _MealPlanScreenState extends ConsumerState<MealPlanScreen>
     );
   }
 
-  Widget _buildAllRecipesTab(List<Recipe> allRecipes) {
-    if (allRecipes.isEmpty) {
+  Widget _buildUserRecipesTab(List<Recipe> userRecipes) {
+    if (userRecipes.isEmpty) {
       return const Center(child: Text('No recipes found'));
     }
 
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: allRecipes.length,
-      itemBuilder: (context, index) => RecipeItemTrainer(
-        meal: allRecipes[index],
+      itemCount: userRecipes.length,
+      itemBuilder: (context, index) => RecipeItem(
+        meal: userRecipes[index],
         selectMeal: (meal) {
-          selectRecipe(context, meal);
+          selectMeal(context, meal);
         },
       ),
     );
+  }
+
+  List<Recipe> _filterRecipes(List<Recipe> recipes) {
+    if (_searchQuery.isEmpty) {
+      return recipes;
+    }
+    return recipes
+        .where((recipe) =>
+            recipe.title.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .toList();
+  }
+
+  Future<void> _handleRefresh() async {
+    await _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final user = ref.read(userProvider);
+    ref.read(userRecipesProvider.notifier).loadUserRecipes();
+    ref.read(savedRecipesProvider.notifier).loadSavedRecipes(user!.id);
+    ref.read(allRecipesProvider.notifier).loadAllRecipes(context);
+  }
+
+  List<Recipe> _sortRecipes(List<Recipe> recipes) {
+    switch (_sortOption) {
+      case 'A-Z':
+        recipes.sort((a, b) => a.title.compareTo(b.title));
+        break;
+      case 'Z-A':
+        recipes.sort((a, b) => b.title.compareTo(a.title));
+        break;
+      case 'Most Rated':
+        recipes.sort((a, b) => b.averageRating.compareTo(a.averageRating));
+        break;
+      case 'Least Rated':
+        recipes.sort((a, b) => a.averageRating.compareTo(b.averageRating));
+        break;
+      case 'Most Recent':
+        recipes.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        break;
+      case 'Least Recent':
+        recipes.sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
+        break;
+      default:
+        break;
+    }
+    return recipes;
+  }
+
+  void _updateSearchQuery(String newQuery) {
+    setState(() {
+      _searchQuery = newQuery;
+    });
+  }
+
+  void _updateSortOption(String option) {
+    setState(() {
+      _sortOption = option;
+    });
   }
 }

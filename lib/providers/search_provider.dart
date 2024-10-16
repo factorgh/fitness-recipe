@@ -1,7 +1,7 @@
+import 'package:fit_cibus/Features/trainer/trainer_service.dart';
+import 'package:fit_cibus/models/user.dart';
+import 'package:fit_cibus/providers/trainer_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
-import 'package:voltican_fitness/models/user.dart';
-import 'package:voltican_fitness/providers/trainer_provider.dart';
 
 class SearchTrainersNotifier extends StateNotifier<AsyncValue<List<User>>> {
   final TrainerService _trainerService;

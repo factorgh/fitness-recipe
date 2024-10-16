@@ -1,17 +1,17 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print, unused_result
 
+import 'package:fit_cibus/Features/trainer/trainer_service.dart';
+import 'package:fit_cibus/models/user.dart';
+import 'package:fit_cibus/providers/trainer_provider.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/screens/login_screen.dart';
+import 'package:fit_cibus/screens/tabs_screen.dart';
+import 'package:fit_cibus/services/auth_service.dart';
+import 'package:fit_cibus/utils/native_alert.dart';
+import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:voltican_fitness/Features/trainer/trainer_service.dart';
-import 'package:voltican_fitness/models/user.dart';
-import 'package:voltican_fitness/providers/trainer_provider.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/login_screen.dart';
-import 'package:voltican_fitness/screens/tabs_screen.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
-import 'package:voltican_fitness/utils/native_alert.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class CodeScreen extends ConsumerStatefulWidget {
   final String? username;
@@ -30,30 +30,87 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
   User? userFromLogin;
 
   @override
-  void initState() {
-    print('--------------------------${widget.username}----------------');
-    _fetchUser();
-    super.initState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: _logout,
+                      child: const Icon(
+                        Icons.logout,
+                        size: 20,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height / 3),
+                Column(
+                  children: [
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Enter trainer's code",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: TextField(
+                        controller: _codeController,
+                        decoration: InputDecoration(
+                          labelText: 'Enter your code',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+                Center(
+                    child: isLoading
+                        ? const CircularProgressIndicator(
+                            color: Colors.redAccent)
+                        : Reusablebutton(
+                            text: 'Confirm Code',
+                            onPressed: () {
+                              if (_codeController.text.trim().isNotEmpty) {
+                                getUserByCode(
+                                    context, _codeController.text.trim());
+                              } else {
+                                NativeAlerts().showErrorAlert(
+                                    context, 'Please enter a code');
+                              }
+                            },
+                          )),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   void dispose() {
     _codeController.dispose();
     super.dispose();
-  }
-
-  void _fetchUser() async {
-    await authService.getUserByName(
-      username: widget.username!,
-      onSuccess: (fetchedUser) {
-        setState(() {
-          userFromLogin = fetchedUser;
-        });
-      },
-    );
-
-    print('----------------------user From Login-------------------');
-    print(userFromLogin);
   }
 
   Future<void> getUserByCode(BuildContext context, String code) async {
@@ -79,6 +136,45 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  @override
+  void initState() {
+    print('--------------------------${widget.username}----------------');
+    _fetchUser();
+    super.initState();
+  }
+
+  void _fetchUser() async {
+    await authService.getUserByName(
+      username: widget.username!,
+      onSuccess: (fetchedUser) {
+        setState(() {
+          userFromLogin = fetchedUser as User?;
+        });
+      },
+    );
+
+    print('----------------------user From Login-------------------');
+    print(userFromLogin);
+  }
+
+  Future<void> _logout() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove('auth_token'); // Remove the auth token
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+
+      Future.delayed(const Duration(milliseconds: 500), () {
+        NativeAlerts().showSuccessAlert(context, "Logged out successfully");
+      });
+    } catch (e) {
+      print('Error logging out: $e');
+      NativeAlerts().showErrorAlert(context, 'Failed to log out');
     }
   }
 
@@ -178,101 +274,5 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
       // Handle the case where selectedUser or user is null
       NativeAlerts().showErrorAlert(context, 'Invalid user or trainer data');
     }
-  }
-
-  Future<void> _logout() async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.remove('auth_token'); // Remove the auth token
-
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
-
-      Future.delayed(const Duration(milliseconds: 500), () {
-        NativeAlerts().showSuccessAlert(context, "Logged out successfully");
-      });
-    } catch (e) {
-      print('Error logging out: $e');
-      NativeAlerts().showErrorAlert(context, 'Failed to log out');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    GestureDetector(
-                      onTap: _logout,
-                      child: const Icon(
-                        Icons.logout,
-                        size: 20,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height / 3),
-                Column(
-                  children: [
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Enter trainer's code",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                      child: TextField(
-                        controller: _codeController,
-                        decoration: InputDecoration(
-                          labelText: 'Enter your code',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-                Center(
-                    child: isLoading
-                        ? const CircularProgressIndicator(
-                            color: Colors.redAccent)
-                        : Reusablebutton(
-                            text: 'Confirm Code',
-                            onPressed: () {
-                              if (_codeController.text.trim().isNotEmpty) {
-                                getUserByCode(
-                                    context, _codeController.text.trim());
-                              } else {
-                                NativeAlerts().showErrorAlert(
-                                    context, 'Please enter a code');
-                              }
-                            },
-                          )),
-                const SizedBox(height: 20),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

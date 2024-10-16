@@ -1,10 +1,10 @@
 // ignore_for_file: unused_local_variable, avoid_print, unused_element
 
+import 'package:fit_cibus/models/mealplan.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:voltican_fitness/models/mealplan.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
@@ -100,6 +100,38 @@ class NotificationService {
         ?.createNotificationChannel(channel);
   }
 
+  Future<void> requestNotificationPermission() async {
+    final status = await Permission.notification.request();
+    if (status.isGranted) {
+      // Permission granted
+    } else {
+      // Permission denied
+    }
+  }
+
+  Future<void> scheduleMealPlanNotifications({
+    required String mealPlanId,
+    required DateTime creationDate,
+    required List<Meal> recipeAllocations,
+    required List<String> trainees,
+  }) async {
+    // Notify trainees when a new meal plan is created
+    for (var traineeId in trainees) {
+      await scheduleNotification(
+        id: _generateNotificationId(),
+        title: 'New Meal Plan Created',
+        body: 'A new meal plan has been created. Check it out!',
+        scheduledDate: creationDate,
+        payload: 'meal_plan_$mealPlanId',
+      );
+    }
+
+    // Schedule daily reminders based on recipe allocation
+    for (var allocation in recipeAllocations) {
+      String allocatedTime = allocation.timeOfDay;
+    }
+  }
+
   Future<void> scheduleNotification({
     required int id,
     required String title,
@@ -133,35 +165,24 @@ class NotificationService {
     }
   }
 
-  Future<void> requestNotificationPermission() async {
-    final status = await Permission.notification.request();
-    if (status.isGranted) {
-      // Permission granted
-    } else {
-      // Permission denied
-    }
-  }
-
-  Future<void> scheduleMealPlanNotifications({
-    required String mealPlanId,
-    required DateTime creationDate,
-    required List<Meal> recipeAllocations,
-    required List<String> trainees,
-  }) async {
-    // Notify trainees when a new meal plan is created
-    for (var traineeId in trainees) {
-      await scheduleNotification(
-        id: _generateNotificationId(),
-        title: 'New Meal Plan Created',
-        body: 'A new meal plan has been created. Check it out!',
-        scheduledDate: creationDate,
-        payload: 'meal_plan_$mealPlanId',
-      );
-    }
-
-    // Schedule daily reminders based on recipe allocation
-    for (var allocation in recipeAllocations) {
-      String allocatedTime = allocation.timeOfDay;
+  int _dayDiff(String day) {
+    switch (day) {
+      case 'Mon':
+        return (DateTime.monday - DateTime.now().weekday + 7) % 7;
+      case 'Tue':
+        return (DateTime.tuesday - DateTime.now().weekday + 7) % 7;
+      case 'Wed':
+        return (DateTime.wednesday - DateTime.now().weekday + 7) % 7;
+      case 'Thu':
+        return (DateTime.thursday - DateTime.now().weekday + 7) % 7;
+      case 'Fri':
+        return (DateTime.friday - DateTime.now().weekday + 7) % 7;
+      case 'Sat':
+        return (DateTime.saturday - DateTime.now().weekday + 7) % 7;
+      case 'Sun':
+        return (DateTime.sunday - DateTime.now().weekday + 7) % 7;
+      default:
+        return 0;
     }
   }
 
@@ -184,26 +205,5 @@ class NotificationService {
     return scheduledDate.isBefore(now)
         ? scheduledDate.add(const Duration(days: 7))
         : scheduledDate;
-  }
-
-  int _dayDiff(String day) {
-    switch (day) {
-      case 'Mon':
-        return (DateTime.monday - DateTime.now().weekday + 7) % 7;
-      case 'Tue':
-        return (DateTime.tuesday - DateTime.now().weekday + 7) % 7;
-      case 'Wed':
-        return (DateTime.wednesday - DateTime.now().weekday + 7) % 7;
-      case 'Thu':
-        return (DateTime.thursday - DateTime.now().weekday + 7) % 7;
-      case 'Fri':
-        return (DateTime.friday - DateTime.now().weekday + 7) % 7;
-      case 'Sat':
-        return (DateTime.saturday - DateTime.now().weekday + 7) % 7;
-      case 'Sun':
-        return (DateTime.sunday - DateTime.now().weekday + 7) % 7;
-      default:
-        return 0;
-    }
   }
 }

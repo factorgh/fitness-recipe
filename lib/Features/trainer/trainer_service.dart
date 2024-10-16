@@ -3,10 +3,11 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:fit_cibus/classes/dio_client.dart';
+import 'package:fit_cibus/models/user.dart';
+import 'package:fit_cibus/utils/native_alert.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/classes/dio_client.dart';
-import 'package:voltican_fitness/models/user.dart';
-import 'package:voltican_fitness/utils/native_alert.dart';
+
 
 class TrainerService {
   final DioClient client = DioClient();

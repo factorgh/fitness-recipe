@@ -1,16 +1,15 @@
+import 'package:fit_cibus/Features/notification/services/notification_service.dart';
+import 'package:fit_cibus/screens/calendar_screen.dart';
+import 'package:fit_cibus/screens/calendar_trainee_screen.dart';
+import 'package:fit_cibus/screens/recipes_screen.dart';
+import 'package:fit_cibus/screens/settings_screen.dart';
+import 'package:fit_cibus/screens/trainee_landing_screen.dart';
+import 'package:fit_cibus/screens/trainee_recipe_screen.dart';
+import 'package:fit_cibus/screens/trainee_settings_screen.dart';
+import 'package:fit_cibus/screens/trainees_screen.dart';
+import 'package:fit_cibus/screens/trainer_landing_screen.dart';
+import 'package:fit_cibus/screens/trainer_search.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/Features/notification/services/notification_service.dart';
-
-import 'package:voltican_fitness/screens/calendar_screen.dart';
-import 'package:voltican_fitness/screens/recipes_screen.dart';
-import 'package:voltican_fitness/screens/settings_screen.dart';
-import 'package:voltican_fitness/screens/trainee_landing_screen.dart';
-import 'package:voltican_fitness/screens/trainee_recipe_screen.dart';
-import 'package:voltican_fitness/screens/trainee_settings_screen.dart';
-import 'package:voltican_fitness/screens/trainees_screen.dart';
-import 'package:voltican_fitness/screens/calendar_trainee_screen.dart';
-import 'package:voltican_fitness/screens/trainer_landing_screen.dart';
-import 'package:voltican_fitness/screens/trainer_search.dart'; // Assuming you have this screen
 
 class TabsScreen extends StatefulWidget {
   final String userRole; // Pass user role to the widget
@@ -23,27 +22,6 @@ class TabsScreen extends StatefulWidget {
 
 class _TabsScreenState extends State<TabsScreen> {
   int _activePageIndex = 0;
-
-  // Define pages based on user role
-  List<Widget> get _pages {
-    if (widget.userRole == '0') {
-      return [
-        const TraineeLandingScreen(),
-        const TraineeRecipeScreen(),
-        const CalendarTraineeScreen(),
-        const TrainerSearchScreen(),
-        const TraineeSettingsScreen()
-      ];
-    } else {
-      return const [
-        TrainerLandingScreen(),
-        MealPlanScreen(),
-        CalendarScreen(),
-        TraineesScreen(),
-        SettingsScreen(),
-      ];
-    }
-  }
 
   // Define navigation items based on user role
   List<BottomNavigationBarItem> get _bottomNavBarItems {
@@ -96,10 +74,25 @@ class _TabsScreenState extends State<TabsScreen> {
     }
   }
 
-  void _selectPage(int index) {
-    setState(() {
-      _activePageIndex = index;
-    });
+  // Define pages based on user role
+  List<Widget> get _pages {
+    if (widget.userRole == '0') {
+      return [
+        const TraineeLandingScreen(),
+        const TraineeRecipeScreen(),
+        const CalendarTraineeScreen(),
+        const TrainerSearchScreen(),
+        const TraineeSettingsScreen()
+      ];
+    } else {
+      return const [
+        TrainerLandingScreen(),
+        MealPlanScreen(),
+        CalendarScreen(),
+        TraineesScreen(),
+        SettingsScreen(),
+      ];
+    }
   }
 
   @override
@@ -120,5 +113,11 @@ class _TabsScreenState extends State<TabsScreen> {
         items: _bottomNavBarItems,
       ),
     );
+  }
+
+  void _selectPage(int index) {
+    setState(() {
+      _activePageIndex = index;
+    });
   }
 }

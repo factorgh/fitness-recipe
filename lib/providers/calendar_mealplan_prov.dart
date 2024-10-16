@@ -1,6 +1,6 @@
+import 'package:fit_cibus/Features/mealplan/services/mealplan_service.dart';
+import 'package:fit_cibus/models/mealplan.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/Features/mealplan/services/mealplan_service.dart';
-import 'package:voltican_fitness/models/mealplan.dart';
 
 // Define a state notifier for Meal Plans
 class CalendarMealplanProv extends StateNotifier<AsyncValue<List<MealPlan>>> {

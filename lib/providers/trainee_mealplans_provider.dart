@@ -1,10 +1,10 @@
 // ignore_for_file: avoid_print
 
+import 'package:fit_cibus/Features/mealplan/services/mealplan_service.dart';
+import 'package:fit_cibus/models/mealplan.dart';
+import 'package:fit_cibus/providers/meal_plan_provider.dart';
+import 'package:fit_cibus/providers/meal_plan_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/Features/mealplan/services/mealplan_service.dart';
-import 'package:voltican_fitness/models/mealplan.dart';
-import 'package:voltican_fitness/providers/meal_plan_provider.dart';
-import 'package:voltican_fitness/providers/meal_plan_state.dart';
 
 final traineeMealPlansProvider =
     StateNotifierProvider<TraineeMealPlansNotifier, MealPlansState>((ref) {

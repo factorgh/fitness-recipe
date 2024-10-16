@@ -1,13 +1,13 @@
 // ignore_for_file: avoid_print
 
+import 'package:fit_cibus/models/mealplan.dart';
+import 'package:fit_cibus/providers/meal_plan_state.dart';
+import 'package:fit_cibus/providers/trainee_mealplans_provider.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/widgets/calendar_item_trainee.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:voltican_fitness/models/mealplan.dart';
-import 'package:voltican_fitness/providers/meal_plan_state.dart';
-import 'package:voltican_fitness/providers/trainee_mealplans_provider.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/widgets/calendar_item_trainee.dart';
 
 class CalendarTraineeScreen extends ConsumerStatefulWidget {
   const CalendarTraineeScreen({super.key});
@@ -43,23 +43,6 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
     const Color(0xFFBF360C), // Deep Deep Orange
     const Color(0xFF4A148C), // Deep Deep Purple
   ];
-
-  @override
-  void initState() {
-    super.initState();
-
-    focusedDay = DateTime.now();
-    selectedDay = DateTime.now();
-
-    Future.microtask(() {
-      final traineeId = ref.read(userProvider)?.id;
-      if (traineeId != null) {
-        ref
-            .read(traineeMealPlansProvider.notifier)
-            .fetchTraineeMealPlans(traineeId);
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -250,5 +233,22 @@ class _CalendarTraineeScreenState extends ConsumerState<CalendarTraineeScreen> {
             ),
           ),
         )));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    focusedDay = DateTime.now();
+    selectedDay = DateTime.now();
+
+    Future.microtask(() {
+      final traineeId = ref.read(userProvider)?.id;
+      if (traineeId != null) {
+        ref
+            .read(traineeMealPlansProvider.notifier)
+            .fetchTraineeMealPlans(traineeId);
+      }
+    });
   }
 }

@@ -1,9 +1,8 @@
+import 'package:fit_cibus/providers/meal_plan_provider.dart';
+import 'package:fit_cibus/providers/meal_plan_state.dart';
+import 'package:fit_cibus/widgets/calendar_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:voltican_fitness/providers/meal_plan_provider.dart';
-import 'package:voltican_fitness/providers/meal_plan_state.dart';
-import 'package:voltican_fitness/widgets/calendar_item.dart';
 
 class AllMealPlan extends ConsumerStatefulWidget {
   const AllMealPlan({super.key});

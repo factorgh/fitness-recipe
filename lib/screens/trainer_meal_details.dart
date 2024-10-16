@@ -1,25 +1,24 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print, unused_element, unused_result
 
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/models/user.dart';
+import 'package:fit_cibus/providers/saved_recipe_provider.dart';
+import 'package:fit_cibus/providers/trainer_provider.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/screens/edit_recipe_screen.dart';
+import 'package:fit_cibus/services/auth_service.dart';
+import 'package:fit_cibus/services/recipe_service.dart';
+import 'package:fit_cibus/utils/conversions/capitalize_first.dart';
+import 'package:fit_cibus/utils/native_alert.dart';
+import 'package:fit_cibus/utils/show_snackbar.dart';
+import 'package:fit_cibus/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/models/user.dart';
-import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
-import 'package:voltican_fitness/providers/trainer_provider.dart';
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/edit_recipe_screen.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
-import 'package:voltican_fitness/services/recipe_service.dart';
-import 'package:voltican_fitness/utils/conversions/capitalize_first.dart';
-import 'package:voltican_fitness/utils/native_alert.dart';
-import 'package:voltican_fitness/utils/show_snackbar.dart';
-import 'package:voltican_fitness/widgets/button.dart';
-
 class TrainerMealDetailScreen extends ConsumerStatefulWidget {
-  const TrainerMealDetailScreen({super.key, required this.meal});
   final Recipe meal;
+  const TrainerMealDetailScreen({super.key, required this.meal});
 
   @override
   ConsumerState<TrainerMealDetailScreen> createState() =>
@@ -33,176 +32,6 @@ class _TrainerMealDetailScreenState
   bool isFollowing = false;
   RecipeService recipeService = RecipeService();
   User? owner;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUser();
-  }
-
-  @override
-  void didChangeDependencies() {
-    isFollowing = checkIfFollowing() ?? false;
-    super.didChangeDependencies();
-  }
-
-  bool? checkIfFollowing() {
-    final me = ref.read(userProvider);
-    if (me == null) return null;
-
-    final followingTrainersAsync = ref.watch(followingTrainersProvider(me.id));
-    if (followingTrainersAsync.value == null) {
-      return null;
-    }
-
-    return followingTrainersAsync.value
-        ?.any((trainer) => trainer.id == widget.meal.createdBy);
-  }
-
-  void _fetchUser() async {
-    try {
-      await AuthService().getUser(
-        userId: widget.meal.createdBy,
-        onSuccess: (fetchedUser) {
-          setState(() {
-            owner = fetchedUser;
-          });
-        },
-      );
-      print('-----------------------print owner deatils---------------------');
-      print(owner);
-    } catch (e) {
-      // Handle unexpected errors here
-      showSnack(context, 'An unexpected error occurred');
-    }
-  }
-
-  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Confirm Delete',
-            style: TextStyle(color: Colors.black87),
-          ),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Are you sure you want to delete this item?'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                // Perform the delete action
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _showRatingDialog() async {
-    final TextEditingController commentController = TextEditingController();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Center(
-              child: Text(
-            'Leave your Review',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
-          )),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 10),
-              TextField(
-                controller: commentController,
-                decoration: const InputDecoration(
-                  hintText: 'Write your review here',
-                ),
-                maxLines: 3,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Skip')),
-            ),
-            const Spacer(),
-            TextButton(
-              onPressed: () {
-                String comment = commentController.text;
-                if (comment.isNotEmpty) {
-                  // Handle comment submission here
-                  showSnack(context, 'Review submitted successfully');
-                }
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Post')),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _toggleFollow() async {
-    // Update the follow status in the database
-    final me = ref.read(userProvider);
-    if (isFollowing) {
-      await ref
-          .read(followersProvider(
-                  widget.meal.createdBy.isNotEmpty ? widget.meal.createdBy : '')
-              .notifier)
-          .unfollowTrainer(me!.id, widget.meal.createdBy);
-      ref.refresh(followingTrainersProvider(me.id));
-    } else {
-      await ref
-          .read(followersProvider(
-                  widget.meal.createdBy.isNotEmpty ? widget.meal.createdBy : '')
-              .notifier)
-          .followTrainer(me!.id, widget.meal.createdBy, context);
-      ref.refresh(followingTrainersProvider(me.id));
-    }
-
-    setState(() {
-      isFollowing = !isFollowing;
-    });
-
-    // Show alert if the user is following
-    NativeAlerts().showSuccessAlert(
-      context,
-      isFollowing
-          ? 'You are now following the trainer'
-          : 'You have unfollowed the trainer.',
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -531,6 +360,176 @@ class _TrainerMealDetailScreenState
           ),
         ],
       ),
+    );
+  }
+
+  bool? checkIfFollowing() {
+    final me = ref.read(userProvider);
+    if (me == null) return null;
+
+    final followingTrainersAsync = ref.watch(followingTrainersProvider(me.id));
+    if (followingTrainersAsync.value == null) {
+      return null;
+    }
+
+    return followingTrainersAsync.value
+        ?.any((trainer) => trainer.id == widget.meal.createdBy);
+  }
+
+  @override
+  void didChangeDependencies() {
+    isFollowing = checkIfFollowing() ?? false;
+    super.didChangeDependencies();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUser();
+  }
+
+  void _fetchUser() async {
+    try {
+      await AuthService().getUser(
+        userId: widget.meal.createdBy,
+        onSuccess: (fetchedUser) {
+          setState(() {
+            owner = fetchedUser;
+          });
+        },
+      );
+      print('-----------------------print owner deatils---------------------');
+      print(owner);
+    } catch (e) {
+      // Handle unexpected errors here
+      showSnack(context, 'An unexpected error occurred');
+    }
+  }
+
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Delete',
+            style: TextStyle(color: Colors.black87),
+          ),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want to delete this item?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                // Perform the delete action
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showRatingDialog() async {
+    final TextEditingController commentController = TextEditingController();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Center(
+              child: Text(
+            'Leave your Review',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+          )),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 10),
+              TextField(
+                controller: commentController,
+                decoration: const InputDecoration(
+                  hintText: 'Write your review here',
+                ),
+                maxLines: 3,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Skip')),
+            ),
+            const Spacer(),
+            TextButton(
+              onPressed: () {
+                String comment = commentController.text;
+                if (comment.isNotEmpty) {
+                  // Handle comment submission here
+                  showSnack(context, 'Review submitted successfully');
+                }
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Post')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _toggleFollow() async {
+    // Update the follow status in the database
+    final me = ref.read(userProvider);
+    if (isFollowing) {
+      await ref
+          .read(followersProvider(
+                  widget.meal.createdBy.isNotEmpty ? widget.meal.createdBy : '')
+              .notifier)
+          .unfollowTrainer(me!.id, widget.meal.createdBy);
+      ref.refresh(followingTrainersProvider(me.id));
+    } else {
+      await ref
+          .read(followersProvider(
+                  widget.meal.createdBy.isNotEmpty ? widget.meal.createdBy : '')
+              .notifier)
+          .followTrainer(me!.id, widget.meal.createdBy, context);
+      ref.refresh(followingTrainersProvider(me.id));
+    }
+
+    setState(() {
+      isFollowing = !isFollowing;
+    });
+
+    // Show alert if the user is following
+    NativeAlerts().showSuccessAlert(
+      context,
+      isFollowing
+          ? 'You are now following the trainer'
+          : 'You have unfollowed the trainer.',
     );
   }
 }

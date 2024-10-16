@@ -1,12 +1,12 @@
 // ignore_for_file: avoid_print
 
+import 'package:fit_cibus/models/meal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
-import 'package:voltican_fitness/models/meal.dart';
 
 class TraineePlanDetailScreen extends StatefulWidget {
-  const TraineePlanDetailScreen({super.key, required this.meal});
   final Meal meal;
+  const TraineePlanDetailScreen({super.key, required this.meal});
 
   @override
   State<TraineePlanDetailScreen> createState() => _TraineePlanDetailState();
@@ -14,84 +14,6 @@ class TraineePlanDetailScreen extends StatefulWidget {
 
 class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
   double value = 0.0;
-
-  Future<void> _showReviewConfirmationDialog(BuildContext context) async {
-    final TextEditingController reviewController = TextEditingController();
-
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // User must tap button to dismiss
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          title: const Text(
-            'Submit Your Review',
-            style: TextStyle(
-              color: Colors.black87,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                const Text(
-                  'Please enter your review below:',
-                  style: TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: reviewController,
-                  maxLines: 4,
-                  decoration: InputDecoration(
-                    hintText: 'Enter your review here',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actionsPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.redAccent,
-                textStyle: const TextStyle(fontSize: 16),
-              ),
-              child: const Text('Skip'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                textStyle: const TextStyle(fontSize: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              ),
-              child: const Text('Submit'),
-              onPressed: () {
-                // Handle the submit action
-                String review = reviewController.text;
-                if (review.isNotEmpty) {
-                  print("Review submitted: $review");
-                }
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -293,6 +215,84 @@ class _TraineePlanDetailState extends State<TraineePlanDetailScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _showReviewConfirmationDialog(BuildContext context) async {
+    final TextEditingController reviewController = TextEditingController();
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to dismiss
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Text(
+            'Submit Your Review',
+            style: TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                const Text(
+                  'Please enter your review below:',
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: reviewController,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    hintText: 'Enter your review here',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actionsPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.redAccent,
+                textStyle: const TextStyle(fontSize: 16),
+              ),
+              child: const Text('Skip'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                textStyle: const TextStyle(fontSize: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
+              child: const Text('Submit'),
+              onPressed: () {
+                // Handle the submit action
+                String review = reviewController.text;
+                if (review.isNotEmpty) {
+                  print("Review submitted: $review");
+                }
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

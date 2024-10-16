@@ -1,13 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:fit_cibus/providers/internet_connect.dart';
+import 'package:fit_cibus/screens/login_screen.dart';
+import 'package:fit_cibus/services/auth_service.dart';
+import 'package:fit_cibus/utils/show_snackbar.dart';
+import 'package:fit_cibus/widgets/or_divider.dart';
+import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/providers/internet_connect.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
-import 'package:voltican_fitness/utils/show_snackbar.dart';
-import 'package:voltican_fitness/widgets/or_divider.dart';
-import 'package:voltican_fitness/screens/login_screen.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -26,62 +26,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
   bool _isPasswordVisible = false;
   bool _isLoading = false;
-
-  void _goToLogin(BuildContext ctx) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (ctx) => const LoginScreen()),
-    );
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _usernameController.dispose();
-    _fullNameController.dispose();
-    super.dispose();
-  }
-
-  void signup() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-// Check for internet connectivity
-      final connectivityState = ref.read(connectivityProvider);
-      if (!connectivityState.isConnected) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No internet connection'),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
-        setState(() {
-          _isLoading = false;
-        });
-
-        return; // Exit the method early
-      }
-      try {
-        await authService.signup(
-          ref: ref,
-          context: context,
-          fullName: _fullNameController.text.trim(),
-          username: _usernameController.text.trim(),
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
-      } catch (e) {
-        // Handle signup error here (e.g., show a snackbar)
-        showSnack(context, 'Signup failed: $e');
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -221,6 +165,56 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     );
   }
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _usernameController.dispose();
+    _fullNameController.dispose();
+    super.dispose();
+  }
+
+  void signup() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+// Check for internet connectivity
+      final connectivityState = ref.read(connectivityProvider);
+      if (!connectivityState.isConnected) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No internet connection'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+
+        return; // Exit the method early
+      }
+      try {
+        await authService.signup(
+          ref: ref,
+          context: context,
+          fullName: _fullNameController.text.trim(),
+          username: _usernameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+      } catch (e) {
+        // Handle signup error here (e.g., show a snackbar)
+        showSnack(context, 'Signup failed: $e');
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   Widget _buildTextField({
     required String label,
     required String hint,
@@ -250,6 +244,12 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           validator: validator,
         ),
       ],
+    );
+  }
+
+  void _goToLogin(BuildContext ctx) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (ctx) => const LoginScreen()),
     );
   }
 }

@@ -1,7 +1,6 @@
+import 'package:fit_cibus/screens/all_meal_plan_screen.dart';
+import 'package:fit_cibus/widgets/button.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/all_meal_plan_screen.dart';
-
-import 'package:voltican_fitness/widgets/button.dart';
 
 class AssignRecipeScreen extends StatefulWidget {
   const AssignRecipeScreen({super.key});

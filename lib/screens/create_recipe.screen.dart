@@ -1,17 +1,16 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'dart:io';
+
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/models/user.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/providers/user_recipes.dart';
+import 'package:fit_cibus/services/recipe_service.dart';
+import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/models/user.dart';
-
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/providers/user_recipes.dart';
-
-import 'package:voltican_fitness/services/recipe_service.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class CreateRecipeScreen extends ConsumerStatefulWidget {
   const CreateRecipeScreen({super.key});
@@ -47,84 +46,6 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
       TextEditingController();
   final TextEditingController _newIngredientController =
       TextEditingController();
-
-  void _takePicture() async {
-    final imagePicker = ImagePicker();
-    final pickedImage =
-        await imagePicker.pickImage(source: ImageSource.gallery);
-
-    if (pickedImage == null) return;
-
-    setState(() {
-      _selectedImage = File(pickedImage.path);
-    });
-  }
-
-  @override
-  void dispose() {
-    _mealNameController.dispose();
-    _descriptionController.dispose();
-    _instructionsController.dispose();
-    _nutritionalFactsController.dispose();
-    _newIngredientController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _createRecipe(User user) async {
-    if (!_formKey.currentState!.validate()) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('Please fill in all required fields.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Ok'),
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      await recipeService.createRecipe(
-          context,
-          Recipe(
-              title: _mealNameController.text,
-              ingredients: selectedIngredients,
-              instructions: _instructionsController.text,
-              description: _descriptionController.text,
-              facts: _nutritionalFactsController.text,
-              status: status,
-              period: selectedMealPeriod!,
-              imageUrl: _selectedImage!.path,
-              createdBy: user.id,
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now()));
-      setState(() {});
-      await Future.delayed(Duration.zero, () {
-        ref.read(userRecipesProvider.notifier).loadUserRecipes();
-      });
-
-      Navigator.pop(context);
-    } catch (e) {
-      // Handle any errors (e.g., show an error message)
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -372,6 +293,34 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
     );
   }
 
+  @override
+  void dispose() {
+    _mealNameController.dispose();
+    _descriptionController.dispose();
+    _instructionsController.dispose();
+    _nutritionalFactsController.dispose();
+    _newIngredientController.dispose();
+    super.dispose();
+  }
+
+  Widget _buildMultilineTextField({
+    required TextEditingController controller,
+    required String hintText,
+    required FormFieldValidator<String> validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(),
+        hintText: hintText,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+      ),
+      validator: validator,
+      maxLines: 5,
+      keyboardType: TextInputType.multiline,
+    );
+  }
+
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
@@ -398,21 +347,71 @@ class _CreateRecipeScreenState extends ConsumerState<CreateRecipeScreen> {
     );
   }
 
-  Widget _buildMultilineTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required FormFieldValidator<String> validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        border: const OutlineInputBorder(),
-        hintText: hintText,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-      ),
-      validator: validator,
-      maxLines: 5,
-      keyboardType: TextInputType.multiline,
-    );
+  Future<void> _createRecipe(User user) async {
+    if (!_formKey.currentState!.validate()) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Please fill in all required fields.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Ok'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await recipeService.createRecipe(
+          context,
+          Recipe(
+              title: _mealNameController.text,
+              ingredients: selectedIngredients,
+              instructions: _instructionsController.text,
+              description: _descriptionController.text,
+              facts: _nutritionalFactsController.text,
+              status: status,
+              period: selectedMealPeriod!,
+              imageUrl: _selectedImage!.path,
+              createdBy: user.id,
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now()));
+      setState(() {});
+      await Future.delayed(Duration.zero, () {
+        ref.read(userRecipesProvider.notifier).loadUserRecipes();
+      });
+
+      Navigator.pop(context);
+    } catch (e) {
+      // Handle any errors (e.g., show an error message)
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _takePicture() async {
+    final imagePicker = ImagePicker();
+    final pickedImage =
+        await imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage == null) return;
+
+    setState(() {
+      _selectedImage = File(pickedImage.path);
+    });
   }
 }

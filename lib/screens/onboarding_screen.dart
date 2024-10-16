@@ -1,8 +1,9 @@
 import 'dart:async';
+
+import 'package:fit_cibus/screens/login_screen.dart';
+import 'package:fit_cibus/screens/signup_screen.dart';
+import 'package:fit_cibus/widgets/button.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/login_screen.dart';
-import 'package:voltican_fitness/screens/signup_screen.dart';
-import 'package:voltican_fitness/widgets/button.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -23,51 +24,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   late PageController _pageController;
   int _currentPage = 0;
   Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: 0);
-
-    // Auto slide every 3 seconds with a smooth transition
-    _timer = Timer.periodic(const Duration(seconds: 5), (Timer timer) {
-      if (_currentPage < images.length - 1) {
-        _currentPage++;
-      } else {
-        _currentPage = 0;
-      }
-
-      _pageController.animateToPage(
-        _currentPage,
-        duration:
-            const Duration(milliseconds: 800), // Smooth transition duration
-        curve: Curves.easeInOut, // Smooth transition curve
-      );
-    });
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  void _login(BuildContext ctx) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (ctx) => const LoginScreen(),
-      ),
-    );
-  }
-
-  void _signUp(BuildContext ctx) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (ctx) => const SignupScreen(),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -171,6 +127,51 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: 0);
+
+    // Auto slide every 3 seconds with a smooth transition
+    _timer = Timer.periodic(const Duration(seconds: 5), (Timer timer) {
+      if (_currentPage < images.length - 1) {
+        _currentPage++;
+      } else {
+        _currentPage = 0;
+      }
+
+      _pageController.animateToPage(
+        _currentPage,
+        duration:
+            const Duration(milliseconds: 800), // Smooth transition duration
+        curve: Curves.easeInOut, // Smooth transition curve
+      );
+    });
+  }
+
+  void _login(BuildContext ctx) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => const LoginScreen(),
+      ),
+    );
+  }
+
+  void _signUp(BuildContext ctx) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => const SignupScreen(),
       ),
     );
   }

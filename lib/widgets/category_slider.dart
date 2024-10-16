@@ -1,5 +1,5 @@
+import 'package:fit_cibus/screens/search_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/screens/search_screen.dart';
 
 class CategorySlider extends StatelessWidget {
   final List<String> categories;

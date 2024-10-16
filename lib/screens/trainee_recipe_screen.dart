@@ -1,19 +1,15 @@
 // ignore_for_file: avoid_print
 
+import 'package:fit_cibus/models/recipe.dart';
+import 'package:fit_cibus/providers/all_recipes_provider.dart';
+import 'package:fit_cibus/providers/saved_recipe_provider.dart';
+import 'package:fit_cibus/providers/user_provider.dart';
+import 'package:fit_cibus/screens/saved_trainer_meal_details.dart';
+import 'package:fit_cibus/screens/trainee_recipe_detail_screen.dart';
+import 'package:fit_cibus/widgets/recipe_item.dart';
+import 'package:fit_cibus/widgets/recipe_item_trainer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/models/recipe.dart';
-import 'package:voltican_fitness/providers/all_recipes_provider.dart';
-
-import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
-// import 'package:voltican_fitness/providers/saved_recipe_provider.dart';
-
-import 'package:voltican_fitness/providers/user_provider.dart';
-import 'package:voltican_fitness/screens/saved_trainer_meal_details.dart';
-import 'package:voltican_fitness/screens/trainee_recipe_detail_screen.dart';
-
-import 'package:voltican_fitness/widgets/recipe_item.dart';
-import 'package:voltican_fitness/widgets/recipe_item_trainer.dart';
 
 class TraineeRecipeScreen extends ConsumerStatefulWidget {
   const TraineeRecipeScreen({super.key});
@@ -26,88 +22,6 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String _searchQuery = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _fetchFollowedUsersRecipes();
-    _fetchSavedRecipes();
-  }
-
-  void _fetchFollowedUsersRecipes() {
-    ref.read(allRecipesProvider.notifier).loadAllRecipes(context);
-  }
-
-  void _fetchSavedRecipes() {
-    final user = ref.read(userProvider);
-    if (user == null) {
-      print('Error: User is null');
-      return;
-    }
-    final userId = user.id;
-    ref.read(savedRecipesProvider.notifier).loadSavedRecipes(userId);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  void selectMeal(BuildContext context, Recipe meal) {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => TraineeRecipeDetailScreen(meal: meal),
-    ));
-  }
-
-  void selectRecipe(BuildContext context, Recipe meal) {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => SavedTrainerMealDetailScreen(meal: meal),
-    ));
-  }
-
-  Widget buildMealList(List<Recipe> recipes) {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: recipes.length,
-      itemBuilder: (context, index) => RecipeItem(
-        meal: recipes[index],
-        selectMeal: (meal) {
-          selectMeal(context, meal);
-        },
-      ),
-    );
-  }
-
-  Widget buildRecipeList(List<Recipe> recipes) {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: recipes.length,
-      itemBuilder: (context, index) => RecipeItemTrainer(
-        meal: recipes[index],
-        selectMeal: (meal) {
-          selectRecipe(context, meal);
-        },
-      ),
-    );
-  }
-
-  void _updateSearchQuery(String newQuery) {
-    setState(() {
-      _searchQuery = newQuery;
-    });
-  }
-
-  List<Recipe> _filterRecipes(List<Recipe> recipes) {
-    if (_searchQuery.isEmpty) {
-      return recipes;
-    }
-    return recipes
-        .where((recipe) =>
-            recipe.title.toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -207,6 +121,56 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
     );
   }
 
+  Widget buildFilterIcon() {
+    return PopupMenuButton<String>(
+      icon: Icon(Icons.filter_list, color: Colors.grey[500]),
+      onSelected: (String value) {
+        setState(() {});
+      },
+      itemBuilder: (BuildContext context) {
+        return <String>[
+          'A-Z',
+          'Z-A',
+          'Most Recent',
+          'Least Recent',
+          'Most Rated',
+          'Least Rated',
+        ].map((String choice) {
+          return PopupMenuItem<String>(
+            value: choice,
+            child: Text(choice),
+          );
+        }).toList();
+      },
+    );
+  }
+
+  Widget buildMealList(List<Recipe> recipes) {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: recipes.length,
+      itemBuilder: (context, index) => RecipeItem(
+        meal: recipes[index],
+        selectMeal: (meal) {
+          selectMeal(context, meal);
+        },
+      ),
+    );
+  }
+
+  Widget buildRecipeList(List<Recipe> recipes) {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: recipes.length,
+      itemBuilder: (context, index) => RecipeItemTrainer(
+        meal: recipes[index],
+        selectMeal: (meal) {
+          selectRecipe(context, meal);
+        },
+      ),
+    );
+  }
+
   Widget buildSearchBar() {
     return Container(
       decoration: BoxDecoration(
@@ -241,27 +205,59 @@ class _TraineeRecipeScreenState extends ConsumerState<TraineeRecipeScreen>
     );
   }
 
-  Widget buildFilterIcon() {
-    return PopupMenuButton<String>(
-      icon: Icon(Icons.filter_list, color: Colors.grey[500]),
-      onSelected: (String value) {
-        setState(() {});
-      },
-      itemBuilder: (BuildContext context) {
-        return <String>[
-          'A-Z',
-          'Z-A',
-          'Most Recent',
-          'Least Recent',
-          'Most Rated',
-          'Least Rated',
-        ].map((String choice) {
-          return PopupMenuItem<String>(
-            value: choice,
-            child: Text(choice),
-          );
-        }).toList();
-      },
-    );
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _fetchFollowedUsersRecipes();
+    _fetchSavedRecipes();
+  }
+
+  void selectMeal(BuildContext context, Recipe meal) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => TraineeRecipeDetailScreen(meal: meal),
+    ));
+  }
+
+  void selectRecipe(BuildContext context, Recipe meal) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => SavedTrainerMealDetailScreen(meal: meal),
+    ));
+  }
+
+  void _fetchFollowedUsersRecipes() {
+    ref.read(allRecipesProvider.notifier).loadAllRecipes(context);
+  }
+
+  void _fetchSavedRecipes() {
+    final user = ref.read(userProvider);
+    if (user == null) {
+      print('Error: User is null');
+      return;
+    }
+    final userId = user.id;
+    ref.read(savedRecipesProvider.notifier).loadSavedRecipes(userId);
+  }
+
+  List<Recipe> _filterRecipes(List<Recipe> recipes) {
+    if (_searchQuery.isEmpty) {
+      return recipes;
+    }
+    return recipes
+        .where((recipe) =>
+            recipe.title.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .toList();
+  }
+
+  void _updateSearchQuery(String newQuery) {
+    setState(() {
+      _searchQuery = newQuery;
+    });
   }
 }

@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'package:fit_cibus/models/user.dart';
 import 'package:flutter/foundation.dart';
-import 'package:voltican_fitness/models/user.dart';
 
 class Rating {
   final User user;

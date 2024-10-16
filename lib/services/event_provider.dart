@@ -1,5 +1,5 @@
+import 'package:fit_cibus/models/event.dart';
 import 'package:flutter/material.dart';
-import 'package:voltican_fitness/models/event.dart';
 
 class EventProvider with ChangeNotifier {
   final Map<DateTime, List<Event>> _events = {};

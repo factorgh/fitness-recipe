@@ -1,12 +1,22 @@
 // ignore_for_file: avoid_print
 
 import 'package:dio/dio.dart';
-import 'package:voltican_fitness/classes/dio_client.dart';
-import 'package:voltican_fitness/models/notification.dart';
+import 'package:fit_cibus/classes/dio_client.dart';
+import 'package:fit_cibus/models/notification.dart';
+
 // Import your AppNotification model
 
 class NotificationServiceSub {
   final DioClient client = DioClient();
+
+  Future<void> createNotification(AppNotification notification) async {
+    try {
+      await client.dio.post('/notifications', data: notification.toMap());
+    } on DioException catch (e) {
+      // Handle error
+      throw Exception('Failed to create notification: ${e.message}');
+    }
+  }
 
   Future<List<AppNotification>> getNotifications(String userId) async {
     try {
@@ -38,15 +48,6 @@ class NotificationServiceSub {
       // Handle other errors
       print('Error: $e');
       throw Exception('Failed to fetch notifications: $e');
-    }
-  }
-
-  Future<void> createNotification(AppNotification notification) async {
-    try {
-      await client.dio.post('/notifications', data: notification.toMap());
-    } on DioException catch (e) {
-      // Handle error
-      throw Exception('Failed to create notification: ${e.message}');
     }
   }
 

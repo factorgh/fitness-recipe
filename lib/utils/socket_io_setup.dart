@@ -1,10 +1,14 @@
 // ignore_for_file: avoid_print, library_prefixes
 
+import 'package:fit_cibus/models/notification.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:voltican_fitness/models/notification.dart';
 
 class SocketService {
   IO.Socket? _socket;
+
+  void dispose() {
+    _socket?.disconnect();
+  }
 
   void initSocket() {
     _socket = IO.io(
@@ -29,9 +33,5 @@ class SocketService {
       final notification = AppNotification.fromJson(data);
       onNotification(notification);
     });
-  }
-
-  void dispose() {
-    _socket?.disconnect();
   }
 }

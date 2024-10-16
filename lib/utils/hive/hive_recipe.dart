@@ -1,5 +1,5 @@
+import 'package:fit_cibus/utils/hive/rating.dart';
 import 'package:hive/hive.dart';
-import 'package:voltican_fitness/models/recipe.dart';
 
 part 'hive_recipe.g.dart';
 

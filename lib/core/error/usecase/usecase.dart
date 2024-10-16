@@ -1,5 +1,5 @@
+import 'package:fit_cibus/core/error/failure.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:voltican_fitness/core/error/failure.dart';
 
 abstract class UseCase<SuccessType, Params> {
   Future<Either<Failure, SuccessType>> call(Params params);

@@ -1,10 +1,10 @@
 // ignore_for_file: avoid_print
 
+import 'package:fit_cibus/Features/mealplan/services/mealplan_service.dart';
+import 'package:fit_cibus/models/mealplan.dart';
+import 'package:fit_cibus/providers/meal_plan_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/Features/mealplan/services/mealplan_service.dart';
-import 'package:voltican_fitness/models/mealplan.dart';
-import 'package:voltican_fitness/providers/meal_plan_state.dart';
 
 // Provider for MealPlanService
 final mealPlanServiceProvider = Provider<MealPlanService>((ref) {
@@ -109,7 +109,7 @@ class MealPlansNotifier extends StateNotifier<MealPlansState> {
             .mealPlans
             .map((plan) => plan.id == id ? updatedMealPlan : plan)
             .toList();
-        filterByDuration('Does Not Repeat'); // Reset filter after updating
+        filterByDuration('Does Not Repeat');
       }
     } catch (e) {
       print('Failed to update meal plan: $e');
@@ -124,7 +124,7 @@ class MealPlansNotifier extends StateNotifier<MealPlansState> {
             .mealPlans
             .where((plan) => plan.id != id)
             .toList();
-        filterByDuration('Does Not Repeat'); // Reset filter after deleting
+        filterByDuration('Does Not Repeat');
       }
     } catch (e) {
       print('Failed to delete meal plan: $e');

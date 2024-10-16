@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 // import 'package:http/http.dart' as http;
-import 'package:voltican_fitness/utils/show_snackbar.dart';
 import 'package:dio/dio.dart' as dio;
+import 'package:fit_cibus/utils/show_snackbar.dart';
+import 'package:flutter/material.dart';
 
 void httpErrorHandle({
   required dio.Response response,

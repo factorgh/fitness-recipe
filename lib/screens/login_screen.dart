@@ -3,14 +3,14 @@
 import 'dart:ui';
 
 import 'package:dio/dio.dart';
+import 'package:fit_cibus/providers/internet_connect.dart';
+import 'package:fit_cibus/screens/code_screen.dart';
+import 'package:fit_cibus/screens/signup_screen.dart';
+import 'package:fit_cibus/services/auth_service.dart';
+import 'package:fit_cibus/utils/native_alert.dart';
+import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voltican_fitness/providers/internet_connect.dart';
-import 'package:voltican_fitness/screens/code_screen.dart';
-import 'package:voltican_fitness/screens/signup_screen.dart';
-import 'package:voltican_fitness/services/auth_service.dart';
-import 'package:voltican_fitness/utils/native_alert.dart';
-import 'package:voltican_fitness/widgets/reusable_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -28,152 +28,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   bool _passwordVisible = false;
   bool _isLoading = false; // New: To manage loading state
-
-  @override
-  void dispose() {
-    _passwordController.dispose();
-    _usernameController.dispose();
-    super.dispose();
-  }
-// Needed for the ImageFilter.blur method
-
-  void showAccessDeniedDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // Prevent dismissing by tapping outside
-      builder: (BuildContext context) {
-        return Stack(
-          children: [
-            // Blurred background
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-              child: Container(
-                color:
-                    Colors.black.withOpacity(0.3), // Semi-transparent overlay
-              ),
-            ),
-            // Dialog itself
-            AlertDialog(
-              title: const Text(
-                'Access Denied',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              content: const Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'You can only proceed by entering your Trainer’s Code.',
-                    style: TextStyle(
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text(
-                    'Logout',
-                    style: TextStyle(
-                      color: Colors.redAccent,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    // Navigate to the trainer discovery/follow screen
-                  },
-                ),
-                TextButton(
-                  child: const Text(
-                    'Enter Code',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    // Navigate to the screen where the user can enter a trainer code
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CodeScreen(
-                          username: _usernameController.text.trim(),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _goToSignup(BuildContext ctx) {
-    Navigator.of(ctx).push(
-      MaterialPageRoute(builder: (ctx) => const SignupScreen()),
-    );
-  }
-
-  void _login(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      // Check for internet connectivity
-      final connectivityState = ref.read(connectivityProvider);
-      if (!connectivityState.isConnected) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No internet connection'),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
-        setState(() {
-          _isLoading = false;
-        });
-
-        return; // Exit the method early
-      }
-
-      try {
-        await authService.signIn(
-          context: context,
-          ref: ref, // Use ref from the state
-          username: _usernameController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
-      } on DioException catch (e) {
-        if (e.response?.statusCode == 403) {
-          showAccessDeniedDialog(context);
-        } else {
-          // Show the default error alert for other cases
-          alerts.showErrorAlert(
-            context,
-            'Login failed: Please check your credentials and try again',
-          );
-        }
-      } catch (e) {
-        // Handle other types of exceptions if needed
-        alerts.showErrorAlert(
-          context,
-          'An unexpected error occurred. Please try again later.',
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -333,5 +187,152 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    _usernameController.dispose();
+    super.dispose();
+  }
+
+  // Needed for the ImageFilter.blur method
+
+  void showAccessDeniedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing by tapping outside
+      builder: (BuildContext context) {
+        return Stack(
+          children: [
+            // Blurred background
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: Container(
+                color:
+                    Colors.black.withOpacity(0.3), // Semi-transparent overlay
+              ),
+            ),
+            // Dialog itself
+            AlertDialog(
+              title: const Text(
+                'Access Denied',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'You can only proceed by entering your Trainer’s Code.',
+                    style: TextStyle(
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text(
+                    'Logout',
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    // Navigate to the trainer discovery/follow screen
+                  },
+                ),
+                TextButton(
+                  child: const Text(
+                    'Enter Code',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    // Navigate to the screen where the user can enter a trainer code
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CodeScreen(
+                          username: _usernameController.text.trim(),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _goToSignup(BuildContext ctx) {
+    Navigator.of(ctx).push(
+      MaterialPageRoute(builder: (ctx) => const SignupScreen()),
+    );
+  }
+
+  void _login(BuildContext context) async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Check for internet connectivity
+      final connectivityState = ref.read(connectivityProvider);
+      if (!connectivityState.isConnected) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No internet connection'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+
+        return; // Exit the method early
+      }
+
+      try {
+        await authService.signIn(
+          context: context,
+          ref: ref, // Use ref from the state
+          username: _usernameController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+      } on DioException catch (e) {
+        if (e.response?.statusCode == 403) {
+          showAccessDeniedDialog(context);
+        } else {
+          // Show the default error alert for other cases
+          alerts.showErrorAlert(
+            context,
+            'Login failed: Please check your credentials and try again',
+          );
+        }
+      } catch (e) {
+        // Handle other types of exceptions if needed
+        alerts.showErrorAlert(
+          context,
+          'An unexpected error occurred. Please try again later.',
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 }
