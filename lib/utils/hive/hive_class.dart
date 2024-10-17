@@ -143,6 +143,7 @@ class HiveService {
   }
 
   // Fetch meals for speicfic dates
+// Fetch meals for speicfic dates
   Future<List<HiveMeal>> fetchMealsForDate(DateTime date) async {
     print('-------------------------date for meals------------------------');
     print(date);
