@@ -5,6 +5,7 @@ import 'package:fit_cibus/providers/saved_recipe_provider.dart';
 import 'package:fit_cibus/providers/user_provider.dart';
 import 'package:fit_cibus/services/recipe_service.dart';
 import 'package:fit_cibus/utils/conversions/capitalize_first.dart';
+import 'package:fit_cibus/utils/show_image_util.dart';
 import 'package:fit_cibus/utils/show_snackbar.dart';
 import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
@@ -87,6 +88,31 @@ class _TraineeRecipeDetailScreenState
                     widget.meal.imageUrl,
                     fit: BoxFit.cover,
                   ),
+                  Positioned(
+                    right: 10,
+                    top: 30,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            elevation: 0,
+                            shape: const CircleBorder(),
+                          ),
+                          onPressed: () {
+                            ShowImageUtil.showImagePreview(
+                                context, widget.meal.imageUrl);
+                          },
+                          child: const Icon(
+                            Icons.visibility_outlined,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -105,8 +131,8 @@ class _TraineeRecipeDetailScreenState
                       CapitalizeFirstLetter(
                         text: widget.meal.title,
                         style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       const Spacer(),

@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:ui';
+
 import 'package:fit_cibus/models/recipe.dart';
 import 'package:fit_cibus/providers/user_recipes.dart';
 import 'package:fit_cibus/screens/edit_recipe_screen.dart';
@@ -8,6 +10,53 @@ import 'package:fit_cibus/utils/conversions/capitalize_first.dart';
 import 'package:fit_cibus/widgets/reusable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// Dialog for image preview
+
+void _showImagePreview(BuildContext context, String imageUrl) {
+  showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (BuildContext context) {
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+            child: Container(
+              color: Colors.black.withOpacity(0.8),
+            ),
+          ),
+          // Center the image
+          Center(
+            child: Container(
+              constraints: const BoxConstraints(maxHeight: 500, maxWidth: 500),
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+
+          Positioned(
+            top: 40,
+            right: 20,
+            child: IconButton(
+              icon: const Icon(
+                Icons.close,
+                color: Colors.white,
+                size: 30,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
 
 class MealDetailScreen extends ConsumerStatefulWidget {
   final Recipe meal;
@@ -81,19 +130,24 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                   ),
                   Positioned(
                     right: 10,
-                    top: 40,
+                    top: 30,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.share,
-                            color: Colors.brown,
-                            size: 30,
+                        TextButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            elevation: 0,
+                            shape: const CircleBorder(),
                           ),
                           onPressed: () {
-                            // Add share functionality here
+                            _showImagePreview(context, widget.meal.imageUrl);
                           },
+                          child: const Icon(
+                            Icons.visibility_outlined,
+                            color: Colors.white,
+                            size: 30,
+                          ),
                         ),
                       ],
                     ),

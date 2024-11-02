@@ -5,6 +5,8 @@ import 'package:fit_cibus/models/user.dart';
 import 'package:fit_cibus/providers/saved_recipe_provider.dart';
 import 'package:fit_cibus/providers/user_provider.dart';
 import 'package:fit_cibus/services/auth_service.dart';
+import 'package:fit_cibus/utils/conversions/capitalize_first.dart';
+import 'package:fit_cibus/utils/show_image_util.dart';
 import 'package:fit_cibus/utils/show_snackbar.dart';
 import 'package:fit_cibus/widgets/button.dart';
 import 'package:flutter/material.dart';
@@ -87,6 +89,31 @@ class _TrainerMealDetailScreenState
                     widget.meal.imageUrl,
                     fit: BoxFit.cover,
                   ),
+                  Positioned(
+                    right: 10,
+                    top: 30,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            elevation: 0,
+                            shape: const CircleBorder(),
+                          ),
+                          onPressed: () {
+                            ShowImageUtil.showImagePreview(
+                                context, widget.meal.imageUrl);
+                          },
+                          child: const Icon(
+                            Icons.visibility_outlined,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -100,13 +127,13 @@ class _TrainerMealDetailScreenState
                 children: [
                   const SizedBox(height: 20),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        widget.meal.title,
+                      CapitalizeFirstLetter(
+                        text: widget.meal.title,
                         style: const TextStyle(
-                          fontSize: 23,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       const Spacer(),
@@ -121,12 +148,12 @@ class _TrainerMealDetailScreenState
                           child: Column(
                             children: [
                               RatingBar.builder(
-                                initialRating: 3,
+                                initialRating: value,
                                 minRating: 1,
                                 direction: Axis.horizontal,
                                 allowHalfRating: true,
                                 itemCount: 5,
-                                itemSize: 20,
+                                itemSize: 15,
                                 itemPadding:
                                     const EdgeInsets.symmetric(horizontal: 4.0),
                                 itemBuilder: (context, _) => const Icon(
@@ -139,7 +166,7 @@ class _TrainerMealDetailScreenState
                                 },
                               ),
                               const SizedBox(width: 10),
-                              const Text("(32 Reviews)",
+                              const Text("(No Reviews)",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 12)),
